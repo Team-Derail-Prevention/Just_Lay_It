@@ -12,8 +12,8 @@ public class MapManager : MonoBehaviour
     [SerializeField] private List<GameObject> _normalMapPrefabs = new List<GameObject>();
 
     [Header("Map Settings")]
-    [SerializeField] private Transform mapRoot;
-    [SerializeField] private float mapSpacing = 20f;
+    [SerializeField] private Transform _mapRoot;
+    [SerializeField] private float _mapSpacing = 20f;
 
     private readonly Vector3Int[] _mapOffsets = new Vector3Int[]
     {
@@ -32,6 +32,8 @@ public class MapManager : MonoBehaviour
             return;
         }
         Instance = this;
+
+        InitMapRoot();
     }
 
     private void Start()
@@ -47,6 +49,18 @@ public class MapManager : MonoBehaviour
             GenerateMap();
         }
     }
+
+    private void InitMapRoot()
+    {
+        if (_mapRoot == null)
+        {
+            GameObject rootObj = new GameObject("@MapRoot");
+            _mapRoot = rootObj.transform;
+            _mapRoot.SetParent(transform);
+            _mapRoot.localPosition = Vector3.zero;
+        }
+    }
+
 
     public void GenerateMap()
     {
@@ -151,8 +165,8 @@ public class MapManager : MonoBehaviour
     {
         Assert.IsNotNull(prefab, $"[MapManager] Spawn 실패: '{mapNameTag}' 프리팹이 null입니다. (Grid: {gridPos})");
 
-        Vector3 worldPos = new Vector3(gridPos.x * mapSpacing, 0, gridPos.y * mapSpacing);
-        GameObject mapObj = Instantiate(prefab, worldPos, Quaternion.identity, mapRoot);
+        Vector3 worldPos = new Vector3(gridPos.x * _mapSpacing, 0, gridPos.y * _mapSpacing);
+        GameObject mapObj = Instantiate(prefab, worldPos, Quaternion.identity, _mapRoot);
 
         //mapObj.name = $"{mapNameTag}_{gridPos.x}_{gridPos.y}";
         _spawnedMaps[gridPos] = mapObj;
