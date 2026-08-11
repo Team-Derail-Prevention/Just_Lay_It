@@ -23,8 +23,9 @@ public class DataManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
+                                                                                       
         Instance = this;
+
     }
 
     public T GetData<T>(string dataId) where T : GameDataBase
@@ -81,7 +82,7 @@ public class DataManager : MonoBehaviour
     {
         IsLoaded = false;
 
-        //await LoadDataAsync</*blahblahData*/>(/*"blahblahData*/, cancellationToken);
+        await LoadDataAsync<MonsterData>("MonsterTableData", cancellationToken);
 
         IsLoaded = true;
         OnDataLoadCompleted?.Invoke();
