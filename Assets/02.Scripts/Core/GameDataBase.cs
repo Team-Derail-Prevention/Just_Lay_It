@@ -8,9 +8,8 @@ public class SerializationWrapper<T>
     public List<T> items;
 }
 
-[System.Serializable]
-public class GameDataBase : MonoBehaviour
+[Serializable]
+public class GameDataBase
 {
     public string Id;
-
 }
