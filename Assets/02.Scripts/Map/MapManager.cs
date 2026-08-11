@@ -2,10 +2,8 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class MapManager : MonoBehaviour
+public class MapManager : SingletonBase<MapManager>
 {
-    public static MapManager Instance { get; private set; }
-
     [Header("Map Prefab Settings")]
     [SerializeField] private GameObject _centralTerminalPrefab;
     [SerializeField] private List<GameObject> _stationMapPrefabs = new List<GameObject>();
@@ -26,13 +24,6 @@ public class MapManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-
         InitMapRoot();
     }
 
