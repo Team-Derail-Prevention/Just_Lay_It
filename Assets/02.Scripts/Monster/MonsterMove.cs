@@ -16,8 +16,19 @@ public class MonsterMove : MonoBehaviour
     private float _attackTimer = 0f;
     private float _attackCooldown = 2f;
 
-    private void Start()
+    private async void Start()
     {
+        //테스트 시점꼬임 방지용 비동기 로딩 대기 코드
+        //while (DataManager.Instance == null)
+        //{
+        //    await Cysharp.Threading.Tasks.UniTask.Yield();
+        //}
+
+        //while (!DataManager.Instance.IsLoaded)
+        //{
+        //    await Cysharp.Threading.Tasks.UniTask.Yield();
+        //}
+
         MonsterData monsterData = DataManager.Instance.GetData<MonsterData>(_monsterId);
 
         if (monsterData != null)
@@ -36,6 +47,10 @@ public class MonsterMove : MonoBehaviour
             firePosition = transform;
         }
 
+        if (_target == null && TestTarget.Instance != null)
+        {
+            _target = TestTarget.Instance.transform;
+        }
     }
 
     private void Update()
@@ -44,15 +59,18 @@ public class MonsterMove : MonoBehaviour
         {
             return;
         }
-        float distanceToTarget = Vector3.Distance(transform.position, _target.position);
+
+        Vector3 flatTargetPos = new Vector3(_target.position.x, transform.position.y, _target.position.z);
+
+        float distanceToTarget = Vector3.Distance(transform.position, flatTargetPos);
 
         if(distanceToTarget > _attackRange)
         {
             _isAttackRange = false;
             _attackTimer = 0f;
 
-            transform.position =Vector3.MoveTowards(transform.position, _target.position, _moveSpeed * Time.deltaTime);
-            transform.LookAt(_target);
+            transform.position =Vector3.MoveTowards(transform.position, flatTargetPos , _moveSpeed * Time.deltaTime);
+            transform.LookAt(flatTargetPos);
         }
         else
         {
@@ -61,7 +79,7 @@ public class MonsterMove : MonoBehaviour
                 _isAttackRange = true;
             }
 
-            transform.LookAt(_target);
+            transform.LookAt(flatTargetPos);
 
             _attackTimer += Time.deltaTime;
             if (_attackTimer >= _attackCooldown)
@@ -89,7 +107,7 @@ public class MonsterMove : MonoBehaviour
         MonsterProjectile projectile = projObj.GetComponent<MonsterProjectile>();
         if (projectile != null)
         {
-            Vector3 targetCenter = _target.position + Vector3.up * 1f;
+            Vector3 targetCenter = new Vector3(_target.position.x, firePosition.position.y, _target.position.z);
             Vector3 shootDir = (targetCenter - firePosition.position).normalized;
 
             projectile.ProjectileInitialize(shootDir, _monsterAtk);
