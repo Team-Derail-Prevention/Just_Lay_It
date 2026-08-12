@@ -8,7 +8,7 @@ public class Train : MonoBehaviour
     [SerializeField] public int _targetIndex = 0;
 
     [Header("Detection Setting")]
-    [SerializeField] private float _detectForwardOffset = 0.8f;
+    [SerializeField] private float _detectForwardOffset = 1.5f;
 
     private void Update()
     {
