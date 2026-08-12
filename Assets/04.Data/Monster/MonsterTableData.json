@@ -5,6 +5,7 @@
         "Hp": 5,
         "Atk": 5,
         "Speed": 5,
+        "DropGold": 5,
         "UseAttackSound": "Monster_01_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
         "UseDieSound": "Monster_01_Die_Sound"

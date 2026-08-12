@@ -19,15 +19,15 @@ public class MonsterMove : MonoBehaviour
     private async void Start()
     {
         //테스트 시점꼬임 방지용 비동기 로딩 대기 코드
-        //while (DataManager.Instance == null)
-        //{
-        //    await Cysharp.Threading.Tasks.UniTask.Yield();
-        //}
+        while (DataManager.Instance == null)
+        {
+            await Cysharp.Threading.Tasks.UniTask.Yield();
+        }
 
-        //while (!DataManager.Instance.IsLoaded)
-        //{
-        //    await Cysharp.Threading.Tasks.UniTask.Yield();
-        //}
+        while (!DataManager.Instance.IsLoaded)
+        {
+            await Cysharp.Threading.Tasks.UniTask.Yield();
+        }
 
         MonsterData monsterData = DataManager.Instance.GetData<MonsterData>(_monsterId);
 
@@ -102,7 +102,8 @@ public class MonsterMove : MonoBehaviour
             return;
         }
 
-        GameObject projObj = Instantiate(_projectilePrefab, firePosition.position, Quaternion.identity);
+        string projectilePoolId = _projectilePrefab.name;
+        GameObject projObj = PoolManager.Instance.SpawnFromPool(projectilePoolId, firePosition.position, Quaternion.identity);
 
         MonsterProjectile projectile = projObj.GetComponent<MonsterProjectile>();
         if (projectile != null)
