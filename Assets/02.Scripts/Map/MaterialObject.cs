@@ -14,7 +14,7 @@ public class MaterialObject : BaseColliderTrigger
     [Header("상태 변화 및 수집 연출 설정")]
     [SerializeField] private float _brokenScale = 0.5f;
     [SerializeField] private float _hoverHeight = 0.5f;
-    [SerializeField] private float _suckDuration = 0.5f;
+    [SerializeField] private float _shakeDuration = 0.5f;
 
     [Header("화면 연출 설정 (좌상단 수집)")]
     [SerializeField] private Vector2 _targetViewportPosition = new Vector2(0f, 1f);
@@ -35,46 +35,56 @@ public class MaterialObject : BaseColliderTrigger
     public bool IsBroken => _isBroken;
     public bool IsMining => _isMining;
 
+    // TODO: 드론 이벤트 구독필요
+
     protected void OnEnable()
     {
         _itemCollider = GetComponent<Collider>();
         _initialLocalScale = transform.localScale;
-        
+
         // TODO: 데이터 초기화 위치
     }
 
     private void Update()
     {
-        if (!_isMining && !_isBroken && !_isCollected && (Input.GetKeyDown(KeyCode.Alpha5) || Input.GetMouseButtonDown(0)))
+        // [테스트용 입력] 숫자 5번: "채굴/수집 시작 이벤트"
+        if (!_isMining && !_isBroken && !_isCollected && Input.GetKeyDown(KeyCode.Comma))
         {
-            StartMiningAsync(_defaultMiningDuration, this.GetCancellationTokenOnDestroy()).Forget();
+            ReceiveDroneSignalAndStart();
         }
     }
 
     protected override bool CanInteract(Collider target)
     {
-        return _isBroken && !_isCollected;
+        return !_isMining && !_isBroken && !_isCollected;
     }
 
     protected override void HandleInteraction(Collider target)
     {
-        CollectItemAsync(this.GetCancellationTokenOnDestroy()).Forget();
+        ReceiveDroneSignalAndStart();
     }
 
-    public async UniTaskVoid StartMiningAsync(float duration, CancellationToken cancellationToken)
+    private void ReceiveDroneSignalAndStart()
     {
-        if (_isMining || _isBroken || _isCollected) return;
+        if (_isMining || _isBroken || _isCollected)
+        {
+            return;
+        }
 
+        Debug.Log($"[MaterialObject] '{_materialObjectID}' 드론 수집 신호(이벤트) 수신 -> 채굴 및 수집 시작");
+        StartMiningAndCollectionProcessAsync(this.GetCancellationTokenOnDestroy()).Forget();
+    }
+
+    private async UniTaskVoid StartMiningAndCollectionProcessAsync(CancellationToken cancellationToken)
+    {
         _isMining = true;
         Vector3 startPos = transform.position;
         float elapsedTime = 0f;
 
-        Debug.Log($"[MaterialObject] '{_materialObjectID}' 채굴 시작!");
-
-        while (elapsedTime < duration && !cancellationToken.IsCancellationRequested)
+        while (elapsedTime < _defaultMiningDuration && !cancellationToken.IsCancellationRequested)
         {
             elapsedTime += Time.deltaTime;
-            float t = elapsedTime / duration;
+            float t = elapsedTime / _defaultMiningDuration;
 
             transform.localScale = _initialLocalScale * (1f + Mathf.Sin(elapsedTime * 20f) * (0.1f * (1f - t * 0.5f)));
             transform.position = startPos + UnityEngine.Random.insideUnitSphere * _shakeIntensity;
@@ -84,7 +94,10 @@ public class MaterialObject : BaseColliderTrigger
         }
 
         transform.position = startPos;
+
         BreakObject();
+
+        await CollectItem(cancellationToken);
     }
 
     private void BreakObject()
@@ -99,20 +112,25 @@ public class MaterialObject : BaseColliderTrigger
             _itemCollider.isTrigger = true;
         }
 
-        Debug.Log($"[MaterialObject] '{_materialObjectID}' 파괴 완료, 드랍 아이템 전환");
-        HandleInteraction(_itemCollider);
+        Debug.Log($"[MaterialObject] '{_materialObjectID}' 채굴 완료 및 파괴 전환 (수집 연출로 자동 전환)");
     }
 
-    private async UniTaskVoid CollectItemAsync(CancellationToken cancellationToken)
+    private async UniTask CollectItem(CancellationToken cancellationToken)
     {
-        if (_isCollected || !_isBroken) return;
+        if (_isCollected)
+        {
+            return;
+        }
 
         _isCollected = true;
-        if (_itemCollider != null) _itemCollider.enabled = false;
-
+        if (_itemCollider != null)
+        {
+            _itemCollider.enabled = false;
+        }
 
         // TODO: 수집 시 데이터 업데이트 위치
 
+        // 수집 이벤트 발신 (중앙역 창고나 UI 등)
         OnMaterialObjectCollected?.Invoke(this, _materialObjectAmount);
 
         Vector3 startPos = transform.position;
@@ -126,10 +144,10 @@ public class MaterialObject : BaseColliderTrigger
         }
 
         float elapsedTime = 0f;
-        while (elapsedTime < _suckDuration && !cancellationToken.IsCancellationRequested)
+        while (elapsedTime < _shakeDuration && !cancellationToken.IsCancellationRequested)
         {
             elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / _suckDuration);
+            float t = Mathf.Clamp01(elapsedTime / _shakeDuration);
 
             transform.position = Vector3.Lerp(startPos, targetWorldPosition, t);
             transform.localScale = Vector3.Lerp(startScale, Vector3.zero, t);
@@ -137,7 +155,7 @@ public class MaterialObject : BaseColliderTrigger
             await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
         }
 
-        // TODO: 풀링시 디스트로이 말고 풀링으로 변경
+        // TODO: Destroy 대신 PoolManager로 수정
         Destroy(gameObject);
     }
 }
