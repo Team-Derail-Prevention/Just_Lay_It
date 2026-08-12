@@ -2,24 +2,21 @@
 
 public abstract class BaseColliderTrigger : MonoBehaviour
 {
+    public enum TargetType
+    {
+        None = 0,
+        Train,
+        Drone,
+        Monster,
+    }
+
     [Header("상호작용 대상 설정")]
-    [SerializeField] protected string _targetTag = "Train";
-
+    [SerializeField] protected TargetType _targetType;
     protected bool _isTriggerCollider = false;
-
-    protected virtual void OnEnable()
-    {
-
-    }
-
-    protected virtual void OnDisable()
-    {
-
-    }
 
     protected virtual void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag(_targetTag))
+        if (other.CompareTag(_targetType.ToString()))
         {
             _isTriggerCollider = true;
 
@@ -32,7 +29,7 @@ public abstract class BaseColliderTrigger : MonoBehaviour
 
     protected virtual void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag(_targetTag))
+        if (other.CompareTag(_targetType.ToString()))
         {
             _isTriggerCollider = false;
             HandleExit(other);
@@ -45,7 +42,6 @@ public abstract class BaseColliderTrigger : MonoBehaviour
     }
 
     protected abstract void HandleInteraction(Collider target);
-
 
     protected virtual void HandleExit(Collider target)
     {

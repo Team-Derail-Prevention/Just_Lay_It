@@ -4,23 +4,9 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using Cysharp.Threading.Tasks;
 
-public class ResourceManager : MonoBehaviour
+public class ResourceManager : SingletonBase<ResourceManager>
 {
-    public static ResourceManager Instance { get; private set; }
-
     private Dictionary<string, AsyncOperationHandle> _handles = new Dictionary<string, AsyncOperationHandle>();
-
-    private void Awake()
-    {
-        if (Instance != null)
-        {
-            Debug.LogWarning($"[ResourceManager:Awake] 현재 인스턴스가 존재하여 중복 오브젝트를 파괴합니다.");
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-    }
 
     public async UniTask<T> LoadAsset<T>(string address) where T : UnityEngine.Object
     {

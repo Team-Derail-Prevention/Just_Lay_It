@@ -5,27 +5,13 @@ using System.Linq;
 using System.Threading;
 using UnityEngine;
 
-public class DataManager : MonoBehaviour
+public class DataManager : SingletonBase<DataManager>
 {
-    public static DataManager Instance { get; private set; }
-
     public bool IsLoaded { get; private set; } = false;
 
     public event Action OnDataLoadCompleted;
 
     private readonly Dictionary<Type, object> _dataTableList = new Dictionary<Type, object>();
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Debug.LogWarning($"[DataManager:Awake] 현재 인스턴스가 존재하여 중복 오브젝트를 파괴합니다.");
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-    }
 
     public T GetData<T>(string dataId) where T : GameDataBase
     {
