@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 // 테스트 그리드
-public class TestGridMap : MonoBehaviour
+public class TestGridMap : GridMapBase
 {
     [Header("맵 크기")]
     [SerializeField, Min(1)] private int _width = 10;
@@ -10,9 +10,9 @@ public class TestGridMap : MonoBehaviour
 
     public int Width { get { return _width; } }
     public int Height { get { return _height; } }
-    public float CellSize { get { return _cellSize; } }
+    public override float CellSize { get { return _cellSize; } }
 
-    public CellPos ConvertWorldToCell(Vector3 world)
+    public override CellPos ConvertWorldToCell(Vector3 world)
     {
         Vector3 local = world - transform.position;
 
@@ -22,7 +22,7 @@ public class TestGridMap : MonoBehaviour
         return new CellPos(x, y);
     }
 
-    public Vector3 ConvertCellToWorld(CellPos cell)
+    public override Vector3 ConvertCellToWorld(CellPos cell)
     {
         float x = (cell.X + 0.5f) * _cellSize;
         float z = (cell.Y + 0.5f) * _cellSize;
@@ -30,7 +30,7 @@ public class TestGridMap : MonoBehaviour
         return transform.position + new Vector3(x, 0f, z);
     }
 
-    public bool IsInside(CellPos cell)
+    public override bool IsInside(CellPos cell)
     {
         if (cell.X < 0 || cell.X >= _width)
         {
@@ -43,11 +43,6 @@ public class TestGridMap : MonoBehaviour
         }
 
         return true;
-    }
-
-    public bool IsWalkable(CellPos cell)
-    {
-        return IsInside(cell);
     }
 
     private void OnDrawGizmos()
