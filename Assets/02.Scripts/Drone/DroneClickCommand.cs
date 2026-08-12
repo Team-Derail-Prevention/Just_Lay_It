@@ -8,7 +8,12 @@ public class DroneClickCommand : MonoBehaviour
     [SerializeField] private DroneStateMachine _stateMachine;
 
     [Header("입력")]
+    [SerializeField] private Key _orderModeKey = Key.B;
     [SerializeField] private Key _recallKey = Key.R;
+
+    public bool IsOrderMode { get { return _isOrderMode; } }
+
+    private bool _isOrderMode;
 
     private void Update()
     {
@@ -17,7 +22,13 @@ public class DroneClickCommand : MonoBehaviour
             return;
         }
 
+        HandleOrderModeToggle();
         HandleRecall();
+
+        if (_isOrderMode == false)
+        {
+            return;
+        }
 
         if (Mouse.current.leftButton.wasPressedThisFrame == false)
         {
@@ -30,6 +41,21 @@ public class DroneClickCommand : MonoBehaviour
         }
 
         _stateMachine.Assign(cell);
+    }
+
+    private void HandleOrderModeToggle()
+    {
+        if (Keyboard.current == null)
+        {
+            return;
+        }
+
+        if (Keyboard.current[_orderModeKey].wasPressedThisFrame == false)
+        {
+            return;
+        }
+
+        _isOrderMode = !_isOrderMode;
     }
 
     private void HandleRecall()

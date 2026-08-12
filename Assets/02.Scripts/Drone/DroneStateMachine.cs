@@ -12,7 +12,7 @@ public class DroneStateMachine : MonoBehaviour
     [SerializeField, Min(0f)] private float _workDuration = 2f;
 
     public DroneState State { get { return _state; } }
-    public bool CanAcceptWork { get { return _state == DroneState.Docked; } }
+    public bool CanAcceptWork { get { return _state == DroneState.Docked || _isReturning; } }
     public CellPos WorkCell { get { return _workCell; } }
     public float WorkProgress { get { return GetWorkProgress(); } }
 
@@ -50,9 +50,24 @@ public class DroneStateMachine : MonoBehaviour
         SnapToDock();
     }
 
+    public bool CanAssign(CellPos cell)
+    {
+        if (CanAcceptWork == false)
+        {
+            return false;
+        }
+
+        if (_drone == null)
+        {
+            return false;
+        }
+
+        return _drone.CanMoveTo(cell);
+    }
+
     public bool Assign(CellPos cell)
     {
-        if (_state != DroneState.Docked)
+        if (CanAssign(cell) == false)
         {
             return false;
         }
