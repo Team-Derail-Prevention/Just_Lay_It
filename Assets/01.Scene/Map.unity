@@ -148,13 +148,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 450b23e9b3405ca4798f584a5a2be2cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapMaker
-  _mapRoot: {fileID: 0}
   _cubePrefabs:
   - {fileID: 7136787390363487603, guid: 797c3a5290aa5b64d9a8ba14fcf6fa54, type: 3}
   - {fileID: 6007474108701106520, guid: 9bd75d762f62dc24f9c20fbae86b28fd, type: 3}
   _gridSizeX: 14
   _gridSizeZ: 14
   _spacing: 2
+  _stationPrefab: {fileID: 0}
+  _obstaclePrefabs:
+  - {fileID: 8967484211123364771, guid: b14e81ff37fb82f4399920a9a7b2eb55, type: 3}
+  _materialSpawnDatas:
+  - _prefab: {fileID: 6179755561338510967, guid: 90bfcda798250494690a658a59cc0341, type: 3}
+    _minCount: 6
+  - _prefab: {fileID: 9063175124058616429, guid: e800eb9fe429e68418aaa2e50836063a, type: 3}
+    _minCount: 4
+  _targetObstacleCount: 4
+  _targetMaterialCount: 20
+  _stationHeight: 1
+  _obstacleHeight: 1
+  _materialHeight: 1
 --- !u!4 &54987573
 Transform:
   m_ObjectHideFlags: 0
@@ -164,38 +176,7 @@ Transform:
   m_GameObject: {fileID: 54987571}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.85566, y: 0, z: -3.55134}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &555261869
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 555261870}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &555261870
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 555261869}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 878.3642, y: 0, z: 3134.322}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -357,13 +338,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8752888ebbd98b4d838ae45f7c5299d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapManager
-  _centralTerminalPrefab: {fileID: 8405391829059694711, guid: 03d065b172fbccf4cae348d5209a1859, type: 3}
+  _centralTerminalPrefab: {fileID: 4759543482595874672, guid: 59214ce734e544d49940ef9fdf6ef50d, type: 3}
   _stationMapPrefabs:
-  - {fileID: 446070144316166223, guid: f6b53cf41026c9145964e94e433b2443, type: 3}
+  - {fileID: 1071775791267066297, guid: 8c0ea521479aa3d499697e00d48249df, type: 3}
   _normalMapPrefabs:
-  - {fileID: 446070144316166223, guid: ea4aaccba9a74ec47abc6049e5cc9fe0, type: 3}
+  - {fileID: 6168959663028990866, guid: 542c26c7a290c6947b5bc5dcc03c9caf, type: 3}
   _mapRoot: {fileID: 0}
-  _mapSpacing: 20
+  _mapSpacing: 28
 --- !u!4 &1666572559
 Transform:
   m_ObjectHideFlags: 0
@@ -523,5 +504,4 @@ SceneRoots:
   - {fileID: 1690064760}
   - {fileID: 1281296770}
   - {fileID: 1666572559}
-  - {fileID: 555261870}
   - {fileID: 54987573}
