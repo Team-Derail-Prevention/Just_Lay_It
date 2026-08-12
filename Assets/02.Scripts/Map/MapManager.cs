@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Random = UnityEngine.Random;
 
-public class MapManager : MonoBehaviour
+public class MapManager : SingletonBase<MapManager>
 {
-    public static MapManager Instance { get; private set; }
-
     [Header("Map Prefab Settings")]
     [SerializeField] private GameObject _centralTerminalPrefab;
     [SerializeField] private List<GameObject> _stationMapPrefabs = new List<GameObject>();
@@ -23,16 +23,12 @@ public class MapManager : MonoBehaviour
     };
 
     private Dictionary<Vector3Int, GameObject> _spawnedMaps = new Dictionary<Vector3Int, GameObject>();
+    private Dictionary<Vector3Int, int> _mapTypeData = new Dictionary<Vector3Int, int>();
+
+    public event Action<Dictionary<Vector3Int, int>> OnMapGenerated;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-
         InitMapRoot();
     }
 
@@ -68,6 +64,7 @@ public class MapManager : MonoBehaviour
 
         Assert.IsNotNull(_centralTerminalPrefab, "[MapManager] Central Terminal Prefab이 할당되지 않았습니다!");
         SpawnMapObject(_centralTerminalPrefab, Vector3Int.zero, "CentralTerminal");
+        _mapTypeData[Vector3Int.zero] = 2;
 
         List<bool> assignedTypes = RandomStationLayout();
 
@@ -76,6 +73,8 @@ public class MapManager : MonoBehaviour
             Vector3Int gridPos = _mapOffsets[i];
             bool isStation = assignedTypes[i];
             GameObject selectedPrefab = null;
+
+            int typeId = isStation ? 1 : 0;
 
             if (isStation)
             {
@@ -106,6 +105,8 @@ public class MapManager : MonoBehaviour
         }
 
         Debug.Log("[MapManager] 3x3 맵 생성 및 규칙 배치 완료!");
+
+        OnMapGenerated?.Invoke(_mapTypeData);
     }
 
     private List<bool> RandomStationLayout()
@@ -182,5 +183,10 @@ public class MapManager : MonoBehaviour
             }
         }
         _spawnedMaps.Clear();
+    }
+
+    public Dictionary<Vector3Int, int> GetMapTypeData()
+    {
+        return _mapTypeData;
     }
 }
