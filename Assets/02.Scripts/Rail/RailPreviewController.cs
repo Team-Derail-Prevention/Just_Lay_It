@@ -2,8 +2,6 @@
 
 public class RailPreviewController : MonoBehaviour
 {
-    [SerializeField] private KeyCode _rotateKey = KeyCode.R;
-
     [Header("Ghost Alpha")]
     [SerializeField] private Renderer[] _renderers;
     [SerializeField] private string _colorPropertyName = "_BaseColor";
@@ -25,7 +23,7 @@ public class RailPreviewController : MonoBehaviour
 
     public bool HandleRotationInput()
     {
-        if (!Input.GetKeyDown(_rotateKey))
+        if (!Input.GetKeyDown(KeyCode.T))
         {
             return false;
         }

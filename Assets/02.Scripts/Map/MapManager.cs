@@ -24,10 +24,10 @@ public class MapManager : SingletonBase<MapManager>
 
     private Dictionary<Vector3Int, GameObject> _spawnedMaps = new Dictionary<Vector3Int, GameObject>();
     private Dictionary<Vector3Int, int> _mapTypeData = new Dictionary<Vector3Int, int>();
+
     public event Action<Dictionary<Vector3Int, int>> OnMapGenerated;
 
     public Transform MapRoot { get { return _mapRoot; } }
-    public bool HasGenerated { get; private set; }
 
     private void Awake()
     {
@@ -41,7 +41,7 @@ public class MapManager : SingletonBase<MapManager>
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKeyDown(KeyCode.R))
         {
             Debug.Log("[MapManager] 맵 리셋 및 재생성 테스트 시작");
             GenerateMap();
@@ -109,7 +109,6 @@ public class MapManager : SingletonBase<MapManager>
         Debug.Log("[MapManager] 3x3 맵 생성 및 규칙 배치 완료!");
 
         OnMapGenerated?.Invoke(_mapTypeData);
-        HasGenerated = true;
     }
 
     private List<bool> RandomStationLayout()
