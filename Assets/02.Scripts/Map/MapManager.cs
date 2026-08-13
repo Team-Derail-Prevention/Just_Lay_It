@@ -27,6 +27,8 @@ public class MapManager : SingletonBase<MapManager>
 
     public event Action<Dictionary<Vector3Int, int>> OnMapGenerated;
 
+    public Transform MapRoot { get { return _mapRoot; } }
+
     private void Awake()
     {
         InitMapRoot();

@@ -607,7 +607,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrainFollow
   _frontTrain: {fileID: 6390765769026756936, guid: 0210f7f2904f95149bb571e875d70c50, type: 3}
-  _followDistance: 1.2
+  _followDistance: 3
   _moveSpeed: 5
   _rotateSpeed: 10
   _targetIndex: 0
