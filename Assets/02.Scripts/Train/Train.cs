@@ -10,9 +10,38 @@ public class Train : MonoBehaviour
     [Header("Detection Setting")]
     [SerializeField] private float _detectForwardOffset = 1.5f;
 
+    private bool _isMoving = false;
+
+    public bool IsMoving
+    {
+        get { return _isMoving; }
+    }
+
+    public Camera MainCam { get; private set; }
+
+
+    private void Awake()
+    {
+        MainCam = Camera.main;
+
+        if (MainCam == null)
+        {
+            Debug.LogError("[Train:Awake] 카메라를 찾을 수 없습니다.");
+            return;
+        }
+    }
+
     private void Update()
     {
-        MoveTrain();
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            _isMoving = !_isMoving;
+        }
+
+        if (_isMoving)
+        {
+            MoveTrain();
+        }
     }
 
 
@@ -53,6 +82,16 @@ public class Train : MonoBehaviour
                 _targetIndex++;
             }
         }
+    }
+
+    public void StartMove()
+    {
+        _isMoving = true;
+    }
+
+    public void StopMove()
+    {
+        _isMoving = false;
     }
 
     //public void SetTargetIndex(int index)
