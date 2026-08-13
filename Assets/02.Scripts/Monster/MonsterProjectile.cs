@@ -36,10 +36,17 @@ public class MonsterProjectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        //if (other.CompareTag("Player") || other.GetComponent<TestTarget>() != null)
-        //{
-        //    Debug.Log("Hit Player");
-        //    PoolManager.Instance.DespawnToPool(gameObject);
-        //}
+        if (other.CompareTag("Player") || other.GetComponent<Train>() != null)
+        {
+            Debug.Log("Hit Player");
+
+            // TrainHealth trainHp = other.GetComponent<TrainHealth>();
+            // if (trainHp != null)
+            // {
+            //   trainHp.TakeDamage(damage);
+            // }
+
+            PoolManager.Instance.DespawnToPool(gameObject);
+        }
     }
 }
