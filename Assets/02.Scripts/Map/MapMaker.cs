@@ -8,10 +8,8 @@ public class MapMaker : MonoBehaviour
     {
         [Tooltip("배치할 머테리얼 프리팹")]
         [SerializeField] private GameObject _prefab;
-
         [Tooltip("해당 머테리얼의 최소 생성 보장 개수")]
         [SerializeField] private int _minCount;
-
         public GameObject Prefab => _prefab;
         public int MinCount => _minCount;
     }
@@ -21,13 +19,22 @@ public class MapMaker : MonoBehaviour
     [SerializeField] private int _gridSizeX = 14;
     [SerializeField] private int _gridSizeZ = 14;
     [SerializeField] private float _spacing = 2f;
+    [Tooltip("그라운드(바닥) 타일에 부여할 유니티 레이어 이름")]
+    [SerializeField] private string _groundLayerName = "Ground";
+
+    [Header("3X3 조합을 위한 맵 위치 설정")]
+    [Tooltip("3x3 전체 맵 상에서의 이 맵의 그리드 위치 (예: 중앙은 (0,0,0), 주변은 (-1,0,1) 등)")]
+    [SerializeField] private Vector3Int _mapGridPos = Vector3Int.zero;
 
     [Header("지상 오브젝트 배치 설정 (땅바닥 위)")]
     [SerializeField] private GameObject _stationPrefab;
     [SerializeField] private List<GameObject> _obstaclePrefabs;
     [SerializeField] private List<MaterialSpawnData> _materialSpawnDatas = new List<MaterialSpawnData>();
     [SerializeField] private int _targetObstacleCount = 5;
-    [SerializeField] private int _targetMaterialCount = 8;
+
+    [Header("스테이션 배치 및 보호 구역 설정")]
+    [Tooltip("스테이션 중심 기준 주변으로 다른 오브젝트가 생성되지 않을 반경 (예: 2칸이면 중심 주변 가로세로 안전지대 확보)")]
+    [SerializeField] private int _stationProtectionRadius = 2;
 
     [Header("지상 오브젝트 높이(Y축) 설정 (디폴트: 2)")]
     [SerializeField] private float _stationHeight = 2f;
@@ -36,142 +43,114 @@ public class MapMaker : MonoBehaviour
 
     private Transform _mapRoot;
 
+    public int GridSizeX => _gridSizeX;
+    public int GridSizeZ => _gridSizeZ;
+    public float Spacing => _spacing;
+    public Transform MapRoot => _mapRoot;
+
     [ContextMenu("Generate 14x14 Grid Map With Objects")]
     public void GenerateMap()
     {
         if (_cubePrefabs == null || _cubePrefabs.Count == 0)
         {
-            Debug.LogError("[MapMaker] 배치할 큐브 프리팹 리스트가 비어 있습니다.");
+            Debug.LogError("[MapMaker] 배치할 큐브 프리팹이 등록되지 않았습니다!");
             return;
         }
 
-        GameObject existingRoot = GameObject.Find("@MapRoot_14x14");
-        if (existingRoot != null)
-        {
-            DestroyImmediate(existingRoot);
-        }
-
-        GameObject rootObj = new GameObject("@MapRoot_14x14");
-        _mapRoot = rootObj.transform;
-
-        GameObject groundFolder = new GameObject("Ground");
-        groundFolder.transform.SetParent(_mapRoot);
-        Transform groundRoot = groundFolder.transform;
-
-        GameObject surfaceFolder = new GameObject("SurfaceObjects");
-        surfaceFolder.transform.SetParent(_mapRoot);
-        Transform surfaceRoot = surfaceFolder.transform;
-
-        GameObject stationRootFolder = new GameObject("StationRoot");
-        stationRootFolder.transform.SetParent(surfaceRoot);
-        Transform stationRoot = stationRootFolder.transform;
-
-        GameObject obstaclesFolder = new GameObject("Obstacles");
-        obstaclesFolder.transform.SetParent(surfaceRoot);
-        Transform obstaclesRoot = obstaclesFolder.transform;
-
-        GameObject materialsFolder = new GameObject("Materials");
-        materialsFolder.transform.SetParent(surfaceRoot);
-        Transform materialsRoot = materialsFolder.transform;
-
+        SetupMapRoot();
         System.Random rand = new System.Random();
-        List<Vector3> availableSpawnPositions = new List<Vector3>();
+        List<Vector3> availablePositions = new List<Vector3>();
+        Dictionary<Vector3, Vector2Int> posToGridMap = new Dictionary<Vector3, Vector2Int>();
+
+        Transform groundRoot = CreateSubRoot("Ground", _mapRoot);
+        Transform stationRoot = CreateSubRoot("Station", _mapRoot);
+        Transform obstaclesRoot = CreateSubRoot("Obstacles", _mapRoot);
+        Transform materialsRoot = CreateSubRoot("Materials", _mapRoot);
+
+        int groundLayerIndex = LayerMask.NameToLayer(_groundLayerName);
+        if (groundLayerIndex == -1)
+        {
+            Debug.LogWarning($"[MapMaker] '{_groundLayerName}' 레이어가 프로젝트에 존재하지 않습니다! 기본 레이어(Default)로 유지됩니다. (Edit > Project Settings > Tags and Layers에서 레이어를 추가해주세요)");
+        }
 
         for (int x = 0; x < _gridSizeX; x++)
         {
             for (int z = 0; z < _gridSizeZ; z++)
             {
-                int randomIndex = rand.Next(0, _cubePrefabs.Count);
-                GameObject selectedPrefab = _cubePrefabs[randomIndex];
-
-                if (selectedPrefab == null)
-                {
-                    continue;
-                }
+                int prefabIndex = rand.Next(0, _cubePrefabs.Count);
+                GameObject selectedCubePrefab = _cubePrefabs[prefabIndex];
+                if (selectedCubePrefab == null) continue;
 
                 float posX = (x - _gridSizeX / 2f) * _spacing;
                 float posZ = (z - _gridSizeZ / 2f) * _spacing;
                 Vector3 spawnPos = new Vector3(posX, 0f, posZ);
 
-                Quaternion prefabRotation = selectedPrefab.transform.rotation;
+                GameObject cubeObj = Instantiate(selectedCubePrefab, spawnPos, Quaternion.identity, groundRoot);
+                cubeObj.name = $"Tile_{x}_{z}";
 
-                GameObject cubeObj = Instantiate(selectedPrefab, spawnPos, prefabRotation, groundRoot);
-                cubeObj.name = $"Cube_{x}_{z}_{selectedPrefab.name}";
+                if (groundLayerIndex != -1)
+                {
+                    cubeObj.layer = groundLayerIndex;
+                }
 
-                Vector3 surfacePos = new Vector3(posX, 0.5f, posZ);
-                availableSpawnPositions.Add(surfacePos);
+                MapTileInfo tileInfo = cubeObj.GetComponent<MapTileInfo>();
+                if (tileInfo == null)
+                {
+                    tileInfo = cubeObj.AddComponent<MapTileInfo>();
+                }
+
+                tileInfo.InitTile(new Vector2Int(x, z), _mapGridPos, canInstallRail: true);
+
+                availablePositions.Add(spawnPos);
+                posToGridMap[spawnPos] = new Vector2Int(x, z);
             }
         }
 
-        SpawnInternalObjects(availableSpawnPositions, stationRoot, obstaclesRoot, materialsRoot, rand);
+        if (_stationPrefab != null)
+        {
+            int centerX = _gridSizeX / 2;
+            int centerZ = _gridSizeZ / 2;
 
-        Debug.Log($"[MapMaker] 14x14 맵 및 지상 기물 배치 완료!");
-    }
+            float centerPosX = (centerX - _gridSizeX / 2f) * _spacing;
+            float centerPosZ = (centerZ - _gridSizeZ / 2f) * _spacing;
+            Vector3 stationSpawnPos = new Vector3(centerPosX, _stationHeight, centerPosZ);
 
-    private void SpawnInternalObjects(List<Vector3> availablePositions, Transform stationRoot, Transform obstaclesRoot, Transform materialsRoot, System.Random rand)
-    {
-        if (availablePositions.Count == 0) return;
+            GameObject stationObj = Instantiate(_stationPrefab, stationSpawnPos, Quaternion.identity, stationRoot);
+            stationObj.name = "Station_Main";
 
-        SpawnStation(ref availablePositions, stationRoot, rand);
+            availablePositions.RemoveAll(pos => {
+                if (posToGridMap.TryGetValue(pos, out Vector2Int gridCoord))
+                {
+                    int distanceX = Mathf.Abs(gridCoord.x - centerX);
+                    int distanceZ = Mathf.Abs(gridCoord.y - centerZ);
+                    return distanceX <= _stationProtectionRadius && distanceZ <= _stationProtectionRadius;
+                }
+                return false;
+            });
+        }
 
         SpawnObstacles(ref availablePositions, obstaclesRoot, rand);
+        SpawnMaterials(ref availablePositions, materialsRoot, rand);
 
-        SpawnResources(ref availablePositions, materialsRoot, rand);
+        Debug.Log($"[MapMaker] 중앙 스테이션 및 14x14 그리드 맵 생성 완료! (MapGridPos: {_mapGridPos}, Ground Layer: {_groundLayerName})");
     }
 
-    private void SpawnStation(ref List<Vector3> availablePositions, Transform stationRoot, System.Random rand)
+    private void SetupMapRoot()
     {
-        if (_stationPrefab == null || availablePositions.Count == 0) return;
-
-        List<Vector3> centerCandidates = new List<Vector3>();
-        float mapWidth = _gridSizeX * _spacing;
-        float centerThreshold = mapWidth * 0.25f;
-
-        foreach (var pos in availablePositions)
+        GameObject existingRoot = GameObject.Find("@MapChildRoot");
+        if (existingRoot != null)
         {
-            if (Vector3.Distance(Vector3.zero, new Vector3(pos.x, 0f, pos.z)) <= centerThreshold)
-            {
-                centerCandidates.Add(pos);
-            }
+            DestroyImmediate(existingRoot);
         }
+        GameObject newRoot = new GameObject("@MapChildRoot");
+        _mapRoot = newRoot.transform;
+    }
 
-        if (centerCandidates.Count == 0)
-        {
-            centerCandidates = availablePositions;
-        }
-
-        int randomIndex = rand.Next(0, centerCandidates.Count);
-        Vector3 selectedBasePos = centerCandidates[randomIndex];
-
-        Vector3 stationPos = new Vector3(selectedBasePos.x, _stationHeight, selectedBasePos.z);
-
-        string groupName = _stationPrefab.name;
-        Transform subRoot = stationRoot.Find(groupName);
-        if (subRoot == null)
-        {
-            GameObject newSubRoot = new GameObject(groupName);
-            newSubRoot.transform.SetParent(stationRoot);
-            subRoot = newSubRoot.transform;
-        }
-
-        GameObject stationObj = Instantiate(_stationPrefab, stationPos, Quaternion.identity, subRoot);
-        stationObj.name = "Station_Object";
-
-        float safetyRadius = _spacing * 1.5f;
-        List<Vector3> positionsToRemove = new List<Vector3>();
-
-        foreach (var pos in availablePositions)
-        {
-            if (Vector3.Distance(new Vector3(pos.x, 0f, pos.z), new Vector3(selectedBasePos.x, 0f, selectedBasePos.z)) <= safetyRadius)
-            {
-                positionsToRemove.Add(pos);
-            }
-        }
-
-        foreach (var pos in positionsToRemove)
-        {
-            availablePositions.Remove(pos);
-        }
+    private Transform CreateSubRoot(string name, Transform parent)
+    {
+        GameObject subObj = new GameObject(name);
+        subObj.transform.SetParent(parent);
+        return subObj.transform;
     }
 
     private void SpawnObstacles(ref List<Vector3> availablePositions, Transform obstaclesRoot, System.Random rand)
@@ -179,9 +158,10 @@ public class MapMaker : MonoBehaviour
         if (_obstaclePrefabs == null || _obstaclePrefabs.Count == 0) return;
 
         int countToSpawn = Mathf.Min(_targetObstacleCount, availablePositions.Count);
-
         for (int i = 0; i < countToSpawn; i++)
         {
+            if (availablePositions.Count == 0) break;
+
             int index = rand.Next(0, availablePositions.Count);
             Vector3 basePos = availablePositions[index];
             availablePositions.RemoveAt(index);
@@ -191,9 +171,9 @@ public class MapMaker : MonoBehaviour
             if (selectedPrefab == null) continue;
 
             Vector3 targetPos = new Vector3(basePos.x, _obstacleHeight, basePos.z);
-
             string groupName = selectedPrefab.name;
             Transform subRoot = obstaclesRoot.Find(groupName);
+
             if (subRoot == null)
             {
                 GameObject newSubRoot = new GameObject(groupName);
@@ -206,66 +186,35 @@ public class MapMaker : MonoBehaviour
         }
     }
 
-    private void SpawnResources(ref List<Vector3> availablePositions, Transform materialsRoot, System.Random rand)
+    private void SpawnMaterials(ref List<Vector3> availablePositions, Transform materialsRoot, System.Random rand)
     {
         if (_materialSpawnDatas == null || _materialSpawnDatas.Count == 0) return;
 
-        int spawnedTotalCount = 0;
-        Dictionary<GameObject, int> spawnedCounts = new Dictionary<GameObject, int>();
-
+        // 1단계: 최소 보장 개수 먼저 배치
         foreach (var data in _materialSpawnDatas)
         {
             if (data.Prefab == null || data.MinCount <= 0) continue;
 
-            int countToSpawnMin = Mathf.Min(data.MinCount, availablePositions.Count);
-            spawnedCounts[data.Prefab] = 0;
-
-            for (int i = 0; i < countToSpawnMin; i++)
+            int spawnCount = Mathf.Min(data.MinCount, availablePositions.Count);
+            for (int i = 0; i < spawnCount; i++)
             {
+                if (availablePositions.Count == 0) break;
+
                 int index = rand.Next(0, availablePositions.Count);
                 Vector3 basePos = availablePositions[index];
                 availablePositions.RemoveAt(index);
 
                 InstantiateMaterial(data.Prefab, basePos, materialsRoot);
-                spawnedCounts[data.Prefab]++;
-                spawnedTotalCount++;
-
-                if (availablePositions.Count == 0) break;
             }
-        }
-
-        int remainingTargetCount = Mathf.Max(0, _targetMaterialCount - spawnedTotalCount);
-        int actualSpawnCount = Mathf.Min(remainingTargetCount, availablePositions.Count);
-
-        for (int i = 0; i < actualSpawnCount; i++)
-        {
-            if (availablePositions.Count == 0) break;
-
-            int index = rand.Next(0, availablePositions.Count);
-            Vector3 basePos = availablePositions[index];
-            availablePositions.RemoveAt(index);
-
-            List<GameObject> validPrefabs = new List<GameObject>();
-            foreach (var data in _materialSpawnDatas)
-            {
-                if (data.Prefab != null) validPrefabs.Add(data.Prefab);
-            }
-
-            if (validPrefabs.Count == 0) break;
-
-            int prefabIndex = rand.Next(0, validPrefabs.Count);
-            GameObject selectedPrefab = validPrefabs[prefabIndex];
-
-            InstantiateMaterial(selectedPrefab, basePos, materialsRoot);
         }
     }
 
     private void InstantiateMaterial(GameObject prefab, Vector3 basePos, Transform materialsRoot)
     {
         Vector3 targetPos = new Vector3(basePos.x, _materialHeight, basePos.z);
-
         string groupName = prefab.name;
         Transform subRoot = materialsRoot.Find(groupName);
+
         if (subRoot == null)
         {
             GameObject newSubRoot = new GameObject(groupName);
