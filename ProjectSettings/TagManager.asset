@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Rail
+  - Station
   layers:
   - Default
   - TransparentFX

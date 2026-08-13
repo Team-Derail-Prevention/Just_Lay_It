@@ -1,5 +1,4 @@
-﻿using UnityEditor.ShaderGraph.Internal;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class TrainFollow : MonoBehaviour
 {
@@ -13,6 +12,7 @@ public class TrainFollow : MonoBehaviour
     [SerializeField] public float _rotateSpeed = 10f;
     [SerializeField] private int _targetIndex = 0;
 
+    private Train _headTrain;
 
     private void Update()
     {
@@ -27,6 +27,11 @@ public class TrainFollow : MonoBehaviour
         }
 
         if (TrainManager.Instance.IsStation)
+        {
+            return;
+        }
+
+        if (_headTrain != null && !_headTrain.IsMoving)
         {
             return;
         }
