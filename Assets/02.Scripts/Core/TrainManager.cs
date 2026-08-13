@@ -1,4 +1,4 @@
-﻿using NUnit.Framework.Constraints;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -36,6 +36,10 @@ public class TrainManager : MonoBehaviour
     private HashSet<Transform> visitedNode = new HashSet<Transform>();
     private HashSet<Transform> visitedStation = new HashSet<Transform>();
 
+    public static event Action<Transform> OnTrainSpawn;
+    public static event Action<bool> OnStationState;
+
+
     private void Awake()
     {
         if (Instance == null)
@@ -50,7 +54,12 @@ public class TrainManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha3))
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            DepartStation();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha5))
         {
             SpawnFullTrain(_defaultCarriageCount);
         }
@@ -112,6 +121,8 @@ public class TrainManager : MonoBehaviour
                 SpawnCarriage(_testCarPrefab);
             }
         }
+
+        OnTrainSpawn?.Invoke(_headTrain);
 
         Debug.Log($"[TrainManager] 기관차 1대와 객차 {carriageCount}대 전체 소환 완료!");
     }
@@ -192,13 +203,30 @@ public class TrainManager : MonoBehaviour
     public void ArriveStation(GameObject stationObj)
     {
         IsStation = true;
+        SetCarriagerActive(false);
         Debug.Log("기차역 도착");
+
+        OnStationState?.Invoke(true);
     }
 
-    public void DepartStation(GameObject stationObj)
+    public void DepartStation()
     {
         IsStation = false;
+        SetCarriagerActive(true);
         Debug.Log("기차역 출발");
+
+        OnStationState?.Invoke(false);
+    }
+
+    public void SetCarriagerActive(bool isActive)
+    {
+        for (int i = 0; i < carList.Count; i++)
+        {
+            if (carList[i] != null)
+            {
+                carList[i].SetActive(isActive);
+            }
+        }
     }
 
 }

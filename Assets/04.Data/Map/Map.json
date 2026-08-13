@@ -1,0 +1,67 @@
+[
+  {
+    "Id": "CentralTerminal_001",
+    "Type": "CentralTerminal",
+    "AddressablePath": "CentralTerminal_001"
+  },
+  {
+    "Id": "Station_001",
+    "Type": "Station",
+    "AddressablePath": "Station_001"
+  },
+  {
+    "Id": "Normal_001",
+    "Type": "Normal",
+    "AddressablePath": "Normal_001"
+  },
+  {
+    "Id": "Station_002",
+    "Type": "Station",
+    "AddressablePath": "Station_002"
+  },
+  {
+    "Id": "Normal_002",
+    "Type": "Normal",
+    "AddressablePath": "Normal_002"
+  },
+  {
+    "Id": "Station_003",
+    "Type": "Station",
+    "AddressablePath": "Station_003"
+  },
+  {
+    "Id": "Normal_003",
+    "Type": "Normal",
+    "AddressablePath": "Normal_003"
+  },
+  {
+    "Id": "Station_004",
+    "Type": "Station",
+    "AddressablePath": "Station_004"
+  },
+  {
+    "Id": "Normal_004",
+    "Type": "Normal",
+    "AddressablePath": "Normal_004"
+  },
+  {
+    "Id": "Station_005",
+    "Type": "Station",
+    "AddressablePath": "Station_005"
+  },
+  {
+    "Id": "Normal_005",
+    "Type": "Normal",
+    "AddressablePath": "Normal_005"
+  },
+  {
+    "Id": "Station_006",
+    "Type": "Station",
+    "AddressablePath": "Station_006"
+  },
+  {
+    "Id": "Normal_006",
+    "Type": "Normal",
+    "AddressablePath": "Normal_006"
+  }
+]

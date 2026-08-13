@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Random = UnityEngine.Random;
 
 public class MapManager : SingletonBase<MapManager>
 {
-    [Header("Map Prefab Settings")]
-    [SerializeField] private GameObject _centralTerminalPrefab;
-    [SerializeField] private List<GameObject> _stationMapPrefabs = new List<GameObject>();
-    [SerializeField] private List<GameObject> _normalMapPrefabs = new List<GameObject>();
-
     [Header("Map Settings")]
     [SerializeField] private Transform _mapRoot;
     [SerializeField] private float _mapSpacing = 20f;
@@ -27,22 +23,22 @@ public class MapManager : SingletonBase<MapManager>
 
     public event Action<Dictionary<Vector3Int, int>> OnMapGenerated;
 
-    private void Awake()
+    private async void Start()
     {
         InitMapRoot();
-    }
 
-    private void Start()
-    {
-        GenerateMap();
+        await EnsureDataLoadedAsync();
+
+        await GenerateMapAsync();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.Equals))
         {
             Debug.Log("[MapManager] 맵 리셋 및 재생성 테스트 시작");
-            GenerateMap();
+            ClearMap();
+            _ = GenerateMapAsync();
         }
     }
 
@@ -57,14 +53,62 @@ public class MapManager : SingletonBase<MapManager>
         }
     }
 
-
-    public void GenerateMap()
+    private async UniTask EnsureDataLoadedAsync()
     {
-        ClearMap();
+        if (DataManager.Instance != null && DataManager.Instance.IsLoaded)
+            return;
 
-        Assert.IsNotNull(_centralTerminalPrefab, "[MapManager] Central Terminal Prefab이 할당되지 않았습니다!");
-        SpawnMapObject(_centralTerminalPrefab, Vector3Int.zero, "CentralTerminal");
-        _mapTypeData[Vector3Int.zero] = 2;
+        UniTaskCompletionSource tcs = new UniTaskCompletionSource();
+
+        if (DataManager.Instance != null)
+        {
+            DataManager.Instance.OnDataLoadCompleted += () => tcs.TrySetResult();
+        }
+        else
+        {
+            Debug.LogError("[MapManager] DataManager 인스턴스를 찾을 수 없습니다! 씬에 DataManager가 존재하는지 확인하세요.");
+            return;
+        }
+
+        await tcs.Task;
+    }
+
+    public async UniTask GenerateMapAsync(CancellationToken cancellationToken = default)
+    {
+        if (DataManager.Instance == null)
+        {
+            Debug.LogError("[MapManager] DataManager 인스턴스가 존재하지 않습니다.");
+            return;
+        }
+
+        IReadOnlyList<MapData> allMapDatas = DataManager.Instance.GetAllData<MapData>();
+        if (allMapDatas == null || allMapDatas.Count == 0)
+        {
+            Debug.LogError("[MapManager] DataManager에서 MapData를 가져오지 못했습니다! DataManager에서 'MapData' 로드가 정상적으로 호출되었는지, JSON 파일 내 items 구조가 올바른지 확인해주세요.");
+            return;
+        }
+
+        MapData centralData = null;
+        List<MapData> stationDatas = new List<MapData>();
+        List<MapData> normalDatas = new List<MapData>();
+
+        foreach (var data in allMapDatas)
+        {
+            if (data == null) continue;
+
+            if (data.Type == MapTypeConst.CentralTerminal) centralData = data;
+            else if (data.Type == MapTypeConst.Station) stationDatas.Add(data);
+            else if (data.Type == MapTypeConst.Normal) normalDatas.Add(data);
+        }
+
+        if (centralData != null)
+        {
+            await SpawnMapFromDataAsync(centralData, Vector3Int.zero, 2, "CentralTerminal", cancellationToken);
+        }
+        else
+        {
+            Debug.LogError("[MapManager] CentralTerminal 타입의 MapData를 찾을 수 없습니다!");
+        }
 
         List<bool> assignedTypes = RandomStationLayout();
 
@@ -72,41 +116,63 @@ public class MapManager : SingletonBase<MapManager>
         {
             Vector3Int gridPos = _mapOffsets[i];
             bool isStation = assignedTypes[i];
-            GameObject selectedPrefab = null;
-
             int typeId = isStation ? 1 : 0;
+
+            MapData selectedData = null;
 
             if (isStation)
             {
-                if (_stationMapPrefabs == null || _stationMapPrefabs.Count == 0)
+                if (stationDatas.Count == 0)
                 {
-                    Debug.LogError($"[MapManager] Station 맵 프리팹 리스트가 비어있습니다! (Grid: {gridPos})");
+                    Debug.LogError($"[MapManager] Station 타입 MapData가 없습니다! (Grid: {gridPos})");
                     continue;
                 }
-                selectedPrefab = _stationMapPrefabs[Random.Range(0, _stationMapPrefabs.Count)];
+                selectedData = stationDatas[Random.Range(0, stationDatas.Count)];
             }
             else
             {
-                if (_normalMapPrefabs == null || _normalMapPrefabs.Count == 0)
+                if (normalDatas.Count == 0)
                 {
-                    Debug.LogError($"[MapManager] Normal 맵 프리팹 리스트가 비어있습니다! (Grid: {gridPos})");
+                    Debug.LogError($"[MapManager] Normal 타입 MapData가 없습니다! (Grid: {gridPos})");
                     continue;
                 }
-                selectedPrefab = _normalMapPrefabs[Random.Range(0, _normalMapPrefabs.Count)];
+                selectedData = normalDatas[Random.Range(0, normalDatas.Count)];
             }
 
-            if (selectedPrefab == null)
+            if (selectedData == null)
             {
-                Debug.LogError($"[MapManager] 리스트에서 선택된 맵 프리팹이 null입니다. (isStation: {isStation}, Grid: {gridPos})");
+                Debug.LogError($"[MapManager] 선택된 맵 데이터가 null입니다. (Grid: {gridPos})");
                 continue;
             }
 
-            SpawnMapObject(selectedPrefab, gridPos, isStation ? "StationMap" : "NormalMap");
+            string tag = isStation ? "StationMap" : "NormalMap";
+            await SpawnMapFromDataAsync(selectedData, gridPos, typeId, tag, cancellationToken);
         }
 
-        Debug.Log("[MapManager] 3x3 맵 생성 및 규칙 배치 완료!");
-
+        Debug.Log("[MapManager] 데이터 기반 3x3 맵 생성 완료!");
         OnMapGenerated?.Invoke(_mapTypeData);
+    }
+
+    private async UniTask SpawnMapFromDataAsync(MapData mapData, Vector3Int gridPos, int typeId, string mapNameTag, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(mapData.AddressablePath))
+        {
+            Debug.LogError($"[MapManager] 맵 데이터(ID: {mapData.Id})의 AddressablePath가 비어있습니다.");
+            return;
+        }
+
+        GameObject prefab = await ResourceManager.Instance.LoadAsset<GameObject>(mapData.AddressablePath);
+        if (prefab == null)
+        {
+            Debug.LogError($"[MapManager] 어드레서블 로드 실패: '{mapData.AddressablePath}' (ID: {mapData.Id})");
+            return;
+        }
+
+        Vector3 worldPos = new Vector3(gridPos.x * _mapSpacing, 0, gridPos.y * _mapSpacing);
+        GameObject mapObj = Instantiate(prefab, worldPos, Quaternion.identity, _mapRoot);
+
+        _spawnedMaps[gridPos] = mapObj;
+        _mapTypeData[gridPos] = typeId;
     }
 
     private List<bool> RandomStationLayout()
@@ -132,7 +198,6 @@ public class MapManager : SingletonBase<MapManager>
             currentIteration++;
         }
 
-        Debug.LogWarning("[MapManager] 유효한 셔플 레이아웃을 찾지 못해 기본 레이아웃을 반환합니다.");
         return new List<bool> { true, true, false, true, true, false, false, false };
     }
 
@@ -148,29 +213,14 @@ public class MapManager : SingletonBase<MapManager>
             if (layout[index])
             {
                 currentStreak++;
-                if (currentStreak > maxStreak)
-                {
-                    maxStreak = currentStreak;
-                }
+                if (currentStreak > maxStreak) maxStreak = currentStreak;
             }
             else
             {
                 currentStreak = 0;
             }
         }
-
         return maxStreak <= 2;
-    }
-
-    private void SpawnMapObject(GameObject prefab, Vector3Int gridPos, string mapNameTag)
-    {
-        Assert.IsNotNull(prefab, $"[MapManager] Spawn 실패: '{mapNameTag}' 프리팹이 null입니다. (Grid: {gridPos})");
-
-        Vector3 worldPos = new Vector3(gridPos.x * _mapSpacing, 0, gridPos.y * _mapSpacing);
-        GameObject mapObj = Instantiate(prefab, worldPos, Quaternion.identity, _mapRoot);
-
-        //mapObj.name = $"{mapNameTag}_{gridPos.x}_{gridPos.y}";
-        _spawnedMaps[gridPos] = mapObj;
     }
 
     private void ClearMap()
@@ -183,6 +233,7 @@ public class MapManager : SingletonBase<MapManager>
             }
         }
         _spawnedMaps.Clear();
+        _mapTypeData.Clear();
     }
 
     public Dictionary<Vector3Int, int> GetMapTypeData()
