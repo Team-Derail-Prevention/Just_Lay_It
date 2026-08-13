@@ -9,7 +9,7 @@ public class DroneClickCommand : MonoBehaviour
 
     [Header("입력")]
     [SerializeField] private Key _orderModeKey = Key.B;
-    [SerializeField] private Key _recallKey = Key.R;
+    [SerializeField] private Key _recallKey = Key.V;
 
     public bool IsOrderMode { get { return _isOrderMode; } }
 
@@ -30,7 +30,7 @@ public class DroneClickCommand : MonoBehaviour
             return;
         }
 
-        if (Mouse.current.leftButton.wasPressedThisFrame == false)
+        if (Mouse.current.rightButton.wasPressedThisFrame == false)
         {
             return;
         }
