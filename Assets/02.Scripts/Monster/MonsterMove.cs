@@ -2,12 +2,12 @@
 using static UnityEngine.GraphicsBuffer;
 
 public class MonsterMove : MonoBehaviour
-{
-    [SerializeField] private string _monsterId = "Monster_01";
+{    
     [SerializeField] private float _attackRange = 5.0f;
     [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private Transform firePosition;
 
+    private string _monsterId;
     private float _moveSpeed;
     private int _monsterAtk;
     private Transform _target;
@@ -15,43 +15,6 @@ public class MonsterMove : MonoBehaviour
 
     private float _attackTimer = 0f;
     private float _attackCooldown = 2f;
-
-    private async void Start()
-    {
-        //테스트 시점꼬임 방지용 비동기 로딩 대기 코드
-        while (DataManager.Instance == null)
-        {
-            await Cysharp.Threading.Tasks.UniTask.Yield();
-        }
-
-        while (!DataManager.Instance.IsLoaded)
-        {
-            await Cysharp.Threading.Tasks.UniTask.Yield();
-        }
-
-        MonsterData monsterData = DataManager.Instance.GetData<MonsterData>(_monsterId);
-
-        if (monsterData != null)
-        {
-            _moveSpeed = monsterData.Speed;
-            _monsterAtk = monsterData.Atk;
-            Debug.Log($"Monster '{monsterData.MonsterName}' move speed: {_moveSpeed}");
-        }
-        else
-        {
-            Debug.LogError($"Monster data not found for ID: {_monsterId}");
-        }
-
-        if(firePosition == null)
-        {
-            firePosition = transform;
-        }
-
-        //if (_target == null && TestTarget.Instance != null)
-        //{
-        //    _target = TestTarget.Instance.transform;
-        //}
-    }
 
     private void Update()
     {
@@ -90,11 +53,36 @@ public class MonsterMove : MonoBehaviour
         }
     }
 
-    public void SetTarget(Transform target)
+    public void Initialize(string monsterId, Transform target)
     {
+        _monsterId = monsterId;
         _target = target;
+
+        _isAttackRange = false;
+        _attackTimer = 0f;
+
+        if (firePosition == null)
+        {
+            firePosition = transform;
+        }
+
+        LoadMonsterData();
     }
 
+    private void LoadMonsterData()
+    {
+        MonsterData monsterData = DataManager.Instance.GetData<MonsterData>(_monsterId);
+
+        if (monsterData != null)
+        {
+            _moveSpeed = monsterData.Speed;
+            _monsterAtk = monsterData.Atk;
+        }
+        else
+        {
+            Debug.LogError($"{_monsterId} 몬스터 데이터를 찾을 수 없습니다");
+        }
+    }
     private void ShootProjectile()
     {
         if (_projectilePrefab == null)
