@@ -80,7 +80,7 @@ public class RailManager : MonoBehaviour
 
     private void HandleMapGenerated(Dictionary<Vector3Int, int> mapTypeData)
     {
-        Transform_MapRoot = MapManager_Ref.MapRoot;
+        // Transform_MapRoot = MapManager_Ref.MapRoot;
         ClearAllPlacedRails();
         BuildCubeLookup();
     }

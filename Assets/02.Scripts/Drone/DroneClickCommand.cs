@@ -4,85 +4,72 @@ using UnityEngine.InputSystem;
 public class DroneClickCommand : MonoBehaviour
 {
     [Header("참조")]
-    [SerializeField] private Camera _camera;
-    [SerializeField] private TestGridMap _grid;
-    [SerializeField] private Drone _drone;
+    [SerializeField] private DroneTargetCursor _cursor;
+    [SerializeField] private DroneStateMachine _stateMachine;
 
-    private bool _hasHoverCell;
-    private CellPos _hoverCell;
+    [Header("입력")]
+    [SerializeField] private Key _orderModeKey = Key.B;
+    [SerializeField] private Key _recallKey = Key.V;
 
-    private void Awake()
-    {
-        if (_camera == null)
-        {
-            _camera = Camera.main;
-        }
-    }
+    public bool IsOrderMode { get { return _isOrderMode; } }
+
+    private bool _isOrderMode;
 
     private void Update()
     {
-        if (Mouse.current == null)
+        if (Mouse.current == null || _cursor == null || _stateMachine == null)
         {
             return;
         }
 
-        _hasHoverCell = TryGetCellUnderMouse(out _hoverCell);
+        HandleOrderModeToggle();
+        HandleRecall();
 
-        if (Mouse.current.leftButton.wasPressedThisFrame == false)
+        if (_isOrderMode == false)
         {
             return;
         }
 
-        if (_hasHoverCell == false)
+        if (Mouse.current.rightButton.wasPressedThisFrame == false)
         {
             return;
         }
 
-        _drone.MoveTo(_hoverCell);
+        if (_cursor.TryGetTarget(out MaterialObject target) == false)
+        {
+            return;
+        }
+
+        _stateMachine.Assign(target);
     }
 
-    private bool TryGetCellUnderMouse(out CellPos cell)
+    private void HandleOrderModeToggle()
     {
-        cell = default;
-
-        if (_camera == null || _grid == null)
-        {
-            return false;
-        }
-
-        Vector2 screen = Mouse.current.position.ReadValue();
-        Ray ray = _camera.ScreenPointToRay(screen);
-        Plane ground = new Plane(Vector3.up, _grid.transform.position);
-
-        if (ground.Raycast(ray, out float distance) == false)
-        {
-            return false;
-        }
-
-        CellPos hit = _grid.ConvertWorldToCell(ray.GetPoint(distance));
-
-        if (_grid.IsWalkable(hit) == false)
-        {
-            return false;
-        }
-
-        cell = hit;
-
-        return true;
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (_hasHoverCell == false || _grid == null)
+        if (Keyboard.current == null)
         {
             return;
         }
 
-        Gizmos.color = Color.green;
+        if (Keyboard.current[_orderModeKey].wasPressedThisFrame == false)
+        {
+            return;
+        }
 
-        Vector3 center = _grid.ConvertCellToWorld(_hoverCell);
-        Vector3 size = new Vector3(_grid.CellSize, 0.05f, _grid.CellSize);
+        _isOrderMode = !_isOrderMode;
+    }
 
-        Gizmos.DrawWireCube(center, size);
+    private void HandleRecall()
+    {
+        if (Keyboard.current == null)
+        {
+            return;
+        }
+
+        if (Keyboard.current[_recallKey].wasPressedThisFrame == false)
+        {
+            return;
+        }
+
+        _stateMachine.Recall();
     }
 }
