@@ -33,7 +33,7 @@ public class Train : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha2))
+        if (Input.GetKeyDown(KeyCode.Alpha6))
         {
             _isMoving = !_isMoving;
         }

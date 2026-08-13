@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class TrainManager : MonoBehaviour
 {
@@ -36,6 +36,10 @@ public class TrainManager : MonoBehaviour
     private HashSet<Transform> visitedNode = new HashSet<Transform>();
     private HashSet<Transform> visitedStation = new HashSet<Transform>();
 
+    public static event Action<Transform> OnTrainSpawn;
+    public static event Action<bool> OnStationState;
+
+
     private void Awake()
     {
         if (Instance == null)
@@ -50,12 +54,12 @@ public class TrainManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             DepartStation();
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha3))
+        if (Input.GetKeyDown(KeyCode.Alpha5))
         {
             SpawnFullTrain(_defaultCarriageCount);
         }
@@ -118,10 +122,7 @@ public class TrainManager : MonoBehaviour
             }
         }
 
-        if (CameraManager.Instance != null)
-        {
-            CameraManager.Instance.SetCameraTarget(_headTrain);
-        }
+        OnTrainSpawn?.Invoke(_headTrain);
 
         Debug.Log($"[TrainManager] 기관차 1대와 객차 {carriageCount}대 전체 소환 완료!");
     }
@@ -204,6 +205,8 @@ public class TrainManager : MonoBehaviour
         IsStation = true;
         SetCarriagerActive(false);
         Debug.Log("기차역 도착");
+
+        OnStationState?.Invoke(true);
     }
 
     public void DepartStation()
@@ -211,6 +214,8 @@ public class TrainManager : MonoBehaviour
         IsStation = false;
         SetCarriagerActive(true);
         Debug.Log("기차역 출발");
+
+        OnStationState?.Invoke(false);
     }
 
     public void SetCarriagerActive(bool isActive)
