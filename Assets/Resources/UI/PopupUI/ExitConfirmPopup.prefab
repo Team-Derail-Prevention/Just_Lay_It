@@ -158,6 +158,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6166723387526084360}
+  - component: {fileID: 3336170904860235266}
   m_Layer: 5
   m_Name: ExitConfirmPopup
   m_TagString: Untagged
@@ -188,6 +189,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 900, y: 550}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &3336170904860235266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2521885703806528817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e92592fcee65d744eb5ded61658da463, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ExitConfirmPopup
+  _messageText: {fileID: 6263523994982773411}
+  _yesButton: {fileID: 4590687865320125105}
+  _noButton: {fileID: 3016867130757757109}
 --- !u!1 &3875092551696262387
 GameObject:
   m_ObjectHideFlags: 0
@@ -769,6 +785,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3393532458673574038, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
   m_PrefabInstance: {fileID: 2545199740084696467}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4590687865320125105 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2082699219380995874, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 2545199740084696467}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!1001 &3835144163476520855
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -951,3 +978,14 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3393532458673574038, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
   m_PrefabInstance: {fileID: 3835144163476520855}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3016867130757757109 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2082699219380995874, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 3835144163476520855}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button

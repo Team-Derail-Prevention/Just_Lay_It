@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public class LobbyUI : UIBase
 {
@@ -28,7 +29,7 @@ public class LobbyUI : UIBase
 
     private void OnClick_GameStart()
     {
-        UIManager.Instance.StartGameFromLobby();
+        UIManager.Instance.StartGameFromLobby().Forget();
     }
 
     private void OnClick_Upgrade()
