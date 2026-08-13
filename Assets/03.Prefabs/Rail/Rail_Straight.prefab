@@ -102,9 +102,10 @@ GameObject:
   - component: {fileID: 2431257760836619461}
   - component: {fileID: 4347039301869912080}
   - component: {fileID: -5197946312972721738}
+  - component: {fileID: 797043721347912653}
   m_Layer: 0
   m_Name: Rail_Straight
-  m_TagString: Untagged
+  m_TagString: Rail
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -152,6 +153,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca6ace616028d2547b3eb757722adc8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailPreviewController
-  _rotateKey: 114
   _renderers: []
   _colorPropertyName: _BaseColor
+--- !u!65 &797043721347912653
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6366447609679932853}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.909245, y: 1, z: 1.4618063}
+  m_Center: {x: 0.007020235, y: 0, z: -0.018642902}
