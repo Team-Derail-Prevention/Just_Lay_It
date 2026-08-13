@@ -118,6 +118,11 @@ public class TrainManager : MonoBehaviour
             }
         }
 
+        if (CameraManager.Instance != null)
+        {
+            CameraManager.Instance.SetCameraTarget(_headTrain);
+        }
+
         Debug.Log($"[TrainManager] 기관차 1대와 객차 {carriageCount}대 전체 소환 완료!");
     }
     //

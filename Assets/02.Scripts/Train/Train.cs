@@ -17,14 +17,14 @@ public class Train : MonoBehaviour
         get { return _isMoving; }
     }
 
-    public Camera MainCam { get; private set; }
+    public Camera Camera { get; private set; }
 
 
     private void Awake()
     {
-        MainCam = Camera.main;
+        Camera = Camera.main;
 
-        if (MainCam == null)
+        if (Camera == null)
         {
             Debug.LogError("[Train:Awake] 카메라를 찾을 수 없습니다.");
             return;
