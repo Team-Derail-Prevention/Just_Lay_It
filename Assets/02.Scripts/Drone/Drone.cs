@@ -9,7 +9,7 @@ public class Drone : MonoBehaviour
     [SerializeField, Min(0.01f)] private float _arriveSpeed = 0.5f;
     [SerializeField, Min(0.001f)] private float _arriveDistance = 0.05f;
 
-    public event Action<CellPos> OnArrived;
+    public event Action OnArrived;
 
     private DroneMoveInput _moveInput;
     private IAgentMover _mover;
@@ -20,19 +20,9 @@ public class Drone : MonoBehaviour
         _mover = GetComponent<IAgentMover>();
     }
 
-    public bool CanMoveTo(CellPos cell)
+    public void MoveTo(Vector3 worldPosition)
     {
-        if (_moveInput == null)
-        {
-            return false;
-        }
-
-        return _moveInput.IsWalkable(cell);
-    }
-
-    public bool MoveTo(CellPos cell)
-    {
-        return _moveInput.SetTarget(cell);
+        _moveInput.SetTarget(worldPosition);
     }
 
     private void Update()
@@ -73,12 +63,10 @@ public class Drone : MonoBehaviour
 
     private void Arrive()
     {
-        CellPos arrivedCell = _moveInput.TargetCell;
-
         _mover.Warp(_moveInput.GetTargetPosition());
         _moveInput.ClearTarget();
 
-        OnArrived?.Invoke(arrivedCell);
+        OnArrived?.Invoke();
     }
 
     private void OnDrawGizmosSelected()

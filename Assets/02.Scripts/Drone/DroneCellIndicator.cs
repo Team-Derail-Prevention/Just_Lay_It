@@ -4,7 +4,7 @@ public class DroneCellIndicator : MonoBehaviour
 {
     [Header("참조")]
     [SerializeField] private DroneClickCommand _command;
-    [SerializeField] private GridCursor _cursor;
+    [SerializeField] private DroneTargetCursor _cursor;
     [SerializeField] private DroneStateMachine _stateMachine;
     [SerializeField] private Renderer _indicator;
 
@@ -12,6 +12,7 @@ public class DroneCellIndicator : MonoBehaviour
     [SerializeField] private Color _allowedColor = Color.green;
     [SerializeField] private Color _blockedColor = Color.red;
     [SerializeField] private float _heightOffset = 0.02f;
+    [SerializeField, Min(0.1f)] private float _size = 2f;
 
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 
@@ -40,7 +41,7 @@ public class DroneCellIndicator : MonoBehaviour
             return;
         }
 
-        if (_cursor.TryGetCell(out CellPos cell) == false)
+        if (_cursor.TryGetTarget(out MaterialObject target) == false)
         {
             SetVisible(false);
 
@@ -48,27 +49,25 @@ public class DroneCellIndicator : MonoBehaviour
         }
 
         SetVisible(true);
-        PlaceAt(cell);
-        Colorize(cell);
+        PlaceAt(target);
+        Colorize(target);
     }
 
-    private void PlaceAt(CellPos cell)
+    private void PlaceAt(MaterialObject target)
     {
-        Vector3 center = _cursor.GetCellCenter(cell);
+        Vector3 position = target.transform.position;
 
-        center.y += _heightOffset;
+        position.y += _heightOffset;
 
-        float size = _cursor.CellSize;
-
-        _indicator.transform.position = center;
-        _indicator.transform.localScale = new Vector3(size, size, 1f);
+        _indicator.transform.position = position;
+        _indicator.transform.localScale = new Vector3(_size, _size, 1f);
     }
 
-    private void Colorize(CellPos cell)
+    private void Colorize(MaterialObject target)
     {
         Color color;
 
-        if (_stateMachine.CanAssign(cell))
+        if (_stateMachine.CanAssign(target))
         {
             color = _allowedColor;
         }

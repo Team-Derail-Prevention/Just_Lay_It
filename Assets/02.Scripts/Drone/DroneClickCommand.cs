@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class DroneClickCommand : MonoBehaviour
 {
     [Header("참조")]
-    [SerializeField] private GridCursor _cursor;
+    [SerializeField] private DroneTargetCursor _cursor;
     [SerializeField] private DroneStateMachine _stateMachine;
 
     [Header("입력")]
@@ -35,12 +35,12 @@ public class DroneClickCommand : MonoBehaviour
             return;
         }
 
-        if (_cursor.TryGetCell(out CellPos cell) == false)
+        if (_cursor.TryGetTarget(out MaterialObject target) == false)
         {
             return;
         }
 
-        _stateMachine.Assign(cell);
+        _stateMachine.Assign(target);
     }
 
     private void HandleOrderModeToggle()

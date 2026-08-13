@@ -2,25 +2,16 @@ using UnityEngine;
 
 public class DroneMoveInput : MonoBehaviour
 {
-    [SerializeField] private GridMapBase _grid;
-
-    public CellPos TargetCell { get { return _targetCell; } }
+    public Vector3 TargetPosition { get { return _targetPosition; } }
     public bool HasTarget { get { return _hasTarget; } }
 
-    private CellPos _targetCell;
+    private Vector3 _targetPosition;
     private bool _hasTarget;
 
-    public bool SetTarget(CellPos cell)
+    public void SetTarget(Vector3 worldPosition)
     {
-        if (IsWalkable(cell) == false)
-        {
-            return false;
-        }
-
-        _targetCell = cell;
+        _targetPosition = worldPosition;
         _hasTarget = true;
-
-        return true;
     }
 
     public void ClearTarget()
@@ -28,27 +19,13 @@ public class DroneMoveInput : MonoBehaviour
         _hasTarget = false;
     }
 
+    // 드론은 자기 높이를 유지한 채 수평으로만 이동합니다.
     public Vector3 GetTargetPosition()
     {
-        if (_grid == null)
-        {
-            return transform.position;
-        }
-
-        Vector3 world = _grid.ConvertCellToWorld(_targetCell);
+        Vector3 world = _targetPosition;
 
         world.y = transform.position.y;
 
         return world;
-    }
-
-    public bool IsWalkable(CellPos cell)
-    {
-        if (_grid == null)
-        {
-            return false;
-        }
-
-        return _grid.IsInside(cell);
     }
 }

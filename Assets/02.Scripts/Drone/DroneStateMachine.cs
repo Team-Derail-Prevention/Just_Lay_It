@@ -5,27 +5,27 @@ using UnityEngine;
 public class DroneStateMachine : MonoBehaviour
 {
     [Header("참조")]
-    [SerializeField] private GridMapBase _grid;
     [SerializeField] private Transform _dock;
+
+    // 이동 중에는 꺼둡니다. 켜져 있으면 지나치는 자원까지 채굴이 시작됩니다.
+    [SerializeField] private Collider _workTrigger;
 
     [Header("작업")]
     [SerializeField, Min(0f)] private float _workDuration = 2f;
 
     public DroneState State { get { return _state; } }
     public bool CanAcceptWork { get { return _state == DroneState.Docked || _isReturning; } }
-    public CellPos WorkCell { get { return _workCell; } }
+    public MaterialObject WorkTarget { get { return _workTarget; } }
     public float WorkProgress { get { return GetWorkProgress(); } }
 
-    public event Action<CellPos> OnWorkCompleted;
+    public event Action<MaterialObject> OnWorkCompleted;
     public event Action<DroneState> OnStateChanged;
 
     private Drone _drone;
     private IAgentMover _mover;
 
     private DroneState _state = DroneState.Docked;
-    private CellPos _workCell;
-    private CellPos _dockCell;
-    private bool _hasDockCell;
+    private MaterialObject _workTarget;
     private bool _isReturning;
     private float _workTimer;
 
@@ -33,6 +33,13 @@ public class DroneStateMachine : MonoBehaviour
     {
         _drone = GetComponent<Drone>();
         _mover = GetComponent<IAgentMover>();
+
+        if (_workTrigger == null)
+        {
+            _workTrigger = GetComponent<Collider>();
+        }
+
+        UpdateWorkTrigger();
     }
 
     private void OnEnable()
@@ -50,35 +57,32 @@ public class DroneStateMachine : MonoBehaviour
         SnapToDock();
     }
 
-    public bool CanAssign(CellPos cell)
+    public bool CanAssign(MaterialObject target)
     {
         if (CanAcceptWork == false)
         {
             return false;
         }
 
-        if (_drone == null)
+        if (target == null)
         {
             return false;
         }
 
-        return _drone.CanMoveTo(cell);
+        return target.IsBroken == false && target.IsMining == false;
     }
 
-    public bool Assign(CellPos cell)
+    public bool Assign(MaterialObject target)
     {
-        if (CanAssign(cell) == false)
+        if (CanAssign(target) == false)
         {
             return false;
         }
 
-        if (_drone.MoveTo(cell) == false)
-        {
-            return false;
-        }
-
-        _workCell = cell;
+        _workTarget = target;
         _isReturning = false;
+
+        _drone.MoveTo(target.transform.position);
 
         SetState(DroneState.Moving);
 
@@ -119,7 +123,7 @@ public class DroneStateMachine : MonoBehaviour
             return;
         }
 
-        OnWorkCompleted?.Invoke(_workCell);
+        OnWorkCompleted?.Invoke(_workTarget);
 
         BeginReturn();
     }
@@ -127,35 +131,25 @@ public class DroneStateMachine : MonoBehaviour
     private void BeginReturn()
     {
         _isReturning = true;
-        _hasDockCell = false;
+        _workTarget = null;
 
         SetState(DroneState.Moving);
 
         TrackDock();
     }
 
+    // 기차가 움직이면 드론칸도 따라 움직이므로 매 프레임 목표를 갱신합니다.
     private void TrackDock()
     {
-        if (TryGetDockCell(out CellPos cell) == false)
+        if (_dock == null)
         {
             return;
         }
 
-        if (_hasDockCell && cell == _dockCell)
-        {
-            return;
-        }
-
-        if (_drone.MoveTo(cell) == false)
-        {
-            return;
-        }
-
-        _dockCell = cell;
-        _hasDockCell = true;
+        _drone.MoveTo(_dock.position);
     }
 
-    private void HandleArrived(CellPos cell)
+    private void HandleArrived()
     {
         if (_state != DroneState.Moving)
         {
@@ -178,38 +172,16 @@ public class DroneStateMachine : MonoBehaviour
 
     private void SnapToDock()
     {
-        if (_mover == null)
+        if (_mover == null || _dock == null)
         {
             return;
         }
 
-        if (TryGetDockCell(out CellPos cell) == false)
-        {
-            return;
-        }
-
-        Vector3 world = _grid.ConvertCellToWorld(cell);
+        Vector3 world = _dock.position;
 
         world.y = transform.position.y;
 
         _mover.Warp(world);
-
-        _dockCell = cell;
-        _hasDockCell = true;
-    }
-
-    private bool TryGetDockCell(out CellPos cell)
-    {
-        cell = default;
-
-        if (_grid == null || _dock == null)
-        {
-            return false;
-        }
-
-        cell = _grid.ConvertWorldToCell(_dock.position);
-
-        return true;
     }
 
     private void SetState(DroneState next)
@@ -221,7 +193,19 @@ public class DroneStateMachine : MonoBehaviour
 
         _state = next;
 
+        UpdateWorkTrigger();
+
         OnStateChanged?.Invoke(_state);
+    }
+
+    private void UpdateWorkTrigger()
+    {
+        if (_workTrigger == null)
+        {
+            return;
+        }
+
+        _workTrigger.enabled = _state == DroneState.Working;
     }
 
     private float GetWorkProgress()
