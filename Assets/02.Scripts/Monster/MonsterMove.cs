@@ -24,32 +24,15 @@ public class MonsterMove : MonoBehaviour
         }
 
         Vector3 flatTargetPos = new Vector3(_target.position.x, transform.position.y, _target.position.z);
-
         float distanceToTarget = Vector3.Distance(transform.position, flatTargetPos);
 
-        if(distanceToTarget > _attackRange)
+        if (distanceToTarget > _attackRange)
         {
-            _isAttackRange = false;
-            _attackTimer = 0f;
-
-            transform.position =Vector3.MoveTowards(transform.position, flatTargetPos , _moveSpeed * Time.deltaTime);
-            transform.LookAt(flatTargetPos);
+            HandleMovement(flatTargetPos);
         }
         else
         {
-            if(!_isAttackRange)
-            {
-                _isAttackRange = true;
-            }
-
-            transform.LookAt(flatTargetPos);
-
-            _attackTimer += Time.deltaTime;
-            if (_attackTimer >= _attackCooldown)
-            {              
-                _attackTimer = 0f;
-                ShootProjectile();
-            }
+            HandleAttack(flatTargetPos);
         }
     }
 
@@ -100,6 +83,31 @@ public class MonsterMove : MonoBehaviour
             Vector3 shootDir = (targetCenter - firePosition.position).normalized;
 
             projectile.ProjectileInitialize(shootDir, _monsterAtk);
+        }
+    }
+
+    private void HandleMovement(Vector3 targetPos)
+    {
+        _isAttackRange = false;
+        _attackTimer = 0f;
+
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, _moveSpeed * Time.deltaTime);
+        transform.LookAt(targetPos);
+    }
+    private void HandleAttack(Vector3 targetPos)
+    {
+        if (!_isAttackRange)
+        {
+            _isAttackRange = true;
+        }
+
+        transform.LookAt(targetPos);
+
+        _attackTimer += Time.deltaTime;
+        if (_attackTimer >= _attackCooldown)
+        {
+            _attackTimer = 0f;
+            ShootProjectile();
         }
     }
 }
