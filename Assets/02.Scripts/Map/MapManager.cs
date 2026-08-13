@@ -42,6 +42,7 @@ public class MapManager : SingletonBase<MapManager>
         if (Input.GetKeyDown(KeyCode.R))
         {
             Debug.Log("[MapManager] 맵 리셋 및 재생성 테스트 시작");
+            ClearMap();
             GenerateMap();
         }
     }
@@ -60,8 +61,6 @@ public class MapManager : SingletonBase<MapManager>
 
     public void GenerateMap()
     {
-        ClearMap();
-
         Assert.IsNotNull(_centralTerminalPrefab, "[MapManager] Central Terminal Prefab이 할당되지 않았습니다!");
         SpawnMapObject(_centralTerminalPrefab, Vector3Int.zero, "CentralTerminal");
         _mapTypeData[Vector3Int.zero] = 2;
