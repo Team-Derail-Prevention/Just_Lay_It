@@ -44,4 +44,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17d8c0f74c71b3945be4eb0ff693b7d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrainManager
+  _headTrain: {fileID: 0}
+  _followDistance: 1.2
   pathList: []
+  carList: []
+  _headPrefab: {fileID: 3943277691693670508, guid: d7dc3abc5aaaa53439468ece5f272af2, type: 3}
+  _testCarPrefab: {fileID: 2815961600046383129, guid: eba2e4059128814468eb71029566c594, type: 3}
+  _testTurretPrefab: {fileID: 7710635448997255348, guid: 36a1cbd3a19ac14478c56bb2f42a517d, type: 3}
+  _spawnPoint: {fileID: 0}
+  _defaultCarriageCount: 3
