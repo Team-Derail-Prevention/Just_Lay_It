@@ -17945,6 +17945,10 @@ PrefabInstance:
       propertyPath: Transform_MapRoot
       value: 
       objectReference: {fileID: 8265845937933750037}
+    - target: {fileID: 6537115754192923904, guid: c38feec43a1e5e74d96f7f3fab807a0d, type: 3}
+      propertyPath: _railSegmentAddress
+      value: Prefab/Rail
+      objectReference: {fileID: 0}
     - target: {fileID: 7432896565880681344, guid: c38feec43a1e5e74d96f7f3fab807a0d, type: 3}
       propertyPath: m_Name
       value: RailManager
