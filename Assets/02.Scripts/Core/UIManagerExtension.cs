@@ -19,6 +19,7 @@ public enum UIType
     SettingUI,
     GameBookUI,
     ExitConfirmPopup,
+    LoadingUI,
 }
 public static class UIManagerExtension
 {
@@ -41,9 +42,38 @@ public static class UIManagerExtension
         uiManager.OpenContentUI(UIType.LobbyUI);
     }
 
-    public static void StartGameFromLobby(this UIManager uiManager)
+    public static Cysharp.Threading.Tasks.UniTask StartGameFromLobby(this UIManager uiManager)
     {
         uiManager.CloseContentUI(UIType.LobbyUI);
+
+        var loadingUI = uiManager.OpenLoadingUI();
+        if (loadingUI == null)
+        {
+            return Cysharp.Threading.Tasks.UniTask.CompletedTask;
+        }
+
+        // 실제 로딩 추후 수정
+
+        loadingUI.SetDataLoaded();
+
+        return Cysharp.Threading.Tasks.UniTask.CompletedTask;
+    }
+
+    public static LoadingUI OpenLoadingUI(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenUI(UIRootType.VeryFrontUI, UIType.LoadingUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("LoadingUI가 생성되지 않았습니다");
+            return null;
+        }
+
+        return uiBase as LoadingUI;
+    }
+
+    public static void CloseLoadingUI(this UIManager uiManager)
+    {
+        uiManager.CloseUI(UIRootType.VeryFrontUI, UIType.LoadingUI);
     }
 
     public static void OpenLobbyUpgradeUI(this UIManager uiManager)
