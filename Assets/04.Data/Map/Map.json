@@ -5,9 +5,9 @@
     "AddressablePath": "CentralTerminal_001"
   },
   {
-    "Id": "Staion_001",
-    "Type": "Staion",
-    "AddressablePath": "Staion_001"
+    "Id": "Station_001",
+    "Type": "Station",
+    "AddressablePath": "Station_001"
   },
   {
     "Id": "Normal_001",
