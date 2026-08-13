@@ -47,8 +47,8 @@ public class MaterialObject : BaseColliderTrigger
 
     private void Update()
     {
-        // [테스트용 입력] 숫자 5번: "채굴/수집 시작 이벤트"
-        if (!_isMining && !_isBroken && !_isCollected && Input.GetKeyDown(KeyCode.Comma))
+        // [테스트용 입력] 마이너스 : "채굴/수집 시작 이벤트"
+        if (!_isMining && !_isBroken && !_isCollected && Input.GetKeyDown(KeyCode.Minus))
         {
             ReceiveDroneSignalAndStart();
         }

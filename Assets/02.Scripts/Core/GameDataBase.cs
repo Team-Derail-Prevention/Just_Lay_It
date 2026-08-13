@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 [Serializable]
 public class SerializationWrapper<T>
@@ -12,4 +11,18 @@ public class SerializationWrapper<T>
 public class GameDataBase
 {
     public string Id;
+}
+
+[Serializable]
+public class MapData : GameDataBase
+{
+    public string Type;
+    public string AddressablePath;
+}
+
+public static class MapTypeConst
+{
+    public const string CentralTerminal = "CentralTerminal";
+    public const string Station = "Station";
+    public const string Normal = "Normal";
 }
