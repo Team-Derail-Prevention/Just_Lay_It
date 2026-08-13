@@ -5,29 +5,32 @@ using UnityEngine;
 public class Drone : MonoBehaviour
 {
     [SerializeField, Min(0.1f)] private float _moveSpeed = 4f;
+    [SerializeField, Min(0f)] private float _slowDownDistance = 1.5f;
+    [SerializeField, Min(0.01f)] private float _arriveSpeed = 0.5f;
+    [SerializeField, Min(0.001f)] private float _arriveDistance = 0.05f;
 
-    public event Action<CellPos> OnArrived;
+    public event Action OnArrived;
 
     private DroneMoveInput _moveInput;
-    private IAgentMovementInput _input;
     private IAgentMover _mover;
 
     private void Awake()
     {
         _moveInput = GetComponent<DroneMoveInput>();
-        _input = _moveInput;
         _mover = GetComponent<IAgentMover>();
     }
 
-    public bool MoveTo(CellPos cell)
+    public void MoveTo(Vector3 worldPosition)
     {
-        return _moveInput.SetTarget(cell);
+        _moveInput.SetTarget(worldPosition);
     }
 
     private void Update()
     {
         if (_moveInput.HasTarget == false)
         {
+            _mover.Move(Vector3.zero, 0f);
+
             return;
         }
 
@@ -35,28 +38,35 @@ public class Drone : MonoBehaviour
 
         offset.y = 0f;
 
-        float step = _moveSpeed * Time.deltaTime;
+        float distance = offset.magnitude;
+        float step = _mover.CurrentVelocity.magnitude * Time.deltaTime;
 
-        if (offset.magnitude <= step)
+        if (distance <= Mathf.Max(_arriveDistance, step))
         {
             Arrive();
 
             return;
         }
 
-        Vector2 movement = _input.MovementInput;
+        _mover.Move(offset, GetDesiredSpeed(distance));
+    }
 
-        _mover.Move(new Vector3(movement.x, 0f, movement.y), _moveSpeed);
+    private float GetDesiredSpeed(float distance)
+    {
+        if (_slowDownDistance <= 0f || distance >= _slowDownDistance)
+        {
+            return _moveSpeed;
+        }
+
+        return Mathf.Lerp(_arriveSpeed, _moveSpeed, distance / _slowDownDistance);
     }
 
     private void Arrive()
     {
-        CellPos arrivedCell = _moveInput.TargetCell;
-
         _mover.Warp(_moveInput.GetTargetPosition());
         _moveInput.ClearTarget();
 
-        OnArrived?.Invoke(arrivedCell);
+        OnArrived?.Invoke();
     }
 
     private void OnDrawGizmosSelected()
