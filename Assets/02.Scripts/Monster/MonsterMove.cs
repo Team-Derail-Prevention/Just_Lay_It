@@ -47,10 +47,10 @@ public class MonsterMove : MonoBehaviour
             firePosition = transform;
         }
 
-        if (_target == null && TestTarget.Instance != null)
-        {
-            _target = TestTarget.Instance.transform;
-        }
+        //if (_target == null && TestTarget.Instance != null)
+        //{
+        //    _target = TestTarget.Instance.transform;
+        //}
     }
 
     private void Update()
