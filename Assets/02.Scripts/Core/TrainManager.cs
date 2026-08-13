@@ -1,6 +1,6 @@
-﻿using NUnit.Framework.Constraints;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class TrainManager : MonoBehaviour
 {
@@ -50,6 +50,11 @@ public class TrainManager : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            DepartStation();
+        }
+
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             SpawnFullTrain(_defaultCarriageCount);
@@ -192,13 +197,26 @@ public class TrainManager : MonoBehaviour
     public void ArriveStation(GameObject stationObj)
     {
         IsStation = true;
+        SetCarriagerActive(false);
         Debug.Log("기차역 도착");
     }
 
-    public void DepartStation(GameObject stationObj)
+    public void DepartStation()
     {
         IsStation = false;
+        SetCarriagerActive(true);
         Debug.Log("기차역 출발");
+    }
+
+    public void SetCarriagerActive(bool isActive)
+    {
+        for (int i = 0; i < carList.Count; i++)
+        {
+            if (carList[i] != null)
+            {
+                carList[i].SetActive(isActive);
+            }
+        }
     }
 
 }
