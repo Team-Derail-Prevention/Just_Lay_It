@@ -19,6 +19,22 @@ public class CameraManager : MonoBehaviour
         Instance = this;
     }
 
+    private void OnEnable()
+    {
+        TrainManager.OnTrainSpawn += TrainSpawn;
+    }
+
+    private void OnDisable()
+    {
+        TrainManager.OnTrainSpawn -= TrainSpawn;
+
+    }
+
+    private void TrainSpawn(Transform headTrain)
+    {
+        SetCameraTarget(headTrain);
+    }
+
     public void SetCameraTarget(Transform transform)
     {
         _cinemachineCamera.Follow = transform;
