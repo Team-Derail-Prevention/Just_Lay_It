@@ -67,7 +67,7 @@ public class DataManager : SingletonBase<DataManager>
     {
         IsLoaded = false;
 
-        //await LoadDataAsync</*blahblahData*/>(/*"blahblahData*/, cancellationToken);
+        await LoadDataAsync<MonsterData>("MonsterTableData", cancellationToken);
 
         IsLoaded = true;
         OnDataLoadCompleted?.Invoke();
