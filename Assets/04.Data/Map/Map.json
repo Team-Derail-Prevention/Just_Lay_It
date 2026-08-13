@@ -1,0 +1,17 @@
+[
+  {
+    "Id": "CentralTerminal_001",
+    "Type": "CentralTerminal",
+    "AddressablePath": "CentralTerminal_001"
+  },
+  {
+    "Id": "Staion_001",
+    "Type": "Staion",
+    "AddressablePath": "Staion_001"
+  },
+  {
+    "Id": "Normal_001",
+    "Type": "Normal",
+    "AddressablePath": "Normal_001"
+  }
+]
