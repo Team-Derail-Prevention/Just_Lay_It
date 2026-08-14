@@ -591,7 +591,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 701013f9eb7482447bb2a247286234f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrainContainer
-  _containerLevelObject: []
+  _containerLevelObject:
+  - {fileID: 7087690204415258103}
+  - {fileID: 1015420260095185290}
+  - {fileID: 6491042929387936369}
   _maxCargo: 100
   _currentAmount: 0
 --- !u!114 &8088652464291806410
@@ -606,7 +609,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0346e48dcf6ce0b47b991ed5102fb198, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrainFollow
-  _frontTrain: {fileID: 6390765769026756936, guid: 0210f7f2904f95149bb571e875d70c50, type: 3}
+  _frontTrain: {fileID: 1684910812018614335, guid: eba2e4059128814468eb71029566c594, type: 3}
   _followDistance: 3
   _moveSpeed: 5
   _rotateSpeed: 10
