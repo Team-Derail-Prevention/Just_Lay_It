@@ -28,8 +28,7 @@ public class TrainManager : MonoBehaviour
 
     [Header("Test Settings")]
     [SerializeField] private GameObject _headPrefab;        
-    [SerializeField] private GameObject _testCarPrefab;     
-    [SerializeField] private GameObject _testTurretPrefab;
+    [SerializeField] private GameObject[] _testCarPrefab;     
     [SerializeField] private Transform _spawnPoint;
     [SerializeField] private int _defaultCarriageCount = 3;
 
@@ -86,17 +85,6 @@ public class TrainManager : MonoBehaviour
     }
 
     [ContextMenu("Test / Spawn Carriage")]
-    public void TestSpawnCarriage()
-    {
-        if (_testCarPrefab != null)
-        {
-            SpawnCarriage(_testCarPrefab);
-        }
-        else
-        {
-            Debug.LogWarning("[TrainManager] Test Car Prefab이 등록되지 않았습니다.");
-        }
-    }
     public void SpawnFullTrain(int carriageCount)
     {
         if (_headPrefab == null)
@@ -114,11 +102,13 @@ public class TrainManager : MonoBehaviour
         _headTrain = newHead.transform;
 
         // 3) 입력한 개수만큼 객차 순차적 추가
-        if (_testCarPrefab != null)
+        if (_testCarPrefab != null && _testCarPrefab.Length > 0)
         {
-            for (int i = 0; i < carriageCount; i++)
+            int count = Mathf.Min(carriageCount, _testCarPrefab.Length);
+
+            for (int i = 0; i < count; i++)
             {
-                SpawnCarriage(_testCarPrefab);
+                SpawnCarriage(_testCarPrefab[i]);
             }
         }
 
