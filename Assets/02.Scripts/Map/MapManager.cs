@@ -9,7 +9,7 @@ public class MapManager : SingletonBase<MapManager>
 {
     [Header("Map Settings")]
     [SerializeField] private Transform _mapRoot;
-    [SerializeField] private float _mapSpacing = 20f;
+    [SerializeField] private float _mapSpacing = 30f;
 
     private readonly Vector3Int[] _mapOffsets = new Vector3Int[]
     {
