@@ -7,6 +7,11 @@ public class SingletonBase<T> : MonoBehaviour where T : MonoBehaviour
 
     private void Awake()
     {
+        Init();
+    }
+
+    protected virtual void Init()
+    {
         if (_instance != null)
         {
             Destroy(gameObject);
