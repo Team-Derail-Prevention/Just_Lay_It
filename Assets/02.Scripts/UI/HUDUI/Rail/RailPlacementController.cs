@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class RailPlacementController : MonoBehaviour
@@ -38,6 +39,7 @@ public class RailPlacementController : MonoBehaviour
     private Vector2Int _curGridCell;
 
     private readonly HashSet<Vector2Int> _occupiedGridCells = new HashSet<Vector2Int>();
+    private readonly Dictionary<Renderer, Material[]> _originalMaterialsDic = new Dictionary<Renderer, Material[]>();
 
     private void Start()
     {
@@ -76,8 +78,20 @@ public class RailPlacementController : MonoBehaviour
         _curGhostObject = Instantiate(prefab);
         SetGhostCollidersEnabled(false);
         _isWaitingConfirm = false;
+        SaveOriginalMaterials();
 
         CreateFootprintIndicator();
+    }
+
+    private void SaveOriginalMaterials()
+    {
+        _originalMaterialsDic.Clear();
+
+        var rendererList = _curGhostObject.GetComponentsInChildren<Renderer>();
+        foreach (var rendererItem in rendererList)
+        {
+            _originalMaterialsDic.Add(rendererItem, rendererItem.sharedMaterials);
+        }
     }
 
     private void CreateFootprintIndicator()
@@ -120,6 +134,11 @@ public class RailPlacementController : MonoBehaviour
             return;
         }
 
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject() == true)
+        {
+            return;
+        }
+
         bool isLeftClickPressed = Mouse.current.leftButton.wasPressedThisFrame;
         if (isLeftClickPressed == false)
         {
@@ -132,16 +151,12 @@ public class RailPlacementController : MonoBehaviour
         bool isHit = Physics.Raycast(ray, out RaycastHit hit, 1000f, _placedRailLayerMask);
         if (isHit == false)
         {
-            Debug.Log("[DEBUG] 레이가 아무것도 못 맞췄음 - LayerMask 또는 콜라이더 확인 필요");
             return;
         }
-
-        Debug.Log($"[DEBUG] 레이가 맞은 오브젝트 : {hit.collider.gameObject.name}");
 
         var placedInfo = hit.collider.GetComponentInParent<PlacedRailInfo>();
         if (placedInfo == null)
         {
-            Debug.Log("[DEBUG] PlacedRailInfo를 못 찾음 - 아직 실체화 안 됐다면 이상함");
             return;
         }
 
@@ -258,6 +273,11 @@ public class RailPlacementController : MonoBehaviour
     private void CheckConfirmInput()
     {
         if (Mouse.current == null)
+        {
+            return;
+        }
+
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject() == true)
         {
             return;
         }
