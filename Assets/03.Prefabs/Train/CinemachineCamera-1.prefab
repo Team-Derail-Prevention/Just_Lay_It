@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5790197784774329411
+--- !u!1 &186382261028607061
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,41 +8,41 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2443437999535731349}
-  - component: {fileID: 3353210033379618572}
-  - component: {fileID: 576145708053326600}
-  - component: {fileID: 7130880774097735509}
-  - component: {fileID: 272420999287657519}
-  - component: {fileID: 6237303659509866370}
+  - component: {fileID: 5240020974542117529}
+  - component: {fileID: 8125980340108596129}
+  - component: {fileID: 7895697200339468540}
+  - component: {fileID: 1916428066104671173}
+  - component: {fileID: 5877290657326706264}
+  - component: {fileID: 8196955273621187914}
   m_Layer: 0
-  m_Name: CinemachineCamera
+  m_Name: CinemachineCamera-1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2443437999535731349
+--- !u!4 &5240020974542117529
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5790197784774329411}
+  m_GameObject: {fileID: 186382261028607061}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.201749, y: 9.832186, z: -8.803404}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.5035291, z: -4.7685847}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3353210033379618572
+--- !u!114 &8125980340108596129
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5790197784774329411}
+  m_GameObject: {fileID: 186382261028607061}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f9dfa5b682dcd46bda6128250e975f58, type: 3}
@@ -79,13 +79,13 @@ MonoBehaviour:
       BarrelClipping: 0.25
       Anamorphism: 0
   BlendHint: 0
---- !u!114 &576145708053326600
+--- !u!114 &7895697200339468540
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5790197784774329411}
+  m_GameObject: {fileID: 186382261028607061}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3b5d7c088409d9a40b7b09aa707777f8, type: 3}
@@ -142,13 +142,13 @@ MonoBehaviour:
       Wait: 1
       Time: 2
     Restrictions: 0
---- !u!114 &7130880774097735509
+--- !u!114 &1916428066104671173
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5790197784774329411}
+  m_GameObject: {fileID: 186382261028607061}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62d54399b04b4fa48a73e121d4937dd4, type: 3}
@@ -176,13 +176,13 @@ MonoBehaviour:
       Wait: 1
       Time: 2
     Restrictions: 0
---- !u!114 &272420999287657519
+--- !u!114 &5877290657326706264
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5790197784774329411}
+  m_GameObject: {fileID: 186382261028607061}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ca7de3aefa901374ba29464584a3109a, type: 3}
@@ -206,13 +206,13 @@ MonoBehaviour:
       m_Bits: 1
     MaximumRaycast: 5
     Damping: 0
---- !u!114 &6237303659509866370
+--- !u!114 &8196955273621187914
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5790197784774329411}
+  m_GameObject: {fileID: 186382261028607061}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 89875cdc57c54474a8a74efd9b2a3b5d, type: 3}
@@ -224,7 +224,7 @@ MonoBehaviour:
   m_ControllerManager:
     Controllers:
     - Name: Look Orbit X
-      Owner: {fileID: 0}
+      Owner: {fileID: 7895697200339468540}
       Enabled: 1
       Input:
         InputAction: {fileID: 786998204676069421, guid: c6e840d152924ea48a957f54086da91e, type: 3}
@@ -237,7 +237,7 @@ MonoBehaviour:
         AccelTime: 0
         DecelTime: 0
     - Name: Look Orbit Y
-      Owner: {fileID: 0}
+      Owner: {fileID: 7895697200339468540}
       Enabled: 1
       Input:
         InputAction: {fileID: -8921087695919949215, guid: c6e840d152924ea48a957f54086da91e, type: 3}
@@ -250,7 +250,7 @@ MonoBehaviour:
         AccelTime: 0
         DecelTime: 0
     - Name: Orbit Scale
-      Owner: {fileID: 0}
+      Owner: {fileID: 7895697200339468540}
       Enabled: 0
       Input:
         InputAction: {fileID: 0}
@@ -263,7 +263,7 @@ MonoBehaviour:
         AccelTime: 0
         DecelTime: 0
     - Name: Look X (Pan)
-      Owner: {fileID: 0}
+      Owner: {fileID: 1916428066104671173}
       Enabled: 1
       Input:
         InputAction: {fileID: 786998204676069421, guid: c6e840d152924ea48a957f54086da91e, type: 3}
@@ -276,7 +276,7 @@ MonoBehaviour:
         AccelTime: 0
         DecelTime: 0
     - Name: Look Y (Tilt)
-      Owner: {fileID: 0}
+      Owner: {fileID: 1916428066104671173}
       Enabled: 1
       Input:
         InputAction: {fileID: -8921087695919949215, guid: c6e840d152924ea48a957f54086da91e, type: 3}
