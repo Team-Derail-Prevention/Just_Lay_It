@@ -50,7 +50,6 @@ public class StartUi : UIBase
         if (isPlayingShowState == true && isAnimationDone == true)
         {
             _isShowFinished = true;
-            Debug.Log("[DEBUG] 연출 종료 감지됨, 이제부터 엔터 입력을 받습니다.");
         }
     }
 
@@ -65,14 +64,12 @@ public class StartUi : UIBase
         bool isEnterPressed = (Keyboard.current.enterKey.wasPressedThisFrame == true || Keyboard.current.numpadEnterKey.wasPressedThisFrame == true);
         if (isEnterPressed == true)
         {
-            Debug.Log("[DEBUG] 엔터 입력 감지됨, OnClickStartConfirm 호출.");
             OnClickStartConfirm();
         }
     }
 
     public void OnClickStartConfirm()
     {
-        Debug.Log("[DEBUG] OnClickStartConfirm 호출됨, CompleteStartUI 실행.");
         UIManager.Instance.CompleteStartUI();
     }
 }
