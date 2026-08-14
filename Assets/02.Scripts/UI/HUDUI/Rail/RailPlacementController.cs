@@ -132,12 +132,16 @@ public class RailPlacementController : MonoBehaviour
         bool isHit = Physics.Raycast(ray, out RaycastHit hit, 1000f, _placedRailLayerMask);
         if (isHit == false)
         {
+            Debug.Log("[DEBUG] 레이가 아무것도 못 맞췄음 - LayerMask 또는 콜라이더 확인 필요");
             return;
         }
+
+        Debug.Log($"[DEBUG] 레이가 맞은 오브젝트 : {hit.collider.gameObject.name}");
 
         var placedInfo = hit.collider.GetComponentInParent<PlacedRailInfo>();
         if (placedInfo == null)
         {
+            Debug.Log("[DEBUG] PlacedRailInfo를 못 찾음 - 아직 실체화 안 됐다면 이상함");
             return;
         }
 
@@ -173,12 +177,44 @@ public class RailPlacementController : MonoBehaviour
         _curGhostObject.transform.position = hoverPos;
 
         bool isCellOccupied = _occupiedGridCells.Contains(_curGridCell);
-        bool hasObstacle = Physics.CheckSphere(snappedGroundPos, _overlapCheckRadius, _obstacleLayerMask);
+        bool hasObstacle = CheckObstacleByActualBounds(snappedGroundPos);
         _isValidPlacement = (hasObstacle == false && isCellOccupied == false);
 
         Material targetMaterial = _isValidPlacement ? _validMaterial : _invalidMaterial;
         UpdateFootprintIndicator(snappedGroundPos, targetMaterial);
     }
+
+    private bool CheckObstacleByActualBounds(Vector3 placedGroundPos)
+    {
+        Bounds hoverBounds = GetGhostBounds();
+        if (hoverBounds.size == Vector3.zero)
+        {
+            return false;
+        }
+
+        Vector3 checkCenter = placedGroundPos + Vector3.up * (hoverBounds.extents.y);
+        Vector3 halfExtents = hoverBounds.extents * 0.9f;
+
+        return Physics.CheckBox(checkCenter, halfExtents, _curGhostObject.transform.rotation, _obstacleLayerMask);
+    }
+
+    private Bounds GetGhostBounds()
+    {
+        var rendererList = _curGhostObject.GetComponentsInChildren<Renderer>();
+        if (rendererList.Length == 0)
+        {
+            return new Bounds(_curGhostObject.transform.position, Vector3.zero);
+        }
+
+        Bounds bounds = rendererList[0].bounds;
+        for (int i = 1; i < rendererList.Length; i++)
+        {
+            bounds.Encapsulate(rendererList[i].bounds);
+        }
+
+        return bounds;
+    }
+
 
     private void UpdateFootprintIndicator(Vector3 snappedGroundPos, Material targetMaterial)
     {
