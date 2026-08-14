@@ -320,4 +320,4 @@ MonoBehaviour:
   _moveSpeed: 5
   _rotateSpeed: 10
   _targetIndex: 0
-  _detectForwardOffset: 0.8
+  _detectForwardOffset: 1.5
