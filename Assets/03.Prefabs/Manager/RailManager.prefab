@@ -82,5 +82,7 @@ MonoBehaviour:
     m_Bits: 8
   Transform_MapRoot: {fileID: 0}
   Transform_RailRoot: {fileID: 4743475429001686930}
-  _railSegmentAddress: Assets/03.Prefabs/Rail
+  MapManager_Ref: {fileID: 0}
+  _straightRailAddress: Prefab/Rail_Straight
+  _cornerRailAddress: Prefab/Rail_Corner
   _ghostAlpha: 0.5
