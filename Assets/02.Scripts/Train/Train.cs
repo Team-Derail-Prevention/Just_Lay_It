@@ -17,19 +17,6 @@ public class Train : MonoBehaviour
         get { return _isMoving; }
     }
 
-    public Camera Camera { get; private set; }
-
-
-    private void Awake()
-    {
-        Camera = Camera.main;
-
-        if (Camera == null)
-        {
-            Debug.LogError("[Train:Awake] 카메라를 찾을 수 없습니다.");
-            return;
-        }
-    }
 
     private void Update()
     {
