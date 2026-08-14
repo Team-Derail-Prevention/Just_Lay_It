@@ -11,12 +11,14 @@ public class MapTileInfo : MonoBehaviour
     [Header("Layer & Detection Settings")]
     [Tooltip("비어있는 땅일 때 적용할 그라운드 레이어 이름")]
     [SerializeField] private string _groundLayerName = "Ground";
+    [Tooltip("타일 위 오브젝트(장애물, 자재 등)에 적용할 오브젝트 레이어 이름")]
+    [SerializeField] private string _objectLayerName = "OnGround";
     [Tooltip("타일 위 오브젝트 감지를 위한 체크 반경 (타일 크기 대비 조절)")]
     [SerializeField] private float _checkRadius = 0.8f;
     [Tooltip("타일 위 오브젝트 감지를 위한 높이 범위")]
     [SerializeField] private float _checkHeight = 3.0f;
-    [Tooltip("오브젝트가 있다고 판단할 레이어 마스크 (기본적으로 Default 혹은 장애물/자재 레이어)")]
-    [SerializeField] private LayerMask _objectLayerMask;
+
+    private LayerMask _objectLayerMask;
 
     public Vector2Int LocalGridCoordinate => _localGridCoordinate;
     public Vector3Int ParentMapGridPos => _parentMapGridPos;
@@ -29,6 +31,22 @@ public class MapTileInfo : MonoBehaviour
     {
         get => _hasRail;
         set => _hasRail = value;
+    }
+
+    public string CurrentLayerName => LayerMask.LayerToName(gameObject.layer);
+
+    private void Awake()
+    {
+        int layerIdx = LayerMask.NameToLayer(_objectLayerName);
+        if (layerIdx != -1)
+        {
+            _objectLayerMask = 1 << layerIdx;
+        }
+        else
+        {
+            Debug.LogWarning($"[MapTileInfo] '{_objectLayerName}' 레이어가 프로젝트에 존재하지 않습니다! 기본 레이어로 대체합니다.");
+            _objectLayerMask = 1 << 0; 
+        }
     }
 
     public void InitTile(Vector2Int localCoordinate, Vector3Int parentMapGridPos, bool canInstallRail = true)
@@ -44,7 +62,7 @@ public class MapTileInfo : MonoBehaviour
     public void UpdateTileStateByOccupant()
     {
         int groundLayerIdx = LayerMask.NameToLayer(_groundLayerName);
-        int defaultLayerIdx = LayerMask.NameToLayer("Default");
+        int objectLayerIdx = LayerMask.NameToLayer(_objectLayerName);
 
         Vector3 center = transform.position + Vector3.up * (_checkHeight * 0.5f);
         Vector3 halfExtents = new Vector3(_checkRadius, _checkHeight * 0.5f, _checkRadius);
@@ -63,7 +81,7 @@ public class MapTileInfo : MonoBehaviour
 
         if (hasOccupant)
         {
-            gameObject.layer = defaultLayerIdx != -1 ? defaultLayerIdx : 0;
+            gameObject.layer = objectLayerIdx != -1 ? objectLayerIdx : 0;
             _canInstallRail = false;
         }
         else
@@ -78,7 +96,7 @@ public class MapTileInfo : MonoBehaviour
 
     public string GetTileDebugInfo()
     {
-        return $"[Tile] Map: {_parentMapGridPos}, Local: {_localGridCoordinate}, Railable: {_canInstallRail}, HasRail: {_hasRail}, Layer: {LayerMask.LayerToName(gameObject.layer)}";
+        return $"[Tile] Map: {_parentMapGridPos}, Local: {_localGridCoordinate}, Railable: {_canInstallRail}, HasRail: {_hasRail}, Layer: {CurrentLayerName}";
     }
 
 #if UNITY_EDITOR

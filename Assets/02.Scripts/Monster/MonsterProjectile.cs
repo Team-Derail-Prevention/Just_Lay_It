@@ -18,7 +18,7 @@ public class MonsterProjectile : MonoBehaviour
 
         if (direction != Vector3.zero)
         {
-            transform.rotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0f, 90f, 0f);
         }
 
     }

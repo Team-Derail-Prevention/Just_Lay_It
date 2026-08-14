@@ -16,6 +16,8 @@ public class MonsterMove : MonoBehaviour
     private float _attackTimer = 0f;
     private float _attackCooldown = 2f;
 
+    private Rigidbody _rb;
+
     private void Update()
     {
         if (_target == null)
@@ -43,6 +45,8 @@ public class MonsterMove : MonoBehaviour
 
         _isAttackRange = false;
         _attackTimer = 0f;
+
+        _rb = GetComponent<Rigidbody>();
 
         if (firePosition == null)
         {
@@ -91,7 +95,21 @@ public class MonsterMove : MonoBehaviour
         _isAttackRange = false;
         _attackTimer = 0f;
 
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, _moveSpeed * Time.deltaTime);
+        if (_rb != null)
+        {
+            _rb.linearVelocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+        }
+
+        Vector3 newPos = Vector3.MoveTowards(transform.position, targetPos, _moveSpeed * Time.deltaTime);
+        if (_rb != null)
+        {
+            _rb.MovePosition(newPos);
+        }
+        else
+        {
+            transform.position = newPos;
+        }
         transform.LookAt(targetPos);
     }
     private void HandleAttack(Vector3 targetPos)
