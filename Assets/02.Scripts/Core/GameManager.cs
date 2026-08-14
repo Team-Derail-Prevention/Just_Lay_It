@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class GameManager : SingletonBase<GameManager>
 {
 
-    public static ResourceManager Resource { get { return Instance._resourceManager; } }
-    public static DataManager Data { get { return Instance._dataManager; } }
-    public static PoolManager Pool { get { return Instance._poolManager; } }
-    public static TimeManager Time { get { return Instance._timeManager; } }
+    public static ResourceManager Resource { get { return ResourceManager.Instance; } }
+    public static DataManager Data { get { return DataManager.Instance; } }
+    public static PoolManager Pool { get { return PoolManager.Instance; } }
 
-    // 매니저 추가는 여기에 한 줄씩. 적은 순서가 그대로 초기화 순서입니다.
-    private ResourceManager _resourceManager = new ResourceManager();
-    private DataManager _dataManager = new DataManager();
-    private PoolManager _poolManager = new PoolManager();
-    private TimeManager _timeManager = new TimeManager();
+    //public static TimeManager Time { get { return Instance._timeManager; } }
+
+
     // TODO: FlowManager가 생기면 여기에 한 줄 추가, 아래 게임 흐름을 가지고 갈 예정
 
     protected override void Init()
@@ -27,6 +25,23 @@ public class GameManager : SingletonBase<GameManager>
             return;
         }
 
+        if (DataManager.Instance != null && DataManager.Instance.IsLoaded)
+        {
+            return;
+        }
+
+
+        if (ResourceManager.Instance != null/*&& ResourceManager.Instance.IsLoaded*/)
+        {
+            return;
+        }
+
+        if (PoolManager.Instance != null /*&& PoolManager.Instance.IsLoaded*/)
+        {
+            return;
+        }
+
+
         InitPool();
 
         LoadDataAsync().Forget();
@@ -37,12 +52,12 @@ public class GameManager : SingletonBase<GameManager>
         GameObject poolRoot = new GameObject("@PoolRoot");
         poolRoot.transform.SetParent(transform);
 
-        _poolManager.Init(poolRoot.transform, new Dictionary<string, int>());
+        PoolManager.Instance.Init(poolRoot.transform, new Dictionary<string, int>());
     }
 
     private async UniTaskVoid LoadDataAsync()
     {
-        await _dataManager.LoadAllDatasAsync(this.GetCancellationTokenOnDestroy());
+        await DataManager.Instance.LoadAllDatasAsync(this.GetCancellationTokenOnDestroy());
     }
 
     // TODO: 풀 미리 생성. 어떤 풀을 몇 개 만들지 정해지면 위 Init에 넘겨주세요.
@@ -64,7 +79,7 @@ public class GameManager : SingletonBase<GameManager>
 
     public void ArriveStation()
     {
-        GameManager.Time.Pause();
+        //GameManager.Time.Pause();
 
         // TODO: 정거장에서 뭘 할지(정산, 보급, 업그레이드) 정해지면 여기에.
     }
