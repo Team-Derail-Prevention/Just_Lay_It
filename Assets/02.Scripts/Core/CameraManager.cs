@@ -7,6 +7,8 @@ public class CameraManager : MonoBehaviour
 
     [SerializeField] private CinemachineCamera _cinemachineCamera;
 
+    private bool _isCursorLocked = true;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -18,10 +20,22 @@ public class CameraManager : MonoBehaviour
 
         Instance = this;
     }
-
     private void OnEnable()
     {
         TrainManager.OnTrainSpawn += TrainSpawn;
+    }
+
+    private void Start()
+    {
+        SetCursorLock(true);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftAlt))
+        {
+            ToggleCursorLock();
+        }
     }
 
     private void OnDisable()
@@ -39,5 +53,27 @@ public class CameraManager : MonoBehaviour
     {
         _cinemachineCamera.Follow = transform;
     }
+
+    public void ToggleCursorLock()
+    {
+        SetCursorLock(!_isCursorLocked);
+    }
+
+    public void SetCursorLock(bool isLocked)
+    {
+        _isCursorLocked = isLocked;
+
+        if (isLocked)
+        {
+           Cursor.lockState = CursorLockMode.Locked;
+           Cursor.visible = false;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+    } 
+
 }
 
