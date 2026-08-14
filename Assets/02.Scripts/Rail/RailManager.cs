@@ -80,7 +80,7 @@ public class RailManager : MonoBehaviour
 
     private void HandleMapGenerated(Dictionary<Vector3Int, int> mapTypeData)
     {
-        // Transform_MapRoot = MapManager_Ref.MapRoot;
+         Transform_MapRoot = MapManager_Ref.MapRoot;
         ClearAllPlacedRails();
         BuildCubeLookup();
     }
@@ -173,7 +173,16 @@ public class RailManager : MonoBehaviour
             Bounds bounds = childRenderers[i].bounds;
             Vector3 topCenter = new Vector3(bounds.center.x, bounds.max.y, bounds.center.z);
 
-            CubeInfo info = new CubeInfo { Name = rendererObj.name, Center = topCenter, Obj = rendererObj };
+            MapTileInfo tileInfo = rendererObj.GetComponent<MapTileInfo>();
+
+            CubeInfo info = new CubeInfo
+            {
+                Name = rendererObj.name,
+                Center = topCenter,
+                Obj = rendererObj,
+                TileScript = tileInfo
+            };
+
             collected.Add(info);
 
             if (topCenter.x < minX) minX = topCenter.x;
@@ -185,7 +194,7 @@ public class RailManager : MonoBehaviour
 
         if (collected.Count == 0)
         {
-            Debug.LogWarning("[RailManager] Ground 레이어인 타일을 하나도 찾지 못함. _groundLayer 설정과 맵 프리팹의 레이어를 확인하세요.");
+            Debug.LogWarning("[RailManager] Ground 레이어인 타일을 하나도 찾지 못함.");
             return;
         }
 
@@ -193,11 +202,7 @@ public class RailManager : MonoBehaviour
         _gridOriginZ = minZ;
         _tileSize = tileSizeCount > 0 ? (tileSizeSum / tileSizeCount) : 1f;
 
-        if (_tileSize <= 0f)
-        {
-            Debug.LogWarning("[RailManager] 타일 크기가 0 이하로 계산됨, 1로 보정");
-            _tileSize = 1f;
-        }
+        if (_tileSize <= 0f) _tileSize = 1f;
 
         for (int i = 0; i < collected.Count; i++)
         {
@@ -215,7 +220,7 @@ public class RailManager : MonoBehaviour
             _cubeGrid.Add(gridIndex, info);
         }
 
-        Debug.Log("[RailManager] 타일 " + _cubeGrid.Count + "개 인식됨 (타일 크기: " + _tileSize + ")");
+        Debug.Log("[RailManager] 타일 " + _cubeGrid.Count + "개 인식됨");
     }
 
     private Vector2Int WorldPointToGridIndex(Vector3 worldPoint)
@@ -325,29 +330,33 @@ public class RailManager : MonoBehaviour
 
     private void TryInstallRail(Vector2Int gridIndex, CubeInfo cubeInfo)
     {
-        if (_installedCubes.Contains(gridIndex))
+        if (_installedCubes.Contains(gridIndex) || (cubeInfo.TileScript != null && cubeInfo.TileScript.HasRail))
         {
             Debug.Log("[RailManager] 이미 레일이 설치된 위치입니다: " + cubeInfo.Name);
             return;
         }
 
-        Vector3 checkPosition = cubeInfo.Center + Vector3.up * 0.5f;
-        Vector3 halfExtents = new Vector3(_tileSize * 0.4f, 0.4f, _tileSize * 0.4f);
-
-        Collider[] hitColliders = Physics.OverlapBox(checkPosition, halfExtents, Quaternion.identity);
-
-        foreach (Collider col in hitColliders)
+        if (cubeInfo.TileScript != null)
         {
-            bool isGround = ((1 << col.gameObject.layer) & _groundLayer.value) != 0;
-
-            if (!isGround)
+            if (!cubeInfo.TileScript.CanInstallRail)
             {
-                Debug.Log($"[RailManager] 장애물({col.name})이 존재하여 레일을 설치할 수 없습니다.");
+                Debug.Log($"[RailManager] 타일({cubeInfo.Name})의 CanInstallRail이 false이므로 설치 불가!");
                 return;
             }
         }
+        else
+        {
+            Debug.LogWarning($"[RailManager] {cubeInfo.Name}에 MapTileInfo 컴포넌트가 없습니다.");
+            return;
+        }
 
         _installedCubes.Add(gridIndex);
+
+        if (cubeInfo.TileScript != null)
+        {
+            cubeInfo.TileScript.HasRail = true;
+        }
+
         SpawnPlacedRailAsync(cubeInfo.Center, _previewController.CurrentRotation).Forget();
     }
 

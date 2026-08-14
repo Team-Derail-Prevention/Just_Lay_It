@@ -66,6 +66,9 @@ public class LoadingUI : UIBase
         SetProgressUI(1f);
 
         UIManager.Instance.CloseLoadingUI();
+
+        // 선로 제작 테스트 임시
+        UIManager.Instance.OpenRailBuildUI();
     }
 
     private void SetProgressUI(float progress01)

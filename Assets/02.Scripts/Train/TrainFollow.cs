@@ -7,7 +7,7 @@ public class TrainFollow : MonoBehaviour
 
 
     [Header("Follow Setting")]
-    [SerializeField] private float _followDistance = 1.2f;
+    [SerializeField] private float _followDistance = 3.0f;
     [SerializeField] private float _moveSpeed = 5f;
     [SerializeField] public float _rotateSpeed = 10f;
     [SerializeField] private int _targetIndex = 0;
