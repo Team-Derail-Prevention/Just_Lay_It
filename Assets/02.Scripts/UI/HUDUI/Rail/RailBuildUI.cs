@@ -18,31 +18,31 @@ public class RailBuildUI : UIBase
 
         if (CraftSlot_Straight != null)
         {
-            CraftSlot_Straight.InitSlot(_vm.GetSlot(ERailType.Straight), OnClick_Craft);
+            CraftSlot_Straight.InitSlot(_vm.GetSlot(RailType.Straight), OnClick_Craft);
         }
 
         if (CraftSlot_Curve != null)
         {
-            CraftSlot_Curve.InitSlot(_vm.GetSlot(ERailType.Curve), OnClick_Craft);
+            CraftSlot_Curve.InitSlot(_vm.GetSlot(RailType.Corner), OnClick_Craft);
         }
 
         if (PlaceSlot_Straight != null)
         {
-            PlaceSlot_Straight.InitSlot(_vm.GetSlot(ERailType.Straight), OnClick_Place);
+            PlaceSlot_Straight.InitSlot(_vm.GetSlot(RailType.Straight), OnClick_Place);
         }
 
         if (PlaceSlot_Curve != null)
         {
-            PlaceSlot_Curve.InitSlot(_vm.GetSlot(ERailType.Curve), OnClick_Place);
+            PlaceSlot_Curve.InitSlot(_vm.GetSlot(RailType.Corner), OnClick_Place);
         }
     }
 
-    private void OnClick_Craft(ERailType railType)
+    private void OnClick_Craft(RailType railType)
     {
         NetworkRailService.Instance.RequestCraft(railType);
     }
 
-    private void OnClick_Place(ERailType railType)
+    private void OnClick_Place(RailType railType)
     {
         NetworkRailService.Instance.RequestStartPlacement(railType);
     }

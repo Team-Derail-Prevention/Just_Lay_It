@@ -3,15 +3,15 @@ using UnityEngine;
 
 public class RailBuildViewModel : ViewModelBase
 {
-    private readonly Dictionary<ERailType, RailSlotViewModel> _slotDic = new Dictionary<ERailType, RailSlotViewModel>();
+    private readonly Dictionary<RailType, RailSlotViewModel> _slotDic = new Dictionary<RailType, RailSlotViewModel>();
 
     public RailBuildViewModel()
     {
-        _slotDic.Add(ERailType.Straight, new RailSlotViewModel { RailType = ERailType.Straight });
-        _slotDic.Add(ERailType.Curve, new RailSlotViewModel { RailType = ERailType.Curve });
+        _slotDic.Add(RailType.Straight, new RailSlotViewModel { RailType = RailType.Straight });
+        _slotDic.Add(RailType.Corner, new RailSlotViewModel { RailType = RailType.Corner });
     }
 
-    public RailSlotViewModel GetSlot(ERailType railType)
+    public RailSlotViewModel GetSlot(RailType railType)
     {
         _slotDic.TryGetValue(railType, out var slotViewModel);
         return slotViewModel;
