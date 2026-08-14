@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 6821358946992447267}
   - component: {fileID: 2726614681355117261}
   - component: {fileID: 5584934039325537983}
-  - component: {fileID: 3545618657740653187}
-  m_Layer: 0
+  - component: {fileID: -6103861837567382992}
+  m_Layer: 6
   m_Name: TestStaion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -91,7 +91,7 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3545618657740653187
+--- !u!65 &-6103861837567382992
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

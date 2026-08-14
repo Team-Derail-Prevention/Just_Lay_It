@@ -45,13 +45,16 @@ public class MapManager : SingletonBase<MapManager>
 
     private void InitMapRoot()
     {
-        if (_mapRoot == null)
+        GameObject existingRoot = GameObject.Find("@MapRoot");
+        if (existingRoot != null)
         {
-            GameObject rootObj = new GameObject("@MapRoot");
-            _mapRoot = rootObj.transform;
-            _mapRoot.SetParent(transform);
-            _mapRoot.localPosition = Vector3.zero;
+            DestroyImmediate(existingRoot);
         }
+
+        GameObject rootObj = new GameObject("@MapRoot");
+        _mapRoot = rootObj.transform;
+        _mapRoot.position = Vector3.zero;
+        _mapRoot.rotation = Quaternion.identity;
     }
 
     private async UniTask EnsureDataLoadedAsync()

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2110792106112759540}
   - component: {fileID: 2092062584151663338}
   - component: {fileID: -2199069094271881691}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Rock2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -125,9 +125,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b53cf8f204edf354f92334b1ce2b38a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaterialObject
-  _targetTag: Train
+  _targetType: 2
   _materialObjectID: 
   _materialObjectAmount: 0
   _brokenScale: 0.5
   _hoverHeight: 0.5
-  _isTestMode: 1
+  _shakeDuration: 0.5
+  _targetViewportPosition: {x: 0, y: 1}
+  _cameraDepthOffset: 10
+  _defaultMiningDuration: 3
+  _shakeIntensity: 0.1
