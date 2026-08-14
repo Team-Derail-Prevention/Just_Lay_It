@@ -846,6 +846,7 @@ GameObject:
   - component: {fileID: 6009367539001793127}
   - component: {fileID: 3048629367149640012}
   - component: {fileID: 5453813953631740604}
+  - component: {fileID: 4523906457424135640}
   - component: {fileID: 911853885252729923}
   - component: {fileID: 1109667046322424571}
   m_Layer: 0
@@ -947,6 +948,22 @@ MonoBehaviour:
   _dock: {fileID: 0}
   _workTrigger: {fileID: 0}
   _workDuration: 3
+--- !u!114 &4523906457424135640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5543407445265190575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ac68ff239a513a4c93e43fe01cac6b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DroneAltitude
+  _cruiseHeight: 3
+  _workGap: 0.5
+  _descendSpeed: 4
+  _ascendSpeed: 3
 --- !u!54 &911853885252729923
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -993,8 +1010,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4, y: 8.26, z: 1.4}
-  m_Center: {x: 0, y: -3.78, z: 0}
+  m_Size: {x: 1.4, y: 2.76, z: 1.4}
+  m_Center: {x: 0, y: -1, z: 0}
 --- !u!1 &8137033883469855729
 GameObject:
   m_ObjectHideFlags: 0
