@@ -96,6 +96,14 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
         return slotVm.NextCost;
     }
 
+    public void GainGold(int amount)
+    {
+        var vm = GetLocalUpgradeViewModel();
+        vm.GainGold(amount);
+
+        // 저장 관련 정해지면 추후 수정
+    }
+
     public object GetSaveData()
     {
         // 저장 관련 정해지면 추후 수정

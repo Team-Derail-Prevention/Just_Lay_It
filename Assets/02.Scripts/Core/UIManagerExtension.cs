@@ -22,6 +22,10 @@ public enum UIType
     LoadingUI,
     RailBuildUI,
     RailPlaceConfirmPopup,
+    HudTrainStatusUI,
+    HudResourceUI,
+    InGameMenuButtonUI,
+    InGameMenuPopup,
 }
 public static class UIManagerExtension
 {
@@ -160,6 +164,70 @@ public static class UIManagerExtension
         uiManager.CloseMainUI(UIType.RailBuildUI);
     }
 
+    public static HudTrainStatusUI OpenHudTrainStatusUI(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenMainUI(UIType.HudTrainStatusUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("HudTrainStatusUI가 생성되지 않았습니다");
+            return null;
+        }
+
+        return uiBase as HudTrainStatusUI;
+    }
+
+    public static void CloseHudTrainStatusUI(this UIManager uiManager)
+    {
+        uiManager.CloseMainUI(UIType.HudTrainStatusUI);
+    }
+
+    public static HudResourceUI OpenHudResourceUI(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenMainUI(UIType.HudResourceUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("HudResourceUI가 생성되지 않았습니다");
+            return null;
+        }
+
+        return uiBase as HudResourceUI;
+    }
+
+    public static void CloseHudResourceUI(this UIManager uiManager)
+    {
+        uiManager.CloseMainUI(UIType.HudResourceUI);
+    }
+
+    public static void OpenInGameMenuButtonUI(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenMainUI(UIType.InGameMenuButtonUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("InGameMenuButtonUI가 생성되지 않았습니다");
+            return;
+        }
+    }
+
+    public static void CloseInGameMenuButtonUI(this UIManager uiManager)
+    {
+        uiManager.CloseMainUI(UIType.InGameMenuButtonUI);
+    }
+
+    public static void OpenInGameMenuPopup(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenPopupUI(UIType.InGameMenuPopup);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("InGameMenuPopup가 생성되지 않았습니다");
+            return;
+        }
+    }
+
+    public static void CloseInGameMenuPopup(this UIManager uiManager)
+    {
+        uiManager.ClosePopupUI(UIType.InGameMenuPopup);
+    }
+
     public static void OpenRailPlaceConfirmPopup(this UIManager uiManager, Action onRotate, Action onConfirm, Action onCancel)
     {
         var uiBase = uiManager.OpenMainUI(UIType.RailPlaceConfirmPopup);
@@ -179,4 +247,6 @@ public static class UIManagerExtension
     {
         uiManager.CloseMainUI(UIType.RailPlaceConfirmPopup);
     }
+
+
 }
