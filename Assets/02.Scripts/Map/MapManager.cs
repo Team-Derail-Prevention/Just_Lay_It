@@ -22,6 +22,7 @@ public class MapManager : SingletonBase<MapManager>
     private Dictionary<Vector3Int, int> _mapTypeData = new Dictionary<Vector3Int, int>();
 
     public event Action<Dictionary<Vector3Int, int>> OnMapGenerated;
+    public Transform MapRoot { get { return _mapRoot; } }
 
     private async void Start()
     {
