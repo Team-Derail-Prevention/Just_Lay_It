@@ -660,16 +660,32 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _gridSizeX
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _gridSizeZ
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _stationHeight
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
       propertyPath: _stationPrefab
       value: 
-      objectReference: {fileID: 7828125231516832780, guid: 268fc317685566d47a8cad2eee5f0d41, type: 3}
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _targetObstacleCount
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
       propertyPath: _materialSpawnDatas.Array.data[0]._minCount
-      value: 8
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
       propertyPath: _materialSpawnDatas.Array.data[1]._minCount
-      value: 8
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 5994443922054863328, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
       propertyPath: m_Name
