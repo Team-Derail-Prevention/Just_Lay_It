@@ -2,7 +2,7 @@
 
 public class RailSlotViewModel : ViewModelBase
 {
-    public ERailType RailType { get; set; }
+    public RailType RailType { get; set; }
 
     private int _ownedCount;
     public int OwnedCount
