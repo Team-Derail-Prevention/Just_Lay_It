@@ -8,7 +8,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
 
     private RailBuildViewModel _localRailBuildViewModel;
 
-    public event Action<ERailType> OnRequestPlaceMode;
+    public event Action<RailType> OnRequestPlaceMode;
 
     private void Start()
     {
@@ -17,8 +17,8 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
 
     private void Update()
     {
-        TickCraftProgress(ERailType.Straight);
-        TickCraftProgress(ERailType.Curve);
+        TickCraftProgress(RailType.Straight);
+        TickCraftProgress(RailType.Corner);
     }
 
     public RailBuildViewModel GetLocalRailBuildViewModel()
@@ -31,7 +31,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
         return _localRailBuildViewModel;
     }
 
-    private void TickCraftProgress(ERailType railType)
+    private void TickCraftProgress(RailType railType)
     {
         var slot = GetLocalRailBuildViewModel().GetSlot(railType);
         if (slot.CraftQueueCount <= 0)
@@ -50,7 +50,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
         slot.OwnedCount += 1;
     }
 
-    public bool RequestCraft(ERailType railType)
+    public bool RequestCraft(RailType railType)
     {
         // 선로 제작 필요 재료 정해지면 수정
         var slot = GetLocalRailBuildViewModel().GetSlot(railType);
@@ -58,7 +58,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
         return true;
     }
 
-    public bool RequestStartPlacement(ERailType railType)
+    public bool RequestStartPlacement(RailType railType)
     {
         var slot = GetLocalRailBuildViewModel().GetSlot(railType);
         if (slot.OwnedCount <= 0)
@@ -71,7 +71,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
         return true;
     }
 
-    public void ConsumeRailOnPlaced(ERailType railType)
+    public void ConsumeRailOnPlaced(RailType railType)
     {
         var slot = GetLocalRailBuildViewModel().GetSlot(railType);
         if (slot.OwnedCount <= 0)
@@ -82,7 +82,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
         slot.OwnedCount -= 1;
     }
 
-    public void ReturnRailToInventory(ERailType railType)
+    public void ReturnRailToInventory(RailType railType)
     {
         var slot = GetLocalRailBuildViewModel().GetSlot(railType);
         slot.OwnedCount += 1;

@@ -12,7 +12,7 @@ public class RailCraftSlotUI : MonoBehaviour
     [SerializeField] private UIButton Button_Craft;
 
     private RailSlotViewModel _viewModel;
-    private Action<ERailType> _onClickCraft;
+    private Action<RailType> _onClickCraft;
 
     private void OnEnable()
     {
@@ -35,7 +35,7 @@ public class RailCraftSlotUI : MonoBehaviour
         }
     }
 
-    public void InitSlot(RailSlotViewModel viewModel, Action<ERailType> onClickCraft)
+    public void InitSlot(RailSlotViewModel viewModel, Action<RailType> onClickCraft)
     {
         _viewModel = viewModel;
         _onClickCraft = onClickCraft;

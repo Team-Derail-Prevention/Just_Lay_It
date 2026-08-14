@@ -11,7 +11,7 @@ public class RailPlaceSlotUI : MonoBehaviour
     [SerializeField] private UIButton Button_Place;
 
     private RailSlotViewModel _viewModel;
-    private Action<ERailType> _onClickPlace;
+    private Action<RailType> _onClickPlace;
 
     private void OnEnable()
     {
@@ -34,7 +34,7 @@ public class RailPlaceSlotUI : MonoBehaviour
         }
     }
 
-    public void InitSlot(RailSlotViewModel viewModel, Action<ERailType> onClickPlace)
+    public void InitSlot(RailSlotViewModel viewModel, Action<RailType> onClickPlace)
     {
         _viewModel = viewModel;
         _onClickPlace = onClickPlace;
