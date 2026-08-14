@@ -20,6 +20,8 @@ public enum UIType
     GameBookUI,
     ExitConfirmPopup,
     LoadingUI,
+    RailBuildUI,
+    RailPlaceConfirmPopup,
 }
 public static class UIManagerExtension
 {
@@ -141,5 +143,40 @@ public static class UIManagerExtension
     public static void CloseExitConfirmPopup(this UIManager uiManager)
     {
         uiManager.ClosePopupUI(UIType.ExitConfirmPopup);
+    }
+
+    public static void OpenRailBuildUI(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenMainUI(UIType.RailBuildUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("RailBuildUI가 생성되지 않았습니다");
+            return;
+        }
+    }
+
+    public static void CloseRailBuildUI(this UIManager uiManager)
+    {
+        uiManager.CloseMainUI(UIType.RailBuildUI);
+    }
+
+    public static void OpenRailPlaceConfirmPopup(this UIManager uiManager, Action onRotate, Action onConfirm, Action onCancel)
+    {
+        var uiBase = uiManager.OpenMainUI(UIType.RailPlaceConfirmPopup);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("RailPlaceConfirmPopup가 생성되지 않았습니다");
+            return;
+        }
+
+        if (uiBase is RailPlaceConfirmPopup confirmPopup)
+        {
+            confirmPopup.Init(onRotate, onConfirm, onCancel);
+        }
+    }
+
+    public static void CloseRailPlaceConfirmPopup(this UIManager uiManager)
+    {
+        uiManager.CloseMainUI(UIType.RailPlaceConfirmPopup);
     }
 }
