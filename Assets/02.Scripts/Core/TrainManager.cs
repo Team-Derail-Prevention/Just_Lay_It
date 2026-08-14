@@ -18,7 +18,7 @@ public class TrainManager : MonoBehaviour
 
     [Header("Train Carriage Setting")]
     [SerializeField] private Transform _headTrain;
-    [SerializeField] private float _followDistance = 1.2f;
+    [SerializeField] private float _followDistance = 3f;
 
     [Header("Total Rail Path Data")]
     public List<Transform> pathList = new List<Transform>();
