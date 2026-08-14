@@ -74,6 +74,13 @@ public class MapMaker : MonoBehaviour
             Debug.LogWarning($"[MapMaker] '{_groundLayerName}' 레이어가 프로젝트에 존재하지 않습니다! 기본 레이어(Default)로 유지됩니다.");
         }
 
+        // 📌 1. 타일들을 생성하기 전에 'Ground' 루트 오브젝트 자체에 먼저 레이어를 확실히 설정합니다.
+        if (groundLayerIndex != -1)
+        {
+            groundRoot.gameObject.layer = groundLayerIndex;
+        }
+
+        // 2. 15x15 바닥 타일 생성
         for (int x = 0; x < _gridSizeX; x++)
         {
             for (int z = 0; z < _gridSizeZ; z++)
@@ -89,6 +96,7 @@ public class MapMaker : MonoBehaviour
                 GameObject cubeObj = InstantiatePrefabSafe(selectedCubePrefab, spawnPos, Quaternion.identity, groundRoot);
                 cubeObj.name = $"Tile_{x}_{z}";
 
+                // 생성된 각 타일도 그라운드 레이어 적용
                 if (groundLayerIndex != -1)
                 {
                     cubeObj.layer = groundLayerIndex;
@@ -129,7 +137,8 @@ public class MapMaker : MonoBehaviour
             GameObject stationObj = InstantiatePrefabSafe(_stationPrefab, stationSpawnPos, Quaternion.identity, stationRoot);
             stationObj.name = "Station_Main";
 
-            int stationProtectionRadius = 1; 
+            // 📌 3. 스테이션이 존재하는 경우 정중앙 3x3 영역의 타일 레이어를 Default로 변경하고 레일 설치 불가 처리
+            int stationProtectionRadius = 1;
             foreach (var kvp in posToTileObj)
             {
                 if (posToGridMap.TryGetValue(kvp.Key, out Vector2Int gridCoord))
@@ -153,7 +162,8 @@ public class MapMaker : MonoBehaviour
             }
         }
 
-        int spawnExclusionRadius = 2; 
+        // 5x5 영역은 장애물/자재 스폰 후보군에서 제외
+        int spawnExclusionRadius = 2;
         availablePositions.RemoveAll(pos => {
             if (posToGridMap.TryGetValue(pos, out Vector2Int gridCoord))
             {
