@@ -6,16 +6,32 @@ using UnityEditor;
 
 public class MapMaker : MonoBehaviour
 {
+    public enum MapCategory
+    {
+        Normal,
+        Station,
+        CentralTerminal
+    }
+
     [System.Serializable]
     public struct MaterialSpawnData
     {
-        [Tooltip("배치할 머테리얼 프리팹")]
+        [Tooltip("배치할 머테리얼 프리팹 (프리팹 이름이 JSON의 Id와 완벽히 동일해야 합니다)")]
         [SerializeField] private GameObject _prefab;
-        [Tooltip("해당 머테리얼의 최소 생성 보장 개수")]
+        [Tooltip("해당 머테리얼 타입의 최소 생성 보장 개수")]
         [SerializeField] private int _minCount;
+
         public GameObject Prefab => _prefab;
         public int MinCount => _minCount;
     }
+
+    [Header("데이터 로드")]
+    [Tooltip("여기에 올려주신 JSON 파일(TextAsset)을 드래그해서 넣으세요")]
+    [SerializeField] private TextAsset _materialJsonData;
+
+    [Header("맵 카테고리 설정")]
+    [Tooltip("Normal: 스테이션 없음 / 전체 영역 오브젝트 랜덤 배치\nStation, CentralTerminal: 정중앙 스테이션 배치 및 보호 구역 적용")]
+    [SerializeField] private MapCategory _mapCategory = MapCategory.Normal;
 
     [Header("바닥 맵 생성 설정")]
     [SerializeField] private List<GameObject> _cubePrefabs = new List<GameObject>();
@@ -30,6 +46,7 @@ public class MapMaker : MonoBehaviour
     [SerializeField] private Vector3Int _mapGridPos = Vector3Int.zero;
 
     [Header("지상 오브젝트 배치 설정 (땅바닥 위)")]
+    [Tooltip("Station 또는 CentralTerminal 카테고리일 때만 인스펙터에 노출 및 정중앙에 배치됩니다.")]
     [SerializeField] private GameObject _stationPrefab;
     [SerializeField] private List<GameObject> _obstaclePrefabs;
     [SerializeField] private List<MaterialSpawnData> _materialSpawnDatas = new List<MaterialSpawnData>();
@@ -42,10 +59,29 @@ public class MapMaker : MonoBehaviour
 
     private Transform _mapRoot;
 
+    private Dictionary<string, MaterialObjectData> _materialDataDict = new Dictionary<string, MaterialObjectData>();
+
     public int GridSizeX => _gridSizeX;
     public int GridSizeZ => _gridSizeZ;
     public float Spacing => _spacing;
     public Transform MapRoot => _mapRoot;
+
+    private void LoadJsonData()
+    {
+        if (_materialJsonData == null) return;
+
+        string json = "{\"items\":" + _materialJsonData.text + "}";
+        var wrapper = JsonUtility.FromJson<SerializationWrapper<MaterialObjectData>>(json);
+
+        _materialDataDict.Clear();
+        if (wrapper != null && wrapper.items != null)
+        {
+            foreach (var item in wrapper.items)
+            {
+                _materialDataDict[item.Id] = item;
+            }
+        }
+    }
 
     [ContextMenu("Generate 15x15 Grid Map With Objects")]
     public void GenerateMap()
@@ -56,7 +92,10 @@ public class MapMaker : MonoBehaviour
             return;
         }
 
+        LoadJsonData();
+
         SetupMapRoot();
+
         System.Random rand = new System.Random();
         List<Vector3> availablePositions = new List<Vector3>();
         Dictionary<Vector3, Vector2Int> posToGridMap = new Dictionary<Vector3, Vector2Int>();
@@ -74,13 +113,11 @@ public class MapMaker : MonoBehaviour
             Debug.LogWarning($"[MapMaker] '{_groundLayerName}' 레이어가 프로젝트에 존재하지 않습니다! 기본 레이어(Default)로 유지됩니다.");
         }
 
-        // 📌 1. 타일들을 생성하기 전에 'Ground' 루트 오브젝트 자체에 먼저 레이어를 확실히 설정합니다.
         if (groundLayerIndex != -1)
         {
             groundRoot.gameObject.layer = groundLayerIndex;
         }
 
-        // 2. 15x15 바닥 타일 생성
         for (int x = 0; x < _gridSizeX; x++)
         {
             for (int z = 0; z < _gridSizeZ; z++)
@@ -93,10 +130,9 @@ public class MapMaker : MonoBehaviour
                 float posZ = (z - _gridSizeZ / 2f) * _spacing;
                 Vector3 spawnPos = new Vector3(posX, 0f, posZ);
 
-                GameObject cubeObj = InstantiatePrefabSafe(selectedCubePrefab, spawnPos, Quaternion.identity, groundRoot);
-                cubeObj.name = $"Tile_{x}_{z}";
+                GameObject cubeObj = InstantiatePrefabSafe(selectedCubePrefab, spawnPos, selectedCubePrefab.transform.rotation, groundRoot);
+                cubeObj.name = selectedCubePrefab.name;
 
-                // 생성된 각 타일도 그라운드 레이어 적용
                 if (groundLayerIndex != -1)
                 {
                     cubeObj.layer = groundLayerIndex;
@@ -118,9 +154,10 @@ public class MapMaker : MonoBehaviour
 
         SetupGroundBoxCollider(groundRoot);
 
-        int centerGridX = _gridSizeX / 2; // 7
-        int centerGridZ = _gridSizeZ / 2; // 7
-        bool hasStation = (_stationPrefab != null);
+        int centerGridX = _gridSizeX / 2;
+        int centerGridZ = _gridSizeZ / 2;
+
+        bool hasStation = (_mapCategory != MapCategory.Normal && _stationPrefab != null);
 
         if (hasStation)
         {
@@ -134,10 +171,9 @@ public class MapMaker : MonoBehaviour
                 }
             }
 
-            GameObject stationObj = InstantiatePrefabSafe(_stationPrefab, stationSpawnPos, Quaternion.identity, stationRoot);
-            stationObj.name = "Station_Main";
+            GameObject stationObj = InstantiatePrefabSafe(_stationPrefab, stationSpawnPos, _stationPrefab.transform.rotation, stationRoot);
+            stationObj.name = _stationPrefab.name;
 
-            // 📌 3. 스테이션이 존재하는 경우 정중앙 3x3 영역의 타일 레이어를 Default로 변경하고 레일 설치 불가 처리
             int stationProtectionRadius = 1;
             foreach (var kvp in posToTileObj)
             {
@@ -160,26 +196,38 @@ public class MapMaker : MonoBehaviour
                     }
                 }
             }
+
+            int spawnExclusionRadius = 2;
+            availablePositions.RemoveAll(pos => {
+                if (posToGridMap.TryGetValue(pos, out Vector2Int gridCoord))
+                {
+                    int distanceX = Mathf.Abs(gridCoord.x - centerGridX);
+                    int distanceZ = Mathf.Abs(gridCoord.y - centerGridZ);
+
+                    bool inExclusionZone = distanceX <= spawnExclusionRadius && distanceZ <= spawnExclusionRadius;
+
+                    bool isCrossZone = false;
+                    if (_mapCategory == MapCategory.CentralTerminal)
+                    {
+                        isCrossZone = (gridCoord.x == centerGridX || gridCoord.y == centerGridZ);
+                    }
+
+                    return inExclusionZone || isCrossZone;
+                }
+                return false;
+            });
+
+            Debug.Log($"[MapMaker] [{_mapCategory}] 스테이션 배치 완료 및 정중앙 3x3 보호 / 5x5 스폰 제한 구역 설정됨.");
         }
-
-        // 5x5 영역은 장애물/자재 스폰 후보군에서 제외
-        int spawnExclusionRadius = 2;
-        availablePositions.RemoveAll(pos => {
-            if (posToGridMap.TryGetValue(pos, out Vector2Int gridCoord))
-            {
-                int distanceX = Mathf.Abs(gridCoord.x - centerGridX);
-                int distanceZ = Mathf.Abs(gridCoord.y - centerGridZ);
-                return distanceX <= spawnExclusionRadius && distanceZ <= spawnExclusionRadius;
-            }
-            return false;
-        });
-
-        Debug.Log($"[MapMaker] 정중앙 (7,7) 기준 5x5 영역은 오브젝트 스폰 후보군에서 제외되었으며, 스테이션이 있는 경우 3x3 영역의 그라운드는 Default 레이어로 처리되었습니다. (스테이션 존재: {hasStation})");
+        else
+        {
+            Debug.Log($"[MapMaker] [Normal] Normal 카테고리이므로 스테이션이 생성되지 않으며, 전체 15x15 영역(정중앙 포함)에 오브젝트가 무작위 배치됩니다.");
+        }
 
         SpawnObstacles(ref availablePositions, obstaclesRoot, rand, defaultLayerIndex, posToTileObj);
         SpawnMaterials(ref availablePositions, materialsRoot, rand, defaultLayerIndex, posToTileObj);
 
-        Debug.Log($"[MapMaker] 15x15 맵 생성 완료! (스테이션 존재: {hasStation}, MapGridPos: {_mapGridPos})");
+        Debug.Log($"[MapMaker] 15x15 맵 생성 완료! (카테고리: {_mapCategory}, MapGridPos: {_mapGridPos})");
     }
 
     private void SetupGroundBoxCollider(Transform groundRoot)
@@ -209,12 +257,14 @@ public class MapMaker : MonoBehaviour
 
     private void SetupMapRoot()
     {
-        GameObject existingRoot = GameObject.Find("@MapChildRoot");
+        string rootName = $"{_mapCategory}_00";
+
+        GameObject existingRoot = GameObject.Find(rootName);
         if (existingRoot != null)
         {
             DestroyImmediate(existingRoot);
         }
-        GameObject newRoot = new GameObject("@MapChildRoot");
+        GameObject newRoot = new GameObject(rootName);
         _mapRoot = newRoot.transform;
     }
 
@@ -262,8 +312,8 @@ public class MapMaker : MonoBehaviour
                 subRoot = newSubRoot.transform;
             }
 
-            GameObject obstacleObj = InstantiatePrefabSafe(selectedPrefab, targetPos, Quaternion.identity, subRoot);
-            obstacleObj.name = $"Obstacle_{i}";
+            GameObject obstacleObj = InstantiatePrefabSafe(selectedPrefab, targetPos, selectedPrefab.transform.rotation, subRoot);
+            obstacleObj.name = selectedPrefab.name;
         }
     }
 
@@ -274,6 +324,14 @@ public class MapMaker : MonoBehaviour
         foreach (var data in _materialSpawnDatas)
         {
             if (data.Prefab == null || data.MinCount <= 0) continue;
+
+            string targetId = data.Prefab.name;
+
+            if (!_materialDataDict.TryGetValue(targetId, out MaterialObjectData jsonData))
+            {
+                Debug.LogWarning($"[MapMaker] 프리팹 이름 '{targetId}'에 해당하는 JSON 데이터를 찾을 수 없습니다! 스폰을 건너뜁니다.");
+                continue;
+            }
 
             int spawnCount = Mathf.Min(data.MinCount, availablePositions.Count);
             for (int i = 0; i < spawnCount; i++)
@@ -293,12 +351,12 @@ public class MapMaker : MonoBehaviour
                     }
                 }
 
-                InstantiateMaterial(data.Prefab, basePos, materialsRoot);
+                InstantiateMaterial(data.Prefab, basePos, materialsRoot, jsonData);
             }
         }
     }
 
-    private void InstantiateMaterial(GameObject prefab, Vector3 basePos, Transform materialsRoot)
+    private void InstantiateMaterial(GameObject prefab, Vector3 basePos, Transform materialsRoot, MaterialObjectData jsonData)
     {
         Vector3 targetPos = new Vector3(basePos.x, _materialHeight, basePos.z);
         string groupName = prefab.name;
@@ -311,7 +369,12 @@ public class MapMaker : MonoBehaviour
             subRoot = newSubRoot.transform;
         }
 
-        GameObject resourceObj = InstantiatePrefabSafe(prefab, targetPos, Quaternion.identity, subRoot);
-        resourceObj.name = $"Resource_{subRoot.childCount - 1}";
+        GameObject resourceObj = InstantiatePrefabSafe(prefab, targetPos, prefab.transform.rotation, subRoot);
+        resourceObj.name = prefab.name;
+
+        if (resourceObj.TryGetComponent<MaterialObject>(out var materialObj))
+        {
+            materialObj.InitializeData(jsonData);
+        }
     }
 }

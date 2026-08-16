@@ -69,6 +69,7 @@ public class DataManager : SingletonBase<DataManager>
 
         await LoadDataAsync<MapData>("MapData", cancellationToken);
         await LoadDataAsync<MonsterData>("MonsterTableData", cancellationToken);
+        await LoadDataAsync<MaterialObjectData>("MaterialObjectData", cancellationToken);
 
         IsLoaded = true;
         OnDataLoadCompleted?.Invoke();
