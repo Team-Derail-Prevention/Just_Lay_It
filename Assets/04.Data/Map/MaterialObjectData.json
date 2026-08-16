@@ -1,0 +1,32 @@
+[
+  {
+    "Id": "Rock_001",
+    "Type": "Rock",
+    "amount": 1,
+    "AddressablePath": "Rock_001"
+  },
+  {
+    "Id": "DeadTree_001",
+    "Type": "DeadTree",
+    "amount": 1,
+    "AddressablePath": "DeadTree_001"
+  },
+  {
+    "Id": "Rock_002",
+    "Type": "Rock",
+    "amount": 2,
+    "AddressablePath": "Rock_002"
+  },
+  {
+    "Id": "DeadTree_002",
+    "Type": "DeadTree",
+    "amount": 2,
+    "AddressablePath": "DeadTree_002"
+  },
+  {
+    "Id": "DeadTree_003",
+    "Type": "DeadTree",
+    "amount": 3,
+    "AddressablePath": "DeadTree_003"
+  }
+]

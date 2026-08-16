@@ -2,66 +2,79 @@
   {
     "Id": "CentralTerminal_001",
     "Type": "CentralTerminal",
+    "GuestCount": 0,
     "AddressablePath": "CentralTerminal_001"
   },
   {
     "Id": "Station_001",
     "Type": "Station",
+    "GuestCount": 1,
     "AddressablePath": "Station_001"
   },
   {
     "Id": "Normal_001",
     "Type": "Normal",
+    "GuestCount": 0,
     "AddressablePath": "Normal_001"
   },
   {
     "Id": "Station_002",
     "Type": "Station",
+    "GuestCount": 2,
     "AddressablePath": "Station_002"
   },
   {
     "Id": "Normal_002",
     "Type": "Normal",
+    "GuestCount": 0,
     "AddressablePath": "Normal_002"
   },
   {
     "Id": "Station_003",
     "Type": "Station",
+    "GuestCount": 3,
     "AddressablePath": "Station_003"
   },
   {
     "Id": "Normal_003",
     "Type": "Normal",
+    "GuestCount": 0,
     "AddressablePath": "Normal_003"
   },
   {
     "Id": "Station_004",
     "Type": "Station",
+    "GuestCount": 4,
     "AddressablePath": "Station_004"
   },
   {
     "Id": "Normal_004",
     "Type": "Normal",
+    "GuestCount": 0,
     "AddressablePath": "Normal_004"
   },
   {
     "Id": "Station_005",
     "Type": "Station",
+    "GuestCount": 5,
     "AddressablePath": "Station_005"
   },
   {
     "Id": "Normal_005",
     "Type": "Normal",
+    "GuestCount": 0,
     "AddressablePath": "Normal_005"
   },
   {
     "Id": "Station_006",
     "Type": "Station",
+    "GuestCount": 6,
     "AddressablePath": "Station_006"
   },
   {
     "Id": "Normal_006",
     "Type": "Normal",
+    "GuestCount": 0,
     "AddressablePath": "Normal_006"
   }
 ]

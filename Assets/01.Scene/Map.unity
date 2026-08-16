@@ -566,6 +566,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MapManager
       objectReference: {fileID: 0}
+    - target: {fileID: 2641926352046683756, guid: 702cd132c9e575444a890b38ea726bfb, type: 3}
+      propertyPath: _mapSpacing
+      value: 30
+      objectReference: {fileID: 0}
     - target: {fileID: 6112901163721120068, guid: 702cd132c9e575444a890b38ea726bfb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 878.3642
@@ -660,6 +664,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _mapType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
       propertyPath: _gridSizeX
       value: 15
       objectReference: {fileID: 0}
@@ -668,24 +676,100 @@ PrefabInstance:
       value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _mapCategory
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
       propertyPath: _stationHeight
       value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
       propertyPath: _stationPrefab
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2170858427920493760, guid: a0837904038e1e440945baba9ca14b6d, type: 3}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialJsonData
+      value: 
+      objectReference: {fileID: 4900000, guid: 510f35ef434d8464ca320dd64c0f52a6, type: 3}
     - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
       propertyPath: _targetObstacleCount
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnDatas.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnSettings.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnDatas.Array.data[0]._prefab
+      value: 
+      objectReference: {fileID: 5070134356130765180, guid: 43a6d4c8227859540b4ceb2ad2036758, type: 3}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnDatas.Array.data[2]._prefab
+      value: 
+      objectReference: {fileID: 5382888589710558236, guid: d818e8db0d4114041923feb36d8b479a, type: 3}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnDatas.Array.data[3]._prefab
+      value: 
+      objectReference: {fileID: 6179755561338510967, guid: 90bfcda798250494690a658a59cc0341, type: 3}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnDatas.Array.data[4]._prefab
+      value: 
+      objectReference: {fileID: 6825517055451600367, guid: f76851bc128e234479fc727ccd52c75b, type: 3}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnSettings.Array.data[0]._type
+      value: rock
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnSettings.Array.data[1]._type
+      value: DeadTree
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnDatas.Array.data[0]._maxCount
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
       propertyPath: _materialSpawnDatas.Array.data[0]._minCount
-      value: 25
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnDatas.Array.data[1]._maxCount
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
       propertyPath: _materialSpawnDatas.Array.data[1]._minCount
-      value: 25
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnDatas.Array.data[2]._minCount
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnDatas.Array.data[3]._minCount
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnDatas.Array.data[4]._minCount
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnSettings.Array.data[0]._count
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnSettings.Array.data[1]._count
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnDatas.Array.data[0]._materialType
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4033950301546019883, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
+      propertyPath: _materialSpawnDatas.Array.data[1]._materialType
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5994443922054863328, guid: 81b5ee3eebc6df14798af63c0039bb3e, type: 3}
       propertyPath: m_Name
@@ -704,6 +788,6 @@ SceneRoots:
   - {fileID: 1281296770}
   - {fileID: 6870809739746527794}
   - {fileID: 7849669436648141030}
-  - {fileID: 8633146466933542460}
   - {fileID: 501186815052181269}
   - {fileID: 7013589477384077802}
+  - {fileID: 8633146466933542460}
