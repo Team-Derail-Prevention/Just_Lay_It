@@ -71,12 +71,12 @@ public class MapMaker : MonoBehaviour
         if (_materialJsonData == null) return;
 
         string json = "{\"items\":" + _materialJsonData.text + "}";
-        var wrapper = JsonUtility.FromJson<SerializationWrapper<MaterialObjectData>>(json);
+        SerializationWrapper<MaterialObjectData> wrapper = JsonUtility.FromJson<SerializationWrapper<MaterialObjectData>>(json);
 
         _materialDataDict.Clear();
         if (wrapper != null && wrapper.items != null)
         {
-            foreach (var item in wrapper.items)
+            foreach (MaterialObjectData item in wrapper.items)
             {
                 _materialDataDict[item.Id] = item;
             }
@@ -162,7 +162,7 @@ public class MapMaker : MonoBehaviour
         if (hasStation)
         {
             Vector3 stationSpawnPos = Vector3.zero;
-            foreach (var kvp in posToGridMap)
+            foreach (KeyValuePair<Vector3, Vector2Int> kvp in posToGridMap)
             {
                 if (kvp.Value.x == centerGridX && kvp.Value.y == centerGridZ)
                 {
@@ -175,7 +175,7 @@ public class MapMaker : MonoBehaviour
             stationObj.name = _stationPrefab.name;
 
             int stationProtectionRadius = 1;
-            foreach (var kvp in posToTileObj)
+            foreach (KeyValuePair<Vector3, GameObject> kvp in posToTileObj)
             {
                 if (posToGridMap.TryGetValue(kvp.Key, out Vector2Int gridCoord))
                 {
@@ -188,7 +188,7 @@ public class MapMaker : MonoBehaviour
                         if (tileObj != null)
                         {
                             if (defaultLayerIndex != -1) tileObj.layer = defaultLayerIndex;
-                            if (tileObj.TryGetComponent<MapTileInfo>(out var tileInfo))
+                            if (tileObj.TryGetComponent<MapTileInfo>(out MapTileInfo tileInfo))
                             {
                                 tileInfo.CanInstallRail = false;
                             }
@@ -291,7 +291,7 @@ public class MapMaker : MonoBehaviour
             if (posToTileObj.TryGetValue(basePos, out GameObject tileObj))
             {
                 if (defaultLayerIndex != -1) tileObj.layer = defaultLayerIndex;
-                if (tileObj.TryGetComponent<MapTileInfo>(out var tileInfo))
+                if (tileObj.TryGetComponent<MapTileInfo>(out MapTileInfo tileInfo))
                 {
                     tileInfo.CanInstallRail = false;
                 }
@@ -321,7 +321,7 @@ public class MapMaker : MonoBehaviour
     {
         if (_materialSpawnDatas == null || _materialSpawnDatas.Count == 0) return;
 
-        foreach (var data in _materialSpawnDatas)
+        foreach (MaterialSpawnData data in _materialSpawnDatas)
         {
             if (data.Prefab == null || data.MinCount <= 0) continue;
 
@@ -345,7 +345,7 @@ public class MapMaker : MonoBehaviour
                 if (posToTileObj.TryGetValue(basePos, out GameObject tileObj))
                 {
                     if (defaultLayerIndex != -1) tileObj.layer = defaultLayerIndex;
-                    if (tileObj.TryGetComponent<MapTileInfo>(out var tileInfo))
+                    if (tileObj.TryGetComponent<MapTileInfo>(out MapTileInfo tileInfo))
                     {
                         tileInfo.CanInstallRail = false;
                     }
@@ -372,7 +372,7 @@ public class MapMaker : MonoBehaviour
         GameObject resourceObj = InstantiatePrefabSafe(prefab, targetPos, prefab.transform.rotation, subRoot);
         resourceObj.name = prefab.name;
 
-        if (resourceObj.TryGetComponent<MaterialObject>(out var materialObj))
+        if (resourceObj.TryGetComponent<MaterialObject>(out MaterialObject materialObj))
         {
             materialObj.InitializeData(jsonData);
         }
