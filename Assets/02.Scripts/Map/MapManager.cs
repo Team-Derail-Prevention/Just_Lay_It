@@ -11,6 +11,10 @@ public class MapManager : SingletonBase<MapManager>
     [SerializeField] private Transform _mapRoot;
     [SerializeField] private float _mapSpacing = 30f;
 
+    [Header("Auto Spawn Rail Settings")]
+    [SerializeField] private string _straightRailAddress = "Prefab/Rail_Straight";
+    [SerializeField] private float _railSpawnOffset = 2f; // 역 중심에서 레일이 떨어질 간격 (맵메이커 타일 간격에 맞춰 수정 가능)
+
     private readonly Vector3Int[] _mapOffsets = new Vector3Int[]
     {
         new Vector3Int(-1, 1, 0),  new Vector3Int(0, 1, 0),  new Vector3Int(1, 1, 0),
@@ -24,13 +28,16 @@ public class MapManager : SingletonBase<MapManager>
     public event Action<Dictionary<Vector3Int, int>> OnMapGenerated;
     public Transform MapRoot { get { return _mapRoot; } }
 
-    private async void Start()
+    private void Awake()
     {
         InitMapRoot();
+    }
 
-        await EnsureDataLoadedAsync();
+    private async void Start()
+    {
+        await NeedDataLoadAsync();
 
-        await GenerateMapAsync();
+        Debug.Log("[MapManager] 데이터 로드 대기 완료. GameManager의 시작 명령을 기다립니다.");
     }
 
     private void Update()
@@ -57,7 +64,7 @@ public class MapManager : SingletonBase<MapManager>
         _mapRoot.rotation = Quaternion.identity;
     }
 
-    private async UniTask EnsureDataLoadedAsync()
+    private async UniTask NeedDataLoadAsync()
     {
         if (DataManager.Instance != null && DataManager.Instance.IsLoaded)
             return;
@@ -111,7 +118,8 @@ public class MapManager : SingletonBase<MapManager>
         }
         else
         {
-            Debug.LogError("[MapManager] CentralTerminal 타입의 MapData를 찾을 수 없습니다!");
+            Debug.LogError("[MapManager] CentralTerminal 타입의 MapData를 찾을 수 없습니다! JSON 데이터에 해당 타입이 있는지 확인해주세요. 맵 생성을 중단합니다.");
+            return;
         }
 
         List<bool> assignedTypes = RandomStationLayout();
@@ -153,7 +161,7 @@ public class MapManager : SingletonBase<MapManager>
             await SpawnMapFromDataAsync(selectedData, gridPos, typeId, tag, cancellationToken);
         }
 
-        Debug.Log("[MapManager] 데이터 기반 3x3 맵 생성 완료!");
+        Debug.Log("[MapManager] 데이터 기반 3x3 맵 생성 및 자동 레일 설치 완료!");
         OnMapGenerated?.Invoke(_mapTypeData);
     }
 
@@ -173,11 +181,88 @@ public class MapManager : SingletonBase<MapManager>
         }
 
         Vector3 worldPos = new Vector3(gridPos.x * _mapSpacing, 0, gridPos.y * _mapSpacing);
-        GameObject mapObj = Instantiate(prefab, worldPos, Quaternion.identity, _mapRoot);
+        GameObject mapObject = Instantiate(prefab, worldPos, Quaternion.identity, _mapRoot);
 
-        _spawnedMaps[gridPos] = mapObj;
+        mapObject.name = $"{mapNameTag} ({gridPos.x}, {gridPos.y})";
+
+        _spawnedMaps[gridPos] = mapObject;
         _mapTypeData[gridPos] = typeId;
+
+        StationObject stationObj = mapObject.GetComponentInChildren<StationObject>();
+        if (stationObj != null)
+        {
+            stationObj.Initialize(mapData.Id);
+        }
+
+        if (typeId == 2)
+        {
+            CentralTerminal terminal = mapObject.GetComponentInChildren<CentralTerminal>();
+            if (terminal != null)
+            {
+                await SpawnRailsAroundAsync(terminal.transform.position, isTerminal: true);
+            }
+        }
+        else if (typeId == 1) 
+        {
+            if (stationObj != null)
+            {
+                await SpawnRailsAroundAsync(stationObj.transform.position, isTerminal: false);
+            }
+        }
     }
+
+    private async UniTask SpawnRailsAroundAsync(Vector3 centerPos, bool isTerminal)
+    {
+        Vector3[] directions = new Vector3[]
+        {
+            new Vector3(0, 0, _railSpawnOffset), 
+            new Vector3(0, 0, -_railSpawnOffset),
+            new Vector3(-_railSpawnOffset, 0, 0),
+            new Vector3(_railSpawnOffset, 0, 0)  
+        };
+
+        Quaternion[] rotations = new Quaternion[]
+        {
+            Quaternion.identity,
+            Quaternion.identity,
+            Quaternion.Euler(0, 90, 0),
+            Quaternion.Euler(0, 90, 0)
+        };
+
+        if (isTerminal)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                await PlaceSingleRailAsync(centerPos + directions[i], rotations[i]);
+            }
+        }
+        else
+        {
+            int randIndex = Random.Range(0, 4);
+            await PlaceSingleRailAsync(centerPos + directions[randIndex], rotations[randIndex]);
+        }
+    }
+
+    private async UniTask PlaceSingleRailAsync(Vector3 targetPos, Quaternion rotation)
+    {
+        if (string.IsNullOrEmpty(_straightRailAddress)) return;
+
+        GameObject railPrefab = await ResourceManager.Instance.LoadAsset<GameObject>(_straightRailAddress);
+
+        if (railPrefab != null)
+        {
+            Vector3 finalPos = new Vector3(targetPos.x, 2f, targetPos.z);
+
+            GameObject railObj = Instantiate(railPrefab, finalPos, rotation, _mapRoot);
+            railObj.name = "AutoSpawned_StraightRail";
+        }
+        else
+        {
+            Debug.LogWarning($"[MapManager] 레일 프리팹('{_straightRailAddress}') 로드 실패.");
+        }
+    }
+
+    // --- (이하 RandomStationLayout, IsValidLayout, ClearMap 등 기존 코드 유지) ---
 
     private List<bool> RandomStationLayout()
     {
@@ -227,7 +312,7 @@ public class MapManager : SingletonBase<MapManager>
         return maxStreak <= 2;
     }
 
-    private void ClearMap()
+    public void ClearMap()
     {
         foreach (var kvp in _spawnedMaps)
         {

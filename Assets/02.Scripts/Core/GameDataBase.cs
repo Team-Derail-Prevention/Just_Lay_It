@@ -17,6 +17,8 @@ public class GameDataBase
 public class MapData : GameDataBase
 {
     public string Type;
+    public int GuestCount;
+    public int Gold;
     public string AddressablePath;
 }
 

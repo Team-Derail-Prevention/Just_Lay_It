@@ -70,7 +70,7 @@ public class MapTileInfo : MonoBehaviour
         Collider[] hitColliders = Physics.OverlapBox(center, halfExtents, Quaternion.identity, _objectLayerMask);
 
         bool hasOccupant = false;
-        foreach (var col in hitColliders)
+        foreach (Collider col in hitColliders)
         {
             if (col.gameObject != gameObject && col.transform.root != transform.root)
             {
