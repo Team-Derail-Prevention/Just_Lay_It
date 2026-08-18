@@ -36,7 +36,7 @@ public class MonsterProjectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") || other.GetComponent<Train>() != null)
+        if (other.CompareTag("Train") || other.GetComponent<Train>() != null)
         {
             Debug.Log("Hit Player");
 
