@@ -15,6 +15,7 @@ public class RailManager : SingletonBase<RailManager>
     [Header("Refs")]
     [SerializeField] private Camera Camera_Main;
     [SerializeField] private LayerMask _groundLayer;
+    [SerializeField] private LayerMask _blockedLayer; // 오브젝트가 올라간 바닥(Default) 레이어
     [SerializeField] private Transform Transform_MapRoot;
     [SerializeField] private Transform Transform_RailRoot;
     [SerializeField] private MapManager MapManager_Ref;
@@ -107,10 +108,20 @@ public class RailManager : SingletonBase<RailManager>
 
     private void Update()
     {
-        if (!_isPlaceModeActive) return;
-        if (_previewInstance == null) return;
+        if (!_isPlaceModeActive)
+        {
+            return;
+        }
 
-        if (_isConfirmPopupOpen) return;
+        if (_previewInstance == null)
+        {
+            return;
+        }
+
+        if (_isConfirmPopupOpen)
+        {
+            return;
+        }
 
         HandleRailTypeInput();
 
@@ -222,12 +233,14 @@ public class RailManager : SingletonBase<RailManager>
         int tileSizeCount = 0;
         float ySum = 0f;
 
+        LayerMask scanMask = _groundLayer | _blockedLayer;
+
         for (int i = 0; i < childRenderers.Length; i++)
         {
             GameObject rendererObj = childRenderers[i].gameObject;
 
-            bool isGroundLayer = ((1 << rendererObj.layer) & _groundLayer.value) != 0;
-            if (!isGroundLayer) continue;
+            bool isRelevantLayer = ((1 << rendererObj.layer) & scanMask.value) != 0;
+            if (!isRelevantLayer) continue;
 
             if (seenObjects.Contains(rendererObj)) continue;
             seenObjects.Add(rendererObj);
@@ -236,13 +249,15 @@ public class RailManager : SingletonBase<RailManager>
             Vector3 topCenter = new Vector3(bounds.center.x, bounds.max.y, bounds.center.z);
 
             MapTileInfo tileInfo = rendererObj.GetComponent<MapTileInfo>();
+            bool isGroundLayer = ((1 << rendererObj.layer) & _groundLayer.value) != 0;
 
             CubeInfo info = new CubeInfo
             {
                 Name = rendererObj.name,
                 Center = topCenter,
                 Obj = rendererObj,
-                TileScript = tileInfo
+                TileScript = tileInfo,
+                IsGroundLayer = isGroundLayer
             };
 
             collected.Add(info);
@@ -328,13 +343,20 @@ public class RailManager : SingletonBase<RailManager>
             _previewController.SetGhostAlpha(_ghostAlpha);
         }
 
+        Collider previewCollider = instance.GetComponentInChildren<Collider>();
+        if (previewCollider != null)
+        {
+            previewCollider.enabled = false;
+        }
+
         instance.SetActive(false);
         _previewInstance = instance;
 
-        if (_isHoveredCube && _hoveredCubeInfo.Obj != null)
+        if (_isHoveredCube && _hoveredCubeInfo.Obj != null && _previewController != null && _previewOutline != null)
         {
+            bool isValidPlacement = IsPlacementValid(_hoveredGridIndex, _hoveredCubeInfo);
             _previewController.Show(_hoveredCubeInfo);
-            _previewOutline.Show(_hoveredCubeInfo);
+            _previewOutline.Show(_hoveredCubeInfo, isValidPlacement);
         }
     }
 
@@ -364,9 +386,20 @@ public class RailManager : SingletonBase<RailManager>
             _hoveredCubeInfo = cubeInfo;
             _isHoveredCube = true;
 
+            bool isValidPlacement = IsPlacementValid(gridIndex, cubeInfo);
+
             _previewController.Show(cubeInfo);
-            _previewOutline.Show(cubeInfo);
+            _previewOutline.Show(cubeInfo, isValidPlacement);
         }
+    }
+
+    private bool IsPlacementValid(Vector2Int gridIndex, CubeInfo cubeInfo)
+    {
+        if (!cubeInfo.IsGroundLayer) return false;
+        if (_installedCubes.Contains(gridIndex)) return false;
+        if (cubeInfo.TileScript != null && cubeInfo.TileScript.HasRail) return false;
+        if (cubeInfo.TileScript != null && !cubeInfo.TileScript.CanInstallRail) return false;
+        return true;
     }
 
     private void ClearHover()
@@ -420,7 +453,7 @@ public class RailManager : SingletonBase<RailManager>
         _pendingCubeInfo = cubeInfo;
 
         _previewController?.Show(cubeInfo);
-        _previewOutline?.Show(cubeInfo);
+        _previewOutline?.Show(cubeInfo, isValid: true);
 
         UIManager.Instance.OpenRailPlaceConfirmPopup(
             onRotate: OnPopupRotate,
@@ -511,6 +544,12 @@ public class RailManager : SingletonBase<RailManager>
 
         RailPreviewController controller = spawnedRail.GetComponent<RailPreviewController>();
         if (controller != null) controller.enabled = false;
+
+        Collider placedCollider = spawnedRail.GetComponentInChildren<Collider>();
+        if (placedCollider != null)
+        {
+            placedCollider.enabled = true;
+        }
 
         _placedRails[gridIndex] = new PlacedRailInfo { Obj = spawnedRail, Type = railType };
         Debug.Log($"[RailManager] {railType} 레일 설치됨: " + spawnedRail.name);
