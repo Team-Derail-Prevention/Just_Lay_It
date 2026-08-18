@@ -2,19 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TrainManager : MonoBehaviour
+public class TrainManager : SingletonBase<TrainManager>
 {
-    public static TrainManager Instance { get; private set; }
     public bool IsStation { get; private set; } = false;
-
-
-    [Header("Rail Detect Setting")]
-    private string _railTag = "Rail";
-    private float _detectRadius = 1.0f;
-
-    [Header("Station Detect Setting")]
-    private string _stationTag = "Station";
-    private float _stationDetectRadius = 1.0f;
 
     [Header("Train Carriage Setting")]
     [SerializeField] private Transform _headTrain;
@@ -38,17 +28,9 @@ public class TrainManager : MonoBehaviour
     public static event Action<Transform> OnTrainSpawn;
     public static event Action<bool> OnStationState;
 
-
-    private void Awake()
+    protected override void Init()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        base.Init();
     }
 
     private void Update()
@@ -65,23 +47,37 @@ public class TrainManager : MonoBehaviour
 
     }
 
-    public void DetectRail(Vector3 currentPos)
+    private void ClearExistingTrain()
     {
-        Collider[] hits = Physics.OverlapSphere(currentPos, _detectRadius);
-
-        for (int i = 0; i < hits.Length; i++)
+        for (int i = 0; i < carList.Count; i++)
         {
-            if (hits[i].CompareTag(_railTag))
+            if (carList[i] != null)
             {
-                Transform railTransform = hits[i].transform;
-
-                if (!visitedNode.Contains(railTransform))
-                {
-                    visitedNode.Add(railTransform);
-                    pathList.Add(railTransform);
-                }
+                Destroy(carList[i]);
             }
         }
+        carList.Clear();
+
+        if (_headTrain != null)
+        {
+            Destroy(_headTrain.gameObject);
+            _headTrain = null;
+        }
+    }
+
+    public void DetectRail(Transform railTransform)
+    {
+        if (railTransform == null)
+        {
+            return;
+        }
+
+        if (!visitedNode.Contains(railTransform))
+        {
+            visitedNode.Add(railTransform);
+            pathList.Add(railTransform);
+        }
+      
     }
 
     [ContextMenu("Test / Spawn Carriage")]
@@ -92,6 +88,9 @@ public class TrainManager : MonoBehaviour
             Debug.LogWarning("[TrainManager] Head Prefab이 할당되지 않았습니다.");
             return;
         }
+
+
+        ClearExistingTrain();
 
         // 1) 스폰 포인트 지정 여부 확인 후 위치/회전 세팅
         Vector3 spawnPos = (_spawnPoint != null) ? _spawnPoint.position : Vector3.zero;
@@ -166,44 +165,29 @@ public class TrainManager : MonoBehaviour
         return null;
     }
 
-    public void DetectStation(Vector3 currentPos)
+    public void ArriveStation(GameObject stationObj)
     {
         if (IsStation)
         {
             return;
         }
 
-        Collider[] hits = Physics.OverlapSphere(currentPos, _stationDetectRadius);
-
-        for (int i = 0; i < hits.Length; i++)
+        if (!visitedStation.Contains(stationObj.transform))
         {
-            if (hits[i].CompareTag(_stationTag))
-            {
-                Transform stationTransform = hits[i].transform;
-                if (!visitedStation.Contains(stationTransform))
-                {
-                    visitedStation.Add(stationTransform);
-                    ArriveStation(stationTransform.gameObject);
-                    break;
-                }
-            }
+            visitedStation.Add(stationObj.transform);
+            IsStation = true;
+            SetCarriagerActive(false);
+            Debug.Log("[TrainManager] 기차역 도착 : 정차 상태");
+
+            OnStationState?.Invoke(true);
         }
-    }
-
-    public void ArriveStation(GameObject stationObj)
-    {
-        IsStation = true;
-        SetCarriagerActive(false);
-        Debug.Log("기차역 도착");
-
-        OnStationState?.Invoke(true);
     }
 
     public void DepartStation()
     {
         IsStation = false;
         SetCarriagerActive(true);
-        Debug.Log("기차역 출발");
+        Debug.Log("[TrainManager] 기차역 출발 : 이동 상태");
 
         OnStationState?.Invoke(false);
     }
