@@ -28,8 +28,9 @@ public class MapManager : SingletonBase<MapManager>
     public event Action<Dictionary<Vector3Int, int>> OnMapGenerated;
     public Transform MapRoot { get { return _mapRoot; } }
 
-    private void Awake()
+    protected override void Init()
     {
+        base.Init();
         InitMapRoot();
     }
 
@@ -84,19 +85,19 @@ public class MapManager : SingletonBase<MapManager>
         await tcs.Task;
     }
 
-    public async UniTask GenerateMapAsync(CancellationToken cancellationToken = default)
+    public async UniTask<bool> GenerateMapAsync(CancellationToken cancellationToken = default)
     {
         if (DataManager.Instance == null)
         {
             Debug.LogError("[MapManager] DataManager 인스턴스가 존재하지 않습니다.");
-            return;
+            return false;
         }
 
         IReadOnlyList<MapData> allMapDatas = DataManager.Instance.GetAllData<MapData>();
         if (allMapDatas == null || allMapDatas.Count == 0)
         {
             Debug.LogError("[MapManager] DataManager에서 MapData를 가져오지 못했습니다! DataManager에서 'MapData' 로드가 정상적으로 호출되었는지, JSON 파일 내 items 구조가 올바른지 확인해주세요.");
-            return;
+            return false;
         }
 
         MapData centralData = null;
@@ -119,7 +120,7 @@ public class MapManager : SingletonBase<MapManager>
         else
         {
             Debug.LogError("[MapManager] CentralTerminal 타입의 MapData를 찾을 수 없습니다! JSON 데이터에 해당 타입이 있는지 확인해주세요. 맵 생성을 중단합니다.");
-            return;
+            return false;
         }
 
         List<bool> assignedTypes = RandomStationLayout();
@@ -163,6 +164,8 @@ public class MapManager : SingletonBase<MapManager>
 
         Debug.Log("[MapManager] 데이터 기반 3x3 맵 생성 및 자동 레일 설치 완료!");
         OnMapGenerated?.Invoke(_mapTypeData);
+
+        return true;
     }
 
     private async UniTask SpawnMapFromDataAsync(MapData mapData, Vector3Int gridPos, int typeId, string mapNameTag, CancellationToken cancellationToken)
@@ -261,8 +264,6 @@ public class MapManager : SingletonBase<MapManager>
             Debug.LogWarning($"[MapManager] 레일 프리팹('{_straightRailAddress}') 로드 실패.");
         }
     }
-
-    // --- (이하 RandomStationLayout, IsValidLayout, ClearMap 등 기존 코드 유지) ---
 
     private List<bool> RandomStationLayout()
     {
