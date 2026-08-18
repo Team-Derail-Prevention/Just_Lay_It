@@ -48,21 +48,21 @@ public static class UIManagerExtension
         uiManager.OpenContentUI(UIType.LobbyUI);
     }
 
-    public static Cysharp.Threading.Tasks.UniTask StartGameFromLobby(this UIManager uiManager)
+    public static async Cysharp.Threading.Tasks.UniTask StartGameFromLobby(this UIManager uiManager)
     {
         uiManager.CloseContentUI(UIType.LobbyUI);
 
         var loadingUI = uiManager.OpenLoadingUI();
         if (loadingUI == null)
         {
-            return Cysharp.Threading.Tasks.UniTask.CompletedTask;
+            return;
         }
 
         // 실제 로딩 추후 수정
-
+        await GameManager.Instance.StartGame();
         loadingUI.SetDataLoaded();
 
-        return Cysharp.Threading.Tasks.UniTask.CompletedTask;
+        return;
     }
 
     public static LoadingUI OpenLoadingUI(this UIManager uiManager)
