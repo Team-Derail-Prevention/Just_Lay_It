@@ -78,7 +78,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DroneClickCommand
   _cursor: {fileID: 8709548589285250355}
-  _stateMachine: {fileID: 8962121661737224018}
+  _stateMachine: {fileID: 0}
   _orderModeKey: 16
   _recallKey: 36
 --- !u!114 &4052740878044825668
@@ -95,7 +95,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DroneCellIndicator
   _command: {fileID: 1268735119693262071}
   _cursor: {fileID: 8709548589285250355}
-  _stateMachine: {fileID: 8962121661737224018}
+  _stateMachine: {fileID: 0}
   _indicator: {fileID: 5226786926981250034}
   _allowedColor: {r: 0.2, g: 1, b: 0.35, a: 0.45}
   _blockedColor: {r: 1, g: 0.25, b: 0.2, a: 0.45}
@@ -145,6 +145,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 633754365080438799}
+  - {fileID: 3657333664035388163}
   - {fileID: 7553684508180756163}
   - {fileID: 4247232735873450008}
   - {fileID: 3845847713033036960}
@@ -283,14 +284,69 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4556377227261816289, guid: 73da776ce22c32c4c810f349202fda95, type: 3}
   m_PrefabInstance: {fileID: 4030735746219877870}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8962121661737224018 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5453813953631740604, guid: 73da776ce22c32c4c810f349202fda95, type: 3}
-  m_PrefabInstance: {fileID: 4030735746219877870}
+--- !u!1001 &8927980972870320074
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 9165016977823284023}
+    m_Modifications:
+    - target: {fileID: 4247556021571987335, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
+      propertyPath: m_Name
+      value: Drone_Rail
+      objectReference: {fileID: 0}
+    - target: {fileID: 4608316456770326383, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
+      propertyPath: _dock
+      value: 
+      objectReference: {fileID: 7553684508180756163}
+    - target: {fileID: 5271457812533839049, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5271457812533839049, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5271457812533839049, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5271457812533839049, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5271457812533839049, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.000000021855694
+      objectReference: {fileID: 0}
+    - target: {fileID: 5271457812533839049, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5271457812533839049, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5271457812533839049, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5271457812533839049, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5271457812533839049, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
+--- !u!4 &3657333664035388163 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5271457812533839049, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
+  m_PrefabInstance: {fileID: 8927980972870320074}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7e163c38dfd1ad42aeea0569a81adef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DroneStateMachine
