@@ -896,7 +896,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3d5601a8baca984190619ac08a0a87e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Drone
-  _moveSpeed: 4
+  _moveSpeed: 8
   _slowDownDistance: 1.5
   _arriveSpeed: 0.5
   _arriveDistance: 0.05
@@ -947,7 +947,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DroneStateMachine
   _dock: {fileID: 0}
   _workTrigger: {fileID: 0}
-  _workDuration: 3
+  _workDuration: 1
 --- !u!114 &4523906457424135640
 MonoBehaviour:
   m_ObjectHideFlags: 0
