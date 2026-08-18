@@ -8,37 +8,62 @@ public class StationObject : BaseColliderTrigger
     [Header("기차역 이벤트 데이터")]
     [SerializeField] private string _stationId;
 
-    public string StationId => _stationId;
-    private bool _isInteractionComplted = false;
+    private int _rewardGold = 0;  
+    private int _rescueCount = 0; 
 
-    public void Initailze(string stationId)
+    public string StationId => _stationId;
+    private bool _isInteractionCompleted = false;
+
+    // 맵이 생성될 때 MapManager 등에서 이 기차역의 ID를 넣어주며 초기화합니다.
+    public void Initialize(string stationId)
     {
         _stationId = stationId;
-        _isInteractionComplted = false;
+        _isInteractionCompleted = false;
 
-        // TODO: DataManager에서 기차역 데이터를 가져와서 초기화
+        if (GameManager.Data != null)
+        {
+            MapData myData = GameManager.Data.GetData<MapData>(_stationId);
+            if (myData != null)
+            {
+                _rescueCount = myData.GuestCount;
+                _rewardGold = myData.Gold; 
+            }
+        }
     }
 
     protected override void HandleInteraction(Collider target)
     {
-        if (_isInteractionComplted || !CanInteract(target))
-        {
-            return;
-        }
+        if (_isInteractionCompleted || !CanInteract(target)) return;
 
         Time.timeScale = 0f;
-
         OnStationEntered?.Invoke(this, StationId);
     }
 
     public void ExitStation(bool isHealed)
     {
-        _isInteractionComplted = true;
+        _isInteractionCompleted = true;
 
         if (isHealed)
         {
-            // TODO: 기차체력 회복 및 자재 소모
+            // TODO: TrainManager로 기차 체력 회복 및 자재 소모 로직
         }
+
+        if (ResourceStatusEventHub.Instance != null)
+        {
+            ResourceStatusEventHub.Instance.NotifyRescuedHumanChanged(_rescueCount);
+        }
+
+        if (NetworkUpgradeService.Instance != null && _rewardGold > 0)
+        {
+            NetworkUpgradeService.Instance.GainGold(_rewardGold);
+        }
+
+        if (ResourceStatusEventHub.Instance != null && _rewardGold > 0)
+        {
+            ResourceStatusEventHub.Instance.NotifyMoneyChanged(_rewardGold);
+        }
+
+        Debug.Log($"[StationObject] '{_stationId}' 완료. 골드 {_rewardGold} 획득, 구출 {_rescueCount}명.");
 
         Time.timeScale = 1f;
     }

@@ -10,6 +10,11 @@ public class ExitConfirmPopup : UIBase
     [SerializeField] private Button _yesButton;
     [SerializeField] private Button _noButton;
 
+    [Header("폰트 크기")]
+    [SerializeField] private float _customMessageFontSize = 42f;
+
+    private float _defaultFontSize;
+    private bool _isDefaultFontSizeCaptured;
     private Action _onConfirmExit;
     private Action _onCancel;
 
@@ -30,13 +35,34 @@ public class ExitConfirmPopup : UIBase
 
     public void Init(string message, Action onConfirmExit, Action onCancel)
     {
-        if (_messageText != null && string.IsNullOrEmpty(message) == false)
+        CaptureDefaultFontSizeIfNeeded();
+
+        if (_messageText != null)
         {
-            _messageText.text = message;
+            if (string.IsNullOrEmpty(message) == false)
+            {
+                _messageText.text = message;
+                _messageText.fontSize = _customMessageFontSize;
+            }
+            else
+            {
+                _messageText.fontSize = _defaultFontSize;
+            }
         }
 
         _onConfirmExit = onConfirmExit;
         _onCancel = onCancel;
+    }
+
+    private void CaptureDefaultFontSizeIfNeeded()
+    {
+        if (_isDefaultFontSizeCaptured == true || _messageText == null)
+        {
+            return;
+        }
+
+        _defaultFontSize = _messageText.fontSize;
+        _isDefaultFontSizeCaptured = true;
     }
 
     private void OnClick_Yes()

@@ -5,11 +5,14 @@ using UnityEngine;
 
 public class MaterialObject : BaseColliderTrigger
 {
-    public static event Action<MaterialObject, int> OnMaterialObjectCollected;
+    public static event Action<MaterialObjectData> OnMaterialObjectCollected;
 
     [Header("Material Object Settings")]
     [SerializeField] private string _materialObjectID;
     [SerializeField] private int _materialObjectAmount;
+    private string _materialObjectType;
+
+    private MaterialObjectData _myData;
 
     [Header("상태 변화 및 수집 연출 설정")]
     [SerializeField] private float _brokenScale = 0.5f;
@@ -31,7 +34,9 @@ public class MaterialObject : BaseColliderTrigger
     private Vector3 _initialLocalScale;
 
     public string MaterialId => _materialObjectID;
+    public string MaterialType => _materialObjectType;
     public int MaterialAmount => _materialObjectAmount;
+
     public bool IsBroken => _isBroken;
     public bool IsMining => _isMining;
 
@@ -41,8 +46,6 @@ public class MaterialObject : BaseColliderTrigger
     {
         _itemCollider = GetComponent<Collider>();
         _initialLocalScale = transform.localScale;
-
-        // TODO: 데이터 초기화 위치
     }
 
     private void Update()
@@ -52,6 +55,17 @@ public class MaterialObject : BaseColliderTrigger
         {
             ReceiveDroneSignalAndStart();
         }
+    }
+
+    public void InitializeData(MaterialObjectData data)
+    {
+        _myData = data; 
+
+        _materialObjectID = data.Id;
+        _materialObjectType = data.Type;
+        _materialObjectAmount = data.amount;
+
+        Debug.Log($"[MaterialObject 초기화 완료] ID: {_materialObjectID}, Type: {_materialObjectType}, Amount: {_materialObjectAmount}");
     }
 
     protected override bool CanInteract(Collider target)
@@ -128,10 +142,14 @@ public class MaterialObject : BaseColliderTrigger
             _itemCollider.enabled = false;
         }
 
-        // TODO: 수집 시 데이터 업데이트 위치
-
-        // 수집 이벤트 발신 (중앙역 창고나 UI 등)
-        OnMaterialObjectCollected?.Invoke(this, _materialObjectAmount);
+        if (_myData != null)
+        {
+            OnMaterialObjectCollected?.Invoke(_myData);
+        }
+        else
+        {
+            Debug.LogWarning($"[MaterialObject] 데이터가 비어 있습니다! 맵메이커의 주입이 정상적으로 이루어졌는지 확인하세요.");
+        }
 
         Vector3 startPos = transform.position;
         Vector3 startScale = transform.localScale;
@@ -155,7 +173,6 @@ public class MaterialObject : BaseColliderTrigger
             await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
         }
 
-        // TODO: Destroy 대신 PoolManager로 수정
         Destroy(gameObject);
     }
 }

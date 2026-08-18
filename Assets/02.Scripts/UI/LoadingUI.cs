@@ -67,8 +67,11 @@ public class LoadingUI : UIBase
 
         UIManager.Instance.CloseLoadingUI();
 
-        // 선로 제작 테스트 임시
+        // HudUi 임시
         UIManager.Instance.OpenRailBuildUI();
+        UIManager.Instance.OpenHudTrainStatusUI();
+        UIManager.Instance.OpenHudResourceUI();
+        UIManager.Instance.OpenInGameMenuButtonUI();
     }
 
     private void SetProgressUI(float progress01)

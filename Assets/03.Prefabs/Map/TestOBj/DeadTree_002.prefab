@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -4594519359010222808}
   - component: {fileID: -2727667967134442038}
   m_Layer: 6
-  m_Name: DeadTree2
+  m_Name: DeadTree_002
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -111,8 +111,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.971122, y: 4.382412, z: 1.105447}
-  m_Center: {x: -0.5920521, y: 2.190936, z: 0.0681795}
+  m_Size: {x: 1, y: 4.382412, z: 1}
+  m_Center: {x: 0, y: 2.190936, z: 0}
 --- !u!114 &-2727667967134442038
 MonoBehaviour:
   m_ObjectHideFlags: 0
