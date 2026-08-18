@@ -8,6 +8,10 @@ public class MonsterData : GameDataBase
     public int Hp;
     public int Atk;
     public float Speed;
+    public int DropGold;
+    public string AttackType;
+    public float DebuffDuration;
+    public float DebuffPower;
 
     public string UseAttackSound;
     public string UseTakeDamageSound;
