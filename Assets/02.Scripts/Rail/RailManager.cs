@@ -10,7 +10,7 @@ public enum RailType
     Corner
 }
 
-public class RailManager : MonoBehaviour
+public class RailManager : SingletonBase<RailManager>
 {
     [Header("Refs")]
     [SerializeField] private Camera Camera_Main;
@@ -65,6 +65,8 @@ public class RailManager : MonoBehaviour
 
     private void Awake()
     {
+        base.Init();
+
         if (MapManager_Ref != null)
         {
             MapManager_Ref.OnMapGenerated += HandleMapGenerated;
