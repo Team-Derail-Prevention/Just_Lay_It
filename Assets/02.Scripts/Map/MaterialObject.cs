@@ -24,6 +24,7 @@ public class MaterialObject : BaseColliderTrigger
     [SerializeField] private float _cameraDepthOffset = 10f;
 
     [Header("채굴 및 흔들림 연출 설정")]
+    [Tooltip("채굴 속도 (초 단위)")]
     [SerializeField] private float _defaultMiningDuration = 3.0f;
     [SerializeField] private float _shakeIntensity = 0.1f;
 
