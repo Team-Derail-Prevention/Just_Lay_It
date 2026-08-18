@@ -10,11 +10,12 @@ public enum RailType
     Corner
 }
 
-public class RailManager : MonoBehaviour
+public class RailManager : SingletonBase<RailManager>
 {
     [Header("Refs")]
     [SerializeField] private Camera Camera_Main;
     [SerializeField] private LayerMask _groundLayer;
+    [SerializeField] private LayerMask _blockedLayer; // 오브젝트가 올라간 바닥(Default) 레이어
     [SerializeField] private Transform Transform_MapRoot;
     [SerializeField] private Transform Transform_RailRoot;
     [SerializeField] private MapManager MapManager_Ref;
@@ -31,9 +32,16 @@ public class RailManager : MonoBehaviour
     private float _tileSize = 1f;
     private float _gridOriginX;
     private float _gridOriginZ;
+    private float _groundPlaneY;
 
     private HashSet<Vector2Int> _installedCubes = new HashSet<Vector2Int>();
-    private List<GameObject> _spawnedRailObjects = new List<GameObject>();
+
+    private struct PlacedRailInfo
+    {
+        public GameObject Obj;
+        public RailType Type;
+    }
+    private Dictionary<Vector2Int, PlacedRailInfo> _placedRails = new Dictionary<Vector2Int, PlacedRailInfo>();
 
     private Vector2Int _hoveredGridIndex;
     private bool _isHoveredCube;
@@ -45,17 +53,20 @@ public class RailManager : MonoBehaviour
 
     private Dictionary<Vector2Int, CubeInfo> _cubeGrid = new Dictionary<Vector2Int, CubeInfo>();
 
+    private bool _isPlaceModeActive = false;
+    private bool _isConfirmPopupOpen = false;
+
+    private Vector2Int _pendingGridIndex;
+    private CubeInfo _pendingCubeInfo;
+
     private string CurrentRailAddress
     {
-        get
-        {
-            return _currentRailType == RailType.Corner ? _cornerRailAddress : _straightRailAddress;
-        }
+        get => _currentRailType == RailType.Corner ? _cornerRailAddress : _straightRailAddress;
     }
 
     private void Awake()
     {
-        SpawnPreviewInstanceAsync().Forget();
+        base.Init();
 
         if (MapManager_Ref != null)
         {
@@ -63,52 +74,113 @@ public class RailManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if (NetworkRailService.Instance != null)
+        {
+            NetworkRailService.Instance.OnRequestPlaceMode += EnterPlaceMode;
+        }
+        else
+        {
+            Debug.LogWarning("[RailManager] NetworkRailService.Instance가 Start() 시점에도 null입니다. 씬에 NetworkRailService가 있는지 확인하세요.");
+        }
+    }
+
     private void OnDestroy()
     {
+        if (NetworkRailService.Instance != null)
+        {
+            NetworkRailService.Instance.OnRequestPlaceMode -= EnterPlaceMode;
+        }
+
         if (MapManager_Ref != null)
         {
             MapManager_Ref.OnMapGenerated -= HandleMapGenerated;
         }
 
+        ExitPlaceMode(clearPlacedRails: false);
+
         if (_previewInstance != null)
         {
             Addressables.ReleaseInstance(_previewInstance);
         }
-
-        ClearAllPlacedRails();
-    }
-
-    private void HandleMapGenerated(Dictionary<Vector3Int, int> mapTypeData)
-    {
-         Transform_MapRoot = MapManager_Ref.MapRoot;
-        ClearAllPlacedRails();
-        BuildCubeLookup();
     }
 
     private void Update()
     {
+        if (!_isPlaceModeActive)
+        {
+            return;
+        }
+
         if (_previewInstance == null)
+        {
+            return;
+        }
+
+        if (_isConfirmPopupOpen)
         {
             return;
         }
 
         HandleRailTypeInput();
 
-        if (_previewInstance == null)
+        UpdateHover();
+        UpdateClickInput();
+
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
+            ExitPlaceMode(clearPlacedRails: false);
+        }
+    }
+
+    private void EnterPlaceMode(RailType railType)
+    {
+        if (_isPlaceModeActive)
+        {
+            Debug.Log("[RailManager] 이미 배치 모드가 활성화되어 있습니다.");
             return;
         }
 
-        bool rotationChanged = _previewController.HandleRotationInput();
+        _currentRailType = railType;
+        _isPlaceModeActive = true;
+        _isConfirmPopupOpen = false;
 
-        UpdateHover();
+        Debug.Log($"[RailManager] 배치 모드 진입: {_currentRailType}");
+        SpawnPreviewInstanceAsync().Forget();
+    }
 
-        if (_isHoveredCube && rotationChanged)
+    private void ExitPlaceMode(bool clearPlacedRails = false)
+    {
+        if (!_isPlaceModeActive) return;
+
+        _isPlaceModeActive = false;
+        _isConfirmPopupOpen = false;
+
+        ClearHover();
+        CloseConfirmPopup();
+
+        if (_previewInstance != null)
         {
-            _previewController.Show(_hoveredCubeInfo);
+            Addressables.ReleaseInstance(_previewInstance);
+            _previewInstance = null;
+            _previewOutline = null;
+            _previewController = null;
         }
 
-        UpdateClickInput();
+        if (clearPlacedRails)
+        {
+            ClearAllPlacedRails();
+        }
+
+        Debug.Log("[RailManager] 배치 모드 종료");
+    }
+
+    private void HandleMapGenerated(Dictionary<Vector3Int, int> mapTypeData)
+    {
+        Transform_MapRoot = MapManager_Ref.MapRoot;
+        ClearAllPlacedRails();
+        BuildCubeLookup();
     }
 
     private void HandleRailTypeInput()
@@ -159,13 +231,16 @@ public class RailManager : MonoBehaviour
         float minZ = float.MaxValue;
         float tileSizeSum = 0f;
         int tileSizeCount = 0;
+        float ySum = 0f;
+
+        LayerMask scanMask = _groundLayer | _blockedLayer;
 
         for (int i = 0; i < childRenderers.Length; i++)
         {
             GameObject rendererObj = childRenderers[i].gameObject;
 
-            bool isGroundLayer = ((1 << rendererObj.layer) & _groundLayer.value) != 0;
-            if (!isGroundLayer) continue;
+            bool isRelevantLayer = ((1 << rendererObj.layer) & scanMask.value) != 0;
+            if (!isRelevantLayer) continue;
 
             if (seenObjects.Contains(rendererObj)) continue;
             seenObjects.Add(rendererObj);
@@ -174,13 +249,15 @@ public class RailManager : MonoBehaviour
             Vector3 topCenter = new Vector3(bounds.center.x, bounds.max.y, bounds.center.z);
 
             MapTileInfo tileInfo = rendererObj.GetComponent<MapTileInfo>();
+            bool isGroundLayer = ((1 << rendererObj.layer) & _groundLayer.value) != 0;
 
             CubeInfo info = new CubeInfo
             {
                 Name = rendererObj.name,
                 Center = topCenter,
                 Obj = rendererObj,
-                TileScript = tileInfo
+                TileScript = tileInfo,
+                IsGroundLayer = isGroundLayer
             };
 
             collected.Add(info);
@@ -190,6 +267,7 @@ public class RailManager : MonoBehaviour
 
             tileSizeSum += bounds.size.x;
             tileSizeCount++;
+            ySum += topCenter.y;
         }
 
         if (collected.Count == 0)
@@ -201,7 +279,7 @@ public class RailManager : MonoBehaviour
         _gridOriginX = minX;
         _gridOriginZ = minZ;
         _tileSize = tileSizeCount > 0 ? (tileSizeSum / tileSizeCount) : 1f;
-
+        _groundPlaneY = tileSizeCount > 0 ? (ySum / tileSizeCount) : 0f;
         if (_tileSize <= 0f) _tileSize = 1f;
 
         for (int i = 0; i < collected.Count; i++)
@@ -216,7 +294,6 @@ public class RailManager : MonoBehaviour
 
             CubeInfo info = collected[i];
             info.GridIndex = gridIndex;
-
             _cubeGrid.Add(gridIndex, info);
         }
 
@@ -248,6 +325,12 @@ public class RailManager : MonoBehaviour
             return;
         }
 
+        if (!_isPlaceModeActive)
+        {
+            Addressables.ReleaseInstance(instance);
+            return;
+        }
+
         _previewOutline = instance.GetComponent<RailOutline>();
         _previewController = instance.GetComponent<RailPreviewController>();
 
@@ -260,29 +343,36 @@ public class RailManager : MonoBehaviour
             _previewController.SetGhostAlpha(_ghostAlpha);
         }
 
+        Collider previewCollider = instance.GetComponentInChildren<Collider>();
+        if (previewCollider != null)
+        {
+            previewCollider.enabled = false;
+        }
+
         instance.SetActive(false);
         _previewInstance = instance;
 
-        if (_isHoveredCube && _hoveredCubeInfo.Obj != null)
+        if (_isHoveredCube && _hoveredCubeInfo.Obj != null && _previewController != null && _previewOutline != null)
         {
+            bool isValidPlacement = IsPlacementValid(_hoveredGridIndex, _hoveredCubeInfo);
             _previewController.Show(_hoveredCubeInfo);
-            _previewOutline.Show(_hoveredCubeInfo);
+            _previewOutline.Show(_hoveredCubeInfo, isValidPlacement);
         }
     }
 
     private void UpdateHover()
     {
         Ray ray = Camera_Main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hitInfo;
-        bool hasHit = Physics.Raycast(ray, out hitInfo, 500f, _groundLayer);
+        Plane groundPlane = new Plane(Vector3.up, new Vector3(0f, _groundPlaneY, 0f));
 
-        if (!hasHit)
+        if (!groundPlane.Raycast(ray, out float enter))
         {
             ClearHover();
             return;
         }
 
-        Vector2Int gridIndex = WorldPointToGridIndex(hitInfo.point);
+        Vector3 hitPoint = ray.GetPoint(enter);
+        Vector2Int gridIndex = WorldPointToGridIndex(hitPoint);
 
         if (!_cubeGrid.TryGetValue(gridIndex, out CubeInfo cubeInfo))
         {
@@ -296,9 +386,20 @@ public class RailManager : MonoBehaviour
             _hoveredCubeInfo = cubeInfo;
             _isHoveredCube = true;
 
+            bool isValidPlacement = IsPlacementValid(gridIndex, cubeInfo);
+
             _previewController.Show(cubeInfo);
-            _previewOutline.Show(cubeInfo);
+            _previewOutline.Show(cubeInfo, isValidPlacement);
         }
+    }
+
+    private bool IsPlacementValid(Vector2Int gridIndex, CubeInfo cubeInfo)
+    {
+        if (!cubeInfo.IsGroundLayer) return false;
+        if (_installedCubes.Contains(gridIndex)) return false;
+        if (cubeInfo.TileScript != null && cubeInfo.TileScript.HasRail) return false;
+        if (cubeInfo.TileScript != null && !cubeInfo.TileScript.CanInstallRail) return false;
+        return true;
     }
 
     private void ClearHover()
@@ -308,16 +409,12 @@ public class RailManager : MonoBehaviour
             _previewOutline?.Hide();
             _previewController?.Hide();
         }
-
         _isHoveredCube = false;
     }
 
     private void UpdateClickInput()
     {
-        if (!Input.GetMouseButtonDown(0))
-        {
-            return;
-        }
+        if (!Input.GetMouseButtonDown(0)) return;
 
         if (!_isHoveredCube)
         {
@@ -325,7 +422,75 @@ public class RailManager : MonoBehaviour
             return;
         }
 
-        TryInstallRail(_hoveredGridIndex, _hoveredCubeInfo);
+        if (_installedCubes.Contains(_hoveredGridIndex) ||
+            (_hoveredCubeInfo.TileScript != null && _hoveredCubeInfo.TileScript.HasRail))
+        {
+            Debug.Log("[RailManager] 이미 레일이 설치된 위치입니다: " + _hoveredCubeInfo.Name);
+            return;
+        }
+
+        if (_hoveredCubeInfo.TileScript != null && !_hoveredCubeInfo.TileScript.CanInstallRail)
+        {
+            Debug.Log($"[RailManager] 타일({_hoveredCubeInfo.Name})의 CanInstallRail이 false이므로 설치 불가!");
+            return;
+        }
+
+        OpenConfirmPopup(_hoveredGridIndex, _hoveredCubeInfo);
+    }
+
+    private void OpenConfirmPopup(Vector2Int gridIndex, CubeInfo cubeInfo)
+    {
+        if (_isConfirmPopupOpen) return;
+
+        if (UIManager.Instance == null)
+        {
+            Debug.LogError("[RailManager] UIManager.Instance가 없습니다.");
+            return;
+        }
+
+        _isConfirmPopupOpen = true;
+        _pendingGridIndex = gridIndex;
+        _pendingCubeInfo = cubeInfo;
+
+        _previewController?.Show(cubeInfo);
+        _previewOutline?.Show(cubeInfo, isValid: true);
+
+        UIManager.Instance.OpenRailPlaceConfirmPopup(
+            onRotate: OnPopupRotate,
+            onConfirm: OnPopupConfirm,
+            onCancel: OnPopupCancel
+        );
+    }
+
+    private void CloseConfirmPopup()
+    {
+        if (UIManager.Instance == null) return;
+
+        UIManager.Instance.CloseRailPlaceConfirmPopup();
+    }
+
+    private void OnPopupRotate()
+    {
+        if (_previewInstance == null) return;
+        _previewController?.RotateNext();
+
+        if (_isHoveredCube)
+        {
+            _previewController?.Show(_hoveredCubeInfo);
+        }
+    }
+
+    private void OnPopupConfirm()
+    {
+        TryInstallRail(_pendingGridIndex, _pendingCubeInfo);
+        _isConfirmPopupOpen = false;
+        CloseConfirmPopup();
+    }
+
+    private void OnPopupCancel()
+    {
+        _isConfirmPopupOpen = false;
+        CloseConfirmPopup();
     }
 
     private void TryInstallRail(Vector2Int gridIndex, CubeInfo cubeInfo)
@@ -336,17 +501,9 @@ public class RailManager : MonoBehaviour
             return;
         }
 
-        if (cubeInfo.TileScript != null)
+        if (cubeInfo.TileScript != null && !cubeInfo.TileScript.CanInstallRail)
         {
-            if (!cubeInfo.TileScript.CanInstallRail)
-            {
-                Debug.Log($"[RailManager] 타일({cubeInfo.Name})의 CanInstallRail이 false이므로 설치 불가!");
-                return;
-            }
-        }
-        else
-        {
-            Debug.LogWarning($"[RailManager] {cubeInfo.Name}에 MapTileInfo 컴포넌트가 없습니다.");
+            Debug.Log($"[RailManager] 타일({cubeInfo.Name})의 CanInstallRail이 false이므로 설치 불가!");
             return;
         }
 
@@ -357,15 +514,19 @@ public class RailManager : MonoBehaviour
             cubeInfo.TileScript.HasRail = true;
         }
 
-        SpawnPlacedRailAsync(cubeInfo.Center, _previewController.CurrentRotation).Forget();
+        RailType railTypeAtInstall = _currentRailType;
+
+        NetworkRailService.Instance?.ConsumeRailOnPlaced(railTypeAtInstall);
+
+        SpawnPlacedRailAsync(gridIndex, cubeInfo.Center, _previewInstance.transform.rotation, railTypeAtInstall).Forget();
     }
 
-    private async UniTask SpawnPlacedRailAsync(Vector3 worldPos, Quaternion rotation)
+    private async UniTask SpawnPlacedRailAsync(Vector2Int gridIndex, Vector3 worldPos, Quaternion rotation, RailType railType)
     {
-        string address = CurrentRailAddress;
+        string address = railType == RailType.Corner ? _cornerRailAddress : _straightRailAddress;
         if (string.IsNullOrEmpty(address))
         {
-            Debug.LogWarning($"[RailManager] {_currentRailType} Rail Address가 비어있음");
+            Debug.LogWarning($"[RailManager] {railType} Rail Address가 비어있음");
             return;
         }
 
@@ -374,37 +535,72 @@ public class RailManager : MonoBehaviour
 
         if (handle.Status != AsyncOperationStatus.Succeeded)
         {
-            Debug.LogWarning($"[RailManager] {_currentRailType} 레일 어드레서블 로드 실패");
+            Debug.LogWarning($"[RailManager] {railType} 레일 어드레서블 로드 실패");
             return;
         }
 
         RailOutline outline = spawnedRail.GetComponent<RailOutline>();
-        if (outline != null)
-        {
-            outline.enabled = false;
-        }
+        if (outline != null) outline.enabled = false;
 
         RailPreviewController controller = spawnedRail.GetComponent<RailPreviewController>();
-        if (controller != null)
+        if (controller != null) controller.enabled = false;
+
+        Collider placedCollider = spawnedRail.GetComponentInChildren<Collider>();
+        if (placedCollider != null)
         {
-            controller.enabled = false;
+            placedCollider.enabled = true;
         }
 
-        _spawnedRailObjects.Add(spawnedRail);
-        Debug.Log($"[RailManager] {_currentRailType} 레일 설치됨: " + spawnedRail.name);
+        _placedRails[gridIndex] = new PlacedRailInfo { Obj = spawnedRail, Type = railType };
+        Debug.Log($"[RailManager] {railType} 레일 설치됨: " + spawnedRail.name);
+
+        ExitPlaceMode(clearPlacedRails: false);
+    }
+
+    public void TryRemoveRail(Vector2Int gridIndex)
+    {
+        if (!_installedCubes.Contains(gridIndex))
+        {
+            Debug.Log("[RailManager] 회수할 레일이 없습니다: " + gridIndex);
+            return;
+        }
+
+        if (!_placedRails.TryGetValue(gridIndex, out PlacedRailInfo placedInfo))
+        {
+            Debug.LogWarning("[RailManager] _installedCubes엔 있는데 _placedRails엔 없는 좌표입니다(데이터 불일치): " + gridIndex);
+            _installedCubes.Remove(gridIndex);
+            return;
+        }
+
+        if (_cubeGrid.TryGetValue(gridIndex, out CubeInfo cubeInfo) && cubeInfo.TileScript != null)
+        {
+            cubeInfo.TileScript.HasRail = false;
+        }
+
+        if (placedInfo.Obj != null)
+        {
+            Addressables.ReleaseInstance(placedInfo.Obj);
+        }
+
+        _placedRails.Remove(gridIndex);
+        _installedCubes.Remove(gridIndex);
+
+        NetworkRailService.Instance?.ReturnRailToInventory(placedInfo.Type);
+
+        Debug.Log($"[RailManager] {placedInfo.Type} 레일 회수됨: " + gridIndex);
     }
 
     private void ClearAllPlacedRails()
     {
         _installedCubes.Clear();
 
-        for (int i = 0; i < _spawnedRailObjects.Count; i++)
+        foreach (KeyValuePair<Vector2Int, PlacedRailInfo> kvp in _placedRails)
         {
-            if (_spawnedRailObjects[i] != null)
+            if (kvp.Value.Obj != null)
             {
-                Addressables.ReleaseInstance(_spawnedRailObjects[i]);
+                Addressables.ReleaseInstance(kvp.Value.Obj);
             }
         }
-        _spawnedRailObjects.Clear();
+        _placedRails.Clear();
     }
 }

@@ -7,4 +7,5 @@ public struct CubeInfo
     public GameObject Obj;
     public Vector2Int GridIndex;
     public MapTileInfo TileScript;
+    public bool IsGroundLayer;
 }
