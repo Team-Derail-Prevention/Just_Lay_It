@@ -1,8 +1,7 @@
-using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Drone))]
-public class DroneStateMachine : MonoBehaviour
+public class DroneStateMachine : MonoBehaviour, IDroneWorker
 {
     [Header("참조")]
     [SerializeField] private Transform _dock;
@@ -15,11 +14,7 @@ public class DroneStateMachine : MonoBehaviour
 
     public DroneState State { get { return _state; } }
     public bool CanAcceptWork { get { return _state == DroneState.Docked || _isReturning; } }
-    public MaterialObject WorkTarget { get { return _workTarget; } }
-    public float WorkProgress { get { return GetWorkProgress(); } }
-
-    public event Action<MaterialObject> OnWorkCompleted;
-    public event Action<DroneState> OnStateChanged;
+    public Transform Transform { get { return transform; } }
 
     private Drone _drone;
     private IAgentMover _mover;
@@ -45,15 +40,49 @@ public class DroneStateMachine : MonoBehaviour
     private void OnEnable()
     {
         _drone.OnArrived += HandleArrived;
+
+        if (DroneManager.Instance != null)
+        {
+            DroneManager.Instance.Register(this);
+        }
     }
 
     private void OnDisable()
     {
         _drone.OnArrived -= HandleArrived;
+
+        if (DroneManager.Instance != null)
+        {
+            DroneManager.Instance.Unregister(this);
+        }
+    }
+
+    public bool TryGetWorkTopY(out float topY)
+    {
+        topY = 0f;
+
+        if (_workTarget == null)
+        {
+            return false;
+        }
+
+        if (_workTarget.TryGetComponent(out Collider targetCollider) == false)
+        {
+            return false;
+        }
+
+        topY = targetCollider.bounds.max.y;
+
+        return true;
     }
 
     private void Start()
     {
+        if (DroneManager.Instance != null)
+        {
+            DroneManager.Instance.Register(this);
+        }
+
         SnapToDock();
     }
 
@@ -108,6 +137,13 @@ public class DroneStateMachine : MonoBehaviour
             return;
         }
 
+        if (_state == DroneState.Docked)
+        {
+            TrackDock();
+
+            return;
+        }
+
         if (_state == DroneState.Moving && _isReturning)
         {
             TrackDock();
@@ -122,8 +158,6 @@ public class DroneStateMachine : MonoBehaviour
         {
             return;
         }
-
-        OnWorkCompleted?.Invoke(_workTarget);
 
         BeginReturn();
     }
@@ -194,8 +228,6 @@ public class DroneStateMachine : MonoBehaviour
         _state = next;
 
         UpdateWorkTrigger();
-
-        OnStateChanged?.Invoke(_state);
     }
 
     private void UpdateWorkTrigger()
@@ -206,15 +238,5 @@ public class DroneStateMachine : MonoBehaviour
         }
 
         _workTrigger.enabled = _state == DroneState.Working;
-    }
-
-    private float GetWorkProgress()
-    {
-        if (_state != DroneState.Working || _workDuration <= 0f)
-        {
-            return 0f;
-        }
-
-        return 1f - Mathf.Clamp01(_workTimer / _workDuration);
     }
 }
