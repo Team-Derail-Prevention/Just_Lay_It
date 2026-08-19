@@ -18,6 +18,7 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
 
     private Drone _drone;
     private IAgentMover _mover;
+    private DroneDockPoint _dockPoint;
 
     private DroneState _state = DroneState.Docked;
     private MaterialObject _workTarget;
@@ -28,6 +29,11 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
     {
         _drone = GetComponent<Drone>();
         _mover = GetComponent<IAgentMover>();
+
+        if (_dock != null)
+        {
+            _dockPoint = _dock.GetComponent<DroneDockPoint>();
+        }
 
         if (_workTrigger == null)
         {
@@ -63,15 +69,34 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
 
         if (_workTarget == null)
         {
-            return false;
+            return TryGetDockY(out topY);
         }
 
         if (_workTarget.TryGetComponent(out Collider targetCollider) == false)
         {
-            return false;
+            return TryGetDockY(out topY);
         }
 
         topY = targetCollider.bounds.max.y;
+
+        return true;
+    }
+
+    private bool TryGetDockY(out float dockY)
+    {
+        dockY = 0f;
+
+        if (_dock == null)
+        {
+            return false;
+        }
+
+        if (_dockPoint != null && _dockPoint.IsAttached == false)
+        {
+            return false;
+        }
+
+        dockY = _dock.position.y;
 
         return true;
     }

@@ -1,36 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &365268396328812371
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7553684508180756163}
-  m_Layer: 0
-  m_Name: Drone_DockPoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7553684508180756163
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 365268396328812371}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 9165016977823284023}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8604228717525145015
 GameObject:
   m_ObjectHideFlags: 0
@@ -146,7 +115,6 @@ Transform:
   m_Children:
   - {fileID: 633754365080438799}
   - {fileID: 3657333664035388163}
-  - {fileID: 7553684508180756163}
   - {fileID: 4247232735873450008}
   - {fileID: 3845847713033036960}
   m_Father: {fileID: 0}
@@ -266,10 +234,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5453813953631740604, guid: 73da776ce22c32c4c810f349202fda95, type: 3}
-      propertyPath: _dock
-      value: 
-      objectReference: {fileID: 7553684508180756163}
     - target: {fileID: 5543407445265190575, guid: 73da776ce22c32c4c810f349202fda95, type: 3}
       propertyPath: m_Name
       value: Drone
@@ -296,10 +260,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Drone_Rail
       objectReference: {fileID: 0}
-    - target: {fileID: 4608316456770326383, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
-      propertyPath: _dock
-      value: 
-      objectReference: {fileID: 7553684508180756163}
     - target: {fileID: 5271457812533839049, guid: 8dc2eb4424aeb7e448eba324e2982846, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

@@ -42,6 +42,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
     private Drone _drone;
     private IAgentMover _mover;
+    private DroneDockPoint _dockPoint;
 
     private Phase _phase = Phase.Idle;
 
@@ -56,6 +57,11 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
     {
         _drone = GetComponent<Drone>();
         _mover = GetComponent<IAgentMover>();
+
+        if (_dock != null)
+        {
+            _dockPoint = _dock.GetComponent<DroneDockPoint>();
+        }
     }
 
     private void OnEnable()
@@ -128,7 +134,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         {
             if (_rack == null)
             {
-                return false;
+                return TryGetDockY(out topY);
             }
 
             topY = _rack.position.y;
@@ -143,7 +149,26 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
             return true;
         }
 
-        return false;
+        return TryGetDockY(out topY);
+    }
+
+    private bool TryGetDockY(out float dockY)
+    {
+        dockY = 0f;
+
+        if (_dock == null)
+        {
+            return false;
+        }
+
+        if (_dockPoint != null && _dockPoint.IsAttached == false)
+        {
+            return false;
+        }
+
+        dockY = _dock.position.y;
+
+        return true;
     }
 
     private void Update()
