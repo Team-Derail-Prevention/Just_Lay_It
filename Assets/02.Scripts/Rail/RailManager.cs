@@ -29,6 +29,7 @@ public class RailManager : SingletonBase<RailManager>
 
     private RailType _currentRailType = RailType.Straight;
 
+
     private float _tileSize = 1f;
     private float _gridOriginX;
     private float _gridOriginZ;
@@ -108,6 +109,11 @@ public class RailManager : SingletonBase<RailManager>
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Delete))
+        {
+            RemoveAllRail();
+        }
+
         if (!_isPlaceModeActive)
         {
             return;
@@ -128,7 +134,7 @@ public class RailManager : SingletonBase<RailManager>
         UpdateHover();
         UpdateClickInput();
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             ExitPlaceMode(clearPlacedRails: false);
         }
@@ -557,7 +563,7 @@ public class RailManager : SingletonBase<RailManager>
         ExitPlaceMode(clearPlacedRails: false);
     }
 
-    public void TryRemoveRail(Vector2Int gridIndex)
+    private void RemoveRail(Vector2Int gridIndex)
     {
         if (!_installedCubes.Contains(gridIndex))
         {
@@ -585,9 +591,26 @@ public class RailManager : SingletonBase<RailManager>
         _placedRails.Remove(gridIndex);
         _installedCubes.Remove(gridIndex);
 
-        NetworkRailService.Instance?.ReturnRailToInventory(placedInfo.Type);
+        NetworkRailService.Instance.ReturnRailToInventory(placedInfo.Type);
 
         Debug.Log($"[RailManager] {placedInfo.Type} 레일 회수됨: " + gridIndex);
+    }
+
+    public void RemoveAllRail()
+    {
+        if (_placedRails.Count == 0)
+        {
+            Debug.Log("[RailManager] 회수할 레일이 없습니다.");
+            return;
+        }
+
+        List<Vector2Int> gridIndices = new List<Vector2Int>(_placedRails.Keys);
+        foreach (Vector2Int gridIndex in gridIndices)
+        {
+            RemoveRail(gridIndex);
+        }
+
+        Debug.Log("[RailManager] 설치된 레일 전체 회수 완료");
     }
 
     private void ClearAllPlacedRails()
