@@ -143,6 +143,8 @@ public class MaterialObject : BaseColliderTrigger
             _itemCollider.enabled = false;
         }
 
+        GameManager.Map?.RefreshTileAtWorldPosition(transform.position);
+
         if (_myData != null)
         {
             OnMaterialObjectCollected?.Invoke(_myData);
