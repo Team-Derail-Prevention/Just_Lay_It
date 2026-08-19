@@ -15,7 +15,7 @@ public class RailManager : SingletonBase<RailManager>
     [Header("Refs")]
     [SerializeField] private Camera Camera_Main;
     [SerializeField] private LayerMask _groundLayer;
-    [SerializeField] private LayerMask _blockedLayer; // 오브젝트가 올라간 바닥(Default) 레이어
+    [SerializeField] private LayerMask _blockedLayer;
     [SerializeField] private Transform Transform_MapRoot;
     [SerializeField] private Transform Transform_RailRoot;
     [SerializeField] private MapManager MapManager_Ref;
@@ -28,7 +28,6 @@ public class RailManager : SingletonBase<RailManager>
     [SerializeField, Range(0f, 1f)] private float _ghostAlpha = 0.4f;
 
     private RailType _currentRailType = RailType.Straight;
-
 
     private float _tileSize = 1f;
     private float _gridOriginX;
@@ -59,6 +58,10 @@ public class RailManager : SingletonBase<RailManager>
 
     private Vector2Int _pendingGridIndex;
     private CubeInfo _pendingCubeInfo;
+
+    [Header("Blocked Tile Recheck")]
+    [SerializeField] private float _blockedTileRecheckInterval = 1f;
+    private float _blockedTileRecheckTimer;
 
     private string CurrentRailAddress
     {
@@ -109,6 +112,13 @@ public class RailManager : SingletonBase<RailManager>
 
     private void Update()
     {
+        _blockedTileRecheckTimer += Time.deltaTime;
+        if (_blockedTileRecheckTimer >= _blockedTileRecheckInterval)
+        {
+            _blockedTileRecheckTimer = 0f;
+            RecheckBlockedTiles();
+        }
+
         if (Input.GetKeyDown(KeyCode.Delete))
         {
             RemoveAllRail();
@@ -404,7 +414,6 @@ public class RailManager : SingletonBase<RailManager>
         if (!cubeInfo.IsGroundLayer) return false;
         if (_installedCubes.Contains(gridIndex)) return false;
         if (cubeInfo.TileScript != null && cubeInfo.TileScript.HasRail) return false;
-        if (cubeInfo.TileScript != null && !cubeInfo.TileScript.CanInstallRail) return false;
         return true;
     }
 
@@ -428,16 +437,9 @@ public class RailManager : SingletonBase<RailManager>
             return;
         }
 
-        if (_installedCubes.Contains(_hoveredGridIndex) ||
-            (_hoveredCubeInfo.TileScript != null && _hoveredCubeInfo.TileScript.HasRail))
+        if (!IsPlacementValid(_hoveredGridIndex, _hoveredCubeInfo))
         {
-            Debug.Log("[RailManager] 이미 레일이 설치된 위치입니다: " + _hoveredCubeInfo.Name);
-            return;
-        }
-
-        if (_hoveredCubeInfo.TileScript != null && !_hoveredCubeInfo.TileScript.CanInstallRail)
-        {
-            Debug.Log($"[RailManager] 타일({_hoveredCubeInfo.Name})의 CanInstallRail이 false이므로 설치 불가!");
+            Debug.Log("[RailManager] 설치 불가능한 위치입니다: " + _hoveredCubeInfo.Name);
             return;
         }
 
@@ -501,15 +503,9 @@ public class RailManager : SingletonBase<RailManager>
 
     private void TryInstallRail(Vector2Int gridIndex, CubeInfo cubeInfo)
     {
-        if (_installedCubes.Contains(gridIndex) || (cubeInfo.TileScript != null && cubeInfo.TileScript.HasRail))
+        if (!IsPlacementValid(gridIndex, cubeInfo))
         {
-            Debug.Log("[RailManager] 이미 레일이 설치된 위치입니다: " + cubeInfo.Name);
-            return;
-        }
-
-        if (cubeInfo.TileScript != null && !cubeInfo.TileScript.CanInstallRail)
-        {
-            Debug.Log($"[RailManager] 타일({cubeInfo.Name})의 CanInstallRail이 false이므로 설치 불가!");
+            Debug.Log("[RailManager] 설치 불가능한 위치입니다: " + cubeInfo.Name);
             return;
         }
 
@@ -591,7 +587,7 @@ public class RailManager : SingletonBase<RailManager>
         _placedRails.Remove(gridIndex);
         _installedCubes.Remove(gridIndex);
 
-        NetworkRailService.Instance.ReturnRailToInventory(placedInfo.Type);
+        NetworkRailService.Instance?.ReturnRailToInventory(placedInfo.Type);
 
         Debug.Log($"[RailManager] {placedInfo.Type} 레일 회수됨: " + gridIndex);
     }
@@ -611,6 +607,47 @@ public class RailManager : SingletonBase<RailManager>
         }
 
         Debug.Log("[RailManager] 설치된 레일 전체 회수 완료");
+    }
+
+    public void RefreshTileLayer(GameObject tileObj)
+    {
+        if (tileObj == null) return;
+
+        Renderer renderer = tileObj.GetComponent<Renderer>();
+        if (renderer == null) return;
+
+        Vector3 topCenter = new Vector3(renderer.bounds.center.x, renderer.bounds.max.y, renderer.bounds.center.z);
+        Vector2Int gridIndex = WorldPointToGridIndex(topCenter);
+
+        if (!_cubeGrid.TryGetValue(gridIndex, out CubeInfo info)) return;
+
+        info.IsGroundLayer = ((1 << tileObj.layer) & _groundLayer.value) != 0;
+        _cubeGrid[gridIndex] = info;
+
+        Debug.Log($"[RailManager] 타일 레이어 갱신: {tileObj.name} → IsGroundLayer={info.IsGroundLayer}");
+    }
+
+    private void RecheckBlockedTiles()
+    {
+        if (_cubeGrid.Count == 0) return;
+
+        List<Vector2Int> keys = new List<Vector2Int>(_cubeGrid.Keys);
+        for (int i = 0; i < keys.Count; i++)
+        {
+            Vector2Int key = keys[i];
+            CubeInfo info = _cubeGrid[key];
+
+            if (info.IsGroundLayer) continue;
+            if (info.Obj == null) continue;
+
+            bool isGroundLayerNow = ((1 << info.Obj.layer) & _groundLayer.value) != 0;
+            if (isGroundLayerNow != info.IsGroundLayer)
+            {
+                info.IsGroundLayer = isGroundLayerNow;
+                _cubeGrid[key] = info;
+                Debug.Log($"[RailManager] 재검사로 타일 상태 변경 감지: {info.Name} → IsGroundLayer={isGroundLayerNow}");
+            }
+        }
     }
 
     private void ClearAllPlacedRails()
