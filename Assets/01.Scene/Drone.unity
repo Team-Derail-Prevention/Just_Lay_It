@@ -782,28 +782,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aef1a0ff05bafa74780f304bc19cf24b, type: 3}
---- !u!1 &1474857287 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4689609326682118221, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
-  m_PrefabInstance: {fileID: 6439110891492541049}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1474857297
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1474857287}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5955681090240fd49a3962bb13db6d7a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DroneDeliveryWorker
-  _dock: {fileID: 1760029245}
-  _rack: {fileID: 0}
-  _carrySocket: {fileID: 0}
-  _pickUpDuration: 0.4
-  _dropDuration: 1
 --- !u!1 &1491710779
 GameObject:
   m_ObjectHideFlags: 0
@@ -1170,6 +1148,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4434165422878414424, guid: 76c049cb5f9bc6b4fbec7ef18c4915e4, type: 3}
+      propertyPath: _headTrain
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1456,9 +1438,6 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 4689609326682118221, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
-      insertIndex: 4
-      addedObject: {fileID: 1474857297}
     - targetCorrespondingSourceObject: {fileID: 365268396328812371, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1760029246}

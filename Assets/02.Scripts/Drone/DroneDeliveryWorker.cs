@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Drone))]
 public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
@@ -25,7 +25,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
     [SerializeField, Min(0f)] private float _dropDuration = 1f;
 
     public Transform Transform { get { return transform; } }
-    public bool CanAcceptWork { get { return _order == null; } }
+    public bool CanAcceptWork { get { return _hasOrder == false; } }
 
     public DroneState State
     {
@@ -44,7 +44,12 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
     private IAgentMover _mover;
 
     private Phase _phase = Phase.Idle;
-    private DeliveryOrder _order;
+
+    private bool _hasOrder;
+    private GameObject _payload;
+    private Vector3 _target;
+    private Quaternion _rotation;
+
     private float _workTimer;
 
     private void Awake()
@@ -83,14 +88,21 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         SnapToDock();
     }
 
-    public bool Assign(DeliveryOrder order)
+    public bool Assign(GameObject payload, Vector3 target, Quaternion rotation)
     {
-        if (order == null || CanAcceptWork == false)
+        if (payload == null || CanAcceptWork == false)
         {
             return false;
         }
 
-        _order = order;
+        _payload = payload;
+        _target = target;
+        _rotation = rotation;
+        _hasOrder = true;
+
+        // 아직 싣지 않았으니 목적지에서 보이면 안 됩니다.
+        _payload.SetActive(false);
+
         _phase = Phase.ToRack;
 
         TrackPickUpPoint();
@@ -100,18 +112,9 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
     public void Recall()
     {
-        if (_phase == Phase.Idle)
+        if (_phase == Phase.Idle || _hasOrder)
         {
             return;
-        }
-
-        if (_order != null)
-        {
-            DeliveryOrder cancelled = _order;
-
-            _order = null;
-
-            cancelled.Cancel();
         }
 
         BeginReturn();
@@ -135,12 +138,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
         if (_phase == Phase.ToTarget || _phase == Phase.Dropping)
         {
-            if (_order == null)
-            {
-                return false;
-            }
-
-            topY = _order.Target.y;
+            topY = _target.y;
 
             return true;
         }
@@ -185,26 +183,15 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
             _phase = Phase.ToTarget;
 
-            _drone.MoveTo(_order.Target);
+            _drone.MoveTo(_target);
 
             return;
         }
 
-        Drop();
-    }
+        PutDown();
 
-    private void Drop()
-    {
-        DeliveryOrder finished = _order;
-
-        _order = null;
-
-        PutDown(finished);
-
-        if (finished != null)
-        {
-            finished.Complete();
-        }
+        _hasOrder = false;
+        _payload = null;
 
         BeginReturn();
     }
@@ -235,28 +222,28 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
     private void PickUp()
     {
-        if (_order == null || _order.Payload == null)
+        if (_payload == null)
         {
             return;
         }
 
         Transform socket = _carrySocket != null ? _carrySocket : transform;
 
-        _order.Payload.transform.SetParent(socket, true);
-        _order.Payload.transform.SetPositionAndRotation(socket.position, socket.rotation);
-        _order.Payload.SetActive(true);
+        _payload.transform.SetParent(socket, true);
+        _payload.transform.SetPositionAndRotation(socket.position, socket.rotation);
+        _payload.SetActive(true);
     }
 
-    private void PutDown(DeliveryOrder order)
+    private void PutDown()
     {
-        if (order == null || order.Payload == null)
+        if (_payload == null)
         {
             return;
         }
 
-        order.Payload.transform.SetParent(null, true);
-        order.Payload.transform.SetPositionAndRotation(order.Target, order.Rotation);
-        order.Payload.SetActive(true);
+        _payload.transform.SetParent(null, true);
+        _payload.transform.SetPositionAndRotation(_target, _rotation);
+        _payload.SetActive(true);
     }
 
     private void BeginReturn()

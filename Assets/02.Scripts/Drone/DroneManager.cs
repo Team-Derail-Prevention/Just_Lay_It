@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class DroneManager : MonoBehaviour
@@ -84,9 +83,7 @@ public class DroneManager : MonoBehaviour
         return FindNearestIdleMiner(target.transform.position, target) != null;
     }
 
-    // 드론은 물건을 기차 적재칸에서 목적지로 옮기기만 합니다.
-    // 무엇을 옮기는지, 도착 후 무엇을 할지는 payload와 onDelivered를 넘긴 쪽 몫입니다.
-    public bool RequestDelivery(GameObject payload, Vector3 target, Quaternion rotation, Action onDelivered, Action onCancelled = null)
+    public bool RequestDelivery(GameObject payload, Vector3 target, Quaternion rotation)
     {
         if (payload == null)
         {
@@ -104,19 +101,7 @@ public class DroneManager : MonoBehaviour
             return false;
         }
 
-        DeliveryOrder order = new DeliveryOrder(payload, target, rotation);
-
-        if (onDelivered != null)
-        {
-            order.OnDelivered += onDelivered;
-        }
-
-        if (onCancelled != null)
-        {
-            order.OnCancelled += onCancelled;
-        }
-
-        return carrier.Assign(order);
+        return carrier.Assign(payload, target, rotation);
     }
 
     public bool HasIdleCarrier()
