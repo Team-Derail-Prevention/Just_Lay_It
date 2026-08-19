@@ -16,14 +16,15 @@ public class MapManager : SingletonBase<MapManager>
     [SerializeField] private float _railSpawnOffset = 2f;
 
     private readonly Vector3Int[] _mapOffsets = new Vector3Int[]
-    {
-        new Vector3Int(-1, 1, 0),  new Vector3Int(0, 1, 0),  new Vector3Int(1, 1, 0),
-        new Vector3Int(1, 0, 0),   new Vector3Int(1, -1, 0), new Vector3Int(0, -1, 0),
-        new Vector3Int(-1, -1, 0), new Vector3Int(-1, 0, 0)
-    };
+       {
+        new Vector3Int(-1, 0, 1),  new Vector3Int(0, 0, 1),  new Vector3Int(1, 0, 1),
+        new Vector3Int(1, 0, 0),   new Vector3Int(1, 0, -1), new Vector3Int(0, 0, -1),
+        new Vector3Int(-1, 0, -1), new Vector3Int(-1, 0, 0)
+       };
 
     private Dictionary<Vector3Int, GameObject> _spawnedMaps = new Dictionary<Vector3Int, GameObject>();
     private Dictionary<Vector3Int, int> _mapTypeData = new Dictionary<Vector3Int, int>();
+    private readonly List<MapTileInfo> _spawnedTiles = new List<MapTileInfo>();
 
     public event Action<Dictionary<Vector3Int, int>> OnMapGenerated;
     public Transform MapRoot { get { return _mapRoot; } }
@@ -162,6 +163,9 @@ public class MapManager : SingletonBase<MapManager>
             await SpawnMapFromDataAsync(selectedData, gridPos, typeId, tag, cancellationToken);
         }
 
+        Physics.SyncTransforms();
+        RefreshAllTileOccupancies();
+
         Debug.Log("[MapManager] 데이터 기반 3x3 맵 생성 및 자동 레일 설치 완료!");
         OnMapGenerated?.Invoke(_mapTypeData);
 
@@ -183,18 +187,19 @@ public class MapManager : SingletonBase<MapManager>
             return;
         }
 
-        Vector3 worldPosition = new Vector3(gridPos.x * _mapSpacing, 0, gridPos.y * _mapSpacing);
+        Vector3 worldPosition = new Vector3(gridPos.x * _mapSpacing, 0, gridPos.z * _mapSpacing);
         GameObject mapObject = Instantiate(prefab, worldPosition, Quaternion.identity, _mapRoot);
 
         mapObject.name = $"{mapNameTag} ({gridPos.x}, {gridPos.y})";
 
         _spawnedMaps[gridPos] = mapObject;
         _mapTypeData[gridPos] = typeId;
+        RegisterMapTiles(mapObject, gridPos);
 
         Transform railParent = mapObject.transform.Find("offsetRailRoot");
         if (railParent == null)
         {
-            GameObject railFolder = new GameObject("offsetRail");
+            GameObject railFolder = new GameObject("offsetRailRoot");
             railFolder.transform.SetParent(mapObject.transform);
             railFolder.transform.localPosition = Vector3.zero;
             railParent = railFolder.transform;
@@ -352,6 +357,52 @@ public class MapManager : SingletonBase<MapManager>
         }
         _spawnedMaps.Clear();
         _mapTypeData.Clear();
+        _spawnedTiles.Clear();
+    }
+
+    private void RegisterMapTiles(GameObject mapObject, Vector3Int mapGridPos)
+    {
+        MapTileInfo[] tiles = mapObject.GetComponentsInChildren<MapTileInfo>(true);
+        foreach (MapTileInfo tile in tiles)
+        {
+            tile.SetParentMapGridPosition(mapGridPos);
+            _spawnedTiles.Add(tile);
+        }
+    }
+
+    private void RefreshAllTileOccupancies()
+    {
+        foreach (MapTileInfo tile in _spawnedTiles)
+        {
+            if (tile != null)
+            {
+                tile.RefreshOccupancy();
+            }
+        }
+    }
+
+    public void RefreshTileAtWorldPosition(Vector3 worldPosition)
+    {
+        MapTileInfo closestTile = null;
+        float closestSqrDistance = float.MaxValue;
+
+        foreach (MapTileInfo tile in _spawnedTiles)
+        {
+            if (tile == null) continue;
+
+            Vector3 offset = tile.transform.position - worldPosition;
+            float sqrDistance = offset.x * offset.x + offset.z * offset.z;
+            if (sqrDistance < closestSqrDistance)
+            {
+                closestSqrDistance = sqrDistance;
+                closestTile = tile;
+            }
+        }
+
+        if (closestTile != null)
+        {
+            closestTile.RefreshOccupancy();
+        }
     }
 
     public Dictionary<Vector3Int, int> GetMapTypeData()
