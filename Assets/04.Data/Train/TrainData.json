@@ -1,0 +1,58 @@
+[
+  {
+    "Id": "TRAIN_HEAD_01",
+    "TrainName": "머리칸",
+    "TrainType": "Head",
+    "Description": "선두 기관차",
+    "MoveSpeed": 2,
+    "RotateSpeed": 5,
+    "MaxCargo": 0,
+    "MaxHp": 100,
+    "Defense": 1,
+    "MaxWeaponMount": 0,
+    "MaxCrew": 0,
+    "PrefabPath": null
+  },
+  {
+    "Id": "TRAIN_STANDARD_01",
+    "TrainName": "일반칸",
+    "TrainType": "Standard",
+    "Description": "무기 장착 가능 객차",
+    "MoveSpeed": 2,
+    "RotateSpeed": 5,
+    "MaxCargo": 0,
+    "MaxHp": 100,
+    "Defense": 1,
+    "MaxWeaponMount": 1,
+    "MaxCrew": 2,
+    "PrefabPath": null
+  },
+  {
+    "Id": "TRAIN_STANDARD_02",
+    "TrainName": "일반칸",
+    "TrainType": "Standard",
+    "Description": "무기 장착 가능 객차",
+    "MoveSpeed": 2,
+    "RotateSpeed": 5,
+    "MaxCargo": 0,
+    "MaxHp": 100,
+    "Defense": 1,
+    "MaxWeaponMount": 1,
+    "MaxCrew": 2,
+    "PrefabPath": null
+  },
+  {
+    "Id": "TRAIN_CARGO_01",
+    "TrainName": "화물칸",
+    "TrainType": "Cargo",
+    "Description": "자재 적재칸",
+    "MoveSpeed": 2,
+    "RotateSpeed": 5,
+    "MaxCargo": 100,
+    "MaxHp": 100,
+    "Defense": 1,
+    "MaxWeaponMount": 0,
+    "MaxCrew": 0,
+    "PrefabPath": null
+  }
+]
