@@ -45,4 +45,12 @@
         Straight,
         Corner
     }
+
+    public enum TrainExitDirection
+    {
+        East = 0,  // 동
+        West = 1,  // 서
+        South = 2, // 남
+        North = 3, // 북
+    }
 }
