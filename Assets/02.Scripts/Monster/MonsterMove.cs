@@ -1,9 +1,10 @@
-﻿using Unity.Android.Gradle.Manifest;
-using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
+﻿using UnityEngine;
 
 public class MonsterMove : MonoBehaviour
-{    
+{
+    [Header("Animation")]
+    [SerializeField] private Animator _animator;
+
     [SerializeField] private float _attackRange = 5.0f;
     [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private Transform firePosition;
@@ -13,6 +14,9 @@ public class MonsterMove : MonoBehaviour
     private int _monsterAtk;
     private Transform _target;
     private bool _isAttackRange = false;
+
+    private readonly int _walk = Animator.StringToHash("IsWalk");
+    private readonly int _attack = Animator.StringToHash("Attack");
 
     private float _attackTimer = 0f;
     private float _attackCooldown = 2f;
@@ -85,14 +89,20 @@ public class MonsterMove : MonoBehaviour
             Vector3 targetCenter = new Vector3(_target.position.x, firePosition.position.y, _target.position.z);
             Vector3 shootDir = (targetCenter - firePosition.position).normalized;
 
-            projectile.ProjectileInitialize(shootDir, _monsterAtk);
+            projectile.ProjectileInitialize(shootDir, _monsterAtk, _attackType, _debuffDuration, _debuffPower);
         }
+
     }
 
     private void HandleMovement(Vector3 targetPos)
     {
         _isAttackRange = false;
         _attackTimer = 0f;
+
+        if (_animator != null)
+        {
+            _animator.SetBool(_walk, true);
+        }
 
         if (_rb != null)
         {
@@ -116,6 +126,12 @@ public class MonsterMove : MonoBehaviour
         if (!_isAttackRange)
         {
             _isAttackRange = true;
+
+            if (_animator != null)
+            {
+                _animator.SetBool(_walk, false);
+            }
+
         }
 
         transform.LookAt(targetPos);
@@ -124,6 +140,12 @@ public class MonsterMove : MonoBehaviour
         if (_attackTimer >= _attackCooldown)
         {
             _attackTimer = 0f;
+
+            if (_animator != null)
+            {
+                _animator.SetTrigger(_attack);
+            }
+
             ShootProjectile();
         }
     }
