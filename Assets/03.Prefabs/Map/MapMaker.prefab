@@ -44,12 +44,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 450b23e9b3405ca4798f584a5a2be2cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapMaker
+  _materialJsonData: {fileID: 4900000, guid: 510f35ef434d8464ca320dd64c0f52a6, type: 3}
+  _mapCategory: 0
   _cubePrefabs:
   - {fileID: 5287405914116040443, guid: 797c3a5290aa5b64d9a8ba14fcf6fa54, type: 3}
   - {fileID: 1565410601351267904, guid: 9bd75d762f62dc24f9c20fbae86b28fd, type: 3}
-  _gridSizeX: 14
-  _gridSizeZ: 14
+  _gridSizeX: 15
+  _gridSizeZ: 15
   _spacing: 2
+  _groundLayerName: Ground
   _mapGridPos: {x: 0, y: 0, z: 0}
   _stationPrefab: {fileID: 0}
   _obstaclePrefabs:
