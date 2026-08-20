@@ -27,9 +27,6 @@ public class DroneManager : MonoBehaviour
     [SerializeField] private List<DroneSpawnEntry> _spawnEntries = new List<DroneSpawnEntry>();
     [SerializeField] private Transform _spawnRoot;
 
-    [Header("배달 예약 표시")]
-    [SerializeField, Range(0f, 1f)] private float _reservedAlpha = 0.4f;
-
     private readonly List<IDroneWorker> _workers = new List<IDroneWorker>();
     private readonly List<GameObject> _spawned = new List<GameObject>();
     private readonly Queue<DeliveryOrder> _pendingDeliveries = new Queue<DeliveryOrder>();
@@ -283,11 +280,11 @@ public class DroneManager : MonoBehaviour
 
         if (isGhost)
         {
-            preview.SetGhostAlpha(_reservedAlpha);
+            preview.SetGhost();
         }
         else
         {
-            preview.SetGhostAlpha(1f);
+            preview.SetSolid();
         }
     }
 
