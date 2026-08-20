@@ -44,6 +44,21 @@ public class RailPreviewController : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    public void SetGhost()
+    {
+        float alpha = 0.4f;
+        if (RailManager.Instance != null)
+        {
+            alpha = RailManager.Instance.GhostAlpha;
+        }
+        SetGhostAlpha(alpha);
+    }
+
+    public void SetSolid()
+    {
+        SetGhostAlpha(1f);
+    }
+
     public void SetGhostAlpha(float alpha)
     {
         for (int i = 0; i < _renderers.Length; i++)
