@@ -26,6 +26,12 @@ public enum UIType
     HudResourceUI,
     InGameMenuButtonUI,
     InGameMenuPopup,
+    AugmentInventoryUI,
+    TrainStrengtheningUI,
+    WarehouseUI,
+    TrainDepartureUI,
+    BaseArrivalUI,
+    TextInputPopup,
 }
 public static class UIManagerExtension
 {
@@ -228,6 +234,101 @@ public static class UIManagerExtension
         uiManager.ClosePopupUI(UIType.InGameMenuPopup);
     }
 
+    public static void OpenAugmentInventoryUI(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenPopupUI(UIType.AugmentInventoryUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("AugmentInventoryUI가 생성되지 않았습니다");
+            return;
+        }
+    }
+
+    public static void CloseAugmentInventoryUI(this UIManager uiManager)
+    {
+        uiManager.ClosePopupUI(UIType.AugmentInventoryUI);
+    }
+
+    public static void OpenTrainStrengtheningUI(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenPopupUI(UIType.TrainStrengtheningUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("TrainStrengtheningUI가 생성되지 않았습니다");
+            return;
+        }
+    }
+
+    public static void CloseTrainStrengtheningUI(this UIManager uiManager)
+    {
+        uiManager.ClosePopupUI(UIType.TrainStrengtheningUI);
+    }
+
+    public static void OpenWarehouseUI(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenPopupUI(UIType.WarehouseUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("WarehouseUI가 생성되지 않았습니다");
+            return;
+        }
+    }
+
+    public static void CloseWarehouseUI(this UIManager uiManager)
+    {
+        uiManager.ClosePopupUI(UIType.WarehouseUI);
+    }
+
+    public static void OpenTrainDepartureUI(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenPopupUI(UIType.TrainDepartureUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("TrainDepartureUI가 생성되지 않았습니다");
+            return;
+        }
+    }
+
+    public static void CloseTrainDepartureUI(this UIManager uiManager)
+    {
+        uiManager.ClosePopupUI(UIType.TrainDepartureUI);
+    }
+
+    public static void OpenBaseArrivalUI(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenContentUI(UIType.BaseArrivalUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("BaseArrivalUI가 생성되지 않았습니다");
+            return;
+        }
+    }
+
+    public static void CloseBaseArrivalUI(this UIManager uiManager)
+    {
+        uiManager.CloseContentUI(UIType.BaseArrivalUI);
+    }
+
+    public static void OpenTextInputPopup(this UIManager uiManager, string message, Action<int> onConfirm, Action onInvalidInput = null)
+    {
+        var uiBase = uiManager.OpenPopupUI(UIType.TextInputPopup);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("TextInputPopup가 생성되지 않았습니다");
+            return;
+        }
+
+        if (uiBase is TextInputPopupUI textInputPopup)
+        {
+            textInputPopup.Init(message, onConfirm, onInvalidInput);
+        }
+    }
+
+    public static void CloseTextInputPopup(this UIManager uiManager)
+    {
+        uiManager.ClosePopupUI(UIType.TextInputPopup);
+    }
+
     public static void OpenRailPlaceConfirmPopup(this UIManager uiManager, Action onRotate, Action onConfirm, Action onCancel)
     {
         var uiBase = uiManager.OpenMainUI(UIType.RailPlaceConfirmPopup);
@@ -247,6 +348,4 @@ public static class UIManagerExtension
     {
         uiManager.CloseMainUI(UIType.RailPlaceConfirmPopup);
     }
-
-
 }
