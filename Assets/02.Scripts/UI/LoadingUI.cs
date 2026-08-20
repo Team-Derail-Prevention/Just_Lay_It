@@ -72,6 +72,11 @@ public class LoadingUI : UIBase
         UIManager.Instance.OpenHudTrainStatusUI();
         UIManager.Instance.OpenHudResourceUI();
         UIManager.Instance.OpenInGameMenuButtonUI();
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.StartCountdownAsync().Forget();
+        }
     }
 
     private void SetProgressUI(float progress01)
