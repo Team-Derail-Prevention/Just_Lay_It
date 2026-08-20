@@ -946,8 +946,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7e163c38dfd1ad42aeea0569a81adef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DroneStateMachine
-  _dock: {fileID: 0}
-  _workTrigger: {fileID: 0}
+  _dock: {fileID: 8386779686349033688}
+  _workTrigger: {fileID: 1109667046322424571}
   _workDuration: 1
 --- !u!114 &4523906457424135640
 MonoBehaviour:

@@ -47,6 +47,11 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
     {
         _drone.OnArrived += HandleArrived;
 
+        if (_dockPoint != null)
+        {
+            _dockPoint.OnAttached += HandleDockAttached;
+        }
+
         if (DroneManager.Instance != null)
         {
             DroneManager.Instance.Register(this);
@@ -56,6 +61,11 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
     private void OnDisable()
     {
         _drone.OnArrived -= HandleArrived;
+
+        if (_dockPoint != null)
+        {
+            _dockPoint.OnAttached -= HandleDockAttached;
+        }
 
         if (DroneManager.Instance != null)
         {
@@ -164,8 +174,6 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
 
         if (_state == DroneState.Docked)
         {
-            TrackDock();
-
             return;
         }
 
@@ -173,6 +181,45 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
         {
             TrackDock();
         }
+    }
+
+    private void LateUpdate()
+    {
+        if (_state != DroneState.Docked)
+        {
+            return;
+        }
+
+        HoldAtDock();
+    }
+
+    private void HoldAtDock()
+    {
+        if (_mover == null || _dock == null)
+        {
+            return;
+        }
+
+        if (_dockPoint != null && _dockPoint.IsAttached == false)
+        {
+            return;
+        }
+
+        Vector3 world = _dock.position;
+
+        world.y = transform.position.y;
+
+        _mover.Warp(world);
+    }
+
+    private void HandleDockAttached()
+    {
+        if (_mover == null || _dock == null)
+        {
+            return;
+        }
+
+        _mover.Warp(_dock.position);
     }
 
     private void UpdateWork()

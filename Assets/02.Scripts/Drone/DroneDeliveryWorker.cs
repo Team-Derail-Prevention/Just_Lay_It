@@ -48,6 +48,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
     private bool _hasOrder;
     private GameObject _payload;
+    private GameObject _ghost;
     private Vector3 _target;
     private Quaternion _rotation;
 
@@ -68,6 +69,11 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
     {
         _drone.OnArrived += HandleArrived;
 
+        if (_dockPoint != null)
+        {
+            _dockPoint.OnAttached += HandleDockAttached;
+        }
+
         if (DroneManager.Instance != null)
         {
             DroneManager.Instance.Register(this);
@@ -77,6 +83,11 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
     private void OnDisable()
     {
         _drone.OnArrived -= HandleArrived;
+
+        if (_dockPoint != null)
+        {
+            _dockPoint.OnAttached -= HandleDockAttached;
+        }
 
         if (DroneManager.Instance != null)
         {
@@ -94,20 +105,25 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         SnapToDock();
     }
 
-    public bool Assign(GameObject payload, Vector3 target, Quaternion rotation)
+    public bool Assign(GameObject payload, GameObject ghost, Vector3 target, Quaternion rotation)
     {
         if (payload == null || CanAcceptWork == false)
         {
             return false;
         }
 
+        if (_rack == null && _dock == null)
+        {
+            Debug.LogWarning($"[DroneDeliveryWorker] {name}의 _rack과 _dock이 모두 비어 있어 배달을 받지 않습니다. 프리팹 참조를 확인하세요.", this);
+
+            return false;
+        }
+
         _payload = payload;
+        _ghost = ghost;
         _target = target;
         _rotation = rotation;
         _hasOrder = true;
-
-        // 아직 싣지 않았으니 목적지에서 보이면 안 됩니다.
-        _payload.SetActive(false);
 
         _phase = Phase.ToRack;
 
@@ -187,10 +203,49 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
             return;
         }
 
-        if (_phase == Phase.Idle || _phase == Phase.Returning)
+        if (_phase == Phase.Returning)
         {
             TrackDock();
         }
+    }
+
+    private void LateUpdate()
+    {
+        if (_phase != Phase.Idle)
+        {
+            return;
+        }
+
+        HoldAtDock();
+    }
+
+    private void HoldAtDock()
+    {
+        if (_mover == null || _dock == null)
+        {
+            return;
+        }
+
+        if (_dockPoint != null && _dockPoint.IsAttached == false)
+        {
+            return;
+        }
+
+        Vector3 world = _dock.position;
+
+        world.y = transform.position.y;
+
+        _mover.Warp(world);
+    }
+
+    private void HandleDockAttached()
+    {
+        if (_mover == null || _dock == null)
+        {
+            return;
+        }
+
+        _mover.Warp(_dock.position);
     }
 
     private void UpdateWork()
@@ -263,12 +318,33 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
     {
         if (_payload == null)
         {
+            DestroyGhost();
+
             return;
         }
 
         _payload.transform.SetParent(null, true);
         _payload.transform.SetPositionAndRotation(_target, _rotation);
         _payload.SetActive(true);
+
+        if (DroneManager.Instance != null)
+        {
+            DroneManager.Instance.SetPayloadCollision(_payload, true);
+        }
+
+        DestroyGhost();
+    }
+
+    private void DestroyGhost()
+    {
+        if (_ghost == null)
+        {
+            return;
+        }
+
+        Destroy(_ghost);
+
+        _ghost = null;
     }
 
     private void BeginReturn()

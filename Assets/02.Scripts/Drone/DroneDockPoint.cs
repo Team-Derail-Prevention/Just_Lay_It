@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class DroneDockPoint : MonoBehaviour
 {
+    public event Action OnAttached;
+
     [Header("붙을 칸")]
     [Tooltip("0이면 기관차, 1부터는 뒤쪽 객차 순서")]
     [SerializeField, Min(0)] private int _carIndex = 0;
@@ -20,6 +23,8 @@ public class DroneDockPoint : MonoBehaviour
     private void OnEnable()
     {
         TrainManager.OnTrainSpawn += HandleTrainSpawn;
+
+        AttachToCurrentTrain();
     }
 
     private void OnDisable()
@@ -46,12 +51,57 @@ public class DroneDockPoint : MonoBehaviour
             return;
         }
 
-        _anchor = ResolveCar(head);
+        AttachTo(ResolveCar(head));
+    }
+
+    private void AttachToCurrentTrain()
+    {
+        if (TryResolveCurrentCar(out Transform car) == false)
+        {
+            return;
+        }
+
+        AttachTo(car);
+    }
+
+    // TODO: TrainManager에 HeadTrain getter가 열리면 _carIndex 0도 여기서 처리할 것
+    private bool TryResolveCurrentCar(out Transform car)
+    {
+        car = null;
+
+        if (_carIndex <= 0)
+        {
+            return false;
+        }
+
+        if (TrainManager.Instance == null)
+        {
+            return false;
+        }
+
+        List<GameObject> cars = TrainManager.Instance.carList;
+        int index = _carIndex - 1;
+
+        if (index >= cars.Count || cars[index] == null)
+        {
+            return false;
+        }
+
+        car = cars[index].transform;
+
+        return true;
+    }
+
+    private void AttachTo(Transform car)
+    {
+        _anchor = car;
         _offset = ResolveOffset(_anchor);
 
         Apply();
 
         Debug.Log($"[DroneDockPoint] {_anchor.name}에 드론칸을 붙였습니다. 높이 {_offset.y:F2}");
+
+        OnAttached?.Invoke();
     }
 
     private void Apply()

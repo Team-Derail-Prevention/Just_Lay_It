@@ -430,7 +430,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5955681090240fd49a3962bb13db6d7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DroneDeliveryWorker
-  _dock: {fileID: 0}
+  _dock: {fileID: 4438655100400215635}
   _rack: {fileID: 0}
   _carrySocket: {fileID: 0}
   _pickUpDuration: 0.4
