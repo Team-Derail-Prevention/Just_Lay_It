@@ -10,7 +10,7 @@ public class MaterialObject : BaseColliderTrigger
     [Header("Material Object Settings")]
     [SerializeField] private string _materialObjectID;
     [SerializeField] private int _materialObjectAmount;
-    private string _materialObjectType;
+    [SerializeField]private string _materialObjectType;
 
     private MaterialObjectData _myData;
 
@@ -86,6 +86,7 @@ public class MaterialObject : BaseColliderTrigger
             return;
         }
 
+        Debug.Log($"{_materialObjectID},{_materialObjectType},{_materialObjectAmount}");
         Debug.Log($"[MaterialObject] '{_materialObjectID}' 드론 수집 신호(이벤트) 수신 -> 채굴 및 수집 시작");
         StartMiningAndCollectionProcessAsync(this.GetCancellationTokenOnDestroy()).Forget();
     }
