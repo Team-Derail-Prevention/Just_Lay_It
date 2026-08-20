@@ -140,12 +140,14 @@ public class GameManager : SingletonBase<GameManager>
         {
 
         }
+
+        // Train.DepartStation(); 추가 메서드 만드는 것이 좋음 (해당 위치는 자동시작임)
     }
 
     public void GameOver()
     {
         Debug.Log("[GameManager] 게임 오버! 맵과 오브젝트를 정리합니다.");
-
+        // Train.ClearExistingTrain();
         ChangeGameState(GameState.GameOver);
 
         if (Time != null)

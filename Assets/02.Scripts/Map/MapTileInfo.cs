@@ -1,108 +1,133 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 public class MapTileInfo : MonoBehaviour
 {
+    private const string DefaultLayerName = "Default";
+
     [Header("Grid Information")]
     [SerializeField] private Vector2Int _localGridCoordinate;
     [SerializeField] private Vector3Int _parentMapGridPos;
-    [SerializeField] private bool _canInstallRail = true;
-    [SerializeField] private bool _hasRail = false;
+    [FormerlySerializedAs("_canInstallRail")]
+    [SerializeField] private bool _baseCanInstallRail = true;
+    [SerializeField] private bool _hasRail;
 
     [Header("Layer & Detection Settings")]
     [Tooltip("비어있는 땅일 때 적용할 그라운드 레이어 이름")]
     [SerializeField] private string _groundLayerName = "Ground";
-    [Tooltip("타일 위 오브젝트(장애물, 자재 등)에 적용할 오브젝트 레이어 이름")]
+    [Tooltip("타일 위 점유 오브젝트를 찾는 레이어 이름")]
     [SerializeField] private string _objectLayerName = "OnGround";
     [Tooltip("타일 위 오브젝트 감지를 위한 체크 반경 (타일 크기 대비 조절)")]
     [SerializeField] private float _checkRadius = 0.8f;
     [Tooltip("타일 위 오브젝트 감지를 위한 높이 범위")]
     [SerializeField] private float _checkHeight = 3.0f;
 
+    private int _groundLayerIndex;
+    private int _defaultLayerIndex;
     private LayerMask _objectLayerMask;
+    private bool _hasOnGroundOccupant;
 
     public Vector2Int LocalGridCoordinate => _localGridCoordinate;
     public Vector3Int ParentMapGridPos => _parentMapGridPos;
     public bool CanInstallRail
     {
-        get => _canInstallRail;
-        set => _canInstallRail = value;
+        get => _baseCanInstallRail && !_hasRail && !_hasOnGroundOccupant;
+        set => _baseCanInstallRail = value;
     }
     public bool HasRail
     {
         get => _hasRail;
         set => _hasRail = value;
     }
-
     public string CurrentLayerName => LayerMask.LayerToName(gameObject.layer);
 
     private void Awake()
     {
-        int layerIdx = LayerMask.NameToLayer(_objectLayerName);
-        if (layerIdx != -1)
-        {
-            _objectLayerMask = 1 << layerIdx;
-        }
-        else
-        {
-            Debug.LogWarning($"[MapTileInfo] '{_objectLayerName}' 레이어가 프로젝트에 존재하지 않습니다! 기본 레이어로 대체합니다.");
-            _objectLayerMask = 1 << 0; 
-        }
+        CacheLayerIndices();
     }
 
     public void InitTile(Vector2Int localCoordinate, Vector3Int parentMapGridPos, bool canInstallRail = true)
     {
         _localGridCoordinate = localCoordinate;
         _parentMapGridPos = parentMapGridPos;
-        _canInstallRail = canInstallRail;
+        _baseCanInstallRail = canInstallRail;
         _hasRail = false;
-
-        UpdateTileStateByOccupant();
     }
 
-    public void UpdateTileStateByOccupant()
+    public void SetParentMapGridPosition(Vector3Int parentMapGridPos)
     {
-        int groundLayerIdx = LayerMask.NameToLayer(_groundLayerName);
-        int objectLayerIdx = LayerMask.NameToLayer(_objectLayerName);
+        _parentMapGridPos = parentMapGridPos;
+    }
 
-        Vector3 center = transform.position + Vector3.up * (_checkHeight * 0.5f);
-        Vector3 halfExtents = new Vector3(_checkRadius, _checkHeight * 0.5f, _checkRadius);
+    public void RefreshOccupancy()
+    {
+        Collider[] hitColliders = Physics.OverlapBox(
+            transform.position + Vector3.up * (_checkHeight * 0.5f),
+            new Vector3(_checkRadius, _checkHeight * 0.5f, _checkRadius),
+            Quaternion.identity,
+            _objectLayerMask,
+            QueryTriggerInteraction.Collide);
 
-        Collider[] hitColliders = Physics.OverlapBox(center, halfExtents, Quaternion.identity, _objectLayerMask);
-
-        bool hasOccupant = false;
-        foreach (Collider col in hitColliders)
+        _hasOnGroundOccupant = false;
+        foreach (Collider hitCollider in hitColliders)
         {
-            if (col.gameObject != gameObject && col.transform.root != transform.root)
+            if (hitCollider.transform.IsChildOf(transform))
             {
-                hasOccupant = true;
-                break;
+                continue;
             }
+
+            _hasOnGroundOccupant = true;
+            break;
         }
 
-        if (hasOccupant)
-        {
-            gameObject.layer = objectLayerIdx != -1 ? objectLayerIdx : 0;
-            _canInstallRail = false;
-        }
-        else
-        {
-            if (groundLayerIdx != -1)
-            {
-                gameObject.layer = groundLayerIdx;
-            }
-            _canInstallRail = true;
-        }
+        ApplyVisualLayer();
+    }
+
+    public void SetBakedOccupancy(bool hasOnGroundOccupant)
+    {
+        _hasOnGroundOccupant = hasOnGroundOccupant;
+        ApplyVisualLayer();
     }
 
     public string GetTileDebugInfo()
     {
-        return $"[Tile] Map: {_parentMapGridPos}, Local: {_localGridCoordinate}, Railable: {_canInstallRail}, HasRail: {_hasRail}, Layer: {CurrentLayerName}";
+        return $"[Tile] Map: {_parentMapGridPos}, Local: {_localGridCoordinate}, Railable: {CanInstallRail}, HasRail: {_hasRail}, Layer: {CurrentLayerName}";
+    }
+
+    private void CacheLayerIndices()
+    {
+        _groundLayerIndex = LayerMask.NameToLayer(_groundLayerName);
+        _defaultLayerIndex = LayerMask.NameToLayer(DefaultLayerName);
+
+        int objectLayerIndex = LayerMask.NameToLayer(_objectLayerName);
+        if (objectLayerIndex == -1)
+        {
+            Debug.LogWarning($"[MapTileInfo] '{_objectLayerName}' 레이어가 프로젝트에 없습니다. 점유물 탐색을 수행하지 않습니다.", this);
+            _objectLayerMask = 0;
+            return;
+        }
+
+        _objectLayerMask = 1 << objectLayerIndex;
+    }
+
+    private void ApplyVisualLayer()
+    {
+        if (_hasOnGroundOccupant)
+        {
+            gameObject.layer = _defaultLayerIndex != -1 ? _defaultLayerIndex : 0;
+            return;
+        }
+
+        if (_groundLayerIndex != -1)
+        {
+            gameObject.layer = _groundLayerIndex;
+        }
     }
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = _canInstallRail ? Color.green : Color.red;
+        Gizmos.color = CanInstallRail ? Color.green : Color.red;
         Vector3 center = transform.position + Vector3.up * (_checkHeight * 0.5f);
         Vector3 size = new Vector3(_checkRadius * 2f, _checkHeight, _checkRadius * 2f);
         Gizmos.DrawWireCube(center, size);
