@@ -258,6 +258,10 @@ PrefabInstance:
       propertyPath: Transform_MapRoot
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 6537115754192923904, guid: c38feec43a1e5e74d96f7f3fab807a0d, type: 3}
+      propertyPath: _blockedLayer.m_Bits
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7432896565880681344, guid: c38feec43a1e5e74d96f7f3fab807a0d, type: 3}
       propertyPath: m_Name
       value: RailManager
@@ -603,6 +607,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8752888ebbd98b4d838ae45f7c5299d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapManager
+--- !u!1 &1274323088
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1274323089}
+  m_Layer: 0
+  m_Name: '@Mangers'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1274323089
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274323088}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.86813, y: -0, z: -1.33313}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1281296768
 GameObject:
   m_ObjectHideFlags: 0
@@ -1335,7 +1370,6 @@ SceneRoots:
   - {fileID: 6870809739746527794}
   - {fileID: 7849669436648141030}
   - {fileID: 8633146466933542460}
-  - {fileID: 3608402662823048638}
   - {fileID: 1127103237}
   - {fileID: 207454770}
   - {fileID: 782080149}
@@ -1345,3 +1379,5 @@ SceneRoots:
   - {fileID: 355367012}
   - {fileID: 1948292441}
   - {fileID: 254537760}
+  - {fileID: 3608402662823048638}
+  - {fileID: 1274323089}

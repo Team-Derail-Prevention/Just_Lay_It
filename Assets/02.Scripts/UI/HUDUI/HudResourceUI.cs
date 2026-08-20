@@ -5,10 +5,7 @@ using UnityEngine;
 
 public class HudResourceUI : UIBase
 {
-    [Header("인게임 재화")]
-    [SerializeField] private TextMeshProUGUI Text_Money;
-
-    [Header("로비 업그레이드 재화")]
+    [Header("로비 재화")]
     [SerializeField] private TextMeshProUGUI Text_Cash;
 
     [Header("나무")]
@@ -31,10 +28,17 @@ public class HudResourceUI : UIBase
         }
         else
         {
-            ResourceStatusEventHub.Instance.OnMoneyChanged += SetMoney;
             ResourceStatusEventHub.Instance.OnWoodChanged += SetWood;
             ResourceStatusEventHub.Instance.OnStoneChanged += SetStone;
             ResourceStatusEventHub.Instance.OnRescuedHumanChanged += SetRescuedHuman;
+        }
+
+        if (NetworkResourceService.Instance != null)
+        {
+            var resourceVm = NetworkResourceService.Instance.GetLocalResourceViewModel();
+            SetWood(resourceVm.CurrentWood);
+            SetStone(resourceVm.CurrentStone);
+            SetRescuedHuman(resourceVm.RescuedHumanCount);
         }
 
         if (NetworkUpgradeService.Instance != null)
@@ -49,7 +53,6 @@ public class HudResourceUI : UIBase
     {
         if (ResourceStatusEventHub.Instance != null)
         {
-            ResourceStatusEventHub.Instance.OnMoneyChanged -= SetMoney;
             ResourceStatusEventHub.Instance.OnWoodChanged -= SetWood;
             ResourceStatusEventHub.Instance.OnStoneChanged -= SetStone;
             ResourceStatusEventHub.Instance.OnRescuedHumanChanged -= SetRescuedHuman;
@@ -66,14 +69,6 @@ public class HudResourceUI : UIBase
         if (e.PropertyName == nameof(UpgradeViewModel.CurrentGold))
         {
             SetCash(_upgradeVm.CurrentGold);
-        }
-    }
-
-    public void SetMoney(int curMoneyCount)
-    {
-        if (Text_Money != null)
-        {
-            Text_Money.text = curMoneyCount.ToString();
         }
     }
 
