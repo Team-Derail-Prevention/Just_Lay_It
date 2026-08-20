@@ -327,7 +327,6 @@ public class RailManager : SingletonBase<RailManager>
 
             if (_cubeGrid.ContainsKey(gridIndex))
             {
-                Debug.LogWarning("[RailManager] 격자 좌표 충돌: " + gridIndex + " - " + collected[i].Name);
                 continue;
             }
 
