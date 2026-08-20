@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 455937325778317079}
-  - component: {fileID: 8401909824167381536}
+  - component: {fileID: 4978429336350493507}
   - component: {fileID: 8858961566353470936}
   - component: {fileID: 5667825740660284636}
   m_Layer: 6
@@ -35,7 +35,7 @@ Transform:
   - {fileID: 382375545464609825}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8401909824167381536
+--- !u!114 &4978429336350493507
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -47,9 +47,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37717214ffe672b42958739045c43b20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailOutline
-  _outlineMaterial: {fileID: 2100000, guid: 51664dec69705914a8e9890463f95b9a, type: 2}
-  _outlineHeightOffset: 0.02
-  _outlineWidth: 0.06
+  _validFillMaterial: {fileID: 2100000, guid: 51664dec69705914a8e9890463f95b9a, type: 2}
+  _invalidFillMaterial: {fileID: 2100000, guid: 694b2df8dccf80847a5ec788181d12d0, type: 2}
+  _heightOffset: 0.02
 --- !u!114 &8858961566353470936
 MonoBehaviour:
   m_ObjectHideFlags: 0

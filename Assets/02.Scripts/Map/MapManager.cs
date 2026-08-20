@@ -13,17 +13,18 @@ public class MapManager : SingletonBase<MapManager>
 
     [Header("Auto Spawn Rail Settings")]
     [SerializeField] private string _straightRailAddress = "Prefab/Rail_Straight";
-    [SerializeField] private float _railSpawnOffset = 2f; // 역 중심에서 레일이 떨어질 간격 (맵메이커 타일 간격에 맞춰 수정 가능)
+    [SerializeField] private float _railSpawnOffset = 2f;
 
     private readonly Vector3Int[] _mapOffsets = new Vector3Int[]
-    {
-        new Vector3Int(-1, 1, 0),  new Vector3Int(0, 1, 0),  new Vector3Int(1, 1, 0),
-        new Vector3Int(1, 0, 0),   new Vector3Int(1, -1, 0), new Vector3Int(0, -1, 0),
-        new Vector3Int(-1, -1, 0), new Vector3Int(-1, 0, 0)
-    };
+       {
+        new Vector3Int(-1, 0, 1),  new Vector3Int(0, 0, 1),  new Vector3Int(1, 0, 1),
+        new Vector3Int(1, 0, 0),   new Vector3Int(1, 0, -1), new Vector3Int(0, 0, -1),
+        new Vector3Int(-1, 0, -1), new Vector3Int(-1, 0, 0)
+       };
 
     private Dictionary<Vector3Int, GameObject> _spawnedMaps = new Dictionary<Vector3Int, GameObject>();
     private Dictionary<Vector3Int, int> _mapTypeData = new Dictionary<Vector3Int, int>();
+    private readonly List<MapTileInfo> _spawnedTiles = new List<MapTileInfo>();
 
     public event Action<Dictionary<Vector3Int, int>> OnMapGenerated;
     public Transform MapRoot { get { return _mapRoot; } }
@@ -162,6 +163,9 @@ public class MapManager : SingletonBase<MapManager>
             await SpawnMapFromDataAsync(selectedData, gridPos, typeId, tag, cancellationToken);
         }
 
+        Physics.SyncTransforms();
+        RefreshAllTileOccupancies();
+
         Debug.Log("[MapManager] 데이터 기반 3x3 맵 생성 및 자동 레일 설치 완료!");
         OnMapGenerated?.Invoke(_mapTypeData);
 
@@ -183,70 +187,99 @@ public class MapManager : SingletonBase<MapManager>
             return;
         }
 
-        Vector3 worldPos = new Vector3(gridPos.x * _mapSpacing, 0, gridPos.y * _mapSpacing);
-        GameObject mapObject = Instantiate(prefab, worldPos, Quaternion.identity, _mapRoot);
+        Vector3 worldPosition = new Vector3(gridPos.x * _mapSpacing, 0, gridPos.z * _mapSpacing);
+        GameObject mapObject = Instantiate(prefab, worldPosition, Quaternion.identity, _mapRoot);
 
         mapObject.name = $"{mapNameTag} ({gridPos.x}, {gridPos.y})";
 
         _spawnedMaps[gridPos] = mapObject;
         _mapTypeData[gridPos] = typeId;
+        RegisterMapTiles(mapObject, gridPos);
 
-        StationObject stationObj = mapObject.GetComponentInChildren<StationObject>();
-        if (stationObj != null)
+        Transform railParent = mapObject.transform.Find("offsetRailRoot");
+        if (railParent == null)
         {
-            stationObj.Initialize(mapData.Id);
+            GameObject railFolder = new GameObject("offsetRailRoot");
+            railFolder.transform.SetParent(mapObject.transform);
+            railFolder.transform.localPosition = Vector3.zero;
+            railParent = railFolder.transform;
         }
 
         if (typeId == 2)
         {
             CentralTerminal terminal = mapObject.GetComponentInChildren<CentralTerminal>();
-            if (terminal != null)
-            {
-                await SpawnRailsAroundAsync(terminal.transform.position, isTerminal: true);
-            }
+            Vector3 centerPosition = terminal != null ? terminal.transform.position : worldPosition;
+
+            await SpawnRailsAroundAsync(centerPosition, true, railParent);
         }
-        else if (typeId == 1) 
+        else if (typeId == 1)
         {
+            StationObject stationObj = mapObject.GetComponentInChildren<StationObject>();
             if (stationObj != null)
             {
-                await SpawnRailsAroundAsync(stationObj.transform.position, isTerminal: false);
+                stationObj.Initialize(mapData.Id);
             }
+            Vector3 centerPosition = stationObj != null ? stationObj.transform.position : worldPosition;
+
+            await SpawnRailsAroundAsync(centerPosition, false, railParent);
         }
     }
 
-    private async UniTask SpawnRailsAroundAsync(Vector3 centerPos, bool isTerminal)
+    private async UniTask SpawnRailsAroundAsync(Vector3 centerPos, bool isTerminal, Transform railParent)
     {
-        Vector3[] directions = new Vector3[]
-        {
-            new Vector3(0, 0, _railSpawnOffset), 
-            new Vector3(0, 0, -_railSpawnOffset),
-            new Vector3(-_railSpawnOffset, 0, 0),
-            new Vector3(_railSpawnOffset, 0, 0)  
-        };
-
-        Quaternion[] rotations = new Quaternion[]
-        {
-            Quaternion.identity,
-            Quaternion.identity,
-            Quaternion.Euler(0, 90, 0),
-            Quaternion.Euler(0, 90, 0)
-        };
+        int railCount = 3;
+        float railLength = 2f;
+        float railHeight = 1f;
 
         if (isTerminal)
         {
-            for (int i = 0; i < 4; i++)
+            (Vector3 dir, Quaternion rot)[] paths = new (Vector3, Quaternion)[]
             {
-                await PlaceSingleRailAsync(centerPos + directions[i], rotations[i]);
+                (new Vector3(0, 0, 1), Quaternion.Euler(0, 90, 0)),  
+                (new Vector3(0, 0, -1), Quaternion.Euler(0, 90, 0)), 
+                (new Vector3(-1, 0, 0), Quaternion.identity),        
+                (new Vector3(1, 0, 0), Quaternion.identity)          
+            };
+
+            for (int d = 0; d < paths.Length; d++)
+            {
+                GameObject dirRoot = new GameObject(d.ToString());
+                dirRoot.transform.SetParent(railParent);
+                dirRoot.transform.localPosition = Vector3.zero;
+
+                for (int i = 0; i < (2* railCount); i++)
+                {
+                    Vector3 offset = paths[d].dir * (_railSpawnOffset + (i * railLength));
+
+                    await PlaceSingleRailAsync(centerPos + offset, paths[d].rot, railHeight, dirRoot.transform);
+                }
             }
         }
         else
         {
-            int randIndex = Random.Range(0, 4);
-            await PlaceSingleRailAsync(centerPos + directions[randIndex], rotations[randIndex]);
+            (Vector3 dir, Quaternion rot)[] paths = new (Vector3, Quaternion)[]
+            {
+                (new Vector3(-1, 0, 0), Quaternion.identity),
+                (new Vector3(1, 0, 0), Quaternion.identity)  
+            };
+
+            for (int d = 0; d < paths.Length; d++)
+            {
+                GameObject dirRoot = new GameObject(d.ToString());
+                dirRoot.transform.SetParent(railParent);
+                dirRoot.transform.localPosition = Vector3.zero;
+
+                for (int i = 0; i < railCount; i++)
+                {
+                    Vector3 offset = paths[d].dir * (_railSpawnOffset + (i * railLength));
+
+                    await PlaceSingleRailAsync(centerPos + offset, paths[d].rot, railHeight, dirRoot.transform);
+                }
+            }
         }
     }
 
-    private async UniTask PlaceSingleRailAsync(Vector3 targetPos, Quaternion rotation)
+    private async UniTask PlaceSingleRailAsync(Vector3 targetPos, Quaternion rotation, float height, Transform parent)
     {
         if (string.IsNullOrEmpty(_straightRailAddress)) return;
 
@@ -254,9 +287,9 @@ public class MapManager : SingletonBase<MapManager>
 
         if (railPrefab != null)
         {
-            Vector3 finalPos = new Vector3(targetPos.x, 2f, targetPos.z);
+            Vector3 finalPos = new Vector3(targetPos.x, height, targetPos.z);
 
-            GameObject railObj = Instantiate(railPrefab, finalPos, rotation, _mapRoot);
+            GameObject railObj = Instantiate(railPrefab, finalPos, rotation, parent);
             railObj.name = "AutoSpawned_StraightRail";
         }
         else
@@ -324,6 +357,52 @@ public class MapManager : SingletonBase<MapManager>
         }
         _spawnedMaps.Clear();
         _mapTypeData.Clear();
+        _spawnedTiles.Clear();
+    }
+
+    private void RegisterMapTiles(GameObject mapObject, Vector3Int mapGridPos)
+    {
+        MapTileInfo[] tiles = mapObject.GetComponentsInChildren<MapTileInfo>(true);
+        foreach (MapTileInfo tile in tiles)
+        {
+            tile.SetParentMapGridPosition(mapGridPos);
+            _spawnedTiles.Add(tile);
+        }
+    }
+
+    private void RefreshAllTileOccupancies()
+    {
+        foreach (MapTileInfo tile in _spawnedTiles)
+        {
+            if (tile != null)
+            {
+                tile.RefreshOccupancy();
+            }
+        }
+    }
+
+    public void RefreshTileAtWorldPosition(Vector3 worldPosition)
+    {
+        MapTileInfo closestTile = null;
+        float closestSqrDistance = float.MaxValue;
+
+        foreach (MapTileInfo tile in _spawnedTiles)
+        {
+            if (tile == null) continue;
+
+            Vector3 offset = tile.transform.position - worldPosition;
+            float sqrDistance = offset.x * offset.x + offset.z * offset.z;
+            if (sqrDistance < closestSqrDistance)
+            {
+                closestSqrDistance = sqrDistance;
+                closestTile = tile;
+            }
+        }
+
+        if (closestTile != null)
+        {
+            closestTile.RefreshOccupancy();
+        }
     }
 
     public Dictionary<Vector3Int, int> GetMapTypeData()

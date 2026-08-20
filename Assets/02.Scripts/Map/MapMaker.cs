@@ -3,16 +3,10 @@ using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using Enums;
 
 public class MapMaker : MonoBehaviour
 {
-    public enum MapCategory
-    {
-        Normal,
-        Station,
-        CentralTerminal
-    }
-
     [System.Serializable]
     public struct MaterialSpawnData
     {
@@ -107,7 +101,6 @@ public class MapMaker : MonoBehaviour
         Transform materialsRoot = CreateSubRoot("Materials", _mapRoot);
 
         int groundLayerIndex = LayerMask.NameToLayer(_groundLayerName);
-        int defaultLayerIndex = LayerMask.NameToLayer("Default");
         if (groundLayerIndex == -1)
         {
             Debug.LogWarning($"[MapMaker] '{_groundLayerName}' 레이어가 프로젝트에 존재하지 않습니다! 기본 레이어(Default)로 유지됩니다.");
@@ -173,6 +166,7 @@ public class MapMaker : MonoBehaviour
 
             GameObject stationObj = InstantiatePrefabSafe(_stationPrefab, stationSpawnPos, _stationPrefab.transform.rotation, stationRoot);
             stationObj.name = _stationPrefab.name;
+            SetTileBakedOccupancy(stationSpawnPos, posToTileObj, true);
 
             int stationProtectionRadius = 1;
             foreach (KeyValuePair<Vector3, GameObject> kvp in posToTileObj)
@@ -187,11 +181,7 @@ public class MapMaker : MonoBehaviour
                         GameObject tileObj = kvp.Value;
                         if (tileObj != null)
                         {
-                            if (defaultLayerIndex != -1) tileObj.layer = defaultLayerIndex;
-                            if (tileObj.TryGetComponent<MapTileInfo>(out MapTileInfo tileInfo))
-                            {
-                                tileInfo.CanInstallRail = false;
-                            }
+                            SetTileRailAvailability(tileObj, false);
                         }
                     }
                 }
@@ -224,8 +214,8 @@ public class MapMaker : MonoBehaviour
             Debug.Log($"[MapMaker] [Normal] Normal 카테고리이므로 스테이션이 생성되지 않으며, 전체 15x15 영역(정중앙 포함)에 오브젝트가 무작위 배치됩니다.");
         }
 
-        SpawnObstacles(ref availablePositions, obstaclesRoot, rand, defaultLayerIndex, posToTileObj);
-        SpawnMaterials(ref availablePositions, materialsRoot, rand, defaultLayerIndex, posToTileObj);
+        SpawnObstacles(ref availablePositions, obstaclesRoot, rand, posToTileObj);
+        SpawnMaterials(ref availablePositions, materialsRoot, rand, posToTileObj);
 
         Debug.Log($"[MapMaker] 15x15 맵 생성 완료! (카테고리: {_mapCategory}, MapGridPos: {_mapGridPos})");
     }
@@ -275,7 +265,7 @@ public class MapMaker : MonoBehaviour
         return subObj.transform;
     }
 
-    private void SpawnObstacles(ref List<Vector3> availablePositions, Transform obstaclesRoot, System.Random rand, int defaultLayerIndex, Dictionary<Vector3, GameObject> posToTileObj)
+    private void SpawnObstacles(ref List<Vector3> availablePositions, Transform obstaclesRoot, System.Random rand, Dictionary<Vector3, GameObject> posToTileObj)
     {
         if (_obstaclePrefabs == null || _obstaclePrefabs.Count == 0) return;
 
@@ -288,14 +278,8 @@ public class MapMaker : MonoBehaviour
             Vector3 basePos = availablePositions[index];
             availablePositions.RemoveAt(index);
 
-            if (posToTileObj.TryGetValue(basePos, out GameObject tileObj))
-            {
-                if (defaultLayerIndex != -1) tileObj.layer = defaultLayerIndex;
-                if (tileObj.TryGetComponent<MapTileInfo>(out MapTileInfo tileInfo))
-                {
-                    tileInfo.CanInstallRail = false;
-                }
-            }
+            SetTileBakedOccupancy(basePos, posToTileObj, true);
+
 
             int prefabIndex = rand.Next(0, _obstaclePrefabs.Count);
             GameObject selectedPrefab = _obstaclePrefabs[prefabIndex];
@@ -317,7 +301,7 @@ public class MapMaker : MonoBehaviour
         }
     }
 
-    private void SpawnMaterials(ref List<Vector3> availablePositions, Transform materialsRoot, System.Random rand, int defaultLayerIndex, Dictionary<Vector3, GameObject> posToTileObj)
+    private void SpawnMaterials(ref List<Vector3> availablePositions, Transform materialsRoot, System.Random rand, Dictionary<Vector3, GameObject> posToTileObj)
     {
         if (_materialSpawnDatas == null || _materialSpawnDatas.Count == 0) return;
 
@@ -342,14 +326,7 @@ public class MapMaker : MonoBehaviour
                 Vector3 basePos = availablePositions.Count > 0 ? availablePositions[index] : Vector3.zero;
                 availablePositions.RemoveAt(index);
 
-                if (posToTileObj.TryGetValue(basePos, out GameObject tileObj))
-                {
-                    if (defaultLayerIndex != -1) tileObj.layer = defaultLayerIndex;
-                    if (tileObj.TryGetComponent<MapTileInfo>(out MapTileInfo tileInfo))
-                    {
-                        tileInfo.CanInstallRail = false;
-                    }
-                }
+                SetTileBakedOccupancy(basePos, posToTileObj, true);
 
                 InstantiateMaterial(data.Prefab, basePos, materialsRoot, jsonData);
             }
@@ -375,6 +352,22 @@ public class MapMaker : MonoBehaviour
         if (resourceObj.TryGetComponent<MaterialObject>(out MaterialObject materialObj))
         {
             materialObj.InitializeData(jsonData);
+        }
+    }
+
+    private static void SetTileBakedOccupancy(Vector3 basePosition, Dictionary<Vector3, GameObject> posToTileObj, bool isOccupied)
+    {
+        if (!posToTileObj.TryGetValue(new Vector3(basePosition.x, 0f, basePosition.z), out GameObject tileObj)) return;
+        if (!tileObj.TryGetComponent(out MapTileInfo tileInfo)) return;
+
+        tileInfo.SetBakedOccupancy(isOccupied);
+    }
+
+    private static void SetTileRailAvailability(GameObject tileObj, bool canInstallRail)
+    {
+        if (tileObj.TryGetComponent(out MapTileInfo tileInfo))
+        {
+            tileInfo.CanInstallRail = canInstallRail;
         }
     }
 }

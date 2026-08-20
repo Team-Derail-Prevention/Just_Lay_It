@@ -36,3 +36,26 @@ public class MaterialObjectData : GameDataBase
     public int amount;
     public string AddressablePath;
 }
+
+[Serializable]
+public class TrainData : GameDataBase
+{
+    public string TrainName;
+    public string TrainType;
+    public string Description;
+    public float MoveSpeed;
+    public float RotateSpeed;
+    public int MaxCargo;
+    public int MaxHp;
+    public int Defense;
+    public int MaxWeaponMount;
+    public int MaxCrew;
+    public string PrefabPath;
+}
+
+public static class TrainTypeConst
+{
+    public const string Head = "Head";
+    public const string Standard = "Standard";
+    public const string Cargo = "Cargo";
+}

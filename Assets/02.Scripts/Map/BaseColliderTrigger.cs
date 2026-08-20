@@ -1,15 +1,8 @@
 ﻿using UnityEngine;
+using Enums;
 
 public abstract class BaseColliderTrigger : MonoBehaviour
 {
-    public enum TargetType
-    {
-        None = 0,
-        Train,
-        Drone,
-        Monster,
-    }
-
     [Header("상호작용 대상 설정")]
     [SerializeField] protected TargetType _targetType;
     protected bool _isTriggerCollider = false;

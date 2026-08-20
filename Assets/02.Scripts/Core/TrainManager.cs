@@ -47,7 +47,7 @@ public class TrainManager : SingletonBase<TrainManager>
 
     }
 
-    private void ClearExistingTrain()
+    public void ClearExistingTrain()
     {
         for (int i = 0; i < carList.Count; i++)
         {
@@ -98,7 +98,14 @@ public class TrainManager : SingletonBase<TrainManager>
 
         // 2) 기관차(Head) 소환 및 메인 Head로 등록
         GameObject newHead = Instantiate(_headPrefab, spawnPos, spawnRot);
+        if (newHead == null)
+        {
+            Debug.LogError("[TrainManager] 기관차 Instantiate 생성에 실패했습니다.");
+            return;
+        }
+
         _headTrain = newHead.transform;
+        _headTrain.rotation = spawnRot;
 
         // 3) 입력한 개수만큼 객차 순차적 추가
         if (_testCarPrefab != null && _testCarPrefab.Length > 0)
@@ -117,7 +124,7 @@ public class TrainManager : SingletonBase<TrainManager>
     }
     //
 
-    public void SpawnCarriage(GameObject carPrefab)
+    public void SpawnCarriage(GameObject carPrefab, TrainData data = null)
     {
         if (carPrefab == null)
         {
@@ -146,13 +153,21 @@ public class TrainManager : SingletonBase<TrainManager>
 
         GameObject newCar = Instantiate(carPrefab, spawnPos, spawnRot);
 
-        TrainFollow followtrain = newCar.GetComponent<TrainFollow>();
-        if (followtrain != null)
+        TrainFollow followTrain = newCar.GetComponent<TrainFollow>();
+        if (followTrain != null)
         {
-            followtrain.SetFrontTrain(frontCar);
+            followTrain.FollowInit(data, frontCar);
         }
 
-        carList.Add(newCar);
+        TrainContainer trainContainer = newCar.GetComponent<TrainContainer>();
+        if (trainContainer != null && data != null)
+        {
+            trainContainer.ContainerInit(data);
+        }
+
+
+
+            carList.Add(newCar);
     }
 
 
@@ -176,7 +191,7 @@ public class TrainManager : SingletonBase<TrainManager>
         {
             visitedStation.Add(stationObj.transform);
             IsStation = true;
-            SetCarriagerActive(false);
+            SetCarriagesActive(false);
             Debug.Log("[TrainManager] 기차역 도착 : 정차 상태");
 
             OnStationState?.Invoke(true);
@@ -186,13 +201,13 @@ public class TrainManager : SingletonBase<TrainManager>
     public void DepartStation()
     {
         IsStation = false;
-        SetCarriagerActive(true);
+        SetCarriagesActive(true);
         Debug.Log("[TrainManager] 기차역 출발 : 이동 상태");
 
         OnStationState?.Invoke(false);
     }
 
-    public void SetCarriagerActive(bool isActive)
+    public void SetCarriagesActive(bool isActive)
     {
         for (int i = 0; i < carList.Count; i++)
         {

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+//using enums;
 
 
 public enum ContainerLevel
@@ -57,8 +57,21 @@ public class TrainContainer : MonoBehaviour
         RefreshVisual();
     }
 
- 
- 
+    public void ContainerInit(TrainData data)
+    {
+        if (data == null)
+        {
+            return;
+        }
+
+        _maxCargo = data.MaxCargo;
+        _currentAmount = 0f;
+        RefreshVisual();
+    }
+
+
+
+
     private void RefreshVisual()
     {
         float ratio = Mathf.Clamp01(_currentAmount / _maxCargo);

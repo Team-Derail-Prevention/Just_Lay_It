@@ -1,38 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
 
 public class GameManager : SingletonBase<GameManager>
 {
-    public static DataManager Data { get { return DataManager.Instance; } }
-    public static ResourceManager Resource { get { return ResourceManager.Instance; } }
-    public static PoolManager Pool { get { return PoolManager.Instance; } }
-    public static MapManager Map { get { return MapManager.Instance; } }
-    public static TrainManager Train { get { return TrainManager.Instance; } }
-    public static UIManager UI { get { return UIManager.Instance; } }
-    public static TrainStatusEventHub TrainEventHub { get { return TrainStatusEventHub.Instance; } }
-    public static ResourceStatusEventHub ResourceEventHub { get { return ResourceStatusEventHub.Instance; } }
-    public static NetworkRailService NetworkRail { get { return NetworkRailService.Instance; } }
-    public static NetworkUpgradeService UpgradeService { get { return NetworkUpgradeService.Instance; } }
+    [Header("Game Start Settings")]
+    [SerializeField] private int _startingCarriageCount = 3;
+    [SerializeField, Min(0)] private int _resumeCountdownSeconds = 3;
 
-    private TimeManager _timeManager = new TimeManager();
-    public static TimeManager Time
-    {
-        get
-        {
-            if (Instance != null) return Instance._timeManager;
-            return null;
-        }
-    }
-
+    [Header("Runtime State")]
     [SerializeField] private GameState _currentGameState = GameState.Ready;
-    public GameState CurrentGameState { get { return _currentGameState; } }
+
+    private readonly TimeManager _timeManager = new TimeManager();
 
     private Transform _managerRoot;
+    private StationObject _activeStation;
+    private CentralTerminal _activeTerminal;
+    private bool _isStartingGame;
+    private bool _isCountdownRunning;
+    private int _sessionVersion;
+    private float _playTime;
+    private int _lastNotifiedTime;
 
-    private float _playTime = 0f;
-    private int _lastNotifiedTime = 0;
+    public event Action<int> OnCountdownChanged;
+
+    public static DataManager Data => DataManager.Instance;
+    public static ResourceManager Resource => ResourceManager.Instance;
+    public static PoolManager Pool => PoolManager.Instance;
+    public static MapManager Map => MapManager.Instance;
+    public static TrainManager Train => TrainManager.Instance;
+    public static RailManager Rail => RailManager.Instance;
+    public static MonsterSpawn Monster => MonsterSpawn.Instance;
+    public static UIManager UI => UIManager.Instance;
+    public static TrainStatusEventHub TrainEventHub => TrainStatusEventHub.Instance;
+    public static ResourceStatusEventHub ResourceEventHub => ResourceStatusEventHub.Instance;
+    public static NetworkRailService NetworkRail => NetworkRailService.Instance;
+    public static NetworkUpgradeService UpgradeService => NetworkUpgradeService.Instance;
+    public static TimeManager Time => Instance != null ? Instance._timeManager : null;
+
+    public GameState CurrentGameState => _currentGameState;
 
     protected override void Init()
     {
@@ -44,174 +50,416 @@ public class GameManager : SingletonBase<GameManager>
         InitializeGameFlowAsync().Forget();
     }
 
+    private void OnEnable()
+    {
+        StationObject.OnStationEntered += HandleStationEntered;
+        CentralTerminal.OnCentralTerminalEntered += HandleCentralTerminalEntered;
+        CentralTerminal.OnExitDirectionSelected += SelectExitDirection;
+    }
+
+    private void Start()
+    {
+        RefreshManagerHierarchyAsync().Forget();
+    }
+
     private void Update()
     {
-        if (_currentGameState == GameState.Playing)
+        if (_currentGameState != GameState.Playing) return;
+
+        _playTime += UnityEngine.Time.deltaTime;
+        int currentSecond = (int)_playTime;
+
+        if (currentSecond == _lastNotifiedTime) return;
+
+        _lastNotifiedTime = currentSecond;
+        TrainEventHub?.NotifyPlayTimeChanged(_lastNotifiedTime);
+    }
+
+    private void OnDisable()
+    {
+        StationObject.OnStationEntered -= HandleStationEntered;
+        CentralTerminal.OnCentralTerminalEntered -= HandleCentralTerminalEntered;
+        CentralTerminal.OnExitDirectionSelected -= SelectExitDirection;
+    }
+
+    public async UniTask StartGame()
+    {
+        if (_isStartingGame || _currentGameState == GameState.Playing)
         {
-            _playTime += UnityEngine.Time.deltaTime;
-
-            int currentSecond = (int)_playTime;
-
-            if (currentSecond != _lastNotifiedTime)
-            {
-                _lastNotifiedTime = currentSecond;
-                TrainStatusEventHub.Instance.NotifyPlayTimeChanged(_lastNotifiedTime);
-            }
+            Debug.LogWarning("[GameManager] 게임 시작 요청이 이미 처리 중이거나 게임이 진행 중입니다.");
+            return;
         }
+
+        _isStartingGame = true;
+
+        try
+        {
+            RefreshManagerHierarchy();
+            if (!await EnsureGameDataLoadedAsync()) return;
+
+            ResetSessionState();
+            ChangeGameState(GameState.Ready);
+
+            bool isMapGenerated = await Map.GenerateMapAsync(this.GetCancellationTokenOnDestroy());
+            if (!isMapGenerated)
+            {
+                Debug.LogError("[GameManager] 맵 생성에 실패하여 게임 시작을 취소합니다.");
+                return;
+            }
+
+            // Map.OnMapGenerated 이벤트로 RailManager의 타일 조회 상태 초기화 
+            Train.SpawnFullTrain(_startingCarriageCount);
+
+            // MonsterSpawn은 TrainManager.OnTrainSpawn을 구독하여 풀 초기화 후 스폰을 시작
+            // TODO: 드론 생성 전용 Manager 생기면 메서드 추가
+
+            ResumeGameplayTime();
+            ChangeGameState(GameState.Playing);
+            Debug.Log("[GameManager] 맵, 기차, 몬스터 스폰 준비를 완료하고 인게임을 시작합니다.");
+        }
+        finally
+        {
+            _isStartingGame = false;
+        }
+    }
+
+    /// StationObject가 보상 처리하고, GameManager가 다음 인게임 사이클을 재개
+    /// 역 UI가 회복 여부를 결정한 후 출발을 위해 호출하는 메서드
+    public void CompleteStation(bool isHealed)
+    {
+        if (_currentGameState != GameState.EventPaused || _activeStation == null)
+        {
+            Debug.LogWarning("[GameManager] 완료할 활성 역 이벤트가 없습니다.");
+            return;
+        }
+
+        _activeStation.ExitStation(isHealed);
+        _activeStation = null;
+
+        Train?.DepartStation();
+        StartCountdownAsync().Forget();
+
+        // TODO: Station UI가 실제 자재 소모 및 열차 회복 결과를 CompleteStation에 전달 필요(?)
+    }
+
+    public void HandleStationArrival()
+    {
+        HandleStationArrival(null, string.Empty);
+    }
+
+    public void HandleTerminalArrival()
+    {
+        HandleTerminalArrival(null);
+    }
+
+    /// CentralTerminal 이벤트 출구 선택시 호출 메서드
+    public void SelectExitDirection(int directionIndex)
+    {
+        if (_currentGameState != GameState.EventPaused)
+        {
+            Debug.LogWarning("[GameManager] 이벤트가 정지 상태가 아니므로 출구 선택을 무시합니다.");
+            return;
+        }
+
+        Debug.Log($"[GameManager] 출구 방향 {directionIndex}번을 선택했습니다.");
+        _activeTerminal = null;
+
+        ChangeGameState(GameState.ExitSelected);
+        StartCountdownAsync().Forget();
+
+        // TODO: TrainManager에서 출구 방향별 기차 위치·경로설정 메서드 필요
+        // TODO: Terminal UI가 재료 적재, 소비, 무기 추가·강화 결과를 GameManager로 전달해야할 듯
+    }
+
+    public void GameOver()
+    {
+        if (_currentGameState == GameState.GameOver) return;
+
+        Debug.Log("[GameManager] 게임 오버: 진행 중인 시스템을 정리합니다.");
+        ChangeGameState(GameState.GameOver);
+        PauseGameplayTime();
+
+        ClearCurrentSession();
+
+        // TODO: Drone Manager에 public Despawn 필요
+        // TODO: Result UI를 열고 로비로 돌아가는 UI 흐름필요
     }
 
     private void InitManagerRoot()
     {
         GameObject rootObject = GameObject.Find("@Managers");
-        if (rootObject == null) rootObject = new GameObject("@Managers");
+        if (rootObject == null)
+        {
+            rootObject = new GameObject("@Managers");
+        }
 
         _managerRoot = rootObject.transform;
-        if (transform.parent != _managerRoot) rootObject.transform.SetParent(transform);
+        if (transform.parent != _managerRoot)
+        {
+            transform.SetParent(_managerRoot);
+        }
     }
 
     private void OrganizeExistingManagers()
     {
-        if (UI != null && UI.transform.parent != _managerRoot) UI.transform.SetParent(_managerRoot);
-        if (Resource != null && Resource.transform.parent != _managerRoot) Resource.transform.SetParent(_managerRoot);
-        if (Data != null && Data.transform.parent != _managerRoot) Data.transform.SetParent(_managerRoot);
-        if (Map != null && Map.transform.parent != _managerRoot) Map.transform.SetParent(_managerRoot);
-        if (Pool != null && Pool.transform.parent != _managerRoot) Pool.transform.SetParent(_managerRoot);
-        if (Train != null && Train.transform.parent != _managerRoot) Train.transform.SetParent(_managerRoot);
-        if (TrainEventHub != null && TrainEventHub.transform.parent != _managerRoot) TrainEventHub.transform.SetParent(_managerRoot);
-        if (ResourceEventHub != null && ResourceEventHub.transform.parent != _managerRoot) ResourceEventHub.transform.SetParent(_managerRoot);
-        if (NetworkRail != null && NetworkRail.transform.parent != _managerRoot) NetworkRail.transform.SetParent(_managerRoot);
-        if (UpgradeService != null && UpgradeService.transform.parent != _managerRoot) UpgradeService.transform.SetParent(_managerRoot);
+        SetManagerParent(UI);
+        SetManagerParent(Resource);
+        SetManagerParent(Data);
+        SetManagerParent(Map);
+        SetManagerParent(Pool);
+        SetManagerParent(Train);
+        SetManagerParent(Rail);
+        SetManagerParent(Monster);
+        SetManagerParent(TrainEventHub);
+        SetManagerParent(ResourceEventHub);
+        SetManagerParent(NetworkRail);
+        SetManagerParent(UpgradeService);
     }
 
+    public void RefreshManagerHierarchy()
+    {
+        if (_managerRoot == null)
+        {
+            InitManagerRoot();
+        }
+
+        OrganizeExistingManagers();
+    }
+
+    public void RegisterManager(Component manager)
+    {
+        if (manager == null) return;
+
+        if (_managerRoot == null)
+        {
+            InitManagerRoot();
+        }
+
+        SetManagerParent(manager);
+    }
     private async UniTaskVoid InitializeGameFlowAsync()
     {
-        await UniTask.WaitUntil(() => ResourceManager.Instance != null && DataManager.Instance != null);
+        if (!await WaitForRequiredManagersAsync()) return;
 
-        if (!DataManager.Instance.IsLoaded)
-        {
-            Debug.Log("[GameManager] 데이터 로드를 시작합니다...");
-            await DataManager.Instance.LoadAllDatasAsync(this.GetCancellationTokenOnDestroy());
-        }
-
+        await EnsureGameDataLoadedAsync();
         ChangeGameState(GameState.Ready);
-        Debug.Log("[GameManager] 초기화 및 데이터 로드 완료.");
+        Debug.Log("[GameManager] 초기화 및 데이터 로드가 완료되었습니다.");
     }
 
-    public async UniTask StartGame()
+    private async UniTask<bool> EnsureGameDataLoadedAsync()
     {
-        Debug.Log("[GameManager] 게임 시작! 맵 생성을 요청합니다.");
-        ChangeGameState(GameState.Playing);
-
-        if (Map != null)
+        if (Resource == null || Data == null)
         {
-            bool isMapGenerated = await Map.GenerateMapAsync(this.GetCancellationTokenOnDestroy());
-
-            if (!isMapGenerated)
-            {
-                Debug.LogError("[GameManager] 맵 생성에 실패하여 게임을 중단합니다. 기차를 스폰하지 않습니다.");
-                ChangeGameState(GameState.Ready);
-                return; 
-            }
-
-            Debug.Log("[GameManager] 맵 생성 완료!");
+            Debug.LogError("[GameManager] ResourceManager 또는 DataManager가 없습니다.");
+            return false;
         }
 
-        if (Train != null)
+        if (!Data.IsLoaded)
         {
-            Debug.Log("[GameManager] 기차를 스폰합니다.");
-            TrainManager.Instance.SpawnFullTrain(3);
+            Debug.Log("[GameManager] 게임 데이터 로드를 시작합니다.");
+            await Data.LoadAllDatasAsync(this.GetCancellationTokenOnDestroy());
+        }
+
+        return Data.IsLoaded;
+    }
+
+    private async UniTask<bool> WaitForRequiredManagersAsync()
+    {
+        await UniTask.WaitUntil(
+            () => UI != null && Data != null && Resource != null && Map != null && Train != null,
+            cancellationToken: this.GetCancellationTokenOnDestroy());
+
+        return ValidateStartDependencies();
+    }
+
+    private bool ValidateStartDependencies()
+    {
+        bool isValid = true;
+        isValid &= ValidateManager(Data, nameof(DataManager));
+        isValid &= ValidateManager(Resource, nameof(ResourceManager));
+        isValid &= ValidateManager(Map, nameof(MapManager));
+        isValid &= ValidateManager(Train, nameof(TrainManager));
+        return isValid;
+    }
+
+    private void HandleStationEntered(StationObject station, string stationId)
+    {
+        HandleStationArrival(station, stationId);
+    }
+
+    private void HandleCentralTerminalEntered(CentralTerminal terminal)
+    {
+        HandleTerminalArrival(terminal);
+    }
+
+    private void HandleStationArrival(StationObject station, string stationId)
+    {
+        if (_currentGameState != GameState.Playing) return;
+
+        _activeStation = station;
+        PauseGameplayTime();
+        StopAndDespawnMonsters();
+        ChangeGameState(GameState.EventPaused);
+
+        Debug.Log($"[GameManager] 역 도착: '{stationId}' 이벤트 처리를 기다립니다.");
+        // TODO: Station UI를 열고 CompleteStation(bool)을 호출하도록 연결필요
+    }
+
+    private void HandleTerminalArrival(CentralTerminal terminal)
+    {
+        if (_currentGameState != GameState.Playing) return;
+
+        _activeTerminal = terminal;
+        PauseGameplayTime();
+        StopAndDespawnMonsters();
+        RemovePlayerPlacedRails();
+        ChangeGameState(GameState.EventPaused);
+
+        Debug.Log("[GameManager] 터미널 도착: 출구 방향 선택을 기다립니다.");
+        // TODO: Terminal UI를 열고 CentralTerminal.SelectExitGate(int)와 연결필요(?)
+    }
+
+    private void PauseGameplayTime()
+    {
+        if (Time != null && !Time.IsPaused)
+        {
+            Time.Pause();
         }
         else
         {
-            Debug.LogError("[GameManager] TrainManager 인스턴스를 찾을 수 없어 기차를 스폰할 수 없습니다.");
+            UnityEngine.Time.timeScale = 0f;
         }
+        Debug.Log("[GameManager] 게임 시간을 일시정지했습니다.");
+    }
 
-        if (Pool != null)
-        {
-            //
-        }
-
+    private void ResumeGameplayTime()
+    {
         if (Time != null)
         {
-            Time.Resume();
+            while (Time.IsPaused)
+            {
+                Time.Resume();
+            }
         }
 
-        //if (Rail)
-        {
+        UnityEngine.Time.timeScale = 1f;
+    }
 
+    public async UniTask StartCountdownAsync()
+    {
+        if (_isCountdownRunning) return;
+
+        _isCountdownRunning = true;
+        int sessionVersion = _sessionVersion;
+
+        try
+        {
+            for (int remaining = _resumeCountdownSeconds; remaining > 0; remaining--)
+            {
+                OnCountdownChanged?.Invoke(remaining); // UI 카운트 표시
+
+                Debug.Log($"[GameManager] {remaining}초 후 다음 구간을 시작합니다.");
+                await UniTask.Delay(1000, ignoreTimeScale: true, cancellationToken: this.GetCancellationTokenOnDestroy());
+
+                if (sessionVersion != _sessionVersion) return;
+            }
+
+            OnCountdownChanged?.Invoke(0); // UI 카운트 끝 신호 
+
+            ResumeMonsterSpawning();
+            ResumeGameplayTime();
+            ChangeGameState(GameState.Playing);
+        }
+        finally
+        {
+            _isCountdownRunning = false;
         }
     }
 
-    public void GameOver()
+    private void ResumeMonsterSpawning()
     {
-        Debug.Log("[GameManager] 게임 오버! 맵과 오브젝트를 정리합니다.");
-
-        ChangeGameState(GameState.GameOver);
-
-        if (Time != null)
+        if (Monster != null)
         {
-            Time.Resume();
+            Monster.StartSpawning();
         }
-
-        if (Map != null)
+        else
         {
-            Map.ClearMap();
+            Debug.LogWarning("[GameManager] MonsterSpawn이 없어 몬스터 스폰을 재개하지 못했습니다.");
         }
-
-        if (Pool != null)
-        {
-            Pool.AllDespawnToPool();
-        }
-
-        // TODO: UI 매니저를 통해 '로비 화면' 또는 '결과 화면' 띄우기
     }
 
-    public void HandleTerminalArrival()
+    private void StopAndDespawnMonsters()
     {
-        if (_currentGameState == GameState.EventPaused)
+        Monster?.StopSpawning();
+        Pool?.AllDespawnToPool();
+
+        // TODO: PoolManager 몬스터 정리(스킬정리도 필요한지 확인필요)
+    }
+
+    private void RemovePlayerPlacedRails()
+    {
+        if (Rail == null)
         {
+            Debug.LogWarning("[GameManager] RailManager가 없어 플레이어 레일을 정리하지 못했습니다.");
             return;
         }
 
-        Debug.Log("[GameManager] 종착역 도달: 게임을 일시정지하고 종착역 UI 페이즈로 전환합니다.");
-        ChangeGameState(GameState.EventPaused);
-
-        if (Time != null)
-        {
-            Time.Pause();
-        }
+        Rail.RemoveAllRail();
+        Debug.Log("[GameManager] 플레이어가 설치한 레일을 모두 제거했습니다.");
     }
 
-    public void HandleStationArrival()
+    private void ResetSessionState()
     {
-        if (_currentGameState == GameState.EventPaused)
-        {
-            return;
-        }
-
-        Debug.Log("[GameManager] 일반 기차역 도달: 게임을 일시정지하고 기차역 UI 페이즈로 전환합니다.");
-        ChangeGameState(GameState.EventPaused);
-
-        if (Time != null)
-        {
-            Time.Pause();
-        }
+        _activeStation = null;
+        _activeTerminal = null;
+        _playTime = 0f;
+        _lastNotifiedTime = 0;
     }
 
-    public void SelectExitDirection(int directionIndex)
+    /// 게임 오버 로비 복귀 공통으로 사용 세션 정리
+    private void ClearCurrentSession()
     {
-        Debug.Log($"[GameManager] 출구 방향({directionIndex}번) 선택됨: 게임을 재개합니다.");
-
-        if (Time != null)
-        {
-            Time.Resume();
-        }
-
-        ChangeGameState(GameState.ExitSelected);
-        ChangeGameState(GameState.Playing);
-
-        // TODO: 관련Manager에 지시하여 기차 출발 로직 실행
+        _sessionVersion++;
+        StopAndDespawnMonsters();
+        RemovePlayerPlacedRails();
+        Train?.ClearExistingTrain();
+        Map?.ClearMap();
+        ResetSessionState();
     }
+
+    /// 결과 UI가 확인된 뒤 호출
+    public void ReturnToLobby()
+    {
+        ClearCurrentSession();
+        ResumeGameplayTime();
+        ChangeGameState(GameState.Ready);
+        UI?.OpenContentUI(UIType.LobbyUI);
+
+        // TODO: TrainManager 정리 메서드가 추가되면 ClearCurrentSession에서 호출필요
+    }
+
+    private void SetManagerParent(Component manager)
+    {
+        if (manager != null && manager.transform.parent != _managerRoot)
+        {
+            manager.transform.SetParent(_managerRoot);
+        }
+    }
+
+    private async UniTaskVoid RefreshManagerHierarchyAsync()
+    {
+        await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, this.GetCancellationTokenOnDestroy());
+        RefreshManagerHierarchy();
+    }
+
+    private bool ValidateManager(Component manager, string managerName)
+    {
+        if (manager != null) return true;
+
+        Debug.LogError($"[GameManager] 필수 매니저 '{managerName}'를 찾지 못했습니다.");
+        return false;
+    }
+
 
     private void ChangeGameState(GameState newState)
     {
@@ -219,3 +467,4 @@ public class GameManager : SingletonBase<GameManager>
         Debug.Log($"[GameManager] 게임 상태 변경: {_currentGameState}");
     }
 }
+
