@@ -8,15 +8,35 @@ public class TrainFollow : MonoBehaviour
 
     [Header("Follow Setting")]
     [SerializeField] private float _followDistance = 3.0f;
-    [SerializeField] private float _moveSpeed = 5f;
-    [SerializeField] public float _rotateSpeed = 10f;
     [SerializeField] private int _targetIndex = 0;
 
-    private Train _headTrain;
+
+    private TrainData _trainData;
+    private float _moveSpeed = 2f;
+    private float _rotateSpeed = 5f;
+
+    public TrainData Data
+    {
+        get { return _trainData; }
+    }
+
 
     private void Update()
     {
         FollowFrontTrain();
+    }
+
+    public void FollowInit(TrainData data, Transform frontTrain)
+    {
+        _trainData = data;
+
+        if (data != null)
+        {
+            _moveSpeed = data.MoveSpeed;
+            _rotateSpeed = data.RotateSpeed;
+        }
+    
+        SetFrontTrain(frontTrain);
     }
 
     private void FollowFrontTrain()
@@ -27,11 +47,6 @@ public class TrainFollow : MonoBehaviour
         }
 
         if (TrainManager.Instance.IsStation)
-        {
-            return;
-        }
-
-        if (_headTrain != null && !_headTrain.IsMoving)
         {
             return;
         }
