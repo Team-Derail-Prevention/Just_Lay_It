@@ -8,13 +8,24 @@ public class StationObject : BaseColliderTrigger
     [Header("기차역 이벤트 데이터")]
     [SerializeField] private string _stationId;
 
-    private int _rewardGold = 0;  
-    private int _rescueCount = 0; 
+    [System.Serializable]
+    public struct RailSpawnInfo
+    {
+        [Tooltip("레일의 월드 좌표 위치")]
+        public Vector3 position;
+        [Tooltip("레일의 회전값")]
+        public Quaternion rotation;
+    }
+
+    [Header("스폰 포인트 (인게임 자동 등록 및 확인용)")]
+    [SerializeField] private RailSpawnInfo[] _startPoints = new RailSpawnInfo[2];
+
+    private int _rewardGold = 0;
+    private int _rescueCount = 0;
 
     public string StationId => _stationId;
     private bool _isInteractionCompleted = false;
 
-    // 맵이 생성될 때 MapManager 등에서 이 기차역의 ID를 넣어주며 초기화합니다.
     public void Initialize(string stationId)
     {
         _stationId = stationId;
@@ -26,9 +37,23 @@ public class StationObject : BaseColliderTrigger
             if (myData != null)
             {
                 _rescueCount = myData.GuestCount;
-                _rewardGold = myData.Gold; 
+                _rewardGold = myData.Gold;
             }
         }
+    }
+
+    public void RegisterStartPoint(int index, Vector3 pos, Quaternion rot)
+    {
+        if (index >= 0 && index < _startPoints.Length)
+        {
+            _startPoints[index].position = pos;
+            _startPoints[index].rotation = rot;
+        }
+    }
+
+    public RailSpawnInfo GetStartPoint(int index)
+    {
+        return _startPoints[index];
     }
 
     protected override void HandleInteraction(Collider target)
