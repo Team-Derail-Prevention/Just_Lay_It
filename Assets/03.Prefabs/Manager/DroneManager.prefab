@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4338340184446841227
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8960187411945653158}
+  - component: {fileID: 8851289987671306848}
+  m_Layer: 0
+  m_Name: DroneManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8960187411945653158
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4338340184446841227}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1310377152663819632}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8851289987671306848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4338340184446841227}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e445a5059da9a564ea454d75f0db58a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DroneManager
+  _spawnEntries:
+  - Address: Prefab/Drone
+    Count: 1
+  - Address: Prefab/Drone_Rail
+    Count: 1
+  _spawnRoot: {fileID: 1310377152663819632}
+--- !u!1001 &7863227164525866567
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 8960187411945653158}
+    m_Modifications:
+    - target: {fileID: 8743302442161982077, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
+      propertyPath: m_Name
+      value: '@DroneRoot'
+      objectReference: {fileID: 0}
+    - target: {fileID: 9165016977823284023, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9165016977823284023, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9165016977823284023, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9165016977823284023, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9165016977823284023, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9165016977823284023, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9165016977823284023, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9165016977823284023, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9165016977823284023, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9165016977823284023, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
+--- !u!4 &1310377152663819632 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9165016977823284023, guid: 82d537a21694fcb41bd8fa7bebdd0399, type: 3}
+  m_PrefabInstance: {fileID: 7863227164525866567}
+  m_PrefabAsset: {fileID: 0}
