@@ -15,7 +15,7 @@ public class RailManager : SingletonBase<RailManager>
     [Header("Refs")]
     [SerializeField] private Camera Camera_Main;
     [SerializeField] private LayerMask _groundLayer;
-    [SerializeField] private LayerMask _blockedLayer;
+    [SerializeField] private LayerMask _blockedLayer; // 오브젝트가 올라간 바닥(Default) 레이어
     [SerializeField] private Transform Transform_MapRoot;
     [SerializeField] private Transform Transform_RailRoot;
     [SerializeField] private MapManager MapManager_Ref;
@@ -126,6 +126,7 @@ public class RailManager : SingletonBase<RailManager>
 
         if (!_isPlaceModeActive)
         {
+            HandlePlaceModeEntryInput();
             return;
         }
 
@@ -143,6 +144,16 @@ public class RailManager : SingletonBase<RailManager>
 
         UpdateHover();
         UpdateClickInput();
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            _previewController.RotateNext();
+
+            if (_isHoveredCube)
+            {
+                _previewController.Show(_hoveredCubeInfo);
+            }
+        }
 
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -197,6 +208,18 @@ public class RailManager : SingletonBase<RailManager>
         Transform_MapRoot = MapManager_Ref.MapRoot;
         ClearAllPlacedRails();
         BuildCubeLookup();
+    }
+
+    private void HandlePlaceModeEntryInput()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            NetworkRailService.Instance?.RequestStartPlacement(RailType.Straight);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            NetworkRailService.Instance?.RequestStartPlacement(RailType.Corner);
+        }
     }
 
     private void HandleRailTypeInput()
@@ -265,7 +288,7 @@ public class RailManager : SingletonBase<RailManager>
             Vector3 topCenter = new Vector3(bounds.center.x, bounds.max.y, bounds.center.z);
 
             MapTileInfo tileInfo = rendererObj.GetComponent<MapTileInfo>();
-            bool isGroundLayer = ((1 << rendererObj.layer) & _groundLayer.value) != 0;
+            bool isGroundLayer = IsInGroundLayer(rendererObj.layer);
 
             CubeInfo info = new CubeInfo
             {
@@ -321,6 +344,11 @@ public class RailManager : SingletonBase<RailManager>
         int x = Mathf.RoundToInt((worldPoint.x - _gridOriginX) / _tileSize);
         int z = Mathf.RoundToInt((worldPoint.z - _gridOriginZ) / _tileSize);
         return new Vector2Int(x, z);
+    }
+
+    private bool IsInGroundLayer(int layer)
+    {
+        return ((1 << layer) & _groundLayer.value) != 0;
     }
 
     private async UniTask SpawnPreviewInstanceAsync()
@@ -609,24 +637,7 @@ public class RailManager : SingletonBase<RailManager>
         Debug.Log("[RailManager] 설치된 레일 전체 회수 완료");
     }
 
-    public void RefreshTileLayer(GameObject tileObj)
-    {
-        if (tileObj == null) return;
-
-        Renderer renderer = tileObj.GetComponent<Renderer>();
-        if (renderer == null) return;
-
-        Vector3 topCenter = new Vector3(renderer.bounds.center.x, renderer.bounds.max.y, renderer.bounds.center.z);
-        Vector2Int gridIndex = WorldPointToGridIndex(topCenter);
-
-        if (!_cubeGrid.TryGetValue(gridIndex, out CubeInfo info)) return;
-
-        info.IsGroundLayer = ((1 << tileObj.layer) & _groundLayer.value) != 0;
-        _cubeGrid[gridIndex] = info;
-
-        Debug.Log($"[RailManager] 타일 레이어 갱신: {tileObj.name} → IsGroundLayer={info.IsGroundLayer}");
-    }
-
+    // 막혀있다고 기록된 타일들만 주기적으로 다시 확인해서, 오브젝트가 사라져 레이어가 바뀌었으면 캐시를 갱신
     private void RecheckBlockedTiles()
     {
         if (_cubeGrid.Count == 0) return;
@@ -637,10 +648,10 @@ public class RailManager : SingletonBase<RailManager>
             Vector2Int key = keys[i];
             CubeInfo info = _cubeGrid[key];
 
-            if (info.IsGroundLayer) continue;
+            if (info.IsGroundLayer) continue; // 이미 설치 가능한 칸이면 재검사 불필요
             if (info.Obj == null) continue;
 
-            bool isGroundLayerNow = ((1 << info.Obj.layer) & _groundLayer.value) != 0;
+            bool isGroundLayerNow = IsInGroundLayer(info.Obj.layer);
             if (isGroundLayerNow != info.IsGroundLayer)
             {
                 info.IsGroundLayer = isGroundLayerNow;
