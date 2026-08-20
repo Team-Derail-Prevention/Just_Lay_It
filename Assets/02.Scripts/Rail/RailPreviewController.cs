@@ -8,6 +8,7 @@ public class RailPreviewController : MonoBehaviour
     private int _currentRotationStep;
     private MaterialPropertyBlock _propertyBlock;
     public Quaternion CurrentRotation { get { return Quaternion.Euler(0f, _currentRotationStep * 90f, 0f); } }
+    public int CurrentRotationStep { get { return _currentRotationStep; } }
 
     private void Awake()
     {
@@ -31,6 +32,11 @@ public class RailPreviewController : MonoBehaviour
     public void RotateNext()
     {
         _currentRotationStep = (_currentRotationStep + 1) % 4;
+    }
+
+    public void SetRotationStep(int step)
+    {
+        _currentRotationStep = ((step % 4) + 4) % 4;
     }
 
     public void Show(CubeInfo cubeInfo)

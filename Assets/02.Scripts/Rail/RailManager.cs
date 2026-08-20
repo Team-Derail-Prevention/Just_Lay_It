@@ -63,6 +63,8 @@ public class RailManager : SingletonBase<RailManager>
     [SerializeField] private float _blockedTileRecheckInterval = 1f;
     private float _blockedTileRecheckTimer;
 
+    private int _lastRotationStep = 0;
+
     private string CurrentRailAddress
     {
         get => _currentRailType == RailType.Corner ? _cornerRailAddress : _straightRailAddress;
@@ -148,6 +150,7 @@ public class RailManager : SingletonBase<RailManager>
         if (Input.GetKeyDown(KeyCode.R))
         {
             _previewController.RotateNext();
+            _lastRotationStep = _previewController.CurrentRotationStep;
 
             if (_isHoveredCube)
             {
@@ -327,7 +330,6 @@ public class RailManager : SingletonBase<RailManager>
 
             if (_cubeGrid.ContainsKey(gridIndex))
             {
-                Debug.LogWarning("[RailManager] 격자 좌표 충돌: " + gridIndex + " - " + collected[i].Name);
                 continue;
             }
 
@@ -385,6 +387,7 @@ public class RailManager : SingletonBase<RailManager>
         else
         {
             _previewController.SetGhostAlpha(_ghostAlpha);
+            _previewController.SetRotationStep(_lastRotationStep);
         }
 
         Collider previewCollider = instance.GetComponentInChildren<Collider>();
@@ -509,6 +512,11 @@ public class RailManager : SingletonBase<RailManager>
     {
         if (_previewInstance == null) return;
         _previewController?.RotateNext();
+
+        if (_previewController != null)
+        {
+            _lastRotationStep = _previewController.CurrentRotationStep;
+        }
 
         if (_isHoveredCube)
         {
@@ -637,7 +645,6 @@ public class RailManager : SingletonBase<RailManager>
         Debug.Log("[RailManager] 설치된 레일 전체 회수 완료");
     }
 
-    // 막혀있다고 기록된 타일들만 주기적으로 다시 확인해서, 오브젝트가 사라져 레이어가 바뀌었으면 캐시를 갱신
     private void RecheckBlockedTiles()
     {
         if (_cubeGrid.Count == 0) return;
@@ -648,7 +655,7 @@ public class RailManager : SingletonBase<RailManager>
             Vector2Int key = keys[i];
             CubeInfo info = _cubeGrid[key];
 
-            if (info.IsGroundLayer) continue; // 이미 설치 가능한 칸이면 재검사 불필요
+            if (info.IsGroundLayer) continue;
             if (info.Obj == null) continue;
 
             bool isGroundLayerNow = IsInGroundLayer(info.Obj.layer);
