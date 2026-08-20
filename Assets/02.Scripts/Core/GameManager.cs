@@ -97,7 +97,7 @@ public class GameManager : SingletonBase<GameManager>
             RefreshManagerHierarchy();
             if (!await EnsureGameDataLoadedAsync()) return;
 
-            ResetSessionState();
+            ClearCurrentSession();
             ChangeGameState(GameState.Ready);
 
             bool isMapGenerated = await Map.GenerateMapAsync(this.GetCancellationTokenOnDestroy());
@@ -113,9 +113,9 @@ public class GameManager : SingletonBase<GameManager>
             // MonsterSpawn은 TrainManager.OnTrainSpawn을 구독하여 풀 초기화 후 스폰을 시작
             // TODO: 드론 생성 전용 Manager 생기면 메서드 추가
 
-            ResumeGameplayTime();
-            ChangeGameState(GameState.Playing);
-            Debug.Log("[GameManager] 맵, 기차, 몬스터 스폰 준비를 완료하고 인게임을 시작합니다.");
+            ChangeGameState(GameState.EventPaused);
+            Debug.Log("[GameManager] 맵, 기차, 몬스터 스폰 완료");
+
         }
         finally
         {
