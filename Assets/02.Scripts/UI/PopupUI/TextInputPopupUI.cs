@@ -10,6 +10,7 @@ public class TextInputPopupUI : UIBase
 
     private Action<int> _onConfirm;
     private Action _onInvalidInput;
+    private int _maxAllowedAmount;
 
     private void OnEnable()
     {
@@ -35,7 +36,7 @@ public class TextInputPopupUI : UIBase
         _onInvalidInput = null;
     }
 
-    public void Init(string message, Action<int> onConfirm, Action onInvalidInput = null)
+    public void Init(string message, Action<int> onConfirm, Action onInvalidInput = null, int maxAllowedAmount = int.MaxValue)
     {
         if (Text_Message != null && string.IsNullOrEmpty(message) == false)
         {
@@ -51,13 +52,14 @@ public class TextInputPopupUI : UIBase
 
         _onConfirm = onConfirm;
         _onInvalidInput = onInvalidInput;
+        _maxAllowedAmount = maxAllowedAmount;
     }
 
     private void OnSubmitAmount(string inputText)
     {
         bool isParsed = int.TryParse(inputText, out int amount);
 
-        if (isParsed == false || amount <= 0)
+        if (isParsed == false || amount <= 0 || amount > _maxAllowedAmount)
         {
             Action invalidCallback = _onInvalidInput;
             UIManager.Instance.CloseTextInputPopup();
