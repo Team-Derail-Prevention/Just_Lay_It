@@ -3,16 +3,10 @@ using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using Enums;
 
 public class MapMaker : MonoBehaviour
 {
-    public enum MapCategory
-    {
-        Normal,
-        Station,
-        CentralTerminal
-    }
-
     [System.Serializable]
     public struct MaterialSpawnData
     {
