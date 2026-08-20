@@ -349,6 +349,7 @@ GameObject:
   - component: {fileID: 7448638960612092196}
   - component: {fileID: 8619676847978769459}
   - component: {fileID: 28566633754140623}
+  - component: {fileID: -1488224410472738027}
   m_Layer: 0
   m_Name: train-TestFront
   m_TagString: Train
@@ -387,11 +388,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3dd46994b1a6ff4a893eec1078a4664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Train
-  _moveSpeed: 5
-  _rotateSpeed: 10
+  _railDetector: {fileID: 3218179140270863800}
   _reachThreshold: 0.2
   _targetIndex: 0
-  _railDetector: {fileID: 3218179140270863800}
   _isMoving: 1
 --- !u!54 &28566633754140623
 Rigidbody:
@@ -420,3 +419,24 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!65 &-1488224410472738027
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3943277691693670508}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1.0903828, z: 2.2891283}
+  m_Center: {x: 1.736893e-16, y: 0.6650232, z: -0.04347229}

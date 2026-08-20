@@ -18,9 +18,8 @@ public class CentralTerminal : BaseColliderTrigger
             return;
         }
 
-        Time.timeScale = 0f;
-
         OnCentralTerminalEntered?.Invoke(this);
+        Debug.Log($"[CentralTerminal] 중앙역에 진입했습니다. 현재 창고에는 {_storedMaterialCount}개의 화물이 있습니다.");
     }
 
     public void StoreCargo(int amount)
@@ -43,8 +42,6 @@ public class CentralTerminal : BaseColliderTrigger
 
     public void SelectExitGate(int directionIndex)
     {
-        Time.timeScale = 1f;
-
         OnExitDirectionSelected?.Invoke(directionIndex);
     }
 }
