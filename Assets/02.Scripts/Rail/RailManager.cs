@@ -73,7 +73,7 @@ public class RailManager : SingletonBase<RailManager>
         get => _currentRailType == RailType.Corner ? _cornerRailAddress : _straightRailAddress;
     }
 
-    private void Awake()
+    protected override void Init()
     {
         base.Init();
 
