@@ -1,0 +1,38 @@
+[
+  {
+    "Id": "DRONE_WORK_SPEED",
+    "Name": "작업 속도",
+    "Description": "자원을 캐고 레일을 내려놓는 데 걸리는 시간이 줄어듭니다.",
+    "TargetStatType": "WorkSpeed",
+    "Operation": "AddPercent",
+    "Value": 0.15,
+    "MaxLevel": 4,
+    "GoldCost": 100,
+    "GoldCostPerLevel": 100,
+    "IconPath": null
+  },
+  {
+    "Id": "DRONE_MOVE_SPEED",
+    "Name": "비행 속도",
+    "Description": "드론이 목표까지 날아가는 속도가 빨라집니다.",
+    "TargetStatType": "MoveSpeed",
+    "Operation": "AddPercent",
+    "Value": 0.15,
+    "MaxLevel": 4,
+    "GoldCost": 100,
+    "GoldCostPerLevel": 100,
+    "IconPath": null
+  },
+  {
+    "Id": "DRONE_YIELD_BONUS",
+    "Name": "추가 채집",
+    "Description": "자원을 한 번 캘 때마다 추가로 더 얻습니다.",
+    "TargetStatType": "YieldBonus",
+    "Operation": "Add",
+    "Value": 1,
+    "MaxLevel": 4,
+    "GoldCost": 150,
+    "GoldCostPerLevel": 150,
+    "IconPath": null
+  }
+]
