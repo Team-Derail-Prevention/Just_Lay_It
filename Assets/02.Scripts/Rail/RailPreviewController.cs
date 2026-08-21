@@ -19,21 +19,8 @@ public class RailPreviewController : MonoBehaviour
         }
     }
 
-    public bool HandleRotationInput()
-    {
-        if (!Input.GetKeyDown(KeyCode.T))
-        {
-            return false;
-        }
-        RotateNext();
-        return true;
-    }
-
-    public void RotateNext()
-    {
-        _currentRotationStep = (_currentRotationStep + 1) % 4;
-    }
-
+    // 수동 회전(RotateNext 등)은 제거됨. 회전은 항상 RailManager의
+    // ApplyAutoConnect가 인접 레일을 보고 계산해서 SetRotationStep으로만 설정함.
     public void SetRotationStep(int step)
     {
         _currentRotationStep = ((step % 4) + 4) % 4;
