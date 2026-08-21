@@ -148,6 +148,7 @@ public class GameManager : SingletonBase<GameManager>
 
         _activeStation.ExitStation(stoneTaken, citizenBoarded);
         _activeStation = null;
+        UI?.CloseStationArrivalUI();
 
         Train?.DepartStation();
         StartCountdownAsync().Forget();
@@ -175,12 +176,14 @@ public class GameManager : SingletonBase<GameManager>
         }
 
         Debug.Log($"[GameManager] 출구 방향 {directionIndex}번을 선택했습니다.");
+        // TODO: TrainManager에서 출구 방향별 기차 위치·경로설정 메서드 필요
         _activeTerminal = null;
 
         ChangeGameState(GameState.ExitSelected);
+        UI?.CloseBaseArrivalUI();
         StartCountdownAsync().Forget();
 
-        // TODO: TrainManager에서 출구 방향별 기차 위치·경로설정 메서드 필요
+        
         // TODO: Terminal UI가 재료 적재, 소비, 무기 추가·강화 결과를 GameManager로 전달해야할 듯
     }
 
@@ -305,12 +308,19 @@ public class GameManager : SingletonBase<GameManager>
     {
         if (_currentGameState != GameState.Playing) return;
 
+        StationArrivalUI stationUI = UI?.OpenStationArrivalUI();
+        if (stationUI != null)
+        {
+            stationUI.Init(station, station.AvailableStone, station.AvailableCitizen);
+        }
+
         _activeStation = station;
         PauseGameplayTime();
         StopAndDespawnMonsters();
         ChangeGameState(GameState.EventPaused);
 
         Debug.Log($"[GameManager] 역 도착: '{stationId}' 이벤트 처리를 기다립니다.");
+        UI?.OpenBaseArrivalUI();
         // TODO: Station UI를 열고 CompleteStation(bool)을 호출하도록 연결필요
     }
 
