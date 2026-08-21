@@ -1172,6 +1172,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31ada48382a94f4438fa55b9b50a7d5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DroneDockPoint
-  _carIndex: 1
-  _localOffset: {x: 0, y: 2, z: -3}
+  _carIndex: 2
+  _localOffset: {x: 0, y: 2, z: 0}
   _topGap: 1
