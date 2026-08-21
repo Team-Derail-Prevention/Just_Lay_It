@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 [RequireComponent(typeof(Drone))]
 public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
@@ -48,9 +49,11 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
     private bool _hasOrder;
     private GameObject _payload;
+    private Transform _payloadParent;
     private GameObject _ghost;
     private Vector3 _target;
     private Quaternion _rotation;
+    private Action<GameObject> _onPlaced;
 
     private float _workTimer;
 
@@ -82,6 +85,8 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
     private void OnDisable()
     {
+        AbortDelivery();
+
         _drone.OnArrived -= HandleArrived;
 
         if (_dockPoint != null)
@@ -105,7 +110,34 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         SnapToDock();
     }
 
-    public bool Assign(GameObject payload, GameObject ghost, Vector3 target, Quaternion rotation)
+    public GameObject CurrentPayload { get { return _payload; } }
+
+    public bool TryReplacePayload(GameObject oldPayload, GameObject newPayload, GameObject newGhost)
+    {
+        if (_payload == null || _payload != oldPayload || newPayload == null)
+        {
+            return false;
+        }
+
+        bool isCarrying = _payload.transform.parent != _payloadParent;
+
+        DestroyGhost();
+
+        _payload = newPayload;
+        _payloadParent = newPayload.transform.parent;
+        _ghost = newGhost;
+        _target = newPayload.transform.position;
+        _rotation = newPayload.transform.rotation;
+
+        if (isCarrying)
+        {
+            PickUp();
+        }
+
+        return true;
+    }
+
+    public bool Assign(GameObject payload, GameObject ghost, Vector3 target, Quaternion rotation, Action<GameObject> onPlaced = null)
     {
         if (payload == null || CanAcceptWork == false)
         {
@@ -120,9 +152,11 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         }
 
         _payload = payload;
+        _payloadParent = payload.transform.parent;
         _ghost = ghost;
         _target = target;
         _rotation = rotation;
+        _onPlaced = onPlaced;
         _hasOrder = true;
 
         _phase = Phase.ToRack;
@@ -312,6 +346,11 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         _payload.transform.SetParent(socket, true);
         _payload.transform.SetPositionAndRotation(socket.position, socket.rotation);
         _payload.SetActive(true);
+
+        if (DroneManager.Instance != null)
+        {
+            DroneManager.Instance.SetPayloadCollision(_payload, false);
+        }
     }
 
     private void PutDown()
@@ -323,7 +362,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
             return;
         }
 
-        _payload.transform.SetParent(null, true);
+        _payload.transform.SetParent(_payloadParent, true);
         _payload.transform.SetPositionAndRotation(_target, _rotation);
         _payload.SetActive(true);
 
@@ -333,6 +372,26 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         }
 
         DestroyGhost();
+
+        Action<GameObject> onPlaced = _onPlaced;
+        _onPlaced = null;
+        onPlaced?.Invoke(_payload);
+    }
+
+    private void AbortDelivery()
+    {
+        if (_payload == null && _ghost == null)
+        {
+            return;
+        }
+
+        PutDown();
+
+        _payload = null;
+        _payloadParent = null;
+        _onPlaced = null;
+        _hasOrder = false;
+        _phase = Phase.Idle;
     }
 
     private void DestroyGhost()

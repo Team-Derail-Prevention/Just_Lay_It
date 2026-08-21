@@ -16,6 +16,7 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
     public DroneState State { get { return _state; } }
     public bool CanAcceptWork { get { return _state == DroneState.Docked || _isReturning; } }
     public Transform Transform { get { return transform; } }
+    public MaterialObject CurrentTarget { get { return _workTarget; } }
 
     private Drone _drone;
     private IAgentMover _mover;
