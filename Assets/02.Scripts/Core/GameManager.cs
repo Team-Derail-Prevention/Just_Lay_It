@@ -33,6 +33,7 @@ public class GameManager : SingletonBase<GameManager>
     public static MonsterSpawn Monster => MonsterSpawn.Instance;
     public static DroneManager Drone => DroneManager.Instance;
     public static UIManager UI => UIManager.Instance;
+    public static SaveManager Save => SaveManager.Instance;
     public static TimeManager Time => Instance != null ? Instance._timeManager : null;
 
     public static MaterialTransferEventHub MaterialTransferEventHub => MaterialTransferEventHub.Instance;
@@ -226,6 +227,7 @@ public class GameManager : SingletonBase<GameManager>
         SetManagerParent(Rail);
         SetManagerParent(Monster);
         SetManagerParent(Drone);
+        SetManagerParent(Save);
     }
 
     public void RefreshManagerHierarchy()
