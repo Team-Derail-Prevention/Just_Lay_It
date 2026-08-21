@@ -2,9 +2,6 @@
 
 public class Train : MonoBehaviour
 {
-    [Header("Sensor")]
-    [SerializeField] private RailDetector _railDetector;
-
     [Header("Detection Setting")]
     [SerializeField] private float _reachThreshold = 0.2f;
     [SerializeField] public int _targetIndex = 0;
@@ -27,7 +24,7 @@ public class Train : MonoBehaviour
 
     public TrainData Data
     {
-        get {return _trainData; }
+        get { return _trainData; }
     }
 
     public int CurrentHp
@@ -40,22 +37,6 @@ public class Train : MonoBehaviour
         get { return _maxHp; }
     }
 
-    private void Awake()
-    {
-        if (_railDetector == null)
-        {
-            _railDetector = GetComponentInChildren<RailDetector>();
-        }
-    }
-
-    private void OnEnable()
-    {
-        if (_railDetector != null)
-        {
-            _railDetector.OnRailDetected += HandleRailDetected;
-            _railDetector.OnStationDetected += HandleStationDetected;
-        }
-    }
 
     private void Update()
     {
@@ -64,24 +45,17 @@ public class Train : MonoBehaviour
             _isMoving = !_isMoving;
         }
 
-        if (_isMoving)
+        if (_isMoving && !_isBroken)
         {
             MoveTrain();
-        }
-    }
-
-    private void OnDisable()
-    {
-        if (_railDetector != null)
-        {
-            _railDetector.OnRailDetected -= HandleRailDetected;
-            _railDetector.OnStationDetected -= HandleStationDetected;
         }
     }
 
     public void TrainInit(TrainData data)
     {
         _trainData = data;
+        _totalDistance = 0f;
+        _isBroken = false;
 
         if (data != null)
         {
@@ -91,9 +65,6 @@ public class Train : MonoBehaviour
             _currentHp = data.MaxHp;
             _defense = data.Defense;
         }
-
-        _totalDistance = 0f;
-        _isBroken = false;
 
         if (TrainStatusEventHub.Instance != null)
         {
@@ -109,7 +80,7 @@ public class Train : MonoBehaviour
         }
 
         int totalDamage = Mathf.Max(1, damage - _defense);
-        _currentHp = Mathf.Max(0,_currentHp - totalDamage);
+        _currentHp = Mathf.Max(0, _currentHp - totalDamage);
 
         Debug.Log($"[Train] 기관차 피격! 받은 피해: {totalDamage} (적용 전: {damage}, 방어력: {_defense}), 남은 HP: {_currentHp}/{_maxHp}");
 
@@ -136,9 +107,9 @@ public class Train : MonoBehaviour
 
         _currentHp = Mathf.Min(_maxHp, _currentHp + healAmount);
 
-        if (TrainStatusEventHub.Instance != null) 
+        if (TrainStatusEventHub.Instance != null)
         {
-            TrainStatusEventHub.Instance.NotifyHpChanged( _currentHp, _maxHp);
+            TrainStatusEventHub.Instance.NotifyHpChanged(_currentHp, _maxHp);
         }
     }
 
@@ -168,6 +139,10 @@ public class Train : MonoBehaviour
         Transform targetNode = TrainManager.Instance.GetWaypoint(_targetIndex);
         if (targetNode == null)
         {
+            if (TrainStatusEventHub.Instance != null)
+            {
+                TrainStatusEventHub.Instance.NotifySpeedChanged(0f);
+            }
             return;
         }
 
@@ -197,7 +172,7 @@ public class Train : MonoBehaviour
         {
             _targetIndex++;
         }
-       
+
     }
 
     public void StartMove()
@@ -210,24 +185,9 @@ public class Train : MonoBehaviour
         _isMoving = false;
     }
 
-    private void HandleRailDetected(Transform railTransform)
-    {
-        if (TrainManager.Instance != null)
-        {
-            TrainManager.Instance.DetectRail(railTransform);
-        }
-    }
 
-    private void HandleStationDetected(GameObject stationObj)
+    public void SetTargetIndex(int index)
     {
-        if (TrainManager.Instance != null)
-        {
-            TrainManager.Instance.ArriveStation(stationObj);
-        }
+        _targetIndex = index;
     }
-
-    //public void SetTargetIndex(int index)
-    //{
-    //    _targetIndex = index;
-    //}
 }
