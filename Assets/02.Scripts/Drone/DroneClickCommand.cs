@@ -17,7 +17,12 @@ public class DroneClickCommand : MonoBehaviour
 
     private void Update()
     {
-        if (Mouse.current == null || _cursor == null || _stateMachine == null)
+        if (Mouse.current == null || _cursor == null)
+        {
+            return;
+        }
+
+        if (_stateMachine == null && DroneManager.Instance == null)
         {
             return;
         }
@@ -37,6 +42,13 @@ public class DroneClickCommand : MonoBehaviour
 
         if (_cursor.TryGetTarget(out MaterialObject target) == false)
         {
+            return;
+        }
+
+        if (DroneManager.Instance != null)
+        {
+            DroneManager.Instance.TryAssignMining(target);
+
             return;
         }
 
@@ -67,6 +79,13 @@ public class DroneClickCommand : MonoBehaviour
 
         if (Keyboard.current[_recallKey].wasPressedThisFrame == false)
         {
+            return;
+        }
+
+        if (DroneManager.Instance != null)
+        {
+            DroneManager.Instance.RecallAll();
+
             return;
         }
 

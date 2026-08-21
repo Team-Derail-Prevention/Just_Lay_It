@@ -3,7 +3,36 @@ using Enums;
 
 public class NetworkResourceService : SingletonBase<NetworkResourceService>
 {
+    private const int BASE_CARGO_LIMIT = 500;
+
     private ResourceViewModel _localVm;
+    private int _cargoLimit = BASE_CARGO_LIMIT;
+
+    public int CargoLimit
+    {
+        get
+        {
+            return _cargoLimit;
+        }
+    }
+
+    public int CurrentCargoLoad
+    {
+        get
+        {
+            var vm = GetLocalResourceViewModel();
+            return vm.CurrentWood + vm.CurrentStone;
+        }
+    }
+
+    public int RemainingCargoCapacity
+    {
+        get
+        {
+            int remaining = _cargoLimit - CurrentCargoLoad;
+            return Mathf.Max(0, remaining);
+        }
+    }
 
     private void Start()
     {
@@ -61,26 +90,44 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         }
     }
 
-    public void AddWood(int amount)
+    public int AddWood(int amount)
     {
+        int addable = Mathf.Min(amount, RemainingCargoCapacity);
+        if (addable <= 0)
+        {
+            Debug.LogWarning("[NetworkResourceService] 적재 한도가 가득 찼습니다.");
+            return 0;
+        }
+
         var vm = GetLocalResourceViewModel();
-        vm.CurrentWood += amount;
+        vm.CurrentWood += addable;
 
         if (ResourceStatusEventHub.Instance != null)
         {
             ResourceStatusEventHub.Instance.NotifyWoodChanged(vm.CurrentWood);
         }
+
+        return addable;
     }
 
-    public void AddStone(int amount)
+    public int AddStone(int amount)
     {
+        int addable = Mathf.Min(amount, RemainingCargoCapacity);
+        if (addable <= 0)
+        {
+            Debug.LogWarning("[NetworkResourceService] 적재 한도가 가득 찼습니다.");
+            return 0;
+        }
+
         var vm = GetLocalResourceViewModel();
-        vm.CurrentStone += amount;
+        vm.CurrentStone += addable;
 
         if (ResourceStatusEventHub.Instance != null)
         {
             ResourceStatusEventHub.Instance.NotifyStoneChanged(vm.CurrentStone);
         }
+
+        return addable;
     }
 
     public bool TrySpendWood(int amount)
@@ -131,6 +178,12 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
             ResourceStatusEventHub.Instance.NotifyRescuedHumanChanged(vm.RescuedHumanCount);
         }
     }
+
+    public void IncreaseCargoLimit(int amount)
+    {
+        _cargoLimit += amount;
+    }
+
     private void OnRequestSpendMoney(int amount, System.Action<bool> onResult)
     {
         bool isSpent = TrySpendStone(amount);
@@ -140,6 +193,7 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
     public void ResetRun()
     {
         _localVm = new ResourceViewModel();
+        _cargoLimit = BASE_CARGO_LIMIT;
 
         if (ResourceStatusEventHub.Instance != null)
         {
