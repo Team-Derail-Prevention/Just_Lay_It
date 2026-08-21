@@ -27,6 +27,8 @@ public class RailManager : SingletonBase<RailManager>
     [Header("Preview Ghost")]
     [SerializeField, Range(0f, 1f)] private float _ghostAlpha = 0.4f;
 
+    public float GhostAlpha { get { return _ghostAlpha; } }
+
     private RailType _currentRailType = RailType.Straight;
 
     private float _tileSize = 1f;
@@ -591,6 +593,7 @@ public class RailManager : SingletonBase<RailManager>
 
         _placedRails[gridIndex] = new PlacedRailInfo { Obj = spawnedRail, Type = railType };
         Debug.Log($"[RailManager] {railType} 레일 설치됨: " + spawnedRail.name);
+        DroneManager.Instance?.RequestDelivery(spawnedRail, worldPos, rotation);
 
         ExitPlaceMode(clearPlacedRails: false);
     }

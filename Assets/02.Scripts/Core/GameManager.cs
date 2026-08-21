@@ -31,6 +31,7 @@ public class GameManager : SingletonBase<GameManager>
     public static TrainManager Train => TrainManager.Instance;
     public static RailManager Rail => RailManager.Instance;
     public static MonsterSpawn Monster => MonsterSpawn.Instance;
+    public static DroneManager Drone => DroneManager.Instance;
     public static UIManager UI => UIManager.Instance;
     public static TrainStatusEventHub TrainEventHub => TrainStatusEventHub.Instance;
     public static ResourceStatusEventHub ResourceEventHub => ResourceStatusEventHub.Instance;
@@ -106,12 +107,17 @@ public class GameManager : SingletonBase<GameManager>
                 Debug.LogError("[GameManager] 맵 생성에 실패하여 게임 시작을 취소합니다.");
                 return;
             }
+            // Map.OnMapGenerated 이벤트로 RailManager의 타일 조회 상태 초기화
 
-            // Map.OnMapGenerated 이벤트로 RailManager의 타일 조회 상태 초기화 
+            // 드론은 TrainManager.OnTrainSpawn을 구독하므로 기차보다 먼저 생성되어야 함
+            if (Drone != null)
+            {
+                await Drone.SpawnAllAsync();
+            }
+
             Train.SpawnFullTrain(_startingCarriageCount);
 
             // MonsterSpawn은 TrainManager.OnTrainSpawn을 구독하여 풀 초기화 후 스폰을 시작
-            // TODO: 드론 생성 전용 Manager 생기면 메서드 추가
 
             ChangeGameState(GameState.EventPaused);
             Debug.Log("[GameManager] 맵, 기차, 몬스터 스폰 완료");
@@ -181,7 +187,6 @@ public class GameManager : SingletonBase<GameManager>
 
         ClearCurrentSession();
 
-        // TODO: Drone Manager에 public Despawn 필요
         // TODO: Result UI를 열고 로비로 돌아가는 UI 흐름필요
     }
 
@@ -214,6 +219,7 @@ public class GameManager : SingletonBase<GameManager>
         SetManagerParent(ResourceEventHub);
         SetManagerParent(NetworkRail);
         SetManagerParent(UpgradeService);
+        SetManagerParent(Drone);
     }
 
     public void RefreshManagerHierarchy()
@@ -420,6 +426,7 @@ public class GameManager : SingletonBase<GameManager>
     private void ClearCurrentSession()
     {
         _sessionVersion++;
+        Drone?.DespawnAll();
         StopAndDespawnMonsters();
         RemovePlayerPlacedRails();
         Train?.ClearExistingTrain();

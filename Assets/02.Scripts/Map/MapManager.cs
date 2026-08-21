@@ -210,7 +210,7 @@ public class MapManager : SingletonBase<MapManager>
             CentralTerminal terminal = mapObject.GetComponentInChildren<CentralTerminal>();
             Vector3 centerPosition = terminal != null ? terminal.transform.position : worldPosition;
 
-            await SpawnRailsAroundAsync(centerPosition, true, railParent);
+            await SpawnRailsAroundAsync(centerPosition, true, railParent, terminal, null);
         }
         else if (typeId == 1)
         {
@@ -221,11 +221,11 @@ public class MapManager : SingletonBase<MapManager>
             }
             Vector3 centerPosition = stationObj != null ? stationObj.transform.position : worldPosition;
 
-            await SpawnRailsAroundAsync(centerPosition, false, railParent);
+            await SpawnRailsAroundAsync(centerPosition, false, railParent, null, stationObj);
         }
     }
 
-    private async UniTask SpawnRailsAroundAsync(Vector3 centerPos, bool isTerminal, Transform railParent)
+    private async UniTask SpawnRailsAroundAsync(Vector3 centerPos, bool isTerminal, Transform railParent, CentralTerminal terminal = null, StationObject station = null)
     {
         int railCount = 3;
         float railLength = 2f;
@@ -235,10 +235,10 @@ public class MapManager : SingletonBase<MapManager>
         {
             (Vector3 dir, Quaternion rot)[] paths = new (Vector3, Quaternion)[]
             {
-                (new Vector3(0, 0, 1), Quaternion.Euler(0, 90, 0)),  
-                (new Vector3(0, 0, -1), Quaternion.Euler(0, 90, 0)), 
-                (new Vector3(-1, 0, 0), Quaternion.identity),        
-                (new Vector3(1, 0, 0), Quaternion.identity)          
+                (new Vector3(0, 0, 1), Quaternion.Euler(0, 90, 0)),
+                (new Vector3(0, 0, -1), Quaternion.Euler(0, 90, 0)),
+                (new Vector3(-1, 0, 0), Quaternion.identity),
+                (new Vector3(1, 0, 0), Quaternion.identity)
             };
 
             for (int d = 0; d < paths.Length; d++)
@@ -247,11 +247,18 @@ public class MapManager : SingletonBase<MapManager>
                 dirRoot.transform.SetParent(railParent);
                 dirRoot.transform.localPosition = Vector3.zero;
 
-                for (int i = 0; i < (2* railCount); i++)
+                for (int i = 0; i < (2 * railCount); i++)
                 {
                     Vector3 offset = paths[d].dir * (_railSpawnOffset + (i * railLength));
+                    Vector3 targetPos = centerPos + offset;
+                    Quaternion rot = paths[d].rot;
 
-                    await PlaceSingleRailAsync(centerPos + offset, paths[d].rot, railHeight, dirRoot.transform);
+                    GameObject railObj = await PlaceSingleRailAsync(targetPos, rot, railHeight, dirRoot.transform);
+
+                    if (i == 0 && railObj != null && terminal != null)
+                    {
+                        terminal.RegisterStartPoint(d, railObj.transform.position, railObj.transform.rotation);
+                    }
                 }
             }
         }
@@ -260,7 +267,7 @@ public class MapManager : SingletonBase<MapManager>
             (Vector3 dir, Quaternion rot)[] paths = new (Vector3, Quaternion)[]
             {
                 (new Vector3(-1, 0, 0), Quaternion.identity),
-                (new Vector3(1, 0, 0), Quaternion.identity)  
+                (new Vector3(1, 0, 0), Quaternion.identity)
             };
 
             for (int d = 0; d < paths.Length; d++)
@@ -272,16 +279,23 @@ public class MapManager : SingletonBase<MapManager>
                 for (int i = 0; i < railCount; i++)
                 {
                     Vector3 offset = paths[d].dir * (_railSpawnOffset + (i * railLength));
+                    Vector3 targetPos = centerPos + offset;
+                    Quaternion rot = paths[d].rot;
 
-                    await PlaceSingleRailAsync(centerPos + offset, paths[d].rot, railHeight, dirRoot.transform);
+                    GameObject railObj = await PlaceSingleRailAsync(targetPos, rot, railHeight, dirRoot.transform);
+
+                    if (i == 0 && railObj != null && station != null)
+                    {
+                        station.RegisterStartPoint(d, railObj.transform.position, railObj.transform.rotation);
+                    }
                 }
             }
         }
     }
 
-    private async UniTask PlaceSingleRailAsync(Vector3 targetPos, Quaternion rotation, float height, Transform parent)
+    private async UniTask<GameObject> PlaceSingleRailAsync(Vector3 targetPos, Quaternion rotation, float height, Transform parent)
     {
-        if (string.IsNullOrEmpty(_straightRailAddress)) return;
+        if (string.IsNullOrEmpty(_straightRailAddress)) return null;
 
         GameObject railPrefab = await ResourceManager.Instance.LoadAsset<GameObject>(_straightRailAddress);
 
@@ -291,10 +305,12 @@ public class MapManager : SingletonBase<MapManager>
 
             GameObject railObj = Instantiate(railPrefab, finalPos, rotation, parent);
             railObj.name = "AutoSpawned_StraightRail";
+            return railObj;
         }
         else
         {
             Debug.LogWarning($"[MapManager] 레일 프리팹('{_straightRailAddress}') 로드 실패.");
+            return null;
         }
     }
 

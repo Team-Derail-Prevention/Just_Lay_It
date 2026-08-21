@@ -27,7 +27,7 @@ public class DroneCellIndicator : MonoBehaviour
 
     private void Update()
     {
-        if (_command == null || _cursor == null || _stateMachine == null || _indicator == null)
+        if (_command == null || _cursor == null || _indicator == null)
         {
             SetVisible(false);
 
@@ -67,7 +67,7 @@ public class DroneCellIndicator : MonoBehaviour
     {
         Color color;
 
-        if (_stateMachine.CanAssign(target))
+        if (CanAssign(target))
         {
             color = _allowedColor;
         }
@@ -79,6 +79,21 @@ public class DroneCellIndicator : MonoBehaviour
         _indicator.GetPropertyBlock(_propertyBlock);
         _propertyBlock.SetColor(BaseColorId, color);
         _indicator.SetPropertyBlock(_propertyBlock);
+    }
+
+    private bool CanAssign(MaterialObject target)
+    {
+        if (DroneManager.Instance != null)
+        {
+            return DroneManager.Instance.CanAssignMining(target);
+        }
+
+        if (_stateMachine != null)
+        {
+            return _stateMachine.CanAssign(target);
+        }
+
+        return false;
     }
 
     private void SetVisible(bool visible)

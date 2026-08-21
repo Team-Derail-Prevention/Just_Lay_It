@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(DroneStateMachine))]
 public class DroneAltitude : MonoBehaviour
 {
     [Header("높이")]
@@ -11,11 +10,11 @@ public class DroneAltitude : MonoBehaviour
     [SerializeField, Min(0.1f)] private float _descendSpeed = 4f;
     [SerializeField, Min(0.1f)] private float _ascendSpeed = 3f;
 
-    private DroneStateMachine _stateMachine;
+    private IDroneWorker _worker;
 
     private void Awake()
     {
-        _stateMachine = GetComponent<DroneStateMachine>();
+        _worker = GetComponent<IDroneWorker>();
     }
 
     private void Update()
@@ -34,7 +33,7 @@ public class DroneAltitude : MonoBehaviour
     {
         float workHeight = GetWorkHeight();
 
-        if (_stateMachine.State == DroneState.Working)
+        if (_worker != null && _worker.State == DroneState.Working)
         {
             return workHeight;
         }
@@ -49,20 +48,17 @@ public class DroneAltitude : MonoBehaviour
 
     private float GetWorkHeight()
     {
-
-        MaterialObject target = _stateMachine.WorkTarget;
-
-        if (target == null)
+        if (_worker == null)
         {
             return _cruiseHeight;
         }
 
-        if (target.TryGetComponent(out Collider targetCollider) == false)
+        if (_worker.TryGetWorkTopY(out float topY) == false)
         {
             return _cruiseHeight;
         }
 
-        return targetCollider.bounds.max.y + _workGap;
+        return topY + _workGap;
     }
 
     private float GetSpeed(float targetHeight)
