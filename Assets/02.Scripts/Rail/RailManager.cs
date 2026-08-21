@@ -27,6 +27,9 @@ public class RailManager : SingletonBase<RailManager>
     [Header("Preview Ghost")]
     [SerializeField, Range(0f, 1f)] private float _ghostAlpha = 0.4f;
 
+    [Header("Installed Rail Order (Train Path)")]
+    [SerializeField] private List<Transform> _installedRailPath = new List<Transform>();
+
     public float GhostAlpha { get { return _ghostAlpha; } }
 
     private RailType _currentRailType = RailType.Straight;
@@ -648,6 +651,8 @@ public class RailManager : SingletonBase<RailManager>
             placedCollider.enabled = true;
         }
 
+        _installedRailPath.Add(spawnedRail.transform);
+
         _placedRails[gridIndex] = new PlacedRailInfo { Obj = spawnedRail, Type = railType, RotationStep = rotationStep };
         Debug.Log($"[RailManager] {railType} 레일 설치됨: " + spawnedRail.name);
         DroneManager.Instance?.RequestDelivery(spawnedRail, worldPos, rotation);
@@ -733,6 +738,11 @@ public class RailManager : SingletonBase<RailManager>
 
         if (oldInfo.Obj != null)
         {
+            int pathIndex = _installedRailPath.IndexOf(oldInfo.Obj.transform);
+            if (pathIndex != -1)
+            {
+                _installedRailPath[pathIndex] = spawnedRail.transform;
+            }
             Addressables.ReleaseInstance(oldInfo.Obj);
         }
 
@@ -774,6 +784,7 @@ public class RailManager : SingletonBase<RailManager>
 
         if (placedInfo.Obj != null)
         {
+            _installedRailPath.Remove(placedInfo.Obj.transform);
             Addressables.ReleaseInstance(placedInfo.Obj);
         }
 
@@ -832,6 +843,7 @@ public class RailManager : SingletonBase<RailManager>
     private void ClearAllPlacedRails()
     {
         _installedCubes.Clear();
+        _installedRailPath.Clear();
 
         foreach (KeyValuePair<Vector2Int, PlacedRailInfo> kvp in _placedRails)
         {
@@ -842,4 +854,20 @@ public class RailManager : SingletonBase<RailManager>
         }
         _placedRails.Clear();
     }
+
+    public Transform GetRailNode(int index)
+    {
+        if (index >= 0 && index < _installedRailPath.Count)
+        {
+            return _installedRailPath[index];
+        }
+        return null;
+    }
+
+    //레일 총개수 확인용
+    public int GetRailCount()
+    {
+        return _installedRailPath.Count;
+    }
+
 }
