@@ -10,23 +10,20 @@ public class TrainManager : SingletonBase<TrainManager>
     [SerializeField] private Transform _headTrain;
     [SerializeField] private float _followDistance = 3f;
 
-    [Header("Total Rail Path Data")]
-    public List<Transform> pathList = new List<Transform>();
-
     [Header("Connected Train Carriages")]
     public List<GameObject> carList = new List<GameObject>();
 
     [Header("Test Settings")]
-    [SerializeField] private GameObject _headPrefab;        
-    [SerializeField] private GameObject[] _testCarPrefab;     
+    [SerializeField] private GameObject _headPrefab;
+    [SerializeField] private GameObject[] _testCarPrefab;
     [SerializeField] private Transform _spawnPoint;
     [SerializeField] private int _defaultCarriageCount = 3;
 
-    private HashSet<Transform> visitedNode = new HashSet<Transform>();
     private HashSet<Transform> visitedStation = new HashSet<Transform>();
 
     public static event Action<Transform> OnTrainSpawn;
     public static event Action<bool> OnStationState;
+    public static event Action OnTrainRelocated;
 
     protected override void Init()
     {
@@ -63,25 +60,27 @@ public class TrainManager : SingletonBase<TrainManager>
             Destroy(_headTrain.gameObject);
             _headTrain = null;
         }
+
+        visitedStation.Clear();
+        IsStation = false;
     }
 
-    public void DetectRail(Transform railTransform)
-    {
-        if (railTransform == null)
-        {
-            return;
-        }
 
-        if (!visitedNode.Contains(railTransform))
-        {
-            visitedNode.Add(railTransform);
-            pathList.Add(railTransform);
-        }
-      
-    }
 
+
+    // 기본 테스트용 소환 (인스펙터에 등록된 스폰스팟 기준)
     [ContextMenu("Test / Spawn Carriage")]
     public void SpawnFullTrain(int carriageCount)
+    {
+        Vector3 spawnPos = (_spawnPoint != null) ? _spawnPoint.position : Vector3.zero;
+        Quaternion spawnRot = (_spawnPoint != null) ? _spawnPoint.rotation : Quaternion.identity;
+
+        SpawnFullTrain(spawnPos, spawnRot, carriageCount);
+    }
+    //
+
+
+    public void SpawnFullTrain(Vector3 spawnPos, Quaternion spawnRot, int carriageCount)
     {
         if (_headPrefab == null)
         {
@@ -89,14 +88,9 @@ public class TrainManager : SingletonBase<TrainManager>
             return;
         }
 
-
         ClearExistingTrain();
 
-        // 1) 스폰 포인트 지정 여부 확인 후 위치/회전 세팅
-        Vector3 spawnPos = (_spawnPoint != null) ? _spawnPoint.position : Vector3.zero;
-        Quaternion spawnRot = (_spawnPoint != null) ? _spawnPoint.rotation : Quaternion.identity;
-
-        // 2) 기관차(Head) 소환 및 메인 Head로 등록
+        //  기차 헤드 소환 및 회전값 등록
         GameObject newHead = Instantiate(_headPrefab, spawnPos, spawnRot);
         if (newHead == null)
         {
@@ -105,16 +99,29 @@ public class TrainManager : SingletonBase<TrainManager>
         }
 
         _headTrain = newHead.transform;
+        _headTrain.position = spawnPos;
         _headTrain.rotation = spawnRot;
 
-        // 3) 입력한 개수만큼 객차 순차적 추가
+        Train trainScript = newHead.GetComponent<Train>();
+        if (trainScript != null && DataManager.Instance != null)
+        {
+            TrainData headData = DataManager.Instance.GetData<TrainData>("TRAIN_HEAD_01");
+            trainScript.TrainInit(headData);
+        }
+
         if (_testCarPrefab != null && _testCarPrefab.Length > 0)
         {
             int count = Mathf.Min(carriageCount, _testCarPrefab.Length);
 
             for (int i = 0; i < count; i++)
             {
-                SpawnCarriage(_testCarPrefab[i]);
+                TrainData carData = null;
+                if (DataManager.Instance != null)
+                {
+                    carData = DataManager.Instance.GetData<TrainData>("TRAIN_CARGO_01");
+                }
+
+                SpawnCarriage(_testCarPrefab[i], carData);
             }
         }
 
@@ -122,7 +129,51 @@ public class TrainManager : SingletonBase<TrainManager>
 
         Debug.Log($"[TrainManager] 기관차 1대와 객차 {carriageCount}대 전체 소환 완료!");
     }
-    //
+
+    public void RelocateTrain(Vector3 spawnPos, Quaternion spawnRot)
+    {
+        if (_headTrain == null)
+        {
+            Debug.Log("[TrainManager] 재배치할 기차 헤드가 없습니다.");
+            return;
+        }
+
+        _headTrain.position = spawnPos;
+        _headTrain.rotation = spawnRot;
+
+        Train head = _headTrain.GetComponent<Train>();
+        if (head != null)
+        {
+            head.SetTargetIndex(0);
+        }
+
+        Vector3 backspawn = -(spawnRot * Vector3.forward);
+        Transform front = _headTrain;
+
+        for (int i = 0; i < carList.Count; i++)
+        {
+            if (carList[i] != null && front != null)
+            {
+                Vector3 carPos = front.position + (backspawn * _followDistance);
+                carList[i].transform.position = carPos;
+                carList[i].transform.rotation = spawnRot;
+
+                TrainFollow follow = carList[i].GetComponent<TrainFollow>();
+                if (follow != null)
+                {
+                    follow.SetFrontTrain(front);
+                }
+
+                front = carList[i].transform;
+            }
+        }
+
+        OnTrainRelocated?.Invoke();
+
+        Debug.Log($"[TrainManager] 출구 위치({spawnPos})로 기차 재배치 완료!");
+    }
+
+
 
     public void SpawnCarriage(GameObject carPrefab, TrainData data = null)
     {
@@ -165,17 +216,15 @@ public class TrainManager : SingletonBase<TrainManager>
             trainContainer.ContainerInit(data);
         }
 
-
-
-            carList.Add(newCar);
+        carList.Add(newCar);
     }
 
 
     public Transform GetWaypoint(int index)
     {
-        if (index >= 0 && index < pathList.Count)
+        if (RailManager.Instance != null)
         {
-            return pathList[index];
+            return RailManager.Instance.GetRailNode(index);
         }
         return null;
     }
@@ -187,24 +236,21 @@ public class TrainManager : SingletonBase<TrainManager>
             return;
         }
 
-        if (!visitedStation.Contains(stationObj.transform))
-        {
             visitedStation.Add(stationObj.transform);
             IsStation = true;
             SetCarriagesActive(false);
             Debug.Log("[TrainManager] 기차역 도착 : 정차 상태");
-
             OnStationState?.Invoke(true);
-        }
     }
 
     public void DepartStation()
     {
         IsStation = false;
+
         SetCarriagesActive(true);
+        OnStationState?.Invoke(false);
         Debug.Log("[TrainManager] 기차역 출발 : 이동 상태");
 
-        OnStationState?.Invoke(false);
     }
 
     public void SetCarriagesActive(bool isActive)
