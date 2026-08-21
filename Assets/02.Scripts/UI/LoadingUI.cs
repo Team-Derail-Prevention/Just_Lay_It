@@ -67,16 +67,23 @@ public class LoadingUI : UIBase
 
         UIManager.Instance.CloseLoadingUI();
 
-        // HudUi 임시
+        var countdownPopup = UIManager.Instance.OpenGameStartCountdownPopup();
+        if (countdownPopup != null)
+        {
+            countdownPopup.Init(OpenInGameHudForTest);
+        }
+        else
+        {
+            OpenInGameHudForTest();
+        }
+    }
+
+    private void OpenInGameHudForTest()
+    {
         UIManager.Instance.OpenRailBuildUI();
         UIManager.Instance.OpenHudTrainStatusUI();
         UIManager.Instance.OpenHudResourceUI();
         UIManager.Instance.OpenInGameMenuButtonUI();
-
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.StartCountdownAsync().Forget();
-        }
     }
 
     private void SetProgressUI(float progress01)
