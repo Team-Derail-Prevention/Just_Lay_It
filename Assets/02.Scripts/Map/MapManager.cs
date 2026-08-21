@@ -68,14 +68,14 @@ public class MapManager : SingletonBase<MapManager>
 
     private async UniTask NeedDataLoadAsync()
     {
-        if (DataManager.Instance != null && DataManager.Instance.IsLoaded)
+        if (GameManager.Data != null && GameManager.Data.IsLoaded)
             return;
 
         UniTaskCompletionSource tcs = new UniTaskCompletionSource();
 
-        if (DataManager.Instance != null)
+        if (GameManager.Data != null)
         {
-            DataManager.Instance.OnDataLoadCompleted += () => tcs.TrySetResult();
+            GameManager.Data.OnDataLoadCompleted += () => tcs.TrySetResult();
         }
         else
         {
@@ -88,13 +88,13 @@ public class MapManager : SingletonBase<MapManager>
 
     public async UniTask<bool> GenerateMapAsync(CancellationToken cancellationToken = default)
     {
-        if (DataManager.Instance == null)
+        if (GameManager.Data == null)
         {
             Debug.LogError("[MapManager] DataManager 인스턴스가 존재하지 않습니다.");
             return false;
         }
 
-        IReadOnlyList<MapData> allMapDatas = DataManager.Instance.GetAllData<MapData>();
+        IReadOnlyList<MapData> allMapDatas = GameManager.Data.GetAllData<MapData>();
         if (allMapDatas == null || allMapDatas.Count == 0)
         {
             Debug.LogError("[MapManager] DataManager에서 MapData를 가져오지 못했습니다! DataManager에서 'MapData' 로드가 정상적으로 호출되었는지, JSON 파일 내 items 구조가 올바른지 확인해주세요.");
@@ -161,6 +161,8 @@ public class MapManager : SingletonBase<MapManager>
 
             string tag = isStation ? "StationMap" : "NormalMap";
             await SpawnMapFromDataAsync(selectedData, gridPos, typeId, tag, cancellationToken);
+
+            await UniTask.Yield(CancellationToken.None);
         }
 
         Physics.SyncTransforms();
@@ -180,7 +182,7 @@ public class MapManager : SingletonBase<MapManager>
             return;
         }
 
-        GameObject prefab = await ResourceManager.Instance.LoadAsset<GameObject>(mapData.AddressablePath);
+        GameObject prefab = await GameManager.Resource.LoadAsset<GameObject>(mapData.AddressablePath);
         if (prefab == null)
         {
             Debug.LogError($"[MapManager] 어드레서블 로드 실패: '{mapData.AddressablePath}' (ID: {mapData.Id})");
@@ -297,7 +299,7 @@ public class MapManager : SingletonBase<MapManager>
     {
         if (string.IsNullOrEmpty(_straightRailAddress)) return null;
 
-        GameObject railPrefab = await ResourceManager.Instance.LoadAsset<GameObject>(_straightRailAddress);
+        GameObject railPrefab = await GameManager.Resource.LoadAsset<GameObject>(_straightRailAddress);
 
         if (railPrefab != null)
         {

@@ -46,6 +46,8 @@ public class GameManager : SingletonBase<GameManager>
     public static NetworkAugmentService NetworkAugmentService => NetworkAugmentService.Instance;
     public static NetworkRailService NetworkRailService => NetworkRailService.Instance;
     public static NetworkUpgradeService NetworkUpgradeService => NetworkUpgradeService.Instance;
+    public static NetworkResourceService NetworkResourceService => NetworkResourceService.Instance;
+    public static NetworkWarehouseService NetworkWarehouseService => NetworkWarehouseService.Instance;
 
     public GameState CurrentGameState => _currentGameState;
 
@@ -454,8 +456,8 @@ public class GameManager : SingletonBase<GameManager>
         ClearCurrentSession();
         ResumeGameplayTime();
         ChangeGameState(GameState.Ready);
-        NetworkResourceService.Instance.ResetRun();
-        NetworkWarehouseService.Instance.ResetRun();
+        NetworkResourceService.ResetRun();
+        NetworkWarehouseService.ResetRun();
         UI?.OpenContentUI(UIType.LobbyUI);
     }
 
