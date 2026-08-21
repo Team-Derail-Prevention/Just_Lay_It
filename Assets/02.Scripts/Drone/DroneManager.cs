@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-public class DroneManager : MonoBehaviour
+public class DroneManager : SingletonBase<DroneManager>
 {
     [Serializable]
     private class DroneSpawnEntry
@@ -20,8 +20,6 @@ public class DroneManager : MonoBehaviour
         public Quaternion Rotation;
     }
 
-    public static DroneManager Instance { get; private set; }
-
     [Header("스폰")]
     [Tooltip("비워두면 아무것도 스폰하지 않는다. 씬에 직접 배치한 드론으로 동작")]
     [SerializeField] private List<DroneSpawnEntry> _spawnEntries = new List<DroneSpawnEntry>();
@@ -30,28 +28,6 @@ public class DroneManager : MonoBehaviour
     private readonly List<IDroneWorker> _workers = new List<IDroneWorker>();
     private readonly List<GameObject> _spawned = new List<GameObject>();
     private readonly Queue<DeliveryOrder> _pendingDeliveries = new Queue<DeliveryOrder>();
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Debug.LogWarning("[DroneManager] 이미 다른 DroneManager가 있어 이 컴포넌트를 제거합니다.");
-
-            Destroy(this);
-
-            return;
-        }
-
-        Instance = this;
-    }
-
-    private void OnDestroy()
-    {
-        if (Instance == this)
-        {
-            Instance = null;
-        }
-    }
 
     public async UniTask SpawnAllAsync()
     {
