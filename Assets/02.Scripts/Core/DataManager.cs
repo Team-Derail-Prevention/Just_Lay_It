@@ -81,7 +81,7 @@ public class DataManager : SingletonBase<DataManager>
     {
         Type type = typeof(T);
 
-        TextAsset textAsset = await ResourceManager.Instance.LoadAsset<TextAsset>(address);
+        TextAsset textAsset = await GameManager.Resource.LoadAsset<TextAsset>(address);
         if (textAsset == null)
         {
             Debug.LogError($"[DataManager:LoadDataAsync] 데이터 로드 실패 (주소: {address})");

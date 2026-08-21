@@ -23,6 +23,9 @@ public class StationObject : BaseColliderTrigger
     private int _rewardGold = 0;
     private int _rescueCount = 0;
 
+    public int AvailableStone => _rewardGold;
+    public int AvailableCitizen => _rescueCount;
+
     public string StationId => _stationId;
     private bool _isInteractionCompleted = false;
 
@@ -63,28 +66,13 @@ public class StationObject : BaseColliderTrigger
         OnStationEntered?.Invoke(this, StationId);
     }
 
-    public void ExitStation(bool isHealed)
+    public void ExitStation(int stoneTaken, int citizenBoarded)
     {
         _isInteractionCompleted = true;
 
-        if (isHealed)
+        if (GameManager.ResourceStatusEventHub != null)
         {
-            // TODO: TrainManager로 기차 체력 회복 및 자재 소모 로직
-        }
-
-        if (GameManager.ResourceEventHub != null)
-        {
-            GameManager.ResourceEventHub.NotifyRescuedHumanChanged(_rescueCount);
-        }
-
-        if (GameManager.UpgradeService != null && _rewardGold > 0)
-        {
-            GameManager.UpgradeService.GainGold(_rewardGold);
-        }
-
-        if (GameManager.ResourceEventHub != null && _rewardGold > 0)
-        {
-            GameManager.ResourceEventHub.NotifyMoneyChanged(_rewardGold);
+            GameManager.ResourceStatusEventHub.NotifyRescuedHumanChanged(citizenBoarded);
         }
 
         Debug.Log($"[StationObject] '{_stationId}' 완료. 골드 {_rewardGold} 획득, 구출 {_rescueCount}명.");

@@ -248,7 +248,7 @@ public class StationArrivalUI : UIBase
 
         if (_currentStation != null)
         {
-            // _currentStation.ExitStation(actualTakenStone, actualBoarded);
+            GameManager.Instance.CompleteStation(actualTakenStone, actualBoarded);
         }
 
         UIManager.Instance.CloseStationArrivalUI();
