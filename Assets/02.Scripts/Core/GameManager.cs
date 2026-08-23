@@ -33,11 +33,21 @@ public class GameManager : SingletonBase<GameManager>
     public static MonsterSpawn Monster => MonsterSpawn.Instance;
     public static DroneManager Drone => DroneManager.Instance;
     public static UIManager UI => UIManager.Instance;
-    public static TrainStatusEventHub TrainEventHub => TrainStatusEventHub.Instance;
-    public static ResourceStatusEventHub ResourceEventHub => ResourceStatusEventHub.Instance;
-    public static NetworkRailService NetworkRail => NetworkRailService.Instance;
-    public static NetworkUpgradeService UpgradeService => NetworkUpgradeService.Instance;
+    public static SaveManager Save => SaveManager.Instance;
     public static TimeManager Time => Instance != null ? Instance._timeManager : null;
+
+    public static MaterialTransferEventHub MaterialTransferEventHub => MaterialTransferEventHub.Instance;
+    public static MoneyRequestEventHub MoneyRequestEventHub => MoneyRequestEventHub.Instance;
+    public static TrainStatusEventHub TrainStatusEventHub => TrainStatusEventHub.Instance;
+    public static ResourceStatusEventHub ResourceStatusEventHub => ResourceStatusEventHub.Instance;
+
+    public static NetworkTrainCargoService NetworkTrainCargeService => NetworkTrainCargoService.Instance;
+    public static NetworkTrainStrengtheningService NetworkTrainStrengtheningService => NetworkTrainStrengtheningService.Instance;
+    public static NetworkAugmentService NetworkAugmentService => NetworkAugmentService.Instance;
+    public static NetworkRailService NetworkRailService => NetworkRailService.Instance;
+    public static NetworkUpgradeService NetworkUpgradeService => NetworkUpgradeService.Instance;
+    public static NetworkResourceService NetworkResourceService => NetworkResourceService.Instance;
+    public static NetworkWarehouseService NetworkWarehouseService => NetworkWarehouseService.Instance;
 
     public GameState CurrentGameState => _currentGameState;
 
@@ -73,7 +83,7 @@ public class GameManager : SingletonBase<GameManager>
         if (currentSecond == _lastNotifiedTime) return;
 
         _lastNotifiedTime = currentSecond;
-        TrainEventHub?.NotifyPlayTimeChanged(_lastNotifiedTime);
+        TrainStatusEventHub?.NotifyPlayTimeChanged(_lastNotifiedTime);
     }
 
     private void OnDisable()
@@ -131,7 +141,7 @@ public class GameManager : SingletonBase<GameManager>
 
     /// StationObject가 보상 처리하고, GameManager가 다음 인게임 사이클을 재개
     /// 역 UI가 회복 여부를 결정한 후 출발을 위해 호출하는 메서드
-    public void CompleteStation(bool isHealed)
+    public void CompleteStation(int stoneTaken, int citizenBoarded)
     {
         if (_currentGameState != GameState.EventPaused || _activeStation == null)
         {
@@ -139,8 +149,9 @@ public class GameManager : SingletonBase<GameManager>
             return;
         }
 
-        _activeStation.ExitStation(isHealed);
+        _activeStation.ExitStation(stoneTaken, citizenBoarded);
         _activeStation = null;
+        UI?.CloseStationArrivalUI();
 
         Train?.DepartStation();
         StartCountdownAsync().Forget();
@@ -168,12 +179,14 @@ public class GameManager : SingletonBase<GameManager>
         }
 
         Debug.Log($"[GameManager] 출구 방향 {directionIndex}번을 선택했습니다.");
+        // TODO: TrainManager에서 출구 방향별 기차 위치·경로설정 메서드 필요
         _activeTerminal = null;
 
         ChangeGameState(GameState.ExitSelected);
+        UI?.CloseBaseArrivalUI();
         StartCountdownAsync().Forget();
 
-        // TODO: TrainManager에서 출구 방향별 기차 위치·경로설정 메서드 필요
+        
         // TODO: Terminal UI가 재료 적재, 소비, 무기 추가·강화 결과를 GameManager로 전달해야할 듯
     }
 
@@ -215,11 +228,8 @@ public class GameManager : SingletonBase<GameManager>
         SetManagerParent(Train);
         SetManagerParent(Rail);
         SetManagerParent(Monster);
-        SetManagerParent(TrainEventHub);
-        SetManagerParent(ResourceEventHub);
-        SetManagerParent(NetworkRail);
-        SetManagerParent(UpgradeService);
         SetManagerParent(Drone);
+        SetManagerParent(Save);
     }
 
     public void RefreshManagerHierarchy()
@@ -302,12 +312,19 @@ public class GameManager : SingletonBase<GameManager>
     {
         if (_currentGameState != GameState.Playing) return;
 
+        StationArrivalUI stationUI = UI?.OpenStationArrivalUI();
+        if (stationUI != null)
+        {
+            stationUI.Init(station, station.AvailableStone, station.AvailableCitizen);
+        }
+
         _activeStation = station;
         PauseGameplayTime();
         StopAndDespawnMonsters();
         ChangeGameState(GameState.EventPaused);
 
         Debug.Log($"[GameManager] 역 도착: '{stationId}' 이벤트 처리를 기다립니다.");
+        UI?.OpenBaseArrivalUI();
         // TODO: Station UI를 열고 CompleteStation(bool)을 호출하도록 연결필요
     }
 
@@ -369,7 +386,6 @@ public class GameManager : SingletonBase<GameManager>
 
                 if (sessionVersion != _sessionVersion) return;
             }
-
             OnCountdownChanged?.Invoke(0); // UI 카운트 끝 신호 
 
             ResumeMonsterSpawning();
@@ -422,7 +438,7 @@ public class GameManager : SingletonBase<GameManager>
         _lastNotifiedTime = 0;
     }
 
-    /// 게임 오버 로비 복귀 공통으로 사용 세션 정리
+    /// 게임 오버 로비 복귀 공통 사용
     private void ClearCurrentSession()
     {
         _sessionVersion++;
@@ -440,9 +456,9 @@ public class GameManager : SingletonBase<GameManager>
         ClearCurrentSession();
         ResumeGameplayTime();
         ChangeGameState(GameState.Ready);
+        NetworkResourceService.ResetRun();
+        NetworkWarehouseService.ResetRun();
         UI?.OpenContentUI(UIType.LobbyUI);
-
-        // TODO: TrainManager 정리 메서드가 추가되면 ClearCurrentSession에서 호출필요
     }
 
     private void SetManagerParent(Component manager)

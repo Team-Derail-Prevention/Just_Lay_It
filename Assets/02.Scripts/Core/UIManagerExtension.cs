@@ -32,6 +32,8 @@ public enum UIType
     TrainDepartureUI,
     BaseArrivalUI,
     TextInputPopup,
+    StationArrivalUI,
+    GameStartCountdownPopup,
 }
 public static class UIManagerExtension
 {
@@ -64,9 +66,20 @@ public static class UIManagerExtension
             return;
         }
 
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("GameManager.Instance가 null입니다. 게임 매니저가 초기화되지 않았습니다.");
+            uiManager.CloseLoadingUI();
+            return;
+        }
+
         // 실제 로딩 추후 수정
         await GameManager.Instance.StartGame();
-        loadingUI.SetDataLoaded();
+
+        if (loadingUI != null)
+        {
+            loadingUI.SetDataLoaded();
+        }
 
         return;
     }
@@ -309,7 +322,7 @@ public static class UIManagerExtension
         uiManager.CloseContentUI(UIType.BaseArrivalUI);
     }
 
-    public static void OpenTextInputPopup(this UIManager uiManager, string message, Action<int> onConfirm, Action onInvalidInput = null)
+    public static void OpenTextInputPopup(this UIManager uiManager, string message, Action<int> onConfirm, Action onInvalidInput = null, int maxAllowedAmount = int.MaxValue)
     {
         var uiBase = uiManager.OpenPopupUI(UIType.TextInputPopup);
         if (uiBase == null)
@@ -320,13 +333,47 @@ public static class UIManagerExtension
 
         if (uiBase is TextInputPopupUI textInputPopup)
         {
-            textInputPopup.Init(message, onConfirm, onInvalidInput);
+            textInputPopup.Init(message, onConfirm, onInvalidInput, maxAllowedAmount);
         }
     }
 
     public static void CloseTextInputPopup(this UIManager uiManager)
     {
         uiManager.ClosePopupUI(UIType.TextInputPopup);
+    }
+
+    public static StationArrivalUI OpenStationArrivalUI(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenContentUI(UIType.StationArrivalUI); 
+        if (uiBase == null)
+        {
+            Debug.LogWarning("StationArrivalUI가 생성되지 않았습니다");
+            return null;
+        }
+
+        return uiBase as StationArrivalUI;
+    }
+
+    public static void CloseStationArrivalUI(this UIManager uiManager)
+    {
+        uiManager.CloseContentUI(UIType.StationArrivalUI);
+    }
+
+    public static GameStartCountdownPopup OpenGameStartCountdownPopup(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenPopupUI(UIType.GameStartCountdownPopup);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("GameStartCountdownPopup가 생성되지 않았습니다");
+            return null;
+        }
+
+        return uiBase as GameStartCountdownPopup;
+    }
+
+    public static void CloseGameStartCountdownPopup(this UIManager uiManager)
+    {
+        uiManager.ClosePopupUI(UIType.GameStartCountdownPopup);
     }
 
     public static void OpenRailPlaceConfirmPopup(this UIManager uiManager, Action onRotate, Action onConfirm, Action onCancel)

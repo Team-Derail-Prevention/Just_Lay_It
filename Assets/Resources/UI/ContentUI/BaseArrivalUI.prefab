@@ -2655,7 +2655,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 382, y: -65}
+  m_AnchoredPosition: {x: 410, y: -65}
   m_SizeDelta: {x: 730, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2948575225236777274
@@ -4106,7 +4106,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BaseArrivalUI
   Text_Wood: {fileID: 2007715256226871330}
   Text_Stone: {fileID: 3693904682183868938}
-  Text_Money: {fileID: 3222230143570902840}
+  Text_Cash: {fileID: 0}
   Button_WeaponGacha: {fileID: 3774515065916912495}
   Button_TrainStrengthening: {fileID: 7851382782860391605}
   Button_Inventory: {fileID: 6488896085315558017}
