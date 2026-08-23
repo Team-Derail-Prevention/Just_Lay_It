@@ -46,14 +46,16 @@ public class MonsterProjectile : MonoBehaviour
     {
         if (other.CompareTag("Train") || other.GetComponent<Train>() != null)
         {
-            Debug.Log("플레이어 타격");
+            Debug.Log("Train 타격");
 
-            // TrainHealth trainHp = other.GetComponent<TrainHealth>();
-            // if (trainHp != null)
-            // {
-            //   trainHp.TakeDamage(_damage);
-            //   trainHp.ApplyDebuff(_attackType, _debuffDuration, _debuffPower);
-            // }
+            Train train = other.GetComponent<Train>();
+
+            if (train != null)
+            {
+ 
+                train.TakeDamage(_damage);
+                train.ApplyDebuff(_attackType, _debuffDuration, _debuffPower);
+            }
 
             PoolManager.Instance.DespawnToPool(gameObject);
         }

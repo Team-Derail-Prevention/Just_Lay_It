@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class Train : MonoBehaviour
 {
@@ -6,6 +7,14 @@ public class Train : MonoBehaviour
     [SerializeField] private float _reachThreshold = 0.2f;
     [SerializeField] public int _targetIndex = 0;
     [SerializeField] private bool _isMoving = true;
+
+    [Header("Debuff State")]
+    private bool _isFrozen = false;
+    private bool _isElectrified = false;
+    private float _corrodeMultiplier = 1.0f;
+
+    public bool IsFrozen => _isFrozen;
+    public bool IsElectrified => _isElectrified;
 
     private TrainData _trainData;
     private float _moveSpeed = 2f;
@@ -79,10 +88,11 @@ public class Train : MonoBehaviour
             return;
         }
 
-        int totalDamage = Mathf.Max(1, damage - _defense);
+        int totalDamage = Mathf.Max(1, Mathf.RoundToInt(damage * _corrodeMultiplier));
+
         _currentHp = Mathf.Max(0, _currentHp - totalDamage);
 
-        Debug.Log($"[Train] 기관차 피격! 받은 피해: {totalDamage} (적용 전: {damage}, 방어력: {_defense}), 남은 HP: {_currentHp}/{_maxHp}");
+        Debug.Log($"[Train] 기관차 피격! 받은 피해: {totalDamage} (기본 피해: {damage}, 받는 데미지 배율: {_corrodeMultiplier}배), 남은 HP: {_currentHp}/{_maxHp}");
 
         if (_currentHp <= 0)
         {
@@ -190,4 +200,64 @@ public class Train : MonoBehaviour
     {
         _targetIndex = index;
     }
+
+    public void ApplyDebuff(string debuffType, float duration, float power)
+    {
+        if (_isBroken) return;
+
+        Debug.Log($" 디버프 적용 타입: {debuffType}, 지속시간: {duration}초, 위력: {power}");
+
+        switch (debuffType)
+        {
+            case "Freeze":
+                StartCoroutine(FreezeRoutine(duration));
+                break;
+            case "Electric":
+                StartCoroutine(ElectricRoutine(duration));
+                break;
+            case "Corrode":
+                StartCoroutine(CorrodeRoutine(duration, power));
+                break;
+            case "Steal":
+                StealCargo(power);
+                break;
+            case "None":
+            default:
+                break;
+        }
+    }
+
+    private System.Collections.IEnumerator FreezeRoutine(float duration)
+    {
+        _isFrozen = true;
+        yield return new WaitForSeconds(duration);
+        _isFrozen = false;
+    }
+
+    private System.Collections.IEnumerator ElectricRoutine(float duration)
+    {
+        _isElectrified = true;
+        yield return new WaitForSeconds(duration);
+        _isElectrified = false;
+    }
+
+    private System.Collections.IEnumerator CorrodeRoutine(float duration, float damageMultiplier)
+    {
+        _corrodeMultiplier = damageMultiplier;
+
+        yield return new WaitForSeconds(duration);
+
+        _corrodeMultiplier = 1.0f;
+    }
+
+    private void StealCargo(float stealAmount)
+    {
+        TrainContainer container = GetComponent<TrainContainer>();
+        if (container != null)
+        {
+            container.UseCargo(stealAmount);
+            Debug.Log($"몬스터가 자재를 {stealAmount}만큼 훔침 남은 자재: {container.CurrentAmount}");
+        }
+    }
+
 }
