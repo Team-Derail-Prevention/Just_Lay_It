@@ -40,6 +40,7 @@ public class RailManager : SingletonBase<RailManager>
     private float _groundPlaneY;
 
     private HashSet<Vector2Int> _installedCubes = new HashSet<Vector2Int>();
+    private HashSet<Transform> _registeredRails = new HashSet<Transform>();
 
     private struct PlacedRailInfo
     {
@@ -661,6 +662,8 @@ public class RailManager : SingletonBase<RailManager>
         // 바뀌어야 하는지 재계산해서, 필요하면 그 레일을 다시 스폰함
         UpdateNeighborShapes(gridIndex);
 
+        ConnectStationRails(spawnedRail.transform);
+
         ExitPlaceMode(clearPlacedRails: false);
     }
 
@@ -853,6 +856,72 @@ public class RailManager : SingletonBase<RailManager>
             }
         }
         _placedRails.Clear();
+    }
+    private void ConnectStationRails(Transform placedRail)
+    {
+        if (placedRail == null) return;
+
+        Vector3 placedPos = placedRail.position;
+        // 주변 2~2.5m 내의 레일 콜라이더 탐색
+        Collider[] hits = Physics.OverlapSphere(placedPos, 2.5f);
+        List<Transform> stationRailsToAppend = new List<Transform>();
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            Transform hitTrans = hits[i].transform;
+
+            // 이미 경로에 추가된 레일이면 제외
+            if (_installedRailPath.Contains(hitTrans)) continue;
+
+            // MapManager가 생성한 기본 레일 이름 감지
+            if (hits[i].name.Contains("AutoSpawned"))
+            {
+                Transform dirRoot = hitTrans.parent;
+                if (dirRoot != null)
+                {
+                    for (int c = 0; c < dirRoot.childCount; c++)
+                    {
+                        Transform rail = dirRoot.GetChild(c);
+                        if (!_installedRailPath.Contains(rail))
+                        {
+                            stationRailsToAppend.Add(rail);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (stationRailsToAppend.Count > 0)
+        {
+            // 방금 플레이어가 설치한 레일과 가까운 순서대로 정렬 (역 입구 -> 역 안쪽 순서)
+            stationRailsToAppend.Sort((a, b) =>
+                Vector3.Distance(placedPos, a.position).CompareTo(Vector3.Distance(placedPos, b.position))
+            );
+
+            // 경로 리스트 맨 뒤에 차례대로 추가
+            for (int i = 0; i < stationRailsToAppend.Count; i++)
+            {
+                _installedRailPath.Add(stationRailsToAppend[i]);
+            }
+
+            Debug.Log($"[RailManager] 기차역 진입 레일 {stationRailsToAppend.Count}개가 경로 끝에 연결되었습니다!");
+        }
+    }
+   
+    public void InitStartingRailPath(Transform dirRoot)
+    {
+        _installedRailPath.Clear();
+
+        if (dirRoot == null) return;
+
+        for (int i = 0; i < dirRoot.childCount; i++)
+        {
+            Transform rail = dirRoot.GetChild(i);
+            _installedRailPath.Add(rail);
+        }
+
+        Debug.Log($"[RailManager] 시작 출구 레일이 기본 경로로 등록되었습니다.");
     }
 
     public Transform GetRailNode(int index)

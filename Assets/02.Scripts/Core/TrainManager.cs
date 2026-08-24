@@ -7,17 +7,14 @@ public class TrainManager : SingletonBase<TrainManager>
     public bool IsStation { get; private set; } = false;
 
     [Header("Train Carriage Setting")]
-    [SerializeField] private Transform _headTrain;
     [SerializeField] private float _followDistance = 3f;
 
     [Header("Connected Train Carriages")]
     public List<GameObject> carList = new List<GameObject>();
 
-    [Header("Test Settings")]
+    [Header("Train Settings")]
     [SerializeField] private GameObject _headPrefab;
-    [SerializeField] private GameObject[] _testCarPrefab;
-    [SerializeField] private Transform _spawnPoint;
-    [SerializeField] private int _defaultCarriageCount = 3;
+    [SerializeField] private GameObject[] _CarPrefab;
 
     private HashSet<Transform> visitedStation = new HashSet<Transform>();
 
@@ -25,23 +22,28 @@ public class TrainManager : SingletonBase<TrainManager>
     public static event Action<bool> OnStationState;
     public static event Action OnTrainRelocated;
 
+    private Transform _headTrain;
+
+
     protected override void Init()
     {
         base.Init();
     }
 
-    private void Update()
+
+    public void SpawnTerminalTrain(int carriageCount)
     {
-        if (Input.GetKeyDown(KeyCode.Alpha4))
+        CentralTerminal terminal = GameManager.Map.MapRoot.GetComponentInChildren<CentralTerminal>();
+
+        if (terminal == null)
         {
-            DepartStation();
+            Debug.LogError("[TrainManager] Terminal 정보가 없어 스폰할 수 없습니다.");
+            return;
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha5))
-        {
-            SpawnFullTrain(_defaultCarriageCount);
-        }
-
+        CentralTerminal.RailSpawnInfo startInfo = terminal.GetStartPoint(0);
+        GameManager.Rail?.InitStartingRailPath(terminal.ExitDirRoots[0]);
+        SpawnFullTrain(startInfo.position, startInfo.rotation, carriageCount);
     }
 
     public void ClearExistingTrain()
@@ -64,20 +66,6 @@ public class TrainManager : SingletonBase<TrainManager>
         visitedStation.Clear();
         IsStation = false;
     }
-
-
-
-
-    // 기본 테스트용 소환 (인스펙터에 등록된 스폰스팟 기준)
-    [ContextMenu("Test / Spawn Carriage")]
-    public void SpawnFullTrain(int carriageCount)
-    {
-        Vector3 spawnPos = (_spawnPoint != null) ? _spawnPoint.position : Vector3.zero;
-        Quaternion spawnRot = (_spawnPoint != null) ? _spawnPoint.rotation : Quaternion.identity;
-
-        SpawnFullTrain(spawnPos, spawnRot, carriageCount);
-    }
-    //
 
 
     public void SpawnFullTrain(Vector3 spawnPos, Quaternion spawnRot, int carriageCount)
@@ -109,9 +97,9 @@ public class TrainManager : SingletonBase<TrainManager>
             trainScript.TrainInit(headData);
         }
 
-        if (_testCarPrefab != null && _testCarPrefab.Length > 0)
+        if (_CarPrefab != null && _CarPrefab.Length > 0)
         {
-            int count = Mathf.Min(carriageCount, _testCarPrefab.Length);
+            int count = Mathf.Min(carriageCount, _CarPrefab.Length);
 
             for (int i = 0; i < count; i++)
             {
@@ -121,7 +109,7 @@ public class TrainManager : SingletonBase<TrainManager>
                     carData = DataManager.Instance.GetData<TrainData>("TRAIN_CARGO_01");
                 }
 
-                SpawnCarriage(_testCarPrefab[i], carData);
+                SpawnCarriage(_CarPrefab[i], carData);
             }
         }
 
