@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Drone))]
@@ -7,37 +8,84 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
     private enum Phase
     {
         Idle,
-        ToRack,
-        PickingUp,
         ToTarget,
         Dropping,
         Returning,
     }
 
+    private struct Cargo
+    {
+        public GameObject Payload;
+        public Transform Parent;
+        public GameObject Ghost;
+        public Vector3 Target;
+        public Quaternion Rotation;
+        public Action<GameObject> OnPlaced;
+    }
+
     [Header("참조")]
     [SerializeField] private Transform _dock;
-
-    // TODO: 정명진님 기차에 적재칸이 생기면 그 Transform으로 교체
-    [SerializeField] private Transform _rack;
     [SerializeField] private Transform _carrySocket;
 
+    [Header("적재")]
+    [SerializeField, Min(1)] private int _capacity = 3;
+    [SerializeField, Min(0f)] private float _stackGap = 0.4f;
+
     [Header("작업")]
-    [SerializeField, Min(0f)] private float _pickUpDuration = 0.4f;
     [SerializeField, Min(0f)] private float _dropDuration = 1f;
 
     public Transform Transform { get { return transform; } }
-    public bool CanAcceptWork { get { return _hasOrder == false; } }
+
+    public bool CanAcceptWork
+    {
+        get
+        {
+            if (_cargo.Count >= _capacity)
+            {
+                return false;
+            }
+
+            if (_phase == Phase.Idle)
+            {
+                return true;
+            }
+
+            return _preloadRails.Count > 0;
+        }
+    }
+
+    public bool IsPreloaded { get { return _preloadRails.Count > 0; } }
+
+    public int PreloadCount { get { return _preloadRails.Count; } }
+
+    public bool CanPreload
+    {
+        get
+        {
+            if (_phase != Phase.Idle)
+            {
+                return false;
+            }
+
+            return _cargo.Count + _preloadRails.Count < _capacity;
+        }
+    }
 
     public DroneState State
     {
         get
         {
-            if (_phase == Phase.PickingUp || _phase == Phase.Dropping)
+            if (_phase == Phase.Dropping)
             {
                 return DroneState.Working;
             }
 
-            return _phase == Phase.Idle ? DroneState.Docked : DroneState.Moving;
+            if (_phase == Phase.Idle)
+            {
+                return DroneState.Docked;
+            }
+
+            return DroneState.Moving;
         }
     }
 
@@ -47,13 +95,9 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
     private Phase _phase = Phase.Idle;
 
-    private bool _hasOrder;
-    private GameObject _payload;
-    private Transform _payloadParent;
-    private GameObject _ghost;
-    private Vector3 _target;
-    private Quaternion _rotation;
-    private Action<GameObject> _onPlaced;
+    private readonly List<Cargo> _cargo = new List<Cargo>();
+
+    private readonly List<GameObject> _preloadRails = new List<GameObject>();
 
     private float _workTimer;
 
@@ -86,6 +130,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
     private void OnDisable()
     {
         AbortDelivery();
+        ClearPreloads();
 
         _drone.OnArrived -= HandleArrived;
 
@@ -110,29 +155,39 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         SnapToDock();
     }
 
-    public GameObject CurrentPayload { get { return _payload; } }
+    public bool HasPayload(GameObject payload)
+    {
+        return FindCargoIndex(payload) >= 0;
+    }
 
     public bool TryReplacePayload(GameObject oldPayload, GameObject newPayload, GameObject newGhost)
     {
-        if (_payload == null || _payload != oldPayload || newPayload == null)
+        if (oldPayload == null || newPayload == null)
         {
             return false;
         }
 
-        bool isCarrying = _payload.transform.parent != _payloadParent;
+        int index = FindCargoIndex(oldPayload);
 
-        DestroyGhost();
-
-        _payload = newPayload;
-        _payloadParent = newPayload.transform.parent;
-        _ghost = newGhost;
-        _target = newPayload.transform.position;
-        _rotation = newPayload.transform.rotation;
-
-        if (isCarrying)
+        if (index < 0)
         {
-            PickUp();
+            return false;
         }
+
+        Cargo cargo = _cargo[index];
+
+        DestroyGhost(cargo.Ghost);
+
+        cargo.Payload = newPayload;
+        cargo.Parent = newPayload.transform.parent;
+        cargo.Ghost = newGhost;
+        cargo.Target = newPayload.transform.position;
+        cargo.Rotation = newPayload.transform.rotation;
+
+        _cargo[index] = cargo;
+
+        HoldPayload(newPayload);
+        RefreshStackLayout();
 
         return true;
     }
@@ -144,31 +199,118 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
             return false;
         }
 
-        if (_rack == null && _dock == null)
+        if (_dock == null)
         {
-            Debug.LogWarning($"[DroneDeliveryWorker] {name}의 _rack과 _dock이 모두 비어 있어 배달을 받지 않습니다. 프리팹 참조를 확인하세요.", this);
+            Debug.LogWarning($"[DroneDeliveryWorker] {name}의 _dock이 비어 있어 배달을 받지 않습니다. 프리팹 참조를 확인하세요.", this);
 
             return false;
         }
 
-        _payload = payload;
-        _payloadParent = payload.transform.parent;
-        _ghost = ghost;
-        _target = target;
-        _rotation = rotation;
-        _onPlaced = onPlaced;
-        _hasOrder = true;
+        Cargo cargo = new Cargo
+        {
+            Payload = payload,
+            Parent = payload.transform.parent,
+            Ghost = ghost,
+            Target = target,
+            Rotation = rotation,
+            OnPlaced = onPlaced,
+        };
 
-        _phase = Phase.ToRack;
+        _cargo.Add(cargo);
 
-        TrackPickUpPoint();
+        HoldPayload(payload);
+        ConsumeOnePreload();
+        RefreshStackLayout();
+
+        if (_phase == Phase.Idle)
+        {
+            Depart();
+        }
+        else if (_phase == Phase.Returning)
+        {
+            _phase = Phase.ToTarget;
+
+            _drone.MoveTo(_cargo[0].Target);
+        }
 
         return true;
     }
 
+    public bool TryPreload(GameObject rail)
+    {
+        if (rail == null || CanPreload == false)
+        {
+            return false;
+        }
+
+        rail.transform.SetParent(GetSocket(), true);
+
+        _preloadRails.Add(rail);
+
+        RefreshStackLayout();
+
+        return true;
+    }
+
+    public GameObject TakePreload()
+    {
+        if (_preloadRails.Count == 0)
+        {
+            return null;
+        }
+
+        int last = _preloadRails.Count - 1;
+        GameObject rail = _preloadRails[last];
+
+        _preloadRails.RemoveAt(last);
+
+        if (rail != null)
+        {
+            rail.transform.SetParent(null, true);
+        }
+
+        return rail;
+    }
+
+    private void ConsumeOnePreload()
+    {
+        if (_preloadRails.Count == 0)
+        {
+            return;
+        }
+
+        int last = _preloadRails.Count - 1;
+        GameObject rail = _preloadRails[last];
+
+        _preloadRails.RemoveAt(last);
+
+        if (rail != null)
+        {
+            Destroy(rail);
+        }
+    }
+
+    private void ClearPreloads()
+    {
+        for (int i = 0; i < _preloadRails.Count; i++)
+        {
+            if (_preloadRails[i] != null)
+            {
+                Destroy(_preloadRails[i]);
+            }
+        }
+
+        _preloadRails.Clear();
+    }
+
     public void Recall()
     {
-        if (_phase == Phase.Idle || _hasOrder)
+        if (_phase == Phase.Idle)
+        {
+            return;
+        }
+
+        if (_cargo.Count > 0)
         {
             return;
         }
@@ -180,26 +322,26 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
     {
         topY = 0f;
 
-        if (_phase == Phase.ToRack || _phase == Phase.PickingUp)
+        if (_phase == Phase.ToTarget || _phase == Phase.Dropping)
         {
-            if (_rack == null)
+            if (_cargo.Count == 0)
             {
                 return TryGetDockY(out topY);
             }
 
-            topY = _rack.position.y;
+            topY = _cargo[0].Target.y;
 
             return true;
         }
 
-        if (_phase == Phase.ToTarget || _phase == Phase.Dropping)
+        if (TryGetDockY(out float dockY) == false)
         {
-            topY = _target.y;
-
-            return true;
+            return false;
         }
 
-        return TryGetDockY(out topY);
+        topY = dockY + GetStackHeight();
+
+        return true;
     }
 
     private bool TryGetDockY(out float dockY)
@@ -221,18 +363,23 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         return true;
     }
 
-    private void Update()
+    private float GetStackHeight()
     {
-        if (_phase == Phase.PickingUp || _phase == Phase.Dropping)
-        {
-            UpdateWork();
+        int itemCount = _cargo.Count + _preloadRails.Count;
 
-            return;
+        if (itemCount <= 1)
+        {
+            return 0f;
         }
 
-        if (_phase == Phase.ToRack)
+        return (itemCount - 1) * _stackGap;
+    }
+
+    private void Update()
+    {
+        if (_phase == Phase.Dropping)
         {
-            TrackPickUpPoint();
+            UpdateDrop();
 
             return;
         }
@@ -282,7 +429,24 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         _mover.Warp(_dock.position);
     }
 
-    private void UpdateWork()
+    private void Depart()
+    {
+        if (_phase != Phase.Idle)
+        {
+            return;
+        }
+
+        if (_cargo.Count == 0)
+        {
+            return;
+        }
+
+        _phase = Phase.ToTarget;
+
+        _drone.MoveTo(_cargo[0].Target);
+    }
+
+    private void UpdateDrop()
     {
         _workTimer -= Time.deltaTime;
 
@@ -291,35 +455,26 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
             return;
         }
 
-        if (_phase == Phase.PickingUp)
-        {
-            PickUp();
+        PutDown(0);
 
+        _cargo.RemoveAt(0);
+
+        RefreshStackLayout();
+
+        if (_cargo.Count > 0)
+        {
             _phase = Phase.ToTarget;
 
-            _drone.MoveTo(_target);
+            _drone.MoveTo(_cargo[0].Target);
 
             return;
         }
-
-        PutDown();
-
-        _hasOrder = false;
-        _payload = null;
 
         BeginReturn();
     }
 
     private void HandleArrived()
     {
-        if (_phase == Phase.ToRack)
-        {
-            _workTimer = _pickUpDuration;
-            _phase = Phase.PickingUp;
-
-            return;
-        }
-
         if (_phase == Phase.ToTarget)
         {
             _workTimer = _dropDuration;
@@ -334,76 +489,134 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         }
     }
 
-    private void PickUp()
+    private int FindCargoIndex(GameObject payload)
     {
-        if (_payload == null)
+        if (payload == null)
+        {
+            return -1;
+        }
+
+        for (int i = 0; i < _cargo.Count; i++)
+        {
+            if (_cargo[i].Payload == payload)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private Transform GetSocket()
+    {
+        if (_carrySocket != null)
+        {
+            return _carrySocket;
+        }
+
+        return transform;
+    }
+
+    private void HoldPayload(GameObject payload)
+    {
+        if (payload == null)
         {
             return;
         }
 
-        Transform socket = _carrySocket != null ? _carrySocket : transform;
-
-        _payload.transform.SetParent(socket, true);
-        _payload.transform.SetPositionAndRotation(socket.position, socket.rotation);
-        _payload.SetActive(true);
+        payload.transform.SetParent(GetSocket(), true);
+        payload.SetActive(true);
 
         if (DroneManager.Instance != null)
         {
-            DroneManager.Instance.SetPayloadCollision(_payload, false);
+            DroneManager.Instance.SetPayloadCollision(payload, false);
         }
     }
 
-    private void PutDown()
+    private void RefreshStackLayout()
     {
-        if (_payload == null)
-        {
-            DestroyGhost();
+        Transform socket = GetSocket();
+        int slot = 0;
 
+        for (int i = 0; i < _cargo.Count; i++)
+        {
+            GameObject payload = _cargo[i].Payload;
+
+            if (payload == null)
+            {
+                continue;
+            }
+
+            PlaceInStack(payload, socket, slot);
+
+            slot++;
+        }
+
+        for (int i = 0; i < _preloadRails.Count; i++)
+        {
+            GameObject rail = _preloadRails[i];
+
+            if (rail == null)
+            {
+                continue;
+            }
+
+            PlaceInStack(rail, socket, slot);
+
+            slot++;
+        }
+    }
+
+    private void PlaceInStack(GameObject item, Transform socket, int slot)
+    {
+        Vector3 position = socket.position - Vector3.up * (slot * _stackGap);
+
+        item.transform.SetPositionAndRotation(position, socket.rotation);
+    }
+
+    private void PutDown(int index)
+    {
+        Cargo cargo = _cargo[index];
+
+        DestroyGhost(cargo.Ghost);
+
+        if (cargo.Payload == null)
+        {
             return;
         }
 
-        _payload.transform.SetParent(_payloadParent, true);
-        _payload.transform.SetPositionAndRotation(_target, _rotation);
-        _payload.SetActive(true);
+        cargo.Payload.transform.SetParent(cargo.Parent, true);
+        cargo.Payload.transform.SetPositionAndRotation(cargo.Target, cargo.Rotation);
+        cargo.Payload.SetActive(true);
 
         if (DroneManager.Instance != null)
         {
-            DroneManager.Instance.SetPayloadCollision(_payload, true);
+            DroneManager.Instance.SetPayloadCollision(cargo.Payload, true);
         }
 
-        DestroyGhost();
-
-        Action<GameObject> onPlaced = _onPlaced;
-        _onPlaced = null;
-        onPlaced?.Invoke(_payload);
+        cargo.OnPlaced?.Invoke(cargo.Payload);
     }
 
     private void AbortDelivery()
     {
-        if (_payload == null && _ghost == null)
+        for (int i = 0; i < _cargo.Count; i++)
         {
-            return;
+            PutDown(i);
         }
 
-        PutDown();
+        _cargo.Clear();
 
-        _payload = null;
-        _payloadParent = null;
-        _onPlaced = null;
-        _hasOrder = false;
         _phase = Phase.Idle;
     }
 
-    private void DestroyGhost()
+    private void DestroyGhost(GameObject ghost)
     {
-        if (_ghost == null)
+        if (ghost == null)
         {
             return;
         }
 
-        Destroy(_ghost);
-
-        _ghost = null;
+        Destroy(ghost);
     }
 
     private void BeginReturn()
@@ -411,18 +624,6 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         _phase = Phase.Returning;
 
         TrackDock();
-    }
-
-    private void TrackPickUpPoint()
-    {
-        Transform point = _rack != null ? _rack : _dock;
-
-        if (point == null)
-        {
-            return;
-        }
-
-        _drone.MoveTo(point.position);
     }
 
     private void TrackDock()

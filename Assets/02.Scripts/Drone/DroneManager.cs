@@ -40,12 +40,19 @@ public class DroneManager : SingletonBase<DroneManager>
     [SerializeField] private float _markerHeightOffset = 0.05f;
     [SerializeField, Min(0.1f)] private float _markerSize = 2f;
 
+    [Header("사전 적재")]
+    [Tooltip("레일 재고가 생기면 유휴 운반 드론이 미리 들고 대기하는 표시용 레일. RailManager와 같은 어드레서블 주소")]
+    [SerializeField] private string _preloadRailAddress = "Prefab/Rail_Straight";
+
     private readonly List<IDroneWorker> _workers = new List<IDroneWorker>();
     private readonly List<GameObject> _spawned = new List<GameObject>();
     private readonly Queue<DeliveryOrder> _pendingDeliveries = new Queue<DeliveryOrder>();
     private readonly List<MaterialObject> _pendingMining = new List<MaterialObject>();
     private readonly List<Renderer> _orderMarkers = new List<Renderer>();
     private MaterialPropertyBlock _markerBlock;
+
+    private GameObject _preloadRailPrefab;
+    private bool _isPreloadPrefabRequested;
 
     private static readonly int MarkerColorId = Shader.PropertyToID("_BaseColor");
 
@@ -267,7 +274,7 @@ public class DroneManager : SingletonBase<DroneManager>
         {
             DroneDeliveryWorker carrier = _workers[i] as DroneDeliveryWorker;
 
-            if (carrier == null || carrier.CurrentPayload != oldPayload)
+            if (carrier == null || carrier.HasPayload(oldPayload) == false)
             {
                 continue;
             }
@@ -455,7 +462,179 @@ public class DroneManager : SingletonBase<DroneManager>
     {
         DispatchPendingDeliveries();
         DispatchPendingMining();
+        SyncPreloadRails();
         RefreshOrderMarkers();
+    }
+
+    private void SyncPreloadRails()
+    {
+        if (NetworkRailService.Instance == null)
+        {
+            return;
+        }
+
+        RailBuildViewModel inventory = NetworkRailService.Instance.GetLocalRailBuildViewModel();
+
+        int ownedCount = inventory.GetSlot(RailType.Straight).OwnedCount + inventory.GetSlot(RailType.Corner).OwnedCount;
+        int heldCount = CountPreloadRails();
+
+        if (heldCount < ownedCount)
+        {
+            GivePreloadRail();
+
+            return;
+        }
+
+        if (heldCount > ownedCount)
+        {
+            TakePreloadRailBack();
+        }
+    }
+
+    private int CountPreloadRails()
+    {
+        int count = 0;
+
+        for (int i = 0; i < _workers.Count; i++)
+        {
+            DroneDeliveryWorker carrier = _workers[i] as DroneDeliveryWorker;
+
+            if (carrier != null)
+            {
+                count += carrier.PreloadCount;
+            }
+        }
+
+        return count;
+    }
+
+    private void GivePreloadRail()
+    {
+        if (_preloadRailPrefab == null)
+        {
+            RequestPreloadPrefab();
+
+            return;
+        }
+
+        DroneDeliveryWorker carrier = FindPreloadableCarrier();
+
+        if (carrier == null)
+        {
+            return;
+        }
+
+        GameObject rail = Instantiate(_preloadRailPrefab);
+
+        PreparePreloadVisual(rail);
+
+        if (carrier.TryPreload(rail) == false)
+        {
+            Destroy(rail);
+        }
+    }
+
+    private DroneDeliveryWorker FindPreloadableCarrier()
+    {
+        DroneDeliveryWorker best = null;
+        int bestCount = int.MaxValue;
+
+        for (int i = 0; i < _workers.Count; i++)
+        {
+            DroneDeliveryWorker carrier = _workers[i] as DroneDeliveryWorker;
+
+            if (carrier == null || carrier.CanPreload == false)
+            {
+                continue;
+            }
+
+            if (carrier.PreloadCount >= bestCount)
+            {
+                continue;
+            }
+
+            best = carrier;
+            bestCount = carrier.PreloadCount;
+        }
+
+        return best;
+    }
+
+    private void TakePreloadRailBack()
+    {
+        DroneDeliveryWorker fullest = null;
+        int fullestCount = 0;
+
+        for (int i = 0; i < _workers.Count; i++)
+        {
+            DroneDeliveryWorker carrier = _workers[i] as DroneDeliveryWorker;
+
+            if (carrier == null || carrier.PreloadCount <= fullestCount)
+            {
+                continue;
+            }
+
+            fullest = carrier;
+            fullestCount = carrier.PreloadCount;
+        }
+
+        if (fullest == null)
+        {
+            return;
+        }
+
+        GameObject rail = fullest.TakePreload();
+
+        if (rail != null)
+        {
+            Destroy(rail);
+        }
+    }
+
+    private void PreparePreloadVisual(GameObject rail)
+    {
+        RailOutline outline = rail.GetComponent<RailOutline>();
+
+        if (outline != null)
+        {
+            outline.enabled = false;
+        }
+
+        RailPreviewController preview = rail.GetComponent<RailPreviewController>();
+
+        if (preview != null)
+        {
+            preview.enabled = false;
+        }
+
+        SetPayloadCollision(rail, false);
+    }
+
+    private void RequestPreloadPrefab()
+    {
+        if (_isPreloadPrefabRequested)
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(_preloadRailAddress) || ResourceManager.Instance == null)
+        {
+            return;
+        }
+
+        _isPreloadPrefabRequested = true;
+
+        LoadPreloadPrefabAsync().Forget();
+    }
+
+    private async UniTask LoadPreloadPrefabAsync()
+    {
+        _preloadRailPrefab = await ResourceManager.Instance.LoadAsset<GameObject>(_preloadRailAddress);
+
+        if (_preloadRailPrefab == null)
+        {
+            Debug.LogWarning($"[DroneManager] 사전 적재용 레일 프리팹 로드 실패: {_preloadRailAddress}");
+        }
     }
 
     private void RefreshOrderMarkers()
@@ -666,6 +845,18 @@ public class DroneManager : SingletonBase<DroneManager>
 
     private DroneDeliveryWorker FindNearestIdleCarrier(Vector3 near)
     {
+        DroneDeliveryWorker preloaded = FindNearestIdleCarrier(near, true);
+
+        if (preloaded != null)
+        {
+            return preloaded;
+        }
+
+        return FindNearestIdleCarrier(near, false);
+    }
+
+    private DroneDeliveryWorker FindNearestIdleCarrier(Vector3 near, bool requirePreload)
+    {
         DroneDeliveryWorker best = null;
         float bestDistance = float.MaxValue;
 
@@ -679,6 +870,11 @@ public class DroneManager : SingletonBase<DroneManager>
             }
 
             if (carrier.CanAcceptWork == false)
+            {
+                continue;
+            }
+
+            if (requirePreload && carrier.IsPreloaded == false)
             {
                 continue;
             }

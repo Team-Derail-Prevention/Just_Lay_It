@@ -1457,6 +1457,10 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8851289987671306848, guid: 33dc2d67cae0c034d8d65164778814f5, type: 3}
+      propertyPath: _preloadRailAddress
+      value: Prefab/Rail_Straight
+      objectReference: {fileID: 0}
+    - target: {fileID: 8851289987671306848, guid: 33dc2d67cae0c034d8d65164778814f5, type: 3}
       propertyPath: _spawnEntries.Array.data[0].Count
       value: 1
       objectReference: {fileID: 0}
