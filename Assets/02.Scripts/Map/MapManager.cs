@@ -235,12 +235,13 @@ public class MapManager : SingletonBase<MapManager>
 
         if (isTerminal)
         {
-            (Vector3 dir, Quaternion rot)[] paths = new (Vector3, Quaternion)[]
+            // [수정 포인트] dir(이동 방향), trainRot(기차가 스폰될 회전), railRot(레일 오브젝트가 생성될 시각적 회전)을 분리
+            var paths = new (Vector3 dir, Quaternion trainRot, Quaternion railRot)[]
             {
-                (new Vector3(0, 0, 1), Quaternion.Euler(0, 90, 0)),
-                (new Vector3(0, 0, -1), Quaternion.Euler(0, 90, 0)),
-                (new Vector3(-1, 0, 0), Quaternion.identity),
-                (new Vector3(1, 0, 0), Quaternion.identity)
+                (new Vector3(0, 0, 1),  Quaternion.identity,         Quaternion.Euler(0, 90, 0)), 
+                (new Vector3(0, 0, -1), Quaternion.Euler(0, 180, 0), Quaternion.Euler(0, 90, 0)), 
+                (new Vector3(-1, 0, 0), Quaternion.Euler(0, 270, 0), Quaternion.identity),        
+                (new Vector3(1, 0, 0),  Quaternion.Euler(0, 90, 0),  Quaternion.identity)         
             };
 
             for (int d = 0; d < paths.Length; d++)
@@ -249,17 +250,23 @@ public class MapManager : SingletonBase<MapManager>
                 dirRoot.transform.SetParent(railParent);
                 dirRoot.transform.localPosition = Vector3.zero;
 
+                if (terminal != null)
+                {
+                    terminal.RegisterExitDirRoot(d, dirRoot.transform);
+                }
+
                 for (int i = 0; i < (2 * railCount); i++)
                 {
                     Vector3 offset = paths[d].dir * (_railSpawnOffset + (i * railLength));
                     Vector3 targetPos = centerPos + offset;
-                    Quaternion rot = paths[d].rot;
+
+                    Quaternion rot = paths[d].railRot;
 
                     GameObject railObj = await PlaceSingleRailAsync(targetPos, rot, railHeight, dirRoot.transform);
 
                     if (i == 0 && railObj != null && terminal != null)
                     {
-                        terminal.RegisterStartPoint(d, railObj.transform.position, railObj.transform.rotation);
+                        terminal.RegisterStartPoint(d, railObj.transform.position, paths[d].trainRot);
                     }
                 }
             }
