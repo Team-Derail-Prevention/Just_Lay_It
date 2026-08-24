@@ -36,7 +36,12 @@ public class DroneDockPoint : MonoBehaviour
     {
         if (_anchor == null)
         {
-            return;
+            AttachToCurrentTrain();
+
+            if (_anchor == null)
+            {
+                return;
+            }
         }
 
         Apply();
