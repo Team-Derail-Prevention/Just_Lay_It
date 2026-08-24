@@ -948,7 +948,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DroneStateMachine
   _dock: {fileID: 8386779686349033688}
   _workTrigger: {fileID: 1109667046322424571}
-  _workDuration: 1
+  _workSpeedMultiplier: 3
 --- !u!114 &4523906457424135640
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1057,8 +1057,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31ada48382a94f4438fa55b9b50a7d5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DroneDockPoint
-  _carIndex: 0
-  _localOffset: {x: 0, y: 2, z: -3}
+  _carIndex: 1
+  _localOffset: {x: 0, y: 2, z: 0}
   _topGap: 1
 --- !u!1 &8137033883469855729
 GameObject:

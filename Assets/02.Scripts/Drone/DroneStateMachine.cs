@@ -10,11 +10,13 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
     [SerializeField] private Collider _workTrigger;
 
     [Header("작업")]
-    [SerializeField, Min(0f)] private float _workDuration = 2f;
+    // TODO: 업그레이드 슬롯(DRONE_WORK_SPEED)이 연결되면 인스펙터 값 대신 배율을 주입받는다.
+    [SerializeField, Min(0.01f)] private float _workSpeedMultiplier = 1f;
 
     public DroneState State { get { return _state; } }
     public bool CanAcceptWork { get { return _state == DroneState.Docked || _isReturning; } }
     public Transform Transform { get { return transform; } }
+    public MaterialObject CurrentTarget { get { return _workTarget; } }
 
     private Drone _drone;
     private IAgentMover _mover;
@@ -23,7 +25,6 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
     private DroneState _state = DroneState.Docked;
     private MaterialObject _workTarget;
     private bool _isReturning;
-    private float _workTimer;
 
     private void Awake()
     {
@@ -60,6 +61,8 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
 
     private void OnDisable()
     {
+        UnbindWorkTarget();
+
         _drone.OnArrived -= HandleArrived;
 
         if (_dockPoint != null)
@@ -167,8 +170,6 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
     {
         if (_state == DroneState.Working)
         {
-            UpdateWork();
-
             return;
         }
 
@@ -222,20 +223,35 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
         _mover.Warp(_dock.position);
     }
 
-    private void UpdateWork()
+    private void HandleMiningFinished()
     {
-        _workTimer -= Time.deltaTime;
+        BeginReturn();
+    }
 
-        if (_workTimer > 0f)
+    private void BindWorkTarget()
+    {
+        if (_workTarget == null)
         {
             return;
         }
 
-        BeginReturn();
+        _workTarget.OnMiningFinished += HandleMiningFinished;
+    }
+
+    private void UnbindWorkTarget()
+    {
+        if (_workTarget == null)
+        {
+            return;
+        }
+
+        _workTarget.OnMiningFinished -= HandleMiningFinished;
     }
 
     private void BeginReturn()
     {
+        UnbindWorkTarget();
+
         _isReturning = true;
         _workTarget = null;
 
@@ -271,9 +287,16 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
             return;
         }
 
-        _workTimer = _workDuration;
-
         SetState(DroneState.Working);
+
+        if (_workTarget == null || _workTarget.TryStartMining(_workSpeedMultiplier) == false)
+        {
+            BeginReturn();
+
+            return;
+        }
+
+        BindWorkTarget();
     }
 
     private void SnapToDock()

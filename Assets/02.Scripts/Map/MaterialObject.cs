@@ -6,6 +6,7 @@ using UnityEngine;
 public class MaterialObject : BaseColliderTrigger
 {
     public static event Action<MaterialObjectData> OnMaterialObjectCollected;
+    public event Action OnMiningFinished;
 
     [Header("Material Object Settings")]
     [SerializeField] private string _materialObjectID;
@@ -79,7 +80,19 @@ public class MaterialObject : BaseColliderTrigger
         ReceiveDroneSignalAndStart();
     }
 
-    private void ReceiveDroneSignalAndStart()
+    public bool TryStartMining(float speedMultiplier)
+    {
+        if (_isMining || _isBroken || _isCollected)
+        {
+            return false;
+        }
+
+        ReceiveDroneSignalAndStart(Mathf.Max(0.01f, speedMultiplier));
+
+        return true;
+    }
+
+    private void ReceiveDroneSignalAndStart(float speedMultiplier = 1f)
     {
         if (_isMining || _isBroken || _isCollected)
         {
@@ -88,19 +101,20 @@ public class MaterialObject : BaseColliderTrigger
 
         Debug.Log($"{_materialObjectID},{_materialObjectType},{_materialObjectAmount}");
         Debug.Log($"[MaterialObject] '{_materialObjectID}' 드론 수집 신호(이벤트) 수신 -> 채굴 및 수집 시작");
-        StartMiningAndCollectionProcessAsync(this.GetCancellationTokenOnDestroy()).Forget();
+        StartMiningAndCollectionProcessAsync(speedMultiplier, this.GetCancellationTokenOnDestroy()).Forget();
     }
 
-    private async UniTaskVoid StartMiningAndCollectionProcessAsync(CancellationToken cancellationToken)
+    private async UniTaskVoid StartMiningAndCollectionProcessAsync(float speedMultiplier, CancellationToken cancellationToken)
     {
         _isMining = true;
         Vector3 startPos = transform.position;
         float elapsedTime = 0f;
+        float miningDuration = _defaultMiningDuration / speedMultiplier;
 
-        while (elapsedTime < _defaultMiningDuration && !cancellationToken.IsCancellationRequested)
+        while (elapsedTime < miningDuration && !cancellationToken.IsCancellationRequested)
         {
             elapsedTime += Time.deltaTime;
-            float t = elapsedTime / _defaultMiningDuration;
+            float t = elapsedTime / miningDuration;
 
             transform.localScale = _initialLocalScale * (1f + Mathf.Sin(elapsedTime * 20f) * (0.1f * (1f - t * 0.5f)));
             transform.position = startPos + UnityEngine.Random.insideUnitSphere * _shakeIntensity;
@@ -112,6 +126,8 @@ public class MaterialObject : BaseColliderTrigger
         transform.position = startPos;
 
         BreakObject();
+
+        OnMiningFinished?.Invoke();
 
         await CollectItem(cancellationToken);
     }

@@ -652,11 +652,10 @@ public class RailManager : SingletonBase<RailManager>
             placedCollider.enabled = true;
         }
 
-        _installedRailPath.Add(spawnedRail.transform);
-
         _placedRails[gridIndex] = new PlacedRailInfo { Obj = spawnedRail, Type = railType, RotationStep = rotationStep };
         Debug.Log($"[RailManager] {railType} 레일 설치됨: " + spawnedRail.name);
-        DroneManager.Instance?.RequestDelivery(spawnedRail, worldPos, rotation);
+
+        DroneManager.Deliver(spawnedRail, worldPos, rotation, AddRailToPath);
 
         // 방금 설치한 레일 때문에 옆에 이미 깔려있던 레일의 모양(직선↔코너, 회전)이
         // 바뀌어야 하는지 재계산해서, 필요하면 그 레일을 다시 스폰함
@@ -741,6 +740,8 @@ public class RailManager : SingletonBase<RailManager>
 
         if (oldInfo.Obj != null)
         {
+            DroneManager.TryReplaceDelivery(oldInfo.Obj, spawnedRail);
+
             int pathIndex = _installedRailPath.IndexOf(oldInfo.Obj.transform);
             if (pathIndex != -1)
             {
@@ -922,6 +923,16 @@ public class RailManager : SingletonBase<RailManager>
         }
 
         Debug.Log($"[RailManager] 시작 출구 레일이 기본 경로로 등록되었습니다.");
+    }
+
+    private void AddRailToPath(GameObject rail)
+    {
+        if (rail == null)
+        {
+            return;
+        }
+
+        _installedRailPath.Add(rail.transform);
     }
 
     public Transform GetRailNode(int index)
