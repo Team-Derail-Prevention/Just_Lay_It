@@ -348,6 +348,7 @@ public class GameManager : SingletonBase<GameManager>
         RemovePlayerPlacedRails();
         ChangeGameState(GameState.EventPaused);
 
+        UI?.OpenBaseArrivalUI();
         Debug.Log("[GameManager] 터미널 도착: 출구 방향 선택을 기다립니다.");
         // TODO: Terminal UI를 열고 CentralTerminal.SelectExitGate(int)와 연결필요(?)
     }
