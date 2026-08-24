@@ -897,7 +897,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3d5601a8baca984190619ac08a0a87e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Drone
-  _moveSpeed: 8
+  _moveSpeed: 12
   _slowDownDistance: 1.5
   _arriveSpeed: 0.5
   _arriveDistance: 0.05
