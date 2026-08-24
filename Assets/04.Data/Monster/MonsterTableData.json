@@ -11,7 +11,8 @@
         "DebuffPower": 0,
         "UseAttackSound": "Monster_01_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
-        "UseDieSound": "Monster_01_Die_Sound"
+        "UseDieSound": "Monster_01_Die_Sound",
+        "ProjectileColor": "#FF0000"
     },
     {
         "Id": "Monster_02",
@@ -22,7 +23,8 @@
         "DropGold": 10,
         "UseAttackSound": "Monster_01_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
-        "UseDieSound": "Monster_01_Die_Sound"
+        "UseDieSound": "Monster_01_Die_Sound",
+        "ProjectileColor": "#FF0000"
     },
     {
         "Id": "Monster_03",
@@ -33,7 +35,8 @@
         "DropGold": 20,
         "UseAttackSound": "Monster_01_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
-        "UseDieSound": "Monster_01_Die_Sound"
+        "UseDieSound": "Monster_01_Die_Sound",
+        "ProjectileColor": "#FF0000"
     },
     {
         "Id": "DebuffMonster_01",
@@ -47,7 +50,8 @@
         "DebuffPower": 0,
         "UseAttackSound": "DebuffMonster_01_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
-        "UseDieSound": "Monster_01_Die_Sound"
+        "UseDieSound": "Monster_01_Die_Sound",
+        "ProjectileColor": "#FFFF00"
     },
     {
         "Id": "DebuffMonster_02",
@@ -61,7 +65,8 @@
         "DebuffPower": 0,
         "UseAttackSound": "DebuffMonster_02_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
-        "UseDieSound": "Monster_01_Die_Sound"
+        "UseDieSound": "Monster_01_Die_Sound",
+        "ProjectileColor": "#00FF00"
     },
     {
         "Id": "DebuffMonster_03",
@@ -75,7 +80,8 @@
         "DebuffPower": 0,
         "UseAttackSound": "DebuffMonster_03_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
-        "UseDieSound": "Monster_01_Die_Sound"
+        "UseDieSound": "Monster_01_Die_Sound",
+        "ProjectileColor": "#00FFFF"
     },
     {
         "Id": "DebuffMonster_04",
