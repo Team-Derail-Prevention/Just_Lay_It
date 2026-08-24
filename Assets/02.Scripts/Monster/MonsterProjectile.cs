@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UIElements;
 
 public class MonsterProjectile : MonoBehaviour
 {
@@ -13,7 +14,9 @@ public class MonsterProjectile : MonoBehaviour
     private float _currentTime = 0f;
     private float _lifeTime = 2f;
 
-    public void ProjectileInitialize(Vector3 dir, int atk, string type = "None", float duration = 0f, float power = 0f)
+    [SerializeField] private Renderer _renderer;
+
+    public void ProjectileInitialize(Vector3 dir, int atk, string type = "None", float duration = 0f, float power = 0f, string colorCode = "#FF0000")
     {
         _direction = dir.normalized;
         _damage = atk;
@@ -29,6 +32,7 @@ public class MonsterProjectile : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(_direction) * Quaternion.Euler(0f, 90f, 0f);
         }
 
+        SetColorByHex(colorCode);
     }
 
     private void Update()
@@ -58,6 +62,24 @@ public class MonsterProjectile : MonoBehaviour
             }
 
             PoolManager.Instance.DespawnToPool(gameObject);
+        }
+    }
+
+    private void SetColorByHex(string hexCode)
+    {
+        if (_renderer == null || string.IsNullOrEmpty(hexCode))
+        { 
+            return; 
+        }
+
+        if (ColorUtility.TryParseHtmlString(hexCode, out Color parsedColor))
+        {
+            _renderer.material.color = parsedColor;
+        }
+        else
+        {
+            _renderer.material.color = Color.white;
+            Debug.LogWarning($"Projectile 색상 코드 오류: {hexCode}");
         }
     }
 }
