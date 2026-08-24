@@ -1,6 +1,6 @@
-[
+﻿[
   {
-    "string": "weapon_01",
+    "Id": "NomalWeapon_01",
     "WeaponName": "NomalGun",
     "Atk": 20,
     "FireRate": 3,
