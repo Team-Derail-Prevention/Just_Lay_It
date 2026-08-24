@@ -1,0 +1,12 @@
+[
+  {
+    "string": "weapon_01",
+    "WeaponName": "NomalGun",
+    "Atk": 20,
+    "FireRate": 3,
+    "MagazineSize": 30,
+    "ReloadTime": 2,
+    "UseFireSound": null,
+    "UseReloadSound": null
+  }
+]
