@@ -5,11 +5,34 @@ public class WeaponTargeting : MonoBehaviour
 {
     [SerializeField] private string _enemyTag = "Monster";
 
+    private Transform _LockTarget;
+
     private List<Transform> _targetMonster = new List<Transform>();
 
     public bool HasTarget { get { return _targetMonster.Count > 0; } }
-    public Transform CurrentTarget { get { return GetNearTarget(); } }
+    public Transform CurrentTarget
+    {
+        get
+        {
+            if (IsLockTarget())
+            {
+                return _LockTarget;
+            }
 
+            _LockTarget = GetNearTarget();
+            return _LockTarget;
+        }
+    }
+
+    private void Update()
+    {
+        if (!HasTarget)
+        {
+            return;
+        }
+
+        transform.LookAt(CurrentTarget);
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -58,5 +81,15 @@ public class WeaponTargeting : MonoBehaviour
         }
 
         return nearest;
+    }
+
+    private bool IsLockTarget()
+    {
+        if (_LockTarget == null)
+        {
+            return false;
+        }
+
+        return _targetMonster.Contains(_LockTarget);
     }
 }
