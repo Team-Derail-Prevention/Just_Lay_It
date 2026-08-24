@@ -125,7 +125,7 @@ public class GameManager : SingletonBase<GameManager>
                 await Drone.SpawnAllAsync();
             }
 
-            Train.SpawnFullTrain(_startingCarriageCount);
+            Train.SpawnTerminalTrain(_startingCarriageCount);
 
             // MonsterSpawn은 TrainManager.OnTrainSpawn을 구독하여 풀 초기화 후 스폰을 시작
 
@@ -489,7 +489,6 @@ public class GameManager : SingletonBase<GameManager>
         Debug.LogError($"[GameManager] 필수 매니저 '{managerName}'를 찾지 못했습니다.");
         return false;
     }
-
 
     private void ChangeGameState(GameState newState)
     {
