@@ -1,7 +1,8 @@
-﻿using UnityEngine;
-using System;
-using UnityEngine.UI;
+﻿using System;
 using TMPro;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class UIButton : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class UIButton : MonoBehaviour
     [SerializeField] private Image Image_Select;
 
     private bool _isManualUnbindEvent;
+    private Action _boundCallback;
+    private UnityAction _boundUnityAction;
 
     private void Awake()
     {
@@ -59,15 +62,19 @@ public class UIButton : MonoBehaviour
     {
         if (Button_Base == null) return;
 
-        Button_Base.onClick.AddListener(onClickCallback.Invoke);
+        _boundCallback = onClickCallback;
+        _boundUnityAction = onClickCallback.Invoke;
+        Button_Base.onClick.AddListener(_boundUnityAction);
         _isManualUnbindEvent = isManualUnbindEvent;
     }
 
     public void UnBindOnClickButtonEvent(Action onClickCallback)
     {
-        if (Button_Base == null) return;
+        if (Button_Base == null || _boundUnityAction == null) return;
 
-        Button_Base.onClick.RemoveListener(onClickCallback.Invoke);
+        Button_Base.onClick.RemoveListener(_boundUnityAction);
+        _boundUnityAction = null;
+        _boundCallback = null;
     }
 
     public void UnBindAllOnClickButtonEvent()
@@ -94,5 +101,15 @@ public class UIButton : MonoBehaviour
         }
 
         Image_Select.gameObject.SetActive(isSelected);
+    }
+
+    public void SetInteractable(bool isInteractable)
+    {
+        if (Button_Base == null)
+        {
+            return;
+        }
+
+        Button_Base.interactable = isInteractable;
     }
 }

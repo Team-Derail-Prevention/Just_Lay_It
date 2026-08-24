@@ -117,8 +117,7 @@ public class BaseArrivalUI : UIBase
 
     private void OnClick_WeaponGacha()
     {
-        // 무기 증강 가챠 UI 제작후 추후 수정
-        Debug.Log("[BaseArrivalUI] WeaponGacha 아직 미구현");
+        UIManager.Instance.OpenWeaponGachaUI();
     }
 
     private void OnClick_TrainStrengthening()
