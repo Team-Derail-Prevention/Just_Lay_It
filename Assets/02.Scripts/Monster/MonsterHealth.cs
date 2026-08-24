@@ -1,17 +1,23 @@
 ﻿using UnityEngine;
+using System;
+using System.ComponentModel;
 
 public class MonsterHealth : MonoBehaviour
 {
+    public static event Action<int> OnMonsterDiedWithGold;
+
     private int _maxHp;
     private int _currentHp;
     private bool _isDead = false;
 
+    public int _dropGold;
     public void Initialize(MonsterData data)
     {
         if(data != null)
         {
             _maxHp = data.Hp;
             _currentHp = _maxHp;
+            _dropGold = data.DropGold;
         }
 
         _isDead = false;
@@ -36,6 +42,9 @@ public class MonsterHealth : MonoBehaviour
     private void Die()
     {
         _isDead = true;
+
+        OnMonsterDiedWithGold?.Invoke(_dropGold);
+
         if (MonsterSpawn.Instance != null)
         { 
             MonsterSpawn.Instance.DecreaseMonsterCount();

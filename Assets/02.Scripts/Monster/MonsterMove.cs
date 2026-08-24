@@ -15,8 +15,8 @@ public class MonsterMove : MonoBehaviour
     private Transform _target;
     private bool _isAttackRange = false;
 
-    private readonly int _walk = Animator.StringToHash("IsWalk");
-    private readonly int _attack = Animator.StringToHash("Attack");
+    private readonly int _walk = Animator.StringToHash("IsMove");
+    private readonly int _attack = Animator.StringToHash("IsAttack");
 
     private float _attackTimer = 0f;
     private float _attackCooldown = 2f;
@@ -24,6 +24,8 @@ public class MonsterMove : MonoBehaviour
     private string _attackType;
     private float _debuffDuration;
     private float _debuffPower;
+
+    private string _projectileColor;
 
     private Rigidbody _rb;
 
@@ -69,6 +71,7 @@ public class MonsterMove : MonoBehaviour
             _attackType = data.AttackType;
             _debuffDuration = data.DebuffDuration;
             _debuffPower = data.DebuffPower;
+            _projectileColor = data.ProjectileColor;
         }
     }
 
@@ -89,7 +92,7 @@ public class MonsterMove : MonoBehaviour
             Vector3 targetCenter = new Vector3(_target.position.x, firePosition.position.y, _target.position.z);
             Vector3 shootDir = (targetCenter - firePosition.position).normalized;
 
-            projectile.ProjectileInitialize(shootDir, _monsterAtk, _attackType, _debuffDuration, _debuffPower);
+            projectile.ProjectileInitialize(shootDir, _monsterAtk, _attackType, _debuffDuration, _debuffPower, _projectileColor);
         }
 
     }
