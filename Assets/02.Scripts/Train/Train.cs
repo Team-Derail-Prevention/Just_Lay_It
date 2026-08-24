@@ -58,6 +58,18 @@ public class Train : MonoBehaviour
         {
             MoveTrain();
         }
+
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            Debug.Log("[Cheat] I키 입력: 20 데미지 적용");
+            TakeDamage(20);
+        }
+
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            Debug.Log("[Cheat] O키 입력: 20 회복 적용");
+            Heal(20);
+        }
     }
 
     public void TrainInit(TrainData data)

@@ -8,6 +8,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/01.Scene/Devlop.unity
     guid: 970f28f0ea6ea1d42af31ffad55b0bdb
+  - enabled: 1
+    path: Assets/01.Scene/Test.unity
+    guid: 67ec45daeee64434dbd2f82cda140435
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 4590bc23f3d7c8446b78d4bc334f4b16, type: 2}
   m_UseUCBPForAssetBundles: 0

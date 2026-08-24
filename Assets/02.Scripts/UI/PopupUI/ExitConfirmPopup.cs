@@ -35,6 +35,8 @@ public class ExitConfirmPopup : UIBase
 
     public void Init(string message, Action onConfirmExit, Action onCancel)
     {
+        Debug.Log($"[ExitConfirmPopup] Init 호출됨, onConfirmExit target={onConfirmExit?.Target}, method={onConfirmExit?.Method}");
+
         CaptureDefaultFontSizeIfNeeded();
 
         if (_messageText != null)
@@ -67,13 +69,15 @@ public class ExitConfirmPopup : UIBase
 
     private void OnClick_Yes()
     {
+        Action onConfirmExit = _onConfirmExit;
         UIManager.Instance.CloseExitConfirmPopup();
-        _onConfirmExit?.Invoke();
+        onConfirmExit?.Invoke();
     }
 
     private void OnClick_No()
     {
+        Action onCancel = _onCancel;
         UIManager.Instance.CloseExitConfirmPopup();
-        _onCancel?.Invoke();
+        onCancel?.Invoke();
     }
 }

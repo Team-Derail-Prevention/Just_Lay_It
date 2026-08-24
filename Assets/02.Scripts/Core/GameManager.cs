@@ -198,8 +198,9 @@ public class GameManager : SingletonBase<GameManager>
         ChangeGameState(GameState.GameOver);
         PauseGameplayTime();
 
-        ClearCurrentSession();
+        ReturnToLobby();
 
+        // ClearCurrentSession(); UI가 아직 없어서 주석처리
         // TODO: Result UI를 열고 로비로 돌아가는 UI 흐름필요
     }
 
@@ -458,6 +459,12 @@ public class GameManager : SingletonBase<GameManager>
         ChangeGameState(GameState.Ready);
         NetworkResourceService.ResetRun();
         NetworkWarehouseService.ResetRun();
+
+        UI?.CloseHudTrainStatusUI();
+        UI?.CloseHudResourceUI();
+        UI?.CloseInGameMenuButtonUI();
+        UI?.CloseRailBuildUI();
+
         UI?.OpenContentUI(UIType.LobbyUI);
     }
 
