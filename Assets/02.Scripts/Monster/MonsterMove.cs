@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class MonsterMove : MonoBehaviour
-{    
+{
+    [Header("Animation")]
+    [SerializeField] private Animator _animator;
+
     [SerializeField] private float _attackRange = 5.0f;
     [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private Transform firePosition;
@@ -13,8 +15,15 @@ public class MonsterMove : MonoBehaviour
     private Transform _target;
     private bool _isAttackRange = false;
 
+    private readonly int _walk = Animator.StringToHash("IsWalk");
+    private readonly int _attack = Animator.StringToHash("Attack");
+
     private float _attackTimer = 0f;
     private float _attackCooldown = 2f;
+
+    private string _attackType;
+    private float _debuffDuration;
+    private float _debuffPower;
 
     private Rigidbody _rb;
 
@@ -38,9 +47,8 @@ public class MonsterMove : MonoBehaviour
         }
     }
 
-    public void Initialize(string monsterId, Transform target)
+    public void Initialize(MonsterData data, Transform target)
     {
-        _monsterId = monsterId;
         _target = target;
 
         _isAttackRange = false;
@@ -53,23 +61,18 @@ public class MonsterMove : MonoBehaviour
             firePosition = transform;
         }
 
-        LoadMonsterData();
-    }
-
-    private void LoadMonsterData()
-    {
-        MonsterData monsterData = DataManager.Instance.GetData<MonsterData>(_monsterId);
-
-        if (monsterData != null)
+        if (data != null)
         {
-            _moveSpeed = monsterData.Speed;
-            _monsterAtk = monsterData.Atk;
-        }
-        else
-        {
-            Debug.LogError($"{_monsterId} 몬스터 데이터를 찾을 수 없습니다");
+            _moveSpeed = data.Speed;
+            _monsterAtk = data.Atk;
+
+            _attackType = data.AttackType;
+            _debuffDuration = data.DebuffDuration;
+            _debuffPower = data.DebuffPower;
         }
     }
+
+    
     private void ShootProjectile()
     {
         if (_projectilePrefab == null)
@@ -86,14 +89,20 @@ public class MonsterMove : MonoBehaviour
             Vector3 targetCenter = new Vector3(_target.position.x, firePosition.position.y, _target.position.z);
             Vector3 shootDir = (targetCenter - firePosition.position).normalized;
 
-            projectile.ProjectileInitialize(shootDir, _monsterAtk);
+            projectile.ProjectileInitialize(shootDir, _monsterAtk, _attackType, _debuffDuration, _debuffPower);
         }
+
     }
 
     private void HandleMovement(Vector3 targetPos)
     {
         _isAttackRange = false;
         _attackTimer = 0f;
+
+        if (_animator != null)
+        {
+            _animator.SetBool(_walk, true);
+        }
 
         if (_rb != null)
         {
@@ -117,6 +126,12 @@ public class MonsterMove : MonoBehaviour
         if (!_isAttackRange)
         {
             _isAttackRange = true;
+
+            if (_animator != null)
+            {
+                _animator.SetBool(_walk, false);
+            }
+
         }
 
         transform.LookAt(targetPos);
@@ -125,6 +140,12 @@ public class MonsterMove : MonoBehaviour
         if (_attackTimer >= _attackCooldown)
         {
             _attackTimer = 0f;
+
+            if (_animator != null)
+            {
+                _animator.SetTrigger(_attack);
+            }
+
             ShootProjectile();
         }
     }

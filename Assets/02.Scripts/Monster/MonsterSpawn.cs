@@ -106,13 +106,21 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
 
         if (newMonster != null)
         {
-            MonsterMove moveScript = newMonster.GetComponent<MonsterMove>();
-            if (moveScript != null)
+            MonsterData monsterData = DataManager.Instance.GetData<MonsterData>(monsterId);
+            if (monsterData != null)
             {
-                moveScript.Initialize(monsterId, _mainTrain);
+                MonsterMove moveScript = newMonster.GetComponent<MonsterMove>();
+                if (moveScript != null)
+                {
+                    moveScript.Initialize(monsterData, _mainTrain);
+                }
             }
-
-            //Die가 구현이 안돼어있어서 카운트를 강제로 줄여주기위한 이벤트
+            MonsterHealth healthScript = newMonster.GetComponent<MonsterHealth>();
+            if (healthScript != null)
+            {
+                healthScript.Initialize(monsterData);
+            }
+            
             _currentMonsterCount++;
         }
     }

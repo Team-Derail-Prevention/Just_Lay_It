@@ -45,6 +45,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapManager
   _mapRoot: {fileID: 0}
-  _mapSpacing: 28
-  _stationCountConfig: 4
-  _maxConsecutiveStation: 2
+  _mapSpacing: 30
+  _straightRailAddress: Prefab/Rail_Straight
+  _railSpawnOffset: 2
