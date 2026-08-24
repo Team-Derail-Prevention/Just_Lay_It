@@ -66,8 +66,7 @@ public class InGameMenuPopup : UIBase
     private void ConfirmExitToLobby()
     {
         UIManager.Instance.CloseInGameMenuPopup();
-
-        // 게임매니저에 인게임 내용 정리하고 로비로 나가는 방식으로 추후 수정
+        GameManager.Instance.ReturnToLobby();
     }
 
     private void OnClick_QuitGame()

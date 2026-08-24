@@ -27,6 +27,8 @@ public class GameStartCountdownPopup : UIBase
     }
     private void UpdateCountdownText(int remainingSeconds)
     {
+        Debug.Log($"[Popup] Received: {remainingSeconds}, TextRef null? {Text_Countdown == null}");
+
         if (remainingSeconds > 0)
         {
             if (Text_Countdown != null)
