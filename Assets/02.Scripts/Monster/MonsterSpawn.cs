@@ -29,14 +29,6 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
     private async void Start()
     {
         await InitializePoolAsync();
-
-        if (_mainTrain == null)
-        {
-            return;
-        }
-
-        WaitAndStartSpawningAsync().Forget();
-
     }
 
     private void Update()

@@ -11,6 +11,10 @@ public class GameManager : SingletonBase<GameManager>
     [Header("Runtime State")]
     [SerializeField] private GameState _currentGameState = GameState.Ready;
 
+    [Header("Session Records")]
+    [SerializeField] private int _sessionKillCount = 0;
+    [SerializeField] private int _sessionEarnedGold = 0;
+
     private readonly TimeManager _timeManager = new TimeManager();
 
     private Transform _managerRoot;
@@ -21,6 +25,9 @@ public class GameManager : SingletonBase<GameManager>
     private int _sessionVersion;
     private float _playTime;
     private int _lastNotifiedTime;
+
+    public int SessionKillCount => _sessionKillCount;
+    public int SessionEarnedGold => _sessionEarnedGold;
 
     public event Action<int> OnCountdownChanged;
 
@@ -66,6 +73,7 @@ public class GameManager : SingletonBase<GameManager>
         StationObject.OnStationEntered += HandleStationEntered;
         CentralTerminal.OnCentralTerminalEntered += HandleCentralTerminalEntered;
         CentralTerminal.OnExitDirectionSelected += SelectExitDirection;
+        MonsterHealth.OnMonsterDiedWithGold += HandleMonsterDied;
     }
 
     private void Start()
@@ -91,6 +99,7 @@ public class GameManager : SingletonBase<GameManager>
         StationObject.OnStationEntered -= HandleStationEntered;
         CentralTerminal.OnCentralTerminalEntered -= HandleCentralTerminalEntered;
         CentralTerminal.OnExitDirectionSelected -= SelectExitDirection;
+        MonsterHealth.OnMonsterDiedWithGold -= HandleMonsterDied;
     }
 
     public async UniTask StartGame()
@@ -125,7 +134,7 @@ public class GameManager : SingletonBase<GameManager>
                 await Drone.SpawnAllAsync();
             }
 
-            Train.SpawnFullTrain(_startingCarriageCount);
+            Train.SpawnTerminalTrain(_startingCarriageCount);
 
             // MonsterSpawn은 TrainManager.OnTrainSpawn을 구독하여 풀 초기화 후 스폰을 시작
 
@@ -431,12 +440,27 @@ public class GameManager : SingletonBase<GameManager>
         Debug.Log("[GameManager] 플레이어가 설치한 레일을 모두 제거했습니다.");
     }
 
+    private void HandleMonsterDied(int dropGold)
+    {
+        if (_currentGameState != GameState.Playing)
+        {
+            return;
+        }
+
+        _sessionKillCount++;
+        _sessionEarnedGold += dropGold;
+
+        Debug.Log($"몬스터 처치 현재 킬: {_sessionKillCount} / 누적 골드: {_sessionEarnedGold} (+{dropGold})");
+    }
+
     private void ResetSessionState()
     {
         _activeStation = null;
         _activeTerminal = null;
         _playTime = 0f;
         _lastNotifiedTime = 0;
+        _sessionKillCount = 0;
+        _sessionEarnedGold = 0;
     }
 
     /// 게임 오버 로비 복귀 공통 사용
@@ -489,7 +513,6 @@ public class GameManager : SingletonBase<GameManager>
         Debug.LogError($"[GameManager] 필수 매니저 '{managerName}'를 찾지 못했습니다.");
         return false;
     }
-
 
     private void ChangeGameState(GameState newState)
     {

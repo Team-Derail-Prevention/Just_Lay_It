@@ -71,3 +71,37 @@ public static class TrainTypeConst
     public const string Standard = "Standard";
     public const string Cargo = "Cargo";
 }
+
+[Serializable]
+public class DroneUpgradeData : GameDataBase
+{
+    public string Name;
+    public string Description;
+    public string TargetStatType;
+    public string Operation;
+    public float Value;
+    public int MaxLevel;
+    public int GoldCost;
+    public int GoldCostPerLevel;
+    public string IconPath;
+}
+
+public static class DroneUpgradeIdConst
+{
+    public const string WorkSpeed = "DRONE_WORK_SPEED";
+    public const string MoveSpeed = "DRONE_MOVE_SPEED";
+    public const string YieldBonus = "DRONE_YIELD_BONUS";
+}
+
+public static class UpgradeOperationConst
+{
+    public const string Add = "Add";
+    public const string AddPercent = "AddPercent";
+}
+
+public static class DroneStatTypeConst
+{
+    public const string WorkSpeed = "WorkSpeed";
+    public const string MoveSpeed = "MoveSpeed";
+    public const string YieldBonus = "YieldBonus";
+}
