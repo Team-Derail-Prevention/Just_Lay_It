@@ -458,6 +458,12 @@ public class GameManager : SingletonBase<GameManager>
         ChangeGameState(GameState.Ready);
         NetworkResourceService.ResetRun();
         NetworkWarehouseService.ResetRun();
+
+        UI?.CloseHudTrainStatusUI();
+        UI?.CloseHudResourceUI();
+        UI?.CloseInGameMenuButtonUI();
+        UI?.CloseRailBuildUI();
+
         UI?.OpenContentUI(UIType.LobbyUI);
     }
 
