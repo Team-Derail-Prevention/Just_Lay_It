@@ -22,6 +22,7 @@ public class CentralTerminal : BaseColliderTrigger
     [SerializeField] private RailSpawnInfo[] _startPoints = new RailSpawnInfo[4];
 
     public int StoredMaterialCount => _storedMaterialCount;
+    public Transform[] ExitDirRoots = new Transform[4];
 
     public void RegisterStartPoint(int index, Vector3 pos, Quaternion rot)
     {
@@ -73,5 +74,13 @@ public class CentralTerminal : BaseColliderTrigger
         RailSpawnInfo selectedRailInfo = GetStartPoint(directionIndex);
         Debug.Log($"[CentralTerminal] 출구 방향 {directionIndex} 선택됨! 스폰 위치: {selectedRailInfo.position}, 회전: {selectedRailInfo.rotation.eulerAngles}");
 
+    }
+
+    public void RegisterExitDirRoot(int dirIndex, Transform dirRoot)
+    {
+        if (dirIndex >= 0 && dirIndex < ExitDirRoots.Length)
+        {
+            ExitDirRoots[dirIndex] = dirRoot;
+        }
     }
 }
