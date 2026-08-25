@@ -24,6 +24,8 @@ public class Train : MonoBehaviour
     private float _totalDistance = 0f;
     private bool _isBroken = false;
 
+    public float TotalDistance { get { return _totalDistance; } }
+
 
     public bool IsMoving
     {

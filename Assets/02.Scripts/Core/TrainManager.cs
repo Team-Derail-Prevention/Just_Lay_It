@@ -30,7 +30,7 @@ public class TrainManager : SingletonBase<TrainManager>
         base.Init();
     }
 
-
+    // 터미널 스폰 + 동,서,남,북 선택 시 이동
     public void SpawnTerminalTrain(int carriageCount)
     {
         CentralTerminal terminal = GameManager.Map.MapRoot.GetComponentInChildren<CentralTerminal>();
@@ -45,6 +45,29 @@ public class TrainManager : SingletonBase<TrainManager>
         GameManager.Rail?.InitStartingRailPath(terminal.ExitDirRoots[0]);
         SpawnFullTrain(startInfo.position, startInfo.rotation, carriageCount);
     }
+
+    public void SpawnStationTrain(StationObject station, int carriageCount)
+    {
+        if (station == null)
+        {
+            Debug.LogError("[TrainManager] StationObject 정보가 없어 스폰할 수 없습니다.");
+            return;
+        }
+
+        //머리 진행 방향 기준 (0: 서쪽, 1: 동쪽)
+        Vector3 forward = (_headTrain != null) ? _headTrain.forward : Vector3.forward;
+        int exitIndex = (forward.x >= 0f) ? 1 : 0;
+
+        StationObject.RailSpawnInfo exitInfo = station.GetStartPoint(exitIndex);
+        Transform exitDirRoot = station._exitDirRoots[exitIndex];
+
+        if (exitDirRoot != null)
+        {
+            GameManager.Rail?.InitStartingRailPath(exitDirRoot);
+        }
+
+        SpawnFullTrain(exitInfo.position, exitInfo.rotation, carriageCount);
+    }       
 
     public void ClearExistingTrain()
     {
@@ -118,7 +141,15 @@ public class TrainManager : SingletonBase<TrainManager>
         Debug.Log($"[TrainManager] 기관차 1대와 객차 {carriageCount}대 전체 소환 완료!");
     }
 
-    public void RelocateTrain(Vector3 spawnPos, Quaternion spawnRot)
+    public float GetHeadTrainDistance()
+    {
+        if (_headTrain == null) return 0f;
+
+        Train head = _headTrain.GetComponent<Train>();
+        return head != null ? head.TotalDistance : 0f;
+    }
+
+    public void RelocateTrain(Vector3 spawnPos, Quaternion spawnRot) // 출구 선택 시 스폰으로 소환 예정이기에 폐기 예정
     {
         if (_headTrain == null)
         {
@@ -217,6 +248,19 @@ public class TrainManager : SingletonBase<TrainManager>
         return null;
     }
 
+    public void AddVisitedStation(Transform stationTransform)
+    {
+        if (stationTransform != null && !visitedStation.Contains(stationTransform))
+        {
+            visitedStation.Add(stationTransform);
+        }
+    }
+
+    public bool IsVisitedStation(Transform stationTransform)
+    {
+        return stationTransform != null && visitedStation.Contains(stationTransform);
+    }
+
     public void ArriveStation(GameObject stationObj)
     {
         if (IsStation)
@@ -224,11 +268,11 @@ public class TrainManager : SingletonBase<TrainManager>
             return;
         }
 
-            visitedStation.Add(stationObj.transform);
-            IsStation = true;
-            SetCarriagesActive(false);
-            Debug.Log("[TrainManager] 기차역 도착 : 정차 상태");
-            OnStationState?.Invoke(true);
+        visitedStation.Add(stationObj.transform);
+        IsStation = true;
+        SetCarriagesActive(false);
+        Debug.Log("[TrainManager] 기차역 도착 : 정차 상태");
+        OnStationState?.Invoke(true);
     }
 
     public void DepartStation()
