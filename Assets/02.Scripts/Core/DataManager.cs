@@ -72,6 +72,7 @@ public class DataManager : SingletonBase<DataManager>
         await LoadDataAsync<MaterialObjectData>("MaterialObjectData", cancellationToken);
         await LoadDataAsync<TrainData>("TrainData", cancellationToken);
         await LoadDataAsync<DroneUpgradeData>("DroneUpgradeData", cancellationToken);
+        await LoadDataAsync<WeaponData>("WeaponData", cancellationToken);
 
         IsLoaded = true;
         OnDataLoadCompleted?.Invoke();

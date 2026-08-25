@@ -42,7 +42,6 @@ public class MaterialObject : BaseColliderTrigger
     public bool IsBroken => _isBroken;
     public bool IsMining => _isMining;
 
-    // TODO: 드론 이벤트 구독필요
 
     protected void OnEnable()
     {
@@ -52,7 +51,6 @@ public class MaterialObject : BaseColliderTrigger
 
     private void Update()
     {
-        // [테스트용 입력] 마이너스 : "채굴/수집 시작 이벤트"
         if (!_isMining && !_isBroken && !_isCollected && Input.GetKeyDown(KeyCode.Minus))
         {
             ReceiveDroneSignalAndStart();
@@ -138,11 +136,6 @@ public class MaterialObject : BaseColliderTrigger
         _isBroken = true;
         transform.localScale = Vector3.one * _brokenScale;
         transform.position += Vector3.up * _hoverHeight;
-
-        if (_itemCollider != null)
-        {
-            _itemCollider.isTrigger = true;
-        }
 
         Debug.Log($"[MaterialObject] '{_materialObjectID}' 채굴 완료 및 파괴 전환 (수집 연출로 자동 전환)");
     }
