@@ -334,7 +334,6 @@ public class GameManager : SingletonBase<GameManager>
         ChangeGameState(GameState.EventPaused);
 
         Debug.Log($"[GameManager] 역 도착: '{stationId}' 이벤트 처리를 기다립니다.");
-        UI?.OpenBaseArrivalUI();
         // TODO: Station UI를 열고 CompleteStation(bool)을 호출하도록 연결필요
     }
 
@@ -350,6 +349,7 @@ public class GameManager : SingletonBase<GameManager>
 
         UI?.OpenBaseArrivalUI();
         Debug.Log("[GameManager] 터미널 도착: 출구 방향 선택을 기다립니다.");
+        UI?.OpenBaseArrivalUI();
         // TODO: Terminal UI를 열고 CentralTerminal.SelectExitGate(int)와 연결필요(?)
     }
 
@@ -379,7 +379,7 @@ public class GameManager : SingletonBase<GameManager>
         UnityEngine.Time.timeScale = 1f;
     }
 
-    public async UniTask StartCountdownAsync()
+    public async UniTask StartCountdownAsync(Action onComplete = null)
     {
         if (_isCountdownRunning) return;
 
@@ -396,6 +396,8 @@ public class GameManager : SingletonBase<GameManager>
                 await UniTask.Delay(1000, ignoreTimeScale: true, cancellationToken: this.GetCancellationTokenOnDestroy());
 
                 if (sessionVersion != _sessionVersion) return;
+                GameStartCountdownPopup countdownPopup = UI?.OpenGameStartCountdownPopup();
+                countdownPopup?.Init(onComplete);
             }
             OnCountdownChanged?.Invoke(0); // UI 카운트 끝 신호 
 
@@ -450,6 +452,8 @@ public class GameManager : SingletonBase<GameManager>
 
         _sessionKillCount++;
         _sessionEarnedGold += dropGold;
+
+        NetworkUpgradeService?.GainGold(dropGold);
 
         Debug.Log($"몬스터 처치 현재 킬: {_sessionKillCount} / 누적 골드: {_sessionEarnedGold} (+{dropGold})");
     }
