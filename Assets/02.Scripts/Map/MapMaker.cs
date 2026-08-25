@@ -207,7 +207,44 @@ public class MapMaker : MonoBehaviour
                 return false;
             });
 
-            Debug.Log($"[MapMaker] [{_mapCategory}] 스테이션 배치 완료 및 정중앙 3x3 보호 / 5x5 스폰 제한 구역 설정됨.");
+            // ==========================================
+            // ✅ [추가] 런타임 MapManager의 레일 생성 규칙과 연동하여
+            // 레일 예상 경로 및 주변 1칸 범위에 부쉬/오브젝트 스폰 원천 차단
+            // ==========================================
+            float railSpawnOffset = 2f;
+            float railLength = 2f;
+            List<Vector3> railDirections = new List<Vector3>();
+
+            if (_mapCategory == MapCategory.CentralTerminal)
+            {
+                railDirections.Add(new Vector3(0, 0, 1));
+                railDirections.Add(new Vector3(0, 0, -1));
+                railDirections.Add(new Vector3(-1, 0, 0));
+                railDirections.Add(new Vector3(1, 0, 0));
+            }
+            else if (_mapCategory == MapCategory.Station)
+            {
+                railDirections.Add(new Vector3(-1, 0, 0));
+                railDirections.Add(new Vector3(1, 0, 0));
+            }
+
+            foreach (var dir in railDirections)
+            {
+                // MapManager에서 생성하는 레일 개수(최대 약 6개)만큼 미리 반복하여 경로 확보
+                for (int i = 0; i < 6; i++)
+                {
+                    Vector3 expectedRailPos = Vector3.zero + dir * (railSpawnOffset + (i * railLength));
+
+                    availablePositions.RemoveAll(pos => {
+                        float distX = Mathf.Abs(pos.x - expectedRailPos.x);
+                        float distZ = Mathf.Abs(pos.z - expectedRailPos.z);
+                        // 레일 위치 및 주변 1칸(_spacing인 2 기준이므로 2.1f 이내) 차단
+                        return distX <= 2.1f && distZ <= 2.1f;
+                    });
+                }
+            }
+
+            Debug.Log($"[MapMaker] [{_mapCategory}] 스테이션 및 레일 예상 경로 주변 1칸에 부쉬/오브젝트 스폰 제외 완료.");
         }
         else
         {
@@ -279,7 +316,6 @@ public class MapMaker : MonoBehaviour
             availablePositions.RemoveAt(index);
 
             SetTileBakedOccupancy(basePos, posToTileObj, true);
-
 
             int prefabIndex = rand.Next(0, _obstaclePrefabs.Count);
             GameObject selectedPrefab = _obstaclePrefabs[prefabIndex];

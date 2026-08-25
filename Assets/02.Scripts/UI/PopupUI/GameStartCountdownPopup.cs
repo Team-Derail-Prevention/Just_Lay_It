@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System;
-using Cysharp.Threading.Tasks;
 using TMPro;
 
 public class GameStartCountdownPopup : UIBase
@@ -9,12 +8,12 @@ public class GameStartCountdownPopup : UIBase
 
     private Action _onComplete;
 
-    public void Init(Action onComplete)
+    private void OnEnable()
     {
-        _onComplete = onComplete;
-
-        GameManager.Instance.OnCountdownChanged += UpdateCountdownText;
-        GameManager.Instance.StartCountdownAsync().Forget();
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnCountdownChanged += UpdateCountdownText;
+        }
     }
 
     private void OnDisable()
@@ -24,11 +23,16 @@ public class GameStartCountdownPopup : UIBase
             GameManager.Instance.OnCountdownChanged -= UpdateCountdownText;
         }
 
+        _onComplete = null;
     }
+
+    public void Init(Action onComplete = null)
+    {
+        _onComplete = onComplete;
+    }
+
     private void UpdateCountdownText(int remainingSeconds)
     {
-        Debug.Log($"[Popup] Received: {remainingSeconds}, TextRef null? {Text_Countdown == null}");
-
         if (remainingSeconds > 0)
         {
             if (Text_Countdown != null)
@@ -38,10 +42,11 @@ public class GameStartCountdownPopup : UIBase
         }
         else
         {
-            GameManager.Instance.OnCountdownChanged -= UpdateCountdownText;
+            Action onComplete = _onComplete;
+
             UIManager.Instance.CloseGameStartCountdownPopup();
 
-            _onComplete?.Invoke();
+            onComplete?.Invoke();
         }
     }
 }
