@@ -35,6 +35,7 @@ public enum UIType
     StationArrivalUI,
     GameStartCountdownPopup,
     WeaponGachaUI,
+    ScoreUI,
 }
 public static class UIManagerExtension
 {
@@ -385,6 +386,28 @@ public static class UIManagerExtension
     public static void CloseWeaponGachaUI(this UIManager uiManager)
     {
         uiManager.ClosePopupUI(UIType.WeaponGachaUI);
+    }
+
+    public static ScoreUI OpenScoreUI(this UIManager uiManager, float totalDistance, int rescuedHumanCount, int collectedResourceCount, int killCount, Action onConfirm)
+    {
+        var uiBase = uiManager.OpenPopupUI(UIType.ScoreUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("ScoreUI가 생성되지 않았습니다");
+            return null;
+        }
+
+        if (uiBase is ScoreUI scoreUI)
+        {
+            scoreUI.Init(totalDistance, rescuedHumanCount, collectedResourceCount, killCount, onConfirm);
+        }
+
+        return uiBase as ScoreUI;
+    }
+
+    public static void CloseScoreUI(this UIManager uiManager)
+    {
+        uiManager.ClosePopupUI(UIType.ScoreUI);
     }
 
     public static void OpenRailPlaceConfirmPopup(this UIManager uiManager, Action onRotate, Action onConfirm, Action onCancel)
