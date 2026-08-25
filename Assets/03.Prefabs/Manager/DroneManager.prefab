@@ -49,7 +49,7 @@ MonoBehaviour:
   - Address: Prefab/Drone
     Count: 1
   - Address: Prefab/Drone_Rail
-    Count: 1
+    Count: 2
   _spawnRoot: {fileID: 1310377152663819632}
   _maxMiningOrders: 3
   _orderMarkerMaterial: {fileID: 2100000, guid: 02a6d890caa9fe543952460ecc9658b2, type: 2}
