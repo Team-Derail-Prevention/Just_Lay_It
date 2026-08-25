@@ -137,11 +137,6 @@ public class MaterialObject : BaseColliderTrigger
         transform.localScale = Vector3.one * _brokenScale;
         transform.position += Vector3.up * _hoverHeight;
 
-        if (_itemCollider != null)
-        {
-            _itemCollider.isTrigger = true;
-        }
-
         Debug.Log($"[MaterialObject] '{_materialObjectID}' 채굴 완료 및 파괴 전환 (수집 연출로 자동 전환)");
     }
 
