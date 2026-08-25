@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class Train : MonoBehaviour
 {
@@ -54,7 +53,7 @@ public class Train : MonoBehaviour
             _isMoving = !_isMoving;
         }
 
-        if (_isMoving && !_isBroken)
+        if (GameManager.Instance.CurrentGameState == GameState.Playing && _isMoving && !_isBroken)
         {
             MoveTrain();
         }
