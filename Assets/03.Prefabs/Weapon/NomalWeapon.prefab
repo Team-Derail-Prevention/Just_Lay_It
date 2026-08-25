@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponFire
   _weaponId: NomalWeapon_01
-  _projectileAddressableKey: WeaponProjectile
+  _projectileId: WeaponProjectile
   _firePosition: {fileID: 4604020578338008291}
   _weaponTargeting: {fileID: 2569285876436646186}
 --- !u!114 &2569285876436646186

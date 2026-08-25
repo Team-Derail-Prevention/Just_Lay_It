@@ -8,11 +8,10 @@ public class PoolManager : MonoBehaviour
 
     private Dictionary<string, Queue<GameObject>> _objectPools = new();
     private Dictionary<string, List<GameObject>> _activedObjects = new();
+    private Dictionary<string, GameObject> _prefabMap = new(); // poolId -> prefab, 여러 시스템이 각자 등록해도 서로 안 지워짐
     private Transform _poolRoot;
 
-    private Func<string, GameObject> _resourceLoader;
-
-    private void Awake() 
+    private void Awake()
     {
         if (Instance == null)
         {
@@ -23,14 +22,31 @@ public class PoolManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    public void Init(Transform poolRoot, Dictionary<string, int> initialPoolData, Func<string, GameObject> resourceLoader = null)
+
+    // 여러 시스템(MonsterSpawn, WeaponFire 등)이 각자 Init()을 호출해도 서로의
+    // 등록을 안 지우도록, prefabMap은 통째로 교체하지 않고 키 단위로 합쳐짐(merge).
+    // poolRoot도 null이 아닐 때만 갱신해서 먼저 설정한 쪽이 유지되게 함.
+    public void Init(Transform poolRoot, Dictionary<string, int> initialPoolData, Dictionary<string, GameObject> prefabMap = null)
     {
-        _poolRoot = poolRoot;
-        _resourceLoader = resourceLoader;
+        if (poolRoot != null)
+        {
+            _poolRoot = poolRoot;
+        }
+
+        if (prefabMap != null)
+        {
+            foreach (var kvp in prefabMap)
+            {
+                _prefabMap[kvp.Key] = kvp.Value;
+            }
+        }
 
         if (initialPoolData == null)
         {
-            Debug.LogWarning("[PoolManager] 초기화할 풀 데이터가 없습니다. 빈 상태로 시작합니다.");
+            if (prefabMap == null)
+            {
+                Debug.LogWarning("[PoolManager] 초기화할 풀 데이터도 프리팹 맵도 없습니다. 아무 것도 하지 않습니다.");
+            }
             return;
         }
 
@@ -176,18 +192,11 @@ public class PoolManager : MonoBehaviour
 
     private GameObject LoadGameObject(string address)
     {
-        GameObject gameObject = null;
-
-        if (_resourceLoader != null)
+        if (_prefabMap.TryGetValue(address, out GameObject mappedPrefab) && mappedPrefab != null)
         {
-            gameObject = _resourceLoader.Invoke(address);
+            return mappedPrefab;
         }
 
-        if (gameObject == null)
-        {
-            gameObject = Resources.Load<GameObject>($"Pool/{address}");
-        }
-
-        return gameObject;
+        return Resources.Load<GameObject>($"Pool/{address}");
     }
 }

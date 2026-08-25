@@ -46,12 +46,12 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
 
     private void OnDisable()
     {
-       TrainManager.OnTrainSpawn -= HandleTrainSpawn;
+        TrainManager.OnTrainSpawn -= HandleTrainSpawn;
     }
 
     public void StartSpawning()
     {
-        if(_isSpawning == true)
+        if (_isSpawning == true)
         {
             return;
         }
@@ -94,7 +94,7 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
         }
         string monsterId = GetMonsterIdForCurrentPhase();
 
-        GameObject newMonster = PoolManager.Instance.SpawnFromPool(monsterId, spawnPos );
+        GameObject newMonster = PoolManager.Instance.SpawnFromPool(monsterId, spawnPos);
 
         if (newMonster != null)
         {
@@ -112,7 +112,7 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
             {
                 healthScript.Initialize(monsterData);
             }
-            
+
             _currentMonsterCount++;
         }
     }
@@ -184,12 +184,13 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
             { projectileId, 20 }
         };
 
-        PoolManager.Instance.Init(this.transform, initialPool, (id) =>
+        Dictionary<string, GameObject> prefabMap = new Dictionary<string, GameObject>
         {
-            if (id == targetMonsterId) return monsterPrefab;
-            if (id == projectileId) return projectilePrefab;
-            return null;
-        });
+            { targetMonsterId, monsterPrefab },
+            { projectileId, projectilePrefab }
+        };
+
+        PoolManager.Instance.Init(this.transform, initialPool, prefabMap);
 
         Debug.Log("[MonsterSpawn] 몬스터 프리팹 사전 로드 및 풀 초기화 완료!");
     }
