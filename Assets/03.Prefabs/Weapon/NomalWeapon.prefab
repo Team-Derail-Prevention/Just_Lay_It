@@ -29,7 +29,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4604020578338008291}
+  - {fileID: 7786393527460159393}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &807855997585076235
@@ -43,11 +43,8 @@ GameObject:
   - component: {fileID: 4604020578338008291}
   - component: {fileID: 2108959497149666998}
   - component: {fileID: 3464747615627749516}
-  - component: {fileID: 5231413262877795942}
-  - component: {fileID: 3250104237799892594}
-  - component: {fileID: 7988553148208724448}
   m_Layer: 0
-  m_Name: Weapon
+  m_Name: WeaponModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -61,13 +58,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 807855997585076235}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 108.9937, y: 108.9937, z: 72.52602}
+  m_LocalRotation: {x: -0, y: 0.7071068, z: 0.7071068, w: 0}
+  m_LocalPosition: {x: 0.03612, y: 0, z: -0.23085}
+  m_LocalScale: {x: 108.9937, y: 108.993706, z: 72.52602}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 9071652635691890403}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 180}
+  m_Father: {fileID: 7786393527460159393}
+  m_LocalEulerAnglesHint: {x: 270, y: 0, z: -180}
 --- !u!33 &2108959497149666998
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -126,42 +123,77 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &5231413262877795942
+--- !u!1 &4789990363017123082
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7786393527460159393}
+  - component: {fileID: 6529192293178686584}
+  - component: {fileID: 2569285876436646186}
+  - component: {fileID: 7544517233656898409}
+  m_Layer: 0
+  m_Name: WeaponBase
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7786393527460159393
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4789990363017123082}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4604020578338008291}
+  m_Father: {fileID: 9071652635691890403}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6529192293178686584
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 807855997585076235}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a13436913f013104aa9f64df51df19b5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WeaponTargeting
-  _enemyTag: Monster
---- !u!114 &3250104237799892594
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 807855997585076235}
+  m_GameObject: {fileID: 4789990363017123082}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb902943419949c499efd67a54dceffa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponFire
   _weaponId: NomalWeapon_01
-  _projectilePrefab: {fileID: 5422885236645553885, guid: 1f078eeb8d5e93349a8ff4c950ed2aa7, type: 3}
+  _projectileAddressableKey: WeaponProjectile
   _firePosition: {fileID: 4604020578338008291}
-  _weaponTargeting: {fileID: 5231413262877795942}
---- !u!135 &7988553148208724448
+  _weaponTargeting: {fileID: 2569285876436646186}
+--- !u!114 &2569285876436646186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4789990363017123082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a13436913f013104aa9f64df51df19b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponTargeting
+  _enemyTag: Monster
+--- !u!135 &7544517233656898409
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 807855997585076235}
+  m_GameObject: {fileID: 4789990363017123082}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -174,5 +206,5 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.1
-  m_Center: {x: 0, y: -0.0006571863, z: -0.0007889623}
+  m_Radius: 6
+  m_Center: {x: 0, y: 0, z: 0}

@@ -39,11 +39,11 @@ public class WeaponProjectile : MonoBehaviour
         {
             Debug.Log("Hit Monster");
 
-            // MonsterHealth monsterHp = other.GetComponent<MonsterHealth>();
-            // if (monsterHp != null)
-            // {
-            //     monsterHp.TakeDamage(_damage);
-            // }
+            MonsterHealth monsterHp = other.GetComponent<MonsterHealth>();
+            if (monsterHp != null)
+            {
+                monsterHp.TakeDamage(_damage);
+            }
 
             PoolManager.Instance.DespawnToPool(gameObject);
         }

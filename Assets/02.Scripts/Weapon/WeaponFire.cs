@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
+using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 
 public class WeaponFire : MonoBehaviour
 {
     [SerializeField] private string _weaponId;
-    [SerializeField] private GameObject _projectilePrefab;
+    [SerializeField] private string _projectileAddressableKey = "WeaponProjectile";
     [SerializeField] private Transform _firePosition;
     [SerializeField] private WeaponTargeting _weaponTargeting;
 
@@ -16,6 +18,10 @@ public class WeaponFire : MonoBehaviour
     private float _fireTimer = 0f;
     private float _reloadTimer = 0f;
     private bool _isReloading = false;
+
+    private bool _isInitialized = false;
+
+    private GameObject _loadedProjectilePrefab;
 
     private void Awake()
     {
@@ -30,13 +36,50 @@ public class WeaponFire : MonoBehaviour
         }
     }
 
-    private void Start()
+    private async void Start()
+    {
+        await InitializeAsync();
+    }
+
+    private async UniTask InitializeAsync()
     {
         LoadWeaponData();
+
+        _loadedProjectilePrefab = await ResourceManager.Instance.LoadAsset<GameObject>(_projectileAddressableKey);
+
+        if (_loadedProjectilePrefab == null)
+        {
+            Debug.LogError($"{_projectileAddressableKey} 프리팹을 찾을 수 없습니다! Addressable 체크를 확인하세요.");
+            return;
+        }
+
+        Dictionary<string, int> initialPool = new Dictionary<string, int>
+        {
+            { _projectileAddressableKey, 20 }
+        };
+
+        PoolManager.Instance.Init(this.transform, initialPool, GetProjectilePrefab);
+
+        _isInitialized = true;
+        Debug.Log("[WeaponFire] 투사체 프리팹 어드레서블 로드 및 풀 초기화 완료!");
+    }
+
+    private GameObject GetProjectilePrefab(string id)
+    {
+        if (id == _projectileAddressableKey)
+        {
+            return _loadedProjectilePrefab;
+        }
+        return null;
     }
 
     private void Update()
     {
+        if (!_isInitialized)
+        {
+            return;
+        }
+
         if (_isReloading)
         {
             HandleReload();
@@ -84,19 +127,13 @@ public class WeaponFire : MonoBehaviour
 
     private void ShootProjectile()
     {
-        if (_projectilePrefab == null)
-        {
-            return;
-        }
-
         Transform target = _weaponTargeting.CurrentTarget;
         if (target == null)
         {
             return;
         }
 
-        string projectilePoolId = _projectilePrefab.name;
-        GameObject projObj = PoolManager.Instance.SpawnFromPool(projectilePoolId, _firePosition.position, Quaternion.identity);
+        GameObject projObj = PoolManager.Instance.SpawnFromPool(_projectileAddressableKey, _firePosition.position, Quaternion.identity);
 
         WeaponProjectile projectile = projObj.GetComponent<WeaponProjectile>();
         if (projectile != null)
