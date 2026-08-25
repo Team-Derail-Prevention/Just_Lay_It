@@ -661,7 +661,6 @@ public class RailManager : SingletonBase<RailManager>
         // 바뀌어야 하는지 재계산해서, 필요하면 그 레일을 다시 스폰함
         UpdateNeighborShapes(gridIndex);
 
-        ConnectStationRails(spawnedRail.transform);
 
         ExitPlaceMode(clearPlacedRails: false);
     }
@@ -862,9 +861,15 @@ public class RailManager : SingletonBase<RailManager>
     {
         if (placedRail == null) return;
 
+        if (!_installedRailPath.Contains(placedRail))
+        {
+            return;
+        }
+
         Vector3 placedPos = placedRail.position;
-        // 주변 2~2.5m 내의 레일 콜라이더 탐색
-        Collider[] hits = Physics.OverlapSphere(placedPos, 2.5f);
+
+        // 주변 1M(1칸) 내의 레일 콜라이더 탐색
+        Collider[] hits = Physics.OverlapSphere(placedPos, 1.0f);
         List<Transform> stationRailsToAppend = new List<Transform>();
 
         for (int i = 0; i < hits.Length; i++)
@@ -932,7 +937,9 @@ public class RailManager : SingletonBase<RailManager>
             return;
         }
 
+        Transform railTrans = rail.transform;
         _installedRailPath.Add(rail.transform);
+        ConnectStationRails(railTrans);
     }
 
     public Transform GetRailNode(int index)
