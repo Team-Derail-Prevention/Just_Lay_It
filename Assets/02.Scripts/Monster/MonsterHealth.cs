@@ -5,6 +5,7 @@ using System.ComponentModel;
 public class MonsterHealth : MonoBehaviour
 {
     public static event Action<int> OnMonsterDiedWithGold;
+    public event Action<Transform>OnMonsterDied;
 
     private int _maxHp;
     private int _currentHp;
@@ -44,6 +45,7 @@ public class MonsterHealth : MonoBehaviour
         _isDead = true;
 
         OnMonsterDiedWithGold?.Invoke(_dropGold);
+        OnMonsterDied?.Invoke(transform);
 
         if (MonsterSpawn.Instance != null)
         { 

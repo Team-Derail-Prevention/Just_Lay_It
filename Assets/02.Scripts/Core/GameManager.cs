@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : SingletonBase<GameManager>
@@ -26,10 +27,16 @@ public class GameManager : SingletonBase<GameManager>
     private float _playTime;
     private int _lastNotifiedTime;
 
+    private const int RequiredStationCount = 4;
+
+    private readonly HashSet<string> _completedStationIds = new();
+    public int CompletedStationCount => _completedStationIds.Count;
+
     public int SessionKillCount => _sessionKillCount;
     public int SessionEarnedGold => _sessionEarnedGold;
 
     public event Action<int> OnCountdownChanged;
+    public event Action OnGameCleared;
 
     public static DataManager Data => DataManager.Instance;
     public static ResourceManager Resource => ResourceManager.Instance;
@@ -61,7 +68,10 @@ public class GameManager : SingletonBase<GameManager>
     protected override void Init()
     {
         base.Init();
-        if (Instance != this) return;
+        if (Instance != this)
+        {
+            return;
+        }
 
         InitManagerRoot();
         OrganizeExistingManagers();
@@ -83,12 +93,18 @@ public class GameManager : SingletonBase<GameManager>
 
     private void Update()
     {
-        if (_currentGameState != GameState.Playing) return;
+        if (_currentGameState != GameState.Playing)
+        {
+            return;
+        }
 
         _playTime += UnityEngine.Time.deltaTime;
         int currentSecond = (int)_playTime;
 
-        if (currentSecond == _lastNotifiedTime) return;
+        if (currentSecond == _lastNotifiedTime)
+        {
+            return;
+        }
 
         _lastNotifiedTime = currentSecond;
         TrainStatusEventHub?.NotifyPlayTimeChanged(_lastNotifiedTime);
@@ -115,7 +131,10 @@ public class GameManager : SingletonBase<GameManager>
         try
         {
             RefreshManagerHierarchy();
-            if (!await EnsureGameDataLoadedAsync()) return;
+            if (!await EnsureGameDataLoadedAsync())
+            { 
+                return;
+            }
 
             ClearCurrentSession();
             ChangeGameState(GameState.Ready);
@@ -126,17 +145,13 @@ public class GameManager : SingletonBase<GameManager>
                 Debug.LogError("[GameManager] 맵 생성에 실패하여 게임 시작을 취소합니다.");
                 return;
             }
-            // Map.OnMapGenerated 이벤트로 RailManager의 타일 조회 상태 초기화
-
-            // 드론은 TrainManager.OnTrainSpawn을 구독하므로 기차보다 먼저 생성되어야 함
+                        
             if (Drone != null)
             {
                 await Drone.SpawnAllAsync();
             }
 
             Train.SpawnTerminalTrain(_startingCarriageCount);
-
-            // MonsterSpawn은 TrainManager.OnTrainSpawn을 구독하여 풀 초기화 후 스폰을 시작
 
             ChangeGameState(GameState.EventPaused);
             Debug.Log("[GameManager] 맵, 기차, 몬스터 스폰 완료");
@@ -148,8 +163,6 @@ public class GameManager : SingletonBase<GameManager>
         }
     }
 
-    /// StationObject가 보상 처리하고, GameManager가 다음 인게임 사이클을 재개
-    /// 역 UI가 회복 여부를 결정한 후 출발을 위해 호출하는 메서드
     public void CompleteStation(int stoneTaken, int citizenBoarded)
     {
         if (_currentGameState != GameState.EventPaused || _activeStation == null)
@@ -159,13 +172,14 @@ public class GameManager : SingletonBase<GameManager>
         }
 
         _activeStation.ExitStation(stoneTaken, citizenBoarded);
+
+        _completedStationIds.Add(_activeStation.StationId);
+
         _activeStation = null;
         UI?.CloseStationArrivalUI();
 
         Train?.DepartStation();
         StartCountdownAsync().Forget();
-
-        // TODO: Station UI가 실제 자재 소모 및 열차 회복 결과를 CompleteStation에 전달 필요(?)
     }
 
     public void HandleStationArrival()
@@ -178,7 +192,6 @@ public class GameManager : SingletonBase<GameManager>
         HandleTerminalArrival(null);
     }
 
-    /// CentralTerminal 이벤트 출구 선택시 호출 메서드
     public void SelectExitDirection(int directionIndex)
     {
         if (_currentGameState != GameState.EventPaused)
@@ -194,9 +207,6 @@ public class GameManager : SingletonBase<GameManager>
         ChangeGameState(GameState.ExitSelected);
         UI?.CloseBaseArrivalUI();
         StartCountdownAsync().Forget();
-
-        
-        // TODO: Terminal UI가 재료 적재, 소비, 무기 추가·강화 결과를 GameManager로 전달해야할 듯
     }
 
     public void GameOver()
@@ -208,9 +218,22 @@ public class GameManager : SingletonBase<GameManager>
         PauseGameplayTime();
 
         ReturnToLobby();
-
-        // ClearCurrentSession(); UI가 아직 없어서 주석처리
+        // 결과창 UI 대신 바로 로비
         // TODO: Result UI를 열고 로비로 돌아가는 UI 흐름필요
+    }
+
+    public void GameClear()
+    {
+        if (_currentGameState == GameState.GameClear)
+        {
+            return;
+        }
+
+        ChangeGameState(GameState.GameClear);
+        OnGameCleared?.Invoke();
+        
+        ReturnToLobby(); // 결과창ui대신 임시
+        Debug.Log($"[GameManager] 게임 클리어: 완료 역 {CompletedStationCount}/{RequiredStationCount}");
     }
 
     private void InitManagerRoot()
@@ -226,6 +249,7 @@ public class GameManager : SingletonBase<GameManager>
         {
             transform.SetParent(_managerRoot);
         }
+        // TODO: Station UI를 열고 CompleteStation(stoneTaken, citizenBoarded)을 호출하도록 연결해야 한다.
     }
 
     private void OrganizeExistingManagers()
@@ -254,7 +278,10 @@ public class GameManager : SingletonBase<GameManager>
 
     public void RegisterManager(Component manager)
     {
-        if (manager == null) return;
+        if (manager == null)
+        {
+            return;
+        }
 
         if (_managerRoot == null)
         {
@@ -301,6 +328,7 @@ public class GameManager : SingletonBase<GameManager>
     private bool ValidateStartDependencies()
     {
         bool isValid = true;
+        isValid &= ValidateManager(UI, nameof(UIManager));
         isValid &= ValidateManager(Data, nameof(DataManager));
         isValid &= ValidateManager(Resource, nameof(ResourceManager));
         isValid &= ValidateManager(Map, nameof(MapManager));
@@ -345,10 +373,18 @@ public class GameManager : SingletonBase<GameManager>
         PauseGameplayTime();
         StopAndDespawnMonsters();
         RemovePlayerPlacedRails();
+
+        if (CompletedStationCount >= RequiredStationCount)
+        {
+            GameClear();
+            return;
+        }
+
         ChangeGameState(GameState.EventPaused);
 
         UI?.OpenBaseArrivalUI();
         Debug.Log("[GameManager] 터미널 도착: 출구 방향 선택을 기다립니다.");
+
         UI?.OpenBaseArrivalUI();
         // TODO: Terminal UI를 열고 CentralTerminal.SelectExitGate(int)와 연결필요(?)
     }
@@ -363,6 +399,7 @@ public class GameManager : SingletonBase<GameManager>
         {
             UnityEngine.Time.timeScale = 0f;
         }
+
         Debug.Log("[GameManager] 게임 시간을 일시정지했습니다.");
     }
 
@@ -381,7 +418,10 @@ public class GameManager : SingletonBase<GameManager>
 
     public async UniTask StartCountdownAsync(Action onComplete = null)
     {
-        if (_isCountdownRunning) return;
+        if (_isCountdownRunning)
+        {
+            return;
+        }
 
         _isCountdownRunning = true;
         int sessionVersion = _sessionVersion;
@@ -390,7 +430,7 @@ public class GameManager : SingletonBase<GameManager>
         {
             for (int remaining = _resumeCountdownSeconds; remaining > 0; remaining--)
             {
-                OnCountdownChanged?.Invoke(remaining); // UI 카운트 표시
+                OnCountdownChanged?.Invoke(remaining);
 
                 Debug.Log($"[GameManager] {remaining}초 후 다음 구간을 시작합니다.");
                 await UniTask.Delay(1000, ignoreTimeScale: true, cancellationToken: this.GetCancellationTokenOnDestroy());
@@ -399,7 +439,8 @@ public class GameManager : SingletonBase<GameManager>
                 GameStartCountdownPopup countdownPopup = UI?.OpenGameStartCountdownPopup();
                 countdownPopup?.Init(onComplete);
             }
-            OnCountdownChanged?.Invoke(0); // UI 카운트 끝 신호 
+
+            OnCountdownChanged?.Invoke(0);
 
             ResumeMonsterSpawning();
             ResumeGameplayTime();
@@ -428,6 +469,7 @@ public class GameManager : SingletonBase<GameManager>
         Monster?.StopSpawning();
         Pool?.AllDespawnToPool();
 
+        // TODO: Weapon 투사체 정리
         // TODO: PoolManager 몬스터 정리(스킬정리도 필요한지 확인필요)
     }
 
@@ -466,9 +508,9 @@ public class GameManager : SingletonBase<GameManager>
         _lastNotifiedTime = 0;
         _sessionKillCount = 0;
         _sessionEarnedGold = 0;
+        _completedStationIds.Clear();
     }
 
-    /// 게임 오버 로비 복귀 공통 사용
     private void ClearCurrentSession()
     {
         _sessionVersion++;
@@ -480,12 +522,12 @@ public class GameManager : SingletonBase<GameManager>
         ResetSessionState();
     }
 
-    /// 결과 UI가 확인된 뒤 호출
     public void ReturnToLobby()
     {
         ClearCurrentSession();
         ResumeGameplayTime();
         ChangeGameState(GameState.Ready);
+
         NetworkResourceService.ResetRun();
         NetworkWarehouseService.ResetRun();
 
@@ -493,7 +535,6 @@ public class GameManager : SingletonBase<GameManager>
         UI?.CloseHudResourceUI();
         UI?.CloseInGameMenuButtonUI();
         UI?.CloseRailBuildUI();
-
         UI?.OpenContentUI(UIType.LobbyUI);
     }
 

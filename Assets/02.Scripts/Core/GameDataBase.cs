@@ -53,6 +53,18 @@ public class TrainData : GameDataBase
     public string PrefabPath;
 }
 
+[Serializable]
+public class WeaponData : GameDataBase
+{
+    public string WeaponName;
+    public int Atk;
+    public float FireRate;
+    public int MagazineSize;
+    public float ReloadTime;
+    public string UseFireSound;
+    public string UseReloadSound;
+}
+
 public static class TrainTypeConst
 {
     public const string Head = "Head";
