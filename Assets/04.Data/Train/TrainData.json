@@ -11,7 +11,7 @@
     "Defense": 1,
     "MaxWeaponMount": 0,
     "MaxCrew": 0,
-    "PrefabPath": null
+    "PrefabPath": "Train/train-Front"
   },
   {
     "Id": "TRAIN_STANDARD_01",
@@ -25,7 +25,7 @@
     "Defense": 1,
     "MaxWeaponMount": 1,
     "MaxCrew": 2,
-    "PrefabPath": null
+    "PrefabPath": "Train/train-Follow-1"
   },
   {
     "Id": "TRAIN_STANDARD_02",
@@ -39,7 +39,7 @@
     "Defense": 1,
     "MaxWeaponMount": 1,
     "MaxCrew": 2,
-    "PrefabPath": null
+    "PrefabPath": "Train/train-Follow-2"
   },
   {
     "Id": "TRAIN_CARGO_01",
@@ -53,6 +53,6 @@
     "Defense": 1,
     "MaxWeaponMount": 0,
     "MaxCrew": 0,
-    "PrefabPath": null
+    "PrefabPath": "Train/train-carriage"
   }
 ]

@@ -4,7 +4,7 @@ using System;
 public class NetworkRailService : SingletonBase<NetworkRailService>
 {
     // 임시 선로 제작 소요 시간 3초
-    private const float CRAFT_DURATION = 3f;
+    private const float CRAFT_DURATION = 1.5f;
 
     private RailBuildViewModel _localRailBuildViewModel;
 

@@ -66,16 +66,7 @@ public class LoadingUI : UIBase
         SetProgressUI(1f);
 
         UIManager.Instance.CloseLoadingUI();
-
-        var countdownPopup = UIManager.Instance.OpenGameStartCountdownPopup();
-        if (countdownPopup != null)
-        {
-            countdownPopup.Init(OpenInGameHudForTest);
-        }
-        else
-        {
-            OpenInGameHudForTest();
-        }
+        GameManager.Instance.StartCountdownAsync(OpenInGameHudForTest).Forget();
     }
 
     private void OpenInGameHudForTest()
