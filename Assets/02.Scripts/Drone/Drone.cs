@@ -25,6 +25,11 @@ public class Drone : MonoBehaviour
         _moveInput.SetTarget(worldPosition);
     }
 
+    public void Stop()
+    {
+        _moveInput.ClearTarget();
+    }
+
     private void Update()
     {
         if (_moveInput.HasTarget == false)

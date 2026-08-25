@@ -16,6 +16,7 @@ public class DroneDockPoint : MonoBehaviour
     [SerializeField, Min(0f)] private float _topGap = 1f;
 
     public bool IsAttached { get { return _anchor != null; } }
+    public int CarIndex { get { return _carIndex; } }
 
     private Transform _anchor;
     private Vector3 _offset;
@@ -32,11 +33,34 @@ public class DroneDockPoint : MonoBehaviour
         TrainManager.OnTrainSpawn -= HandleTrainSpawn;
     }
 
+    public void SetCar(int carIndex)
+    {
+        if (carIndex < 0)
+        {
+            return;
+        }
+
+        if (_carIndex == carIndex)
+        {
+            return;
+        }
+
+        _carIndex = carIndex;
+        _anchor = null;
+
+        AttachToCurrentTrain();
+    }
+
     private void LateUpdate()
     {
         if (_anchor == null)
         {
-            return;
+            AttachToCurrentTrain();
+
+            if (_anchor == null)
+            {
+                return;
+            }
         }
 
         Apply();
