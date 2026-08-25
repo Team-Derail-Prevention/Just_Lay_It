@@ -21,7 +21,7 @@ public class StationObject : BaseColliderTrigger
     [SerializeField] private RailSpawnInfo[] _startPoints = new RailSpawnInfo[2];
 
     [Header("방향별 레일 루트 (인게임 자동 등록)")]
-    [SerializeField] private Transform[] _exitDirRoots = new Transform[2]; 
+    [SerializeField] public Transform[] _exitDirRoots = new Transform[2]; 
 
     private int _rewardGold = 0;
     private int _rescueCount = 0;
