@@ -8,7 +8,6 @@ public class RailBuildUI : UIBase
 
     [Header("설치 슬롯")]
     [SerializeField] private RailPlaceSlotUI PlaceSlot_Straight;
-    [SerializeField] private RailPlaceSlotUI PlaceSlot_Curve;
 
     private RailBuildViewModel _vm;
 
@@ -29,11 +28,6 @@ public class RailBuildUI : UIBase
         if (PlaceSlot_Straight != null)
         {
             PlaceSlot_Straight.InitSlot(_vm.GetSlot(RailType.Straight), OnClick_Place);
-        }
-
-        if (PlaceSlot_Curve != null)
-        {
-            PlaceSlot_Curve.InitSlot(_vm.GetSlot(RailType.Corner), OnClick_Place);
         }
     }
 

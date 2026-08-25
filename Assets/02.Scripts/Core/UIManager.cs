@@ -22,12 +22,19 @@ public class UIManager : SingletonBase<UIManager>
 
         var openedUI = GetCreatedUI(uiRootType, uiType);
 
+        if (openedUI == null)
+        {
+            return null;
+        }
+
         bool isSetActiveOnOpen = (isInitialHide == false);
         if (_openedUIDic.Contains(uiType) == false)
         {
             openedUI.gameObject.SetActive(isSetActiveOnOpen);
             _openedUIDic.Add(uiType);
         }
+
+        openedUI.transform.SetAsLastSibling();
 
         return openedUI;
     }
@@ -77,11 +84,26 @@ public class UIManager : SingletonBase<UIManager>
         {
             string path = this.GetUIPath(uiRootType, uiType);
             GameObject loadedObj = Resources.Load<GameObject>(path);
+
+            if (loadedObj == null)
+            {
+                Debug.LogError($"[UIManager] Resources 경로에서 UI 프리팹을 찾지 못했습니다. path=Resources/{path}");
+                return;
+            }
+
             Transform root = GetRootTransform(uiRootType);
             GameObject gObj = Instantiate(loadedObj, root);
             if (gObj != null)
             {
                 var uiBase = gObj.GetComponent<UIBase>();
+
+                if (uiBase == null)
+                {
+                    Debug.LogError($"[UIManager] {uiType} 프리팹({path})에 UIBase 컴포넌트가 없습니다.");
+                    Destroy(gObj);
+                    return;
+                }
+
                 _createdUIDic.Add(uiType, uiBase);
             }
         }
@@ -93,6 +115,8 @@ public class UIManager : SingletonBase<UIManager>
         {
             CreateUI(uiRootType, uiType);
         }
+
+        _createdUIDic.TryGetValue(uiType, out var uiBase);
         return _createdUIDic[uiType];
     }
 

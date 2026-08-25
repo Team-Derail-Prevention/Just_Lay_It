@@ -34,6 +34,7 @@ public enum UIType
     TextInputPopup,
     StationArrivalUI,
     GameStartCountdownPopup,
+    WeaponGachaUI,
 }
 public static class UIManagerExtension
 {
@@ -374,6 +375,16 @@ public static class UIManagerExtension
     public static void CloseGameStartCountdownPopup(this UIManager uiManager)
     {
         uiManager.ClosePopupUI(UIType.GameStartCountdownPopup);
+    }
+
+    public static void OpenWeaponGachaUI(this UIManager uiManager)
+    {
+        uiManager.OpenPopupUI(UIType.WeaponGachaUI);
+    }
+
+    public static void CloseWeaponGachaUI(this UIManager uiManager)
+    {
+        uiManager.ClosePopupUI(UIType.WeaponGachaUI);
     }
 
     public static void OpenRailPlaceConfirmPopup(this UIManager uiManager, Action onRotate, Action onConfirm, Action onCancel)

@@ -20,6 +20,9 @@ public class StationObject : BaseColliderTrigger
     [Header("스폰 포인트 (인게임 자동 등록 및 확인용)")]
     [SerializeField] private RailSpawnInfo[] _startPoints = new RailSpawnInfo[2];
 
+    [Header("방향별 레일 루트 (인게임 자동 등록)")]
+    [SerializeField] private Transform[] _exitDirRoots = new Transform[2]; 
+
     private int _rewardGold = 0;
     private int _rescueCount = 0;
 
@@ -76,5 +79,13 @@ public class StationObject : BaseColliderTrigger
         }
 
         Debug.Log($"[StationObject] '{_stationId}' 완료. 골드 {_rewardGold} 획득, 구출 {_rescueCount}명.");
+    }
+
+    public void RegisterExitDirRoot(int dirIndex, Transform dirRoot)
+    {
+        if (dirIndex >= 0 && dirIndex < _exitDirRoots.Length)
+        {
+            _exitDirRoots[dirIndex] = dirRoot;
+        }
     }
 }

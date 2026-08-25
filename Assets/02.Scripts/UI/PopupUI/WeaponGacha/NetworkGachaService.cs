@@ -1,0 +1,134 @@
+﻿using UnityEngine;
+using System.Collections.Generic;
+
+public class NetworkGachaService : SingletonBase<NetworkGachaService>
+{
+    private const int REROLL_COUNT_DEFAULT = 3; 
+    public const int REROLL_COST_SINGLE = 1;
+    public const int REROLL_COST_ALL = 3;  
+
+    private GachaViewModel _localVm;
+    private List<GunGachaData> _dataPool;
+
+    private void Start()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public GachaViewModel GetLocalGachaViewModel()
+    {
+        if (_localVm == null)
+        {
+            _localVm = new GachaViewModel();
+            _localVm.SetRerollCount(REROLL_COUNT_DEFAULT, REROLL_COUNT_DEFAULT);
+        }
+
+        return _localVm;
+    }
+
+    private List<GunGachaData> GetDataPool()
+    {
+        if (_dataPool == null)
+        {
+            if (DataManager.Instance == null || DataManager.Instance.IsLoaded == false)
+            {
+                Debug.LogWarning("[NetworkGachaService] 데이터가 아직 로드되지 않았습니다.");
+                return new List<GunGachaData>();
+            }
+
+            _dataPool = new List<GunGachaData>(DataManager.Instance.GetAllData<GunGachaData>());
+        }
+
+        return _dataPool;
+    }
+
+    public void OpenGachaBox()
+    {
+        var vm = GetLocalGachaViewModel();
+        vm.SetRerollCount(vm.RerollCountMax, vm.RerollCountMax);
+
+        for (int i = 0; i < GachaViewModel.CARD_SLOT_COUNT; i++)
+        {
+            DrawCardIntoSlot(i);
+        }
+    }
+
+    public void ApplyRerollCountMaxUpgrade(int newMax)
+    {
+        var vm = GetLocalGachaViewModel();
+        vm.SetRerollCount(vm.RerollCountCurrent, newMax);
+    }
+
+    public bool RequestRerollSingle(int slotIndex)
+    {
+        var vm = GetLocalGachaViewModel();
+        if (vm.RerollCountCurrent < REROLL_COST_SINGLE)
+        {
+            Debug.LogWarning("[NetworkGachaService] 재굴림 잔여 횟수가 부족합니다.");
+            return false;
+        }
+
+        vm.SetRerollCount(vm.RerollCountCurrent - REROLL_COST_SINGLE, vm.RerollCountMax);
+        DrawCardIntoSlot(slotIndex);
+        return true;
+    }
+
+    public bool RequestRerollAll()
+    {
+        var vm = GetLocalGachaViewModel();
+        if (vm.RerollCountCurrent < REROLL_COST_ALL)
+        {
+            Debug.LogWarning("[NetworkGachaService] 전체 재굴림에 필요한 횟수가 부족합니다.");
+            return false;
+        }
+
+        vm.SetRerollCount(vm.RerollCountCurrent - REROLL_COST_ALL, vm.RerollCountMax);
+
+        for (int i = 0; i < GachaViewModel.CARD_SLOT_COUNT; i++)
+        {
+            DrawCardIntoSlot(i);
+        }
+
+        return true;
+    }
+
+    private void DrawCardIntoSlot(int slotIndex)
+    {
+        var vm = GetLocalGachaViewModel();
+        var cardState = vm.GetCard(slotIndex);
+        if (cardState == null)
+        {
+            return;
+        }
+
+        var pool = GetDataPool();
+        if (pool.Count == 0)
+        {
+            return;
+        }
+
+        var pickedData = pool[Random.Range(0, pool.Count)];
+        cardState.FillFromData(pickedData);
+    }
+
+    public void RequestSelectCard(int slotIndex)
+    {
+        var vm = GetLocalGachaViewModel();
+        var cardState = vm.GetCard(slotIndex);
+        if (cardState == null)
+        {
+            return;
+        }
+
+        // 실제 인벤토리 추가 처리 연동
+        Debug.Log($"[NetworkGachaService] {cardState.DisplayName} 인벤토리 추가 요청");
+
+        UIManager.Instance.CloseWeaponGachaUI();
+        UIManager.Instance.OpenExitConfirmPopup(null, null, "무기가 인벤토리로 들어갔습니다.");
+    }
+
+    public void ResetRun()
+    {
+        _localVm = null;
+    }
+}

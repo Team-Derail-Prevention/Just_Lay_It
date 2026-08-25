@@ -235,7 +235,6 @@ public class MapManager : SingletonBase<MapManager>
 
         if (isTerminal)
         {
-            // [수정 포인트] dir(이동 방향), trainRot(기차가 스폰될 회전), railRot(레일 오브젝트가 생성될 시각적 회전)을 분리
             var paths = new (Vector3 dir, Quaternion trainRot, Quaternion railRot)[]
             {
                 (new Vector3(0, 0, 1),  Quaternion.identity,         Quaternion.Euler(0, 90, 0)), 
@@ -284,6 +283,11 @@ public class MapManager : SingletonBase<MapManager>
                 GameObject dirRoot = new GameObject(d.ToString());
                 dirRoot.transform.SetParent(railParent);
                 dirRoot.transform.localPosition = Vector3.zero;
+
+                if (station != null)
+                {
+                    station.RegisterExitDirRoot(d, dirRoot.transform);
+                }
 
                 for (int i = 0; i < railCount; i++)
                 {
