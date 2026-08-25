@@ -1,13 +1,15 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using System.Collections.Generic;
+using UnityEngine;
 
 public class WeaponFire : MonoBehaviour
 {
     [SerializeField] private string _weaponId;
-    [SerializeField] private string _projectileAddressableKey = "WeaponProjectile";
+    [SerializeField] private string _projectileId; // Addressable 주소이자 풀 Id로 그대로 사용
     [SerializeField] private Transform _firePosition;
     [SerializeField] private WeaponTargeting _weaponTargeting;
+
+    private GameObject _projectilePrefab; // Addressable 로드 결과 캐시 (null 체크용)
 
     private int _weaponAtk;
     private float _fireRate;
@@ -18,10 +20,6 @@ public class WeaponFire : MonoBehaviour
     private float _fireTimer = 0f;
     private float _reloadTimer = 0f;
     private bool _isReloading = false;
-
-    private bool _isInitialized = false;
-
-    private GameObject _loadedProjectilePrefab;
 
     private void Awake()
     {
@@ -38,48 +36,45 @@ public class WeaponFire : MonoBehaviour
 
     private async void Start()
     {
-        await InitializeAsync();
+        LoadWeaponData();
+        await RegisterProjectilePoolAsync();
     }
 
-    private async UniTask InitializeAsync()
+    // MonsterSpawn.InitializePoolAsync와 동일한 패턴: Addressable로 프리팹을 미리 로드해서
+    // PoolManager.Init()의 prefabMap(Dictionary)으로 넘김. 키 단위로 병합되니 몬스터 등록을 안 지움.
+    private async UniTask RegisterProjectilePoolAsync()
     {
-        LoadWeaponData();
-
-        _loadedProjectilePrefab = await ResourceManager.Instance.LoadAsset<GameObject>(_projectileAddressableKey);
-
-        if (_loadedProjectilePrefab == null)
+        if (string.IsNullOrEmpty(_projectileId))
         {
-            Debug.LogError($"{_projectileAddressableKey} 프리팹을 찾을 수 없습니다! Addressable 체크를 확인하세요.");
+            Debug.LogWarning("[WeaponFire] _projectileId가 비어있어 발사체 풀을 준비하지 못했습니다.");
+            return;
+        }
+
+        _projectilePrefab = await ResourceManager.Instance.LoadAsset<GameObject>(_projectileId);
+
+        if (_projectilePrefab == null)
+        {
+            Debug.LogError($"[WeaponFire] {_projectileId} 발사체 프리팹을 로드하지 못했습니다. Addressable 등록을 확인하세요.");
             return;
         }
 
         Dictionary<string, int> initialPool = new Dictionary<string, int>
         {
-            { _projectileAddressableKey, 20 }
+            { _projectileId, 20 }
         };
 
-        PoolManager.Instance.Init(this.transform, initialPool, GetProjectilePrefab);
-
-        _isInitialized = true;
-        Debug.Log("[WeaponFire] 투사체 프리팹 어드레서블 로드 및 풀 초기화 완료!");
-    }
-
-    private GameObject GetProjectilePrefab(string id)
-    {
-        if (id == _projectileAddressableKey)
+        Dictionary<string, GameObject> prefabMap = new Dictionary<string, GameObject>
         {
-            return _loadedProjectilePrefab;
-        }
-        return null;
+            { _projectileId, _projectilePrefab }
+        };
+
+        PoolManager.Instance.Init(null, initialPool, prefabMap);
+
+        Debug.Log("[WeaponFire] 발사체 풀 초기화 완료!");
     }
 
     private void Update()
     {
-        if (!_isInitialized)
-        {
-            return;
-        }
-
         if (_isReloading)
         {
             HandleReload();
@@ -127,13 +122,18 @@ public class WeaponFire : MonoBehaviour
 
     private void ShootProjectile()
     {
+        if (_projectilePrefab == null)
+        {
+            return;
+        }
+
         Transform target = _weaponTargeting.CurrentTarget;
         if (target == null)
         {
             return;
         }
 
-        GameObject projObj = PoolManager.Instance.SpawnFromPool(_projectileAddressableKey, _firePosition.position, Quaternion.identity);
+        GameObject projObj = PoolManager.Instance.SpawnFromPool(_projectileId, _firePosition.position, Quaternion.identity);
 
         WeaponProjectile projectile = projObj.GetComponent<WeaponProjectile>();
         if (projectile != null)
