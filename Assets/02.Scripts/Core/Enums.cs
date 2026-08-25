@@ -48,9 +48,9 @@
 
     public enum TrainExitDirection
     {
-        North = 0,  // 동
-        South = 1,  // 서
-        West = 2, // 남
-        East = 3, // 북
+        North = 0,  // 북
+        South = 1,  // 남
+        West = 2,   // 서
+        East = 3,   // 동
     }
 }
