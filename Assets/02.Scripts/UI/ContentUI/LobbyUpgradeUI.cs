@@ -7,8 +7,8 @@ using UnityEngine.UI;
 public class LobbyUpgradeUI : UIBase
 {
     [Header("상단 골드 정보")]
-    [SerializeField] private Image Image_GoldIcon;
-    [SerializeField] private TextMeshProUGUI Text_GoldAmount;
+    [SerializeField] private Image Image_CashIcon;
+    [SerializeField] private TextMeshProUGUI Text_CashAmount;
 
     [Header("슬롯 리스트 영역")]
     [SerializeField] private GameObject Prefab_Slot;
@@ -39,7 +39,7 @@ public class LobbyUpgradeUI : UIBase
         _vm = NetworkUpgradeService.Instance.GetLocalUpgradeViewModel();
         _vm.PropertyChanged += OnPropertyChanged_View;
 
-        RefreshGoldText();
+        RefreshCashText();
         CreateAllSlots();
     }
 
@@ -60,9 +60,9 @@ public class LobbyUpgradeUI : UIBase
 
     private void OnPropertyChanged_View(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(UpgradeViewModel.CurrentGold))
+        if (e.PropertyName == nameof(UpgradeViewModel.CurrentCash))
         {
-            RefreshGoldText();
+            RefreshCashText();
         }
         else if (e.PropertyName == "SlotListAdded")
         {
@@ -90,11 +90,11 @@ public class LobbyUpgradeUI : UIBase
         _curSelectedSlotId = null;
     }
 
-    private void RefreshGoldText()
+    private void RefreshCashText()
     {
-        if (Text_GoldAmount != null)
+        if (Text_CashAmount != null)
         {
-            Text_GoldAmount.text = _vm.CurrentGold.ToString();
+            Text_CashAmount.text = _vm.CurrentCash.ToString();
         }
     }
 

@@ -8,7 +8,28 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
     public const int REROLL_COST_ALL = 3;  
 
     private GachaViewModel _localVm;
-    private List<GunGachaData> _dataPool;
+    private List<WeaponData> _dataPool;
+
+    private void OnEnable()
+    {
+        UpgradeEventHub.Instance.OnLobbyUpgraded += OnLobbyUpgraded;
+    }
+
+    private void OnDisable()
+    {
+        if (UpgradeEventHub.Instance != null)
+        {
+            UpgradeEventHub.Instance.OnLobbyUpgraded -= OnLobbyUpgraded;
+        }
+    }
+
+    private void OnLobbyUpgraded(string slotDataId, int newLevel)
+    {
+        if (slotDataId == "LOBBY_GACHA_REROLL")
+        {
+            ApplyRerollCountMaxUpgrade(REROLL_COUNT_DEFAULT + newLevel);
+        }
+    }
 
     private void Start()
     {
@@ -26,17 +47,18 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
         return _localVm;
     }
 
-    private List<GunGachaData> GetDataPool()
+
+    private List<WeaponData> GetDataPool()
     {
         if (_dataPool == null)
         {
             if (DataManager.Instance == null || DataManager.Instance.IsLoaded == false)
             {
                 Debug.LogWarning("[NetworkGachaService] 데이터가 아직 로드되지 않았습니다.");
-                return new List<GunGachaData>();
+                return new List<WeaponData>();
             }
 
-            _dataPool = new List<GunGachaData>(DataManager.Instance.GetAllData<GunGachaData>());
+            _dataPool = new List<WeaponData>(DataManager.Instance.GetAllData<WeaponData>());
         }
 
         return _dataPool;

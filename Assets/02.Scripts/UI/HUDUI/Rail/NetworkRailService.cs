@@ -5,10 +5,35 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
 {
     // 임시 선로 제작 소요 시간 3초
     private const float CRAFT_DURATION = 1.5f;
+    private float _craftSpeedPercent = 0f;
 
     private RailBuildViewModel _localRailBuildViewModel;
 
     public event Action<RailType> OnRequestPlaceMode;
+
+    private void OnEnable()
+    {
+        if (UpgradeEventHub.Instance != null)
+        {
+            UpgradeEventHub.Instance.OnLobbyUpgraded += OnLobbyUpgraded;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (UpgradeEventHub.Instance != null)
+        {
+            UpgradeEventHub.Instance.OnLobbyUpgraded -= OnLobbyUpgraded;
+        }
+    }
+
+    private void OnLobbyUpgraded(string slotDataId, int newLevel)
+    {
+        if (slotDataId == "LOBBY_RAIL_CRAFT_SPEED")
+        {
+            _craftSpeedPercent += 0.1f;
+        }
+    }
 
     private void Start()
     {
@@ -39,7 +64,8 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
             return;
         }
 
-        slot.CraftProgress01 += Time.deltaTime / CRAFT_DURATION;
+        float actualDuration = CRAFT_DURATION * (1f - _craftSpeedPercent);
+        slot.CraftProgress01 += Time.deltaTime / actualDuration;
         if (slot.CraftProgress01 < 1f)
         {
             return;

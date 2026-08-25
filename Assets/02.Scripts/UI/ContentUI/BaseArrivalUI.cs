@@ -39,7 +39,7 @@ public class BaseArrivalUI : UIBase
         {
             _upgradeVm = NetworkUpgradeService.Instance.GetLocalUpgradeViewModel();
             _upgradeVm.PropertyChanged += OnUpgradeViewModelPropertyChanged;
-            SetCashText(_upgradeVm.CurrentGold);
+            SetCashText(_upgradeVm.CurrentCash);
         }
     }
 
@@ -94,9 +94,9 @@ public class BaseArrivalUI : UIBase
 
     private void OnUpgradeViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(UpgradeViewModel.CurrentGold))
+        if (e.PropertyName == nameof(UpgradeViewModel.CurrentCash))
         {
-            SetCashText(_upgradeVm.CurrentGold);
+            SetCashText(_upgradeVm.CurrentCash);
         }
     }
 

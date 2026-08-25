@@ -126,8 +126,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8640cb55082a4794c9cd2e1197acb00c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LobbyUpgradeUI
-  Image_GoldIcon: {fileID: 8533127082486979855}
-  Text_GoldAmount: {fileID: 7881886695817506550}
+  Image_CashIcon: {fileID: 0}
+  Text_CashAmount: {fileID: 0}
   Prefab_Slot: {fileID: 8560120560922502747, guid: e5e70328bc70c264b9f8f532fc947b44, type: 3}
   Transform_SlotRoot: {fileID: 5669808571394658620}
   Image_DetailIcon: {fileID: 3536224241387889792}

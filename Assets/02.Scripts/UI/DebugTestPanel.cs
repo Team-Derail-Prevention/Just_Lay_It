@@ -21,7 +21,7 @@ public class DebugTestPanel : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            NetworkUpgradeService.Instance.GainGold(100);
+            NetworkUpgradeService.Instance.GainCash(100);
         }
     }
 }

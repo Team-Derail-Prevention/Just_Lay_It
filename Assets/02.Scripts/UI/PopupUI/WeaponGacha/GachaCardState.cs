@@ -104,8 +104,9 @@ public class GachaCardState : ViewModelBase
         }
     }
 
-    public void FillFromData(GunGachaData data)
+    public void FillFromData(WeaponData data)
     {
+        /*
         WeaponDataId = data.Id;
         DisplayName = data.DisplayName;
         GradeName = data.GradeName;
@@ -113,6 +114,6 @@ public class GachaCardState : ViewModelBase
         Dps = data.Dps;
         Description = data.Description;
         StatTextList = data.StatTextList;
-        IsSelected = false;
-    }
+        IsSelected = false; */
+    } 
 }

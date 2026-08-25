@@ -25,8 +25,24 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
     private void CreateLocalUpgradeViewModel()
     {
         _localUpgradeViewModel = new UpgradeViewModel();
+        CreateSlotsFromData();
+    }
 
-        // 업글 내용이 정해지면 추후 수정
+    private void CreateSlotsFromData()
+    {
+        if (DataManager.Instance == null || DataManager.Instance.IsLoaded == false)
+        {
+            Debug.LogWarning("[NetworkUpgradeService] 데이터가 아직 로드되지 않았습니다.");
+            return;
+        }
+
+        var dataList = DataManager.Instance.GetAllData<LobbyUpgradeData>();
+
+        foreach (var data in dataList)
+        {
+            var slotVm = new UpgradeSlotViewModel(data.Id, data.Name, data.IconPath, data.MaxLevel, data.BaseCost, data.CostIncreasePerLevel);
+            _localUpgradeViewModel.AddSlot(slotVm);
+        }
     }
 
     public bool RequestPurchase(string slotDataId)
@@ -45,17 +61,28 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
             return false;
         }
 
-        if (vm.TrySpendGold(slotVm.NextCost) == false)
+        if (vm.TrySpendCash(slotVm.NextCost) == false)
         {
-            Debug.LogWarning("[NetworkUpgradeService] 골드가 부족합니다.");
+            Debug.LogWarning("[NetworkUpgradeService] 캐쉬가 부족합니다.");
             return false;
         }
         
         slotVm.LevelUp();
+        ApplyEffect(slotDataId, slotVm.CurrentLevel);
 
         // 저장 관련 정해지면 추후 수정
 
         return true;
+    }
+
+    private void ApplyEffect(string slotDataId, int newLevel)
+    {
+        if (slotDataId == "LOBBY_RESCUE_REWARD")
+        {
+            _cashPerRescuedCitizen += 5;
+        }
+
+        UpgradeEventHub.Instance.NotifyLobbyUpgraded(slotDataId, newLevel);
     }
 
     public bool RequestRefund(string slotDataId)
@@ -69,7 +96,7 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
 
         int refundAmount = CalcRefundAmount(slotVm);
         slotVm.LevelDown();
-        vm.GainGold(refundAmount);
+        vm.GainCash(refundAmount);
 
         // 저장 관련 정해지면 추후 수정
 
@@ -87,7 +114,7 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
             {
                 int refundAmount = CalcRefundAmount(slotVm);
                 slotVm.LevelDown();
-                vm.GainGold(refundAmount);
+                vm.GainCash(refundAmount);
             }
         }
 
@@ -99,24 +126,25 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
         return slotVm.NextCost;
     }
 
-    public void GainGold(int amount)
+    public void GainCash(int amount)
     {
         var vm = GetLocalUpgradeViewModel();
-        vm.GainGold(amount);
+        vm.GainCash(amount);
 
         // 저장 관련 정해지면 추후 수정
     }
 
     public void GrantRescueReward(int rescuedHumanCount)
     {
-        int rewardGold = rescuedHumanCount * _cashPerRescuedCitizen;
-        if (rewardGold <= 0)
+        if (rescuedHumanCount <= 0)
         {
             return;
         }
 
-        GainGold(rewardGold);
-        Debug.Log($"[NetworkUpgradeService] 구출한 시민 {rescuedHumanCount}명 → 보상 캐쉬 {rewardGold} 지급");
+        int rewardCash = rescuedHumanCount * _cashPerRescuedCitizen;
+        GainCash(rewardCash);
+
+        Debug.Log($"[NetworkUpgradeService] 구출한 시민 {rescuedHumanCount}명 → 보상 캐쉬 {rewardCash} 지급");
     }
 
     public object GetSaveData()

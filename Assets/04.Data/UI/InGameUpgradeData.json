@@ -1,0 +1,83 @@
+[
+  {
+    "Id": "BATTLE_HP",
+    "Category": "Battle",
+    "Name": "열차 체력 증가",
+    "MaxLevel": 5,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "string": null
+  },
+  {
+    "Id": "BATTLE_DAMAGE",
+    "Category": "Battle",
+    "Name": "열차 피해량 증가",
+    "MaxLevel": 5,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "string": null
+  },
+  {
+    "Id": "BATTLE_DEFENSE",
+    "Category": "Battle",
+    "Name": "열차 방어력 증가",
+    "MaxLevel": 5,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "string": null
+  },
+  {
+    "Id": "CARGO_RESOURCE_LIMIT",
+    "Category": "Cargo",
+    "Name": "자원 적제 제한량 증가",
+    "MaxLevel": 5,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "string": null
+  },
+  {
+    "Id": "CARGO_CREW_LIMIT",
+    "Category": "Cargo",
+    "Name": "인원 탑승 제한량 증가",
+    "MaxLevel": 5,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "string": null
+  },
+  {
+    "Id": "CARGO_WEAPON_LIMIT",
+    "Category": "Cargo",
+    "Name": "무기 장착 칸 제한 해제",
+    "MaxLevel": 5,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "string": null
+  },
+  {
+    "Id": "DRONE_GATHER_SPEED",
+    "Category": "Drone",
+    "Name": "자원 채집 속도 증가",
+    "MaxLevel": 5,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "string": null
+  },
+  {
+    "Id": "DRONE_GATHER_EFFICIENCY",
+    "Category": "Drone",
+    "Name": "자원 채집 효율 증가",
+    "MaxLevel": 5,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "string": null
+  },
+  {
+    "Id": "DRONE_MOVE_SPEED",
+    "Category": "Drone",
+    "Name": "드론 행동 속도 증가",
+    "MaxLevel": 5,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "string": null
+  }
+]
