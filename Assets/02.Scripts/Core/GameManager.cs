@@ -171,6 +171,10 @@ public class GameManager : SingletonBase<GameManager>
             return;
         }
 
+        Rail?.RemoveAllRail();
+        Train?.SpawnStationTrain(_activeStation, _startingCarriageCount);
+        Train?.AddVisitedStation(_activeStation.transform);
+
         _activeStation.ExitStation(stoneTaken, citizenBoarded);
 
         _completedStationIds.Add(_activeStation.StationId);
@@ -202,10 +206,23 @@ public class GameManager : SingletonBase<GameManager>
 
         Debug.Log($"[GameManager] 출구 방향 {directionIndex}번을 선택했습니다.");
         // TODO: TrainManager에서 출구 방향별 기차 위치·경로설정 메서드 필요
+        CentralTerminal.RailSpawnInfo exitInfo = _activeTerminal.GetStartPoint(directionIndex);
+        Transform exitDirRoot = _activeTerminal.ExitDirRoots[directionIndex];
+
+        Rail?.InitStartingRailPath(exitDirRoot);
+
+        Train?.SpawnFullTrain(exitInfo.position, exitInfo.rotation, _startingCarriageCount);
+
+        if (_activeTerminal != null)
+        {
+            Train?.AddVisitedStation(_activeTerminal.transform);
+        }
+
         _activeTerminal = null;
 
         ChangeGameState(GameState.ExitSelected);
         UI?.CloseBaseArrivalUI();
+        Train?.DepartStation();
         StartCountdownAsync().Forget();
     }
 
@@ -217,9 +234,9 @@ public class GameManager : SingletonBase<GameManager>
         ChangeGameState(GameState.GameOver);
         PauseGameplayTime();
 
-        ReturnToLobby();
-        // 결과창 UI 대신 바로 로비
-        // TODO: Result UI를 열고 로비로 돌아가는 UI 흐름필요
+        int rescuedHumanCount = NetworkResourceService?.GetLocalResourceViewModel().RescuedHumanCount ?? 0;
+        //NetworkUpgradeService?.GrantRescueReward(rescuedHumanCount);
+        OpenScoreReport(ReturnToLobby);
     }
 
     public void GameClear()
@@ -234,6 +251,19 @@ public class GameManager : SingletonBase<GameManager>
         
         ReturnToLobby(); // 결과창ui대신 임시
         Debug.Log($"[GameManager] 게임 클리어: 완료 역 {CompletedStationCount}/{RequiredStationCount}");
+    }
+
+    private void OpenScoreReport(Action onConfirm)
+    {
+        int rescuedHumanCount = NetworkResourceService?.GetLocalResourceViewModel().RescuedHumanCount ?? 0;
+
+        int currentCargo = NetworkResourceService != null ? NetworkResourceService.CurrentCargoLoad : 0;
+        int warehouseStored = NetworkWarehouseService != null ? NetworkWarehouseService.TotalStoredResource : 0;
+        int collectedResourceCount = currentCargo + warehouseStored;
+
+        //float totalDistance = Train != null ? Train.GetHeadTrainDistance() : 0f;
+
+        //UI?.OpenScoreUI(totalDistance, rescuedHumanCount, collectedResourceCount, _sessionKillCount, onConfirm);
     }
 
     private void InitManagerRoot()
@@ -367,7 +397,15 @@ public class GameManager : SingletonBase<GameManager>
 
     private void HandleTerminalArrival(CentralTerminal terminal)
     {
-        if (_currentGameState != GameState.Playing) return;
+        if (_currentGameState != GameState.Playing)
+        {
+            return;
+        }
+
+        if (terminal != null && Train != null && Train.IsVisitedStation(terminal.transform))
+        {
+            return;
+        }
 
         _activeTerminal = terminal;
         PauseGameplayTime();
@@ -382,11 +420,16 @@ public class GameManager : SingletonBase<GameManager>
 
         ChangeGameState(GameState.EventPaused);
 
-        UI?.OpenBaseArrivalUI();
+        OpenScoreReport(OpenBaseArrivalAfterScore);
         Debug.Log("[GameManager] 터미널 도착: 출구 방향 선택을 기다립니다.");
 
         UI?.OpenBaseArrivalUI();
         // TODO: Terminal UI를 열고 CentralTerminal.SelectExitGate(int)와 연결필요(?)
+    }
+
+    private void OpenBaseArrivalAfterScore()
+    {
+        UI?.OpenBaseArrivalUI();
     }
 
     private void PauseGameplayTime()
