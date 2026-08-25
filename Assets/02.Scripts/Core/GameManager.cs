@@ -235,7 +235,7 @@ public class GameManager : SingletonBase<GameManager>
         PauseGameplayTime();
 
         int rescuedHumanCount = NetworkResourceService?.GetLocalResourceViewModel().RescuedHumanCount ?? 0;
-        //NetworkUpgradeService?.GrantRescueReward(rescuedHumanCount);
+        NetworkUpgradeService?.GrantRescueReward(rescuedHumanCount);
         OpenScoreReport(ReturnToLobby);
     }
 
@@ -261,9 +261,9 @@ public class GameManager : SingletonBase<GameManager>
         int warehouseStored = NetworkWarehouseService != null ? NetworkWarehouseService.TotalStoredResource : 0;
         int collectedResourceCount = currentCargo + warehouseStored;
 
-        //float totalDistance = Train != null ? Train.GetHeadTrainDistance() : 0f;
+        float totalDistance = Train != null ? Train.GetHeadTrainDistance() : 0f;
 
-        //UI?.OpenScoreUI(totalDistance, rescuedHumanCount, collectedResourceCount, _sessionKillCount, onConfirm);
+        UI?.OpenScoreUI(totalDistance, rescuedHumanCount, collectedResourceCount, _sessionKillCount, onConfirm);
     }
 
     private void InitManagerRoot()
