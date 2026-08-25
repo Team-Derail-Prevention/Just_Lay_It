@@ -49,32 +49,23 @@ public class CentralTerminal : BaseColliderTrigger
         Debug.Log($"[CentralTerminal] 중앙역에 진입했습니다. 현재 창고에는 {_storedMaterialCount}개의 화물이 있습니다.");
     }
 
-    public void StoreCargo(int amount)
-    {
-        _storedMaterialCount += amount;
-        Debug.Log($"[CentralTerminal] 창고에 {amount}개의 화물이 저장되었습니다." +
-            $"현재 창고에는 {_storedMaterialCount}개의 화물이 있습니다.");
-    }
+    //public void StoreCargo(int amount)
+    //{
+    //    _storedMaterialCount += amount;
+    //    Debug.Log($"[CentralTerminal] 창고에 {amount}개의 화물이 저장되었습니다." +
+    //        $"현재 창고에는 {_storedMaterialCount}개의 화물이 있습니다.");
+    //}
 
-    public bool ConsumeRecoveryTrain(int amount)
-    {
-        if (_storedMaterialCount >= amount)
-        {
-            _storedMaterialCount -= amount;
-            return true;
-        }
+    //public bool ConsumeRecoveryTrain(int amount)
+    //{
+    //    if (_storedMaterialCount >= amount)
+    //    {
+    //        _storedMaterialCount -= amount;
+    //        return true;
+    //    }
 
-        return false;
-    }
-
-    public void SelectExitGate(int directionIndex)
-    {
-        OnExitDirectionSelected?.Invoke(directionIndex);
-
-        RailSpawnInfo selectedRailInfo = GetStartPoint(directionIndex);
-        Debug.Log($"[CentralTerminal] 출구 방향 {directionIndex} 선택됨! 스폰 위치: {selectedRailInfo.position}, 회전: {selectedRailInfo.rotation.eulerAngles}");
-
-    }
+    //    return false;
+    //}
 
     public void RegisterExitDirRoot(int dirIndex, Transform dirRoot)
     {
