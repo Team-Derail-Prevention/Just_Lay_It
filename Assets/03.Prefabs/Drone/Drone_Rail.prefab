@@ -381,7 +381,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3d5601a8baca984190619ac08a0a87e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Drone
-  _moveSpeed: 8
+  _moveSpeed: 12
   _slowDownDistance: 1.5
   _arriveSpeed: 0.5
   _arriveDistance: 0.05
@@ -431,10 +431,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DroneDeliveryWorker
   _dock: {fileID: 4438655100400215635}
-  _rack: {fileID: 0}
   _carrySocket: {fileID: 0}
-  _pickUpDuration: 0.4
-  _dropDuration: 1
+  _capacity: 3
+  _stackGap: 0.4
+  _carryGap: 0.35
+  _dockCatchDistance: 0.8
 --- !u!114 &5247923875354488048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1012,7 +1013,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 91d21386d1235164cb09fa2332de50b6, type: 2}
+  - {fileID: 2100000, guid: 7ce88dd9da3c1b4439824758a237eb28, type: 2}
   - {fileID: 2100000, guid: ca862d9708fb270498ff25634a51396d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -1103,7 +1104,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 91d21386d1235164cb09fa2332de50b6, type: 2}
+  - {fileID: 2100000, guid: c41c59688c87e204fbfefb5c2bed24fc, type: 2}
   - {fileID: 2100000, guid: ca862d9708fb270498ff25634a51396d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
