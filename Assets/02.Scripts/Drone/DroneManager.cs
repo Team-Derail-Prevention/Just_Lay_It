@@ -129,11 +129,32 @@ public class DroneManager : SingletonBase<DroneManager>
 
             for (int n = 0; n < entry.Count; n++)
             {
-                _spawned.Add(Instantiate(prefab, root));
+                GameObject drone = Instantiate(prefab, root);
+
+                ApplyCarSlot(drone, n);
+
+                _spawned.Add(drone);
             }
         }
 
         Debug.Log($"[DroneManager] 드론 {_spawned.Count}대 스폰 완료");
+    }
+
+    private void ApplyCarSlot(GameObject drone, int slot)
+    {
+        if (slot <= 0)
+        {
+            return;
+        }
+
+        DroneDockPoint dock = drone.GetComponentInChildren<DroneDockPoint>(true);
+
+        if (dock == null)
+        {
+            return;
+        }
+
+        dock.SetCar(dock.CarIndex + slot);
     }
 
     public void DespawnAll()
