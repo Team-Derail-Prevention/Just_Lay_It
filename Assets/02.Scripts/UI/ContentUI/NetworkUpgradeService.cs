@@ -4,6 +4,9 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
 {
     private UpgradeViewModel _localUpgradeViewModel;
 
+    [Header("보상 설정")]
+    [SerializeField] private int _cashPerRescuedCitizen = 10;
+
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
@@ -102,6 +105,18 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
         vm.GainGold(amount);
 
         // 저장 관련 정해지면 추후 수정
+    }
+
+    public void GrantRescueReward(int rescuedHumanCount)
+    {
+        int rewardGold = rescuedHumanCount * _cashPerRescuedCitizen;
+        if (rewardGold <= 0)
+        {
+            return;
+        }
+
+        GainGold(rewardGold);
+        Debug.Log($"[NetworkUpgradeService] 구출한 시민 {rescuedHumanCount}명 → 보상 캐쉬 {rewardGold} 지급");
     }
 
     public object GetSaveData()
