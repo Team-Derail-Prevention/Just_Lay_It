@@ -231,7 +231,8 @@ public class GameManager : SingletonBase<GameManager>
 
         ChangeGameState(GameState.GameClear);
         OnGameCleared?.Invoke();
-
+        
+        ReturnToLobby(); // 결과창ui대신 임시
         Debug.Log($"[GameManager] 게임 클리어: 완료 역 {CompletedStationCount}/{RequiredStationCount}");
     }
 
