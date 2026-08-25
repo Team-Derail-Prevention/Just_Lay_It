@@ -6,6 +6,15 @@ public class NetworkWarehouseService : SingletonBase<NetworkWarehouseService>
 {
     private WarehouseViewModel _localVm;
 
+    public int TotalStoredResource
+    {
+        get
+        {
+            var vm = GetLocalWarehouseViewModel();
+            return vm.CurrentWood + vm.CurrentStone;
+        }
+    }
+
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
