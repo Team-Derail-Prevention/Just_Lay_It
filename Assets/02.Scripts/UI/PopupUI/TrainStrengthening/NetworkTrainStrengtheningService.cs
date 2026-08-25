@@ -32,7 +32,7 @@ public class NetworkTrainStrengtheningService : SingletonBase<NetworkTrainStreng
             return;
         }
 
-        var dataList = DataManager.Instance.GetAllData<TrainStrengtheningData>();
+        var dataList = DataManager.Instance.GetAllData<InGameUpgradeData>();
 
         foreach (var data in dataList)
         {
@@ -43,7 +43,7 @@ public class NetworkTrainStrengtheningService : SingletonBase<NetworkTrainStreng
                 continue;
             }
 
-            var slotVm = new TrainStatSlotViewModel(data.Id, category, data.DisplayName, data.IconPath, data.MaxLevel, data.BaseCost, data.CostIncreasePerLevel);
+            var slotVm = new TrainStatSlotViewModel(data.Id, category, data.Name, data.IconPath, data.MaxLevel, data.BaseCost, data.CostIncreasePerLevel);
             _localVm.AddSlot(slotVm);
         }
     }
@@ -77,21 +77,20 @@ public class NetworkTrainStrengtheningService : SingletonBase<NetworkTrainStreng
         }
 
         slotVm.LevelUp();
-        ApplyEffect(slotVm.SlotDataId, slotVm.Category, slotVm.CurrentLevel);
+        ApplyEffect(slotVm.SlotDataId, slotVm.CurrentLevel);
     }
 
-    // 열차 상태 스탯 시스템이 정해지면 추후 수정
-    private void ApplyEffect(string slotDataId, TrainStatCategory category, int newLevel)
+    private void ApplyEffect(string slotDataId, int newLevel)
     {
-        if (category == TrainStatCategory.Cargo)
+        if (slotDataId == "CARGO_WEAPON_LIMIT")
         {
             int unlockedCount = CARGO_BASE_UNLOCKED_COUNT + newLevel;
             NetworkAugmentService.Instance.SetEquipUnlockedCount(unlockedCount);
         }
 
-
-        // 추후 열차 스텟과 연동 추후 수정
+        UpgradeEventHub.Instance.NotifyInGameUpgraded(slotDataId, newLevel);
     }
+
 
     public void ResetRun()
     {

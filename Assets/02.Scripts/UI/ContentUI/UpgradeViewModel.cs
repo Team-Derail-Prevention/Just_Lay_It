@@ -13,19 +13,19 @@ public class UpgradeViewModel : ViewModelBase
         }
     }
 
-    private int _currentGold;
-    public int CurrentGold
+    private int _currentCash;
+    public int CurrentCash
     {
         get
         {
-            return _currentGold;
+            return _currentCash;
         }
         set
         {
-            if (_currentGold != value)
+            if (_currentCash != value)
             {
-                _currentGold = value;
-                OnPropertyChanged(nameof(CurrentGold));
+                _currentCash = value;
+                OnPropertyChanged(nameof(CurrentCash));
             }
         }
     }
@@ -47,19 +47,19 @@ public class UpgradeViewModel : ViewModelBase
         return slotViewModel;
     }
 
-    public bool TrySpendGold(int amount)
+    public bool TrySpendCash(int amount)
     {
-        if (CurrentGold < amount)
+        if (CurrentCash < amount)
         {
             return false;
         }
 
-        CurrentGold -= amount;
+        CurrentCash -= amount;
         return true;
     }
 
-    public void GainGold(int amount)
+    public void GainCash(int amount)
     {
-        CurrentGold += amount;
+        CurrentCash += amount;
     }
 }

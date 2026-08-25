@@ -13,7 +13,7 @@ public class LobbyUpgradeSlotUI : MonoBehaviour
     [SerializeField] private Image[] Image_LevelPipArray;
 
     [Header("가격 정보")]
-    [SerializeField] private Image Image_GoldIcon;
+    [SerializeField] private Image Image_CashIcon;
     [SerializeField] private TextMeshProUGUI Text_Price;
 
     [Header("선택 표시")]

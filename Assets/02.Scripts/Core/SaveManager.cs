@@ -50,14 +50,14 @@ public class SaveManager : SingletonBase<SaveManager>
 
         _isLoading = true;
         _loadedSaveData = LoadUpgradeData();
-        _upgradeViewModel.CurrentGold = _loadedSaveData.Gold;
+        _upgradeViewModel.CurrentCash = _loadedSaveData.Cash;
         ApplySavedSlotLevels();
         _isLoading = false;
     }
 
     private void OnPropertyChanged_UpgradeViewModel(object sender, PropertyChangedEventArgs eventArgs)
     {
-        if (eventArgs.PropertyName == nameof(UpgradeViewModel.CurrentGold))
+        if (eventArgs.PropertyName == nameof(UpgradeViewModel.CurrentCash))
         {
             SaveUpgradeData();
             return;
@@ -170,7 +170,7 @@ public class SaveManager : SingletonBase<SaveManager>
             savedLevelDic[slotKv.Key] = slotKv.Value.CurrentLevel;
         }
 
-        saveData.Gold = _upgradeViewModel.CurrentGold;
+        saveData.Cash = _upgradeViewModel.CurrentCash;
 
         foreach (var savedLevelKv in savedLevelDic)
         {
@@ -187,7 +187,7 @@ public class SaveManager : SingletonBase<SaveManager>
 [Serializable]
 public class UpgradeSaveData
 {
-    public int Gold;
+    public int Cash;
     public List<UpgradeSlotSaveData> SlotList = new List<UpgradeSlotSaveData>();
 }
 

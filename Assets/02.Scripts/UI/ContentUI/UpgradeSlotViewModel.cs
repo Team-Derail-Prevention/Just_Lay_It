@@ -3,8 +3,12 @@
 public class UpgradeSlotViewModel : ViewModelBase
 {
     public string SlotDataId { get; set; }
-
+    public string DisplayName { get; private set; }
+    public string IconPath { get; private set; }
     public int MaxLevel { get; set; } = 4;
+
+    private readonly int _baseCost;
+    private readonly int _costIncreasePerLevel;
 
     private int _currentLevel;
     public int CurrentLevel
@@ -50,8 +54,15 @@ public class UpgradeSlotViewModel : ViewModelBase
         }
     }
 
-    public UpgradeSlotViewModel()
+    public UpgradeSlotViewModel(string slotDataId, string displayName, string iconPath, int maxLevel, int baseCost, int costIncreasePerLevel)
     {
+        SlotDataId = slotDataId;
+        DisplayName = displayName;
+        IconPath = iconPath;
+        MaxLevel = maxLevel;
+        _baseCost = baseCost;
+        _costIncreasePerLevel = costIncreasePerLevel;
+
         RecalculateNextCost();
     }
 
@@ -79,6 +90,6 @@ public class UpgradeSlotViewModel : ViewModelBase
 
     private void RecalculateNextCost()
     {
-        NextCost = (CurrentLevel + 1) * 100;
+        NextCost = _baseCost + (CurrentLevel * _costIncreasePerLevel);
     }
 }

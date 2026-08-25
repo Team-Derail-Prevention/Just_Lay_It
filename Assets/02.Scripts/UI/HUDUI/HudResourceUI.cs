@@ -45,7 +45,7 @@ public class HudResourceUI : UIBase
         {
             _upgradeVm = NetworkUpgradeService.Instance.GetLocalUpgradeViewModel();
             _upgradeVm.PropertyChanged += OnUpgradeViewModelPropertyChanged;
-            SetCash(_upgradeVm.CurrentGold);
+            SetCash(_upgradeVm.CurrentCash);
         }
     }
 
@@ -66,9 +66,9 @@ public class HudResourceUI : UIBase
 
     private void OnUpgradeViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(UpgradeViewModel.CurrentGold))
+        if (e.PropertyName == nameof(UpgradeViewModel.CurrentCash))
         {
-            SetCash(_upgradeVm.CurrentGold);
+            SetCash(_upgradeVm.CurrentCash);
         }
     }
 

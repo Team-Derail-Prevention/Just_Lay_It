@@ -8,6 +8,36 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
     private ResourceViewModel _localVm;
     private int _cargoLimit = BASE_CARGO_LIMIT;
 
+    private int _bonusBaseMaterialAmount = 0;
+
+    private void OnEnable()
+    {
+        if (UpgradeEventHub.Instance != null)
+        {
+            UpgradeEventHub.Instance.OnLobbyUpgraded += OnLobbyUpgraded;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (UpgradeEventHub.Instance != null)
+        {
+            UpgradeEventHub.Instance.OnLobbyUpgraded -= OnLobbyUpgraded;
+        }
+    }
+
+    private void OnLobbyUpgraded(string slotDataId, int newLevel)
+    {
+        if (slotDataId == "LOBBY_BASE_CARGO_LIMIT")
+        {
+            IncreaseCargoLimit(20);
+        }
+        else if (slotDataId == "LOBBY_BASE_MATERIAL_AMOUNT")
+        {
+            _bonusBaseMaterialAmount += 20;
+        }
+    }
+
     public int CargoLimit
     {
         get
@@ -195,10 +225,13 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         _localVm = new ResourceViewModel();
         _cargoLimit = BASE_CARGO_LIMIT;
 
+        _localVm.CurrentWood = _bonusBaseMaterialAmount;
+        _localVm.CurrentStone = _bonusBaseMaterialAmount;
+
         if (ResourceStatusEventHub.Instance != null)
         {
-            ResourceStatusEventHub.Instance.NotifyWoodChanged(0);
-            ResourceStatusEventHub.Instance.NotifyStoneChanged(0);
+            ResourceStatusEventHub.Instance.NotifyWoodChanged(_localVm.CurrentWood);
+            ResourceStatusEventHub.Instance.NotifyStoneChanged(_localVm.CurrentStone);
             ResourceStatusEventHub.Instance.NotifyRescuedHumanChanged(0);
         }
     }

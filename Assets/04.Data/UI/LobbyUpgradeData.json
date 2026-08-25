@@ -1,0 +1,83 @@
+[
+  {
+    "Id": "LOBBY_WEAPON_RELOAD",
+    "Name": "무기 재장전 속도 감소",
+    "MaxLevel": 4,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "Description": "장착한 모든 무기의 재장전 속도가 감소 합니다",
+    "IconPath": null
+  },
+  {
+    "Id": "LOBBY_WEAPON_MAGAZINE",
+    "Name": "무기 탄창 수 증가",
+    "MaxLevel": 4,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "Description": "장착한 모든 무기의 탄창 수가 증가 합니다",
+    "IconPath": null
+  },
+  {
+    "Id": "LOBBY_WEAPON_ATK",
+    "Name": "무기 공격력 증가",
+    "MaxLevel": 4,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "Description": "장착한 모든 무기의 공격력이 증가 합니다",
+    "IconPath": null
+  },
+  {
+    "Id": "LOBBY_WEAPON_RANGE",
+    "Name": "무기 사거리 증가",
+    "MaxLevel": 4,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "Description": "장착한 모든 무기의 공격 가능 범위가 증가 합니다",
+    "IconPath": null
+  },
+  {
+    "Id": "LOBBY_GACHA_REROLL",
+    "Name": "무기 가챠 리롤 횟수 증가",
+    "MaxLevel": 4,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "Description": "무기 가챠 진행시 뽑힌 무기를 다시 돌릴 수 있는 횟수가 증가 합니다",
+    "IconPath": null
+  },
+  {
+    "Id": "LOBBY_RESCUE_REWARD",
+    "Name": "시민 구출 보상량 증가",
+    "MaxLevel": 4,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "Description": "정거장에서 구출한 시민 숫자에 따른 캐쉬 보상량이 증가 합니다",
+    "IconPath": null
+  },
+  {
+    "Id": "LOBBY_RAIL_CRAFT_SPEED",
+    "Name": "선로 제작 속도 감소",
+    "MaxLevel": 4,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "Description": "선로를 제작 하는 속도가 빨라집니다",
+    "IconPath": null
+  },
+  {
+    "Id": "LOBBY_BASE_MATERIAL_AMOUNT",
+    "Name": "기본 자재량 증가",
+    "MaxLevel": 4,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "Description": "게임 시작시 처음에 가지고 시작하는 나무와 돌의 량이 증가합니다",
+    "IconPath": null
+  },
+  {
+    "Id": "LOBBY_BASE_CARGO_LIMIT",
+    "Name": "기본 적재 제한량 증가",
+    "MaxLevel": 4,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "Description": "게임 시작시 나무와 돌의 가지고 있을 수 있는 제한량이 증가 합니다",
+    "IconPath": null
+  }
+]

@@ -538,7 +538,7 @@ public class GameManager : SingletonBase<GameManager>
         _sessionKillCount++;
         _sessionEarnedGold += dropGold;
 
-        NetworkUpgradeService?.GainGold(dropGold);
+        NetworkResourceService?.AddStone(dropGold);
 
         Debug.Log($"몬스터 처치 현재 킬: {_sessionKillCount} / 누적 골드: {_sessionEarnedGold} (+{dropGold})");
     }

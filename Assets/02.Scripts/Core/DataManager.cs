@@ -73,6 +73,8 @@ public class DataManager : SingletonBase<DataManager>
         await LoadDataAsync<TrainData>("TrainData", cancellationToken);
         await LoadDataAsync<DroneUpgradeData>("DroneUpgradeData", cancellationToken);
         await LoadDataAsync<WeaponData>("WeaponData", cancellationToken);
+        await LoadDataAsync<InGameUpgradeData>("InGameUpgradeData", cancellationToken);
+        await LoadDataAsync<LobbyUpgradeData>("LobbyUpgradeData", cancellationToken);
 
         IsLoaded = true;
         OnDataLoadCompleted?.Invoke();

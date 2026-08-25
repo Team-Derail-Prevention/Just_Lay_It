@@ -105,3 +105,25 @@ public static class DroneStatTypeConst
     public const string MoveSpeed = "MoveSpeed";
     public const string YieldBonus = "YieldBonus";
 }
+
+[Serializable]
+public class LobbyUpgradeData : GameDataBase
+{
+    public string Name;
+    public string Description;
+    public int MaxLevel;
+    public int BaseCost;
+    public int CostIncreasePerLevel;
+    public string IconPath;
+}
+
+[Serializable]
+public class InGameUpgradeData : GameDataBase
+{
+    public string Category;
+    public string Name;
+    public string IconPath;
+    public int MaxLevel;
+    public int BaseCost;
+    public int CostIncreasePerLevel;
+}
