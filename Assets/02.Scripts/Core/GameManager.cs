@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : SingletonBase<GameManager>
@@ -26,10 +27,16 @@ public class GameManager : SingletonBase<GameManager>
     private float _playTime;
     private int _lastNotifiedTime;
 
+    private const int RequiredStationCount = 4;
+
+    private readonly HashSet<string> _completedStationIds = new();
+    public int CompletedStationCount => _completedStationIds.Count;
+
     public int SessionKillCount => _sessionKillCount;
     public int SessionEarnedGold => _sessionEarnedGold;
 
     public event Action<int> OnCountdownChanged;
+    public event Action OnGameCleared;
 
     public static DataManager Data => DataManager.Instance;
     public static ResourceManager Resource => ResourceManager.Instance;
@@ -165,6 +172,9 @@ public class GameManager : SingletonBase<GameManager>
         }
 
         _activeStation.ExitStation(stoneTaken, citizenBoarded);
+
+        _completedStationIds.Add(_activeStation.StationId);
+
         _activeStation = null;
         UI?.CloseStationArrivalUI();
 
@@ -212,6 +222,19 @@ public class GameManager : SingletonBase<GameManager>
         // TODO: Result UI를 열고 로비로 돌아가는 UI 흐름필요
     }
 
+    public void GameClear()
+    {
+        if (_currentGameState == GameState.GameClear)
+        {
+            return;
+        }
+
+        ChangeGameState(GameState.GameClear);
+        OnGameCleared?.Invoke();
+
+        Debug.Log($"[GameManager] 게임 클리어: 완료 역 {CompletedStationCount}/{RequiredStationCount}");
+    }
+
     private void InitManagerRoot()
     {
         GameObject rootObject = GameObject.Find("@Managers");
@@ -225,6 +248,7 @@ public class GameManager : SingletonBase<GameManager>
         {
             transform.SetParent(_managerRoot);
         }
+        // TODO: Station UI를 열고 CompleteStation(stoneTaken, citizenBoarded)을 호출하도록 연결해야 한다.
     }
 
     private void OrganizeExistingManagers()
@@ -348,6 +372,13 @@ public class GameManager : SingletonBase<GameManager>
         PauseGameplayTime();
         StopAndDespawnMonsters();
         RemovePlayerPlacedRails();
+
+        if (CompletedStationCount >= RequiredStationCount)
+        {
+            GameClear();
+            return;
+        }
+
         ChangeGameState(GameState.EventPaused);
 
         UI?.OpenBaseArrivalUI();
@@ -476,6 +507,7 @@ public class GameManager : SingletonBase<GameManager>
         _lastNotifiedTime = 0;
         _sessionKillCount = 0;
         _sessionEarnedGold = 0;
+        _completedStationIds.Clear();
     }
 
     private void ClearCurrentSession()
