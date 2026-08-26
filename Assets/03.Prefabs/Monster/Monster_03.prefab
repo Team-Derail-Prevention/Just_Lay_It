@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8969029064315857464}
   - component: {fileID: 990825028463747129}
   m_Layer: 0
-  m_Name: Monster_01
+  m_Name: Monster_03
   m_TagString: Monster
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -200,7 +200,7 @@ PrefabInstance:
     - target: {fileID: 2300000, guid: 28723f10c2a8e094a9351e892f5271b8, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 2954963d08a0b044e8f84eece7126e53, type: 2}
+      objectReference: {fileID: 2100000, guid: 6824078c7b1eed440807879c95741e7f, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
