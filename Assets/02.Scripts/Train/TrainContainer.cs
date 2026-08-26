@@ -1,14 +1,6 @@
 ﻿using UnityEngine;
-//using enums;
+using Enums;
 
-
-public enum ContainerLevel
-{
-    Empty = -1,
-    Low = 0,
-    Medium = 1,
-    Full = 2
-}
 
 public class TrainContainer : MonoBehaviour
 {
@@ -40,11 +32,6 @@ public class TrainContainer : MonoBehaviour
         get { return _currentAmount; }
     }
 
-    public float MaxCargo
-    {
-        get { return _maxCargo; }
-    }
-
     public ContainerLevel CurrentLevel
     {
         get { return _currentLevel; }
@@ -63,8 +50,6 @@ public class TrainContainer : MonoBehaviour
         {
             return;
         }
-
-        _maxCargo = data.MaxCargo;
         _currentAmount = 0f;
         RefreshVisual();
     }
