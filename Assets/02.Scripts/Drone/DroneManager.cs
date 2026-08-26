@@ -18,12 +18,20 @@ public class DroneManager : SingletonBase<DroneManager>
         public GameObject Ghost;
         public Vector3 Target;
         public Quaternion Rotation;
+        public int Sequence;
+        public Action<GameObject> OnPlaced;
+    }
+
+    private struct HeldPlacement
+    {
+        public GameObject Payload;
         public Action<GameObject> OnPlaced;
     }
 
     [Header("스폰")]
     [SerializeField] private List<DroneSpawnEntry> _spawnEntries = new List<DroneSpawnEntry>();
     [SerializeField] private Transform _spawnRoot;
+    [SerializeField, Min(0f)] private float _altitudeStepPerSlot = 0.6f;
 
     [Header("채집 명령")]
     [SerializeField, Min(1)] private int _maxMiningOrders = 3;
@@ -44,6 +52,10 @@ public class DroneManager : SingletonBase<DroneManager>
     private readonly List<GameObject> _spawned = new List<GameObject>();
     private readonly Queue<DeliveryOrder> _pendingDeliveries = new Queue<DeliveryOrder>();
     private readonly List<MaterialObject> _pendingMining = new List<MaterialObject>();
+    private readonly Dictionary<int, HeldPlacement> _heldPlacements = new Dictionary<int, HeldPlacement>();
+
+    private int _nextPlacementSequence;
+    private int _placementTurn;
 
     private DroneRailPreloader _preloader;
     private DroneOrderMarkerView _markerView;
@@ -147,6 +159,8 @@ public class DroneManager : SingletonBase<DroneManager>
             return;
         }
 
+        ApplyCruiseOffset(drone, slot);
+
         DroneDockPoint dock = drone.GetComponentInChildren<DroneDockPoint>(true);
 
         if (dock == null)
@@ -155,6 +169,23 @@ public class DroneManager : SingletonBase<DroneManager>
         }
 
         dock.SetCar(dock.CarIndex + slot);
+    }
+
+    private void ApplyCruiseOffset(GameObject drone, int slot)
+    {
+        if (_altitudeStepPerSlot <= 0f)
+        {
+            return;
+        }
+
+        DroneAltitude altitude = drone.GetComponentInChildren<DroneAltitude>(true);
+
+        if (altitude == null)
+        {
+            return;
+        }
+
+        altitude.AddCruiseOffset(slot * _altitudeStepPerSlot);
     }
 
     public void DespawnAll()
@@ -314,6 +345,13 @@ public class DroneManager : SingletonBase<DroneManager>
             return false;
         }
 
+        if (DroneRailDrop.TryHandOff(oldPayload, newPayload))
+        {
+            Debug.Log($"[순번] 낙하 중이던 레일이 모양 갱신으로 교체돼 순번을 넘겨받았습니다: {newPayload.name}");
+
+            return true;
+        }
+
         for (int i = 0; i < _workers.Count; i++)
         {
             DroneDeliveryWorker carrier = _workers[i] as DroneDeliveryWorker;
@@ -386,13 +424,24 @@ public class DroneManager : SingletonBase<DroneManager>
             return false;
         }
 
-        DroneDeliveryWorker carrier = FindNearestIdleCarrier(target);
+        int sequence = _nextPlacementSequence;
+
+        _nextPlacementSequence++;
+
+        Action<GameObject> sequenced = placed => CompletePlacement(sequence, placed, onPlaced);
+
+        DroneDeliveryWorker carrier = null;
+
+        if (_pendingDeliveries.Count == 0)
+        {
+            carrier = FindNearestIdleCarrier(target);
+        }
 
         if (carrier == null && HasAnyCarrier() == false)
         {
             Debug.Log("[DroneManager] 배달 요청 거절 — 운반 드론이 한 대도 없습니다");
 
-            onPlaced?.Invoke(payload);
+            sequenced(payload);
 
             return false;
         }
@@ -405,12 +454,12 @@ public class DroneManager : SingletonBase<DroneManager>
         {
             Preloader.TopUp(carrier);
 
-            if (carrier.Assign(payload, ghost, target, rotation, onPlaced))
+            if (carrier.Assign(payload, ghost, target, rotation, sequence, sequenced))
             {
                 return true;
             }
 
-            RestorePayload(payload, ghost, target, rotation, onPlaced);
+            RestorePayload(payload, ghost, target, rotation, sequenced);
 
             return false;
         }
@@ -421,7 +470,8 @@ public class DroneManager : SingletonBase<DroneManager>
             Ghost = ghost,
             Target = target,
             Rotation = rotation,
-            OnPlaced = onPlaced,
+            Sequence = sequence,
+            OnPlaced = sequenced,
         };
 
         _pendingDeliveries.Enqueue(order);
@@ -457,12 +507,50 @@ public class DroneManager : SingletonBase<DroneManager>
 
             Preloader.TopUp(carrier);
 
-            if (carrier.Assign(order.Payload, order.Ghost, order.Target, order.Rotation, order.OnPlaced) == false)
+            if (carrier.Assign(order.Payload, order.Ghost, order.Target, order.Rotation, order.Sequence, order.OnPlaced) == false)
             {
                 Debug.LogWarning("[DroneManager] 대기 중이던 배달을 배정하지 못했습니다. 즉시 설치로 남깁니다.");
 
                 RestorePayload(order.Payload, order.Ghost, order.Target, order.Rotation, order.OnPlaced);
             }
+        }
+    }
+
+    public bool IsPlacementTurn(int sequence)
+    {
+        return sequence <= _placementTurn;
+    }
+
+    private void CompletePlacement(int sequence, GameObject placed, Action<GameObject> onPlaced)
+    {
+        if (sequence < _placementTurn)
+        {
+            return;
+        }
+
+        if (sequence > _placementTurn)
+        {
+            _heldPlacements[sequence] = new HeldPlacement { Payload = placed, OnPlaced = onPlaced };
+
+            return;
+        }
+
+        _placementTurn++;
+
+        onPlaced?.Invoke(placed);
+
+        DrainHeldPlacements();
+    }
+
+    private void DrainHeldPlacements()
+    {
+        while (_heldPlacements.TryGetValue(_placementTurn, out HeldPlacement held))
+        {
+            _heldPlacements.Remove(_placementTurn);
+
+            _placementTurn++;
+
+            held.OnPlaced?.Invoke(held.Payload);
         }
     }
 
@@ -485,17 +573,15 @@ public class DroneManager : SingletonBase<DroneManager>
             Destroy(ghost);
         }
 
-        if (payload == null)
+        if (payload != null)
         {
-            return;
+            payload.transform.SetPositionAndRotation(target, rotation);
+
+            SetPayloadGhost(payload, false);
+            SetPayloadCollision(payload, true);
+
+            payload.SetActive(true);
         }
-
-        payload.transform.SetPositionAndRotation(target, rotation);
-
-        SetPayloadGhost(payload, false);
-        SetPayloadCollision(payload, true);
-
-        payload.SetActive(true);
 
         onPlaced?.Invoke(payload);
     }

@@ -17,6 +17,16 @@ public class DroneAltitude : MonoBehaviour
         _worker = GetComponent<IDroneWorker>();
     }
 
+    public void AddCruiseOffset(float offset)
+    {
+        if (offset <= 0f)
+        {
+            return;
+        }
+
+        _cruiseHeight += offset;
+    }
+
     private void Update()
     {
         float targetHeight = GetTargetHeight();
