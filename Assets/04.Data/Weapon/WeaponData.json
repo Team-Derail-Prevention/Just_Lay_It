@@ -1,12 +1,30 @@
-﻿[
+[
   {
-    "Id": "NomalWeapon_01",
+    "string": "weapon_01",
     "WeaponName": "NomalGun",
     "Atk": 20,
     "FireRate": 3,
     "MagazineSize": 30,
     "ReloadTime": 2,
+    "Range": 6,
     "UseFireSound": null,
-    "UseReloadSound": null
+    "UseReloadSound": null,
+    "GradeName": "Common",
+    "Description": "가장 기초적인 무기 미래형으로 개조되었지만 그대로 기본적이다.",
+    "IconPath": null
+  },
+  {
+    "string": "weapon_02",
+    "WeaponName": "MiniGun",
+    "Atk": 10,
+    "FireRate": 1,
+    "MagazineSize": 60,
+    "ReloadTime": 4,
+    "Range": 6,
+    "UseFireSound": null,
+    "UseReloadSound": null,
+    "GradeName": "Common",
+    "Description": "미래형으로 개조된 미니건 공격속도와 탄창수는 늘어났지만 재장전 시간이 느리다.",
+    "IconPath": null
   }
 ]
