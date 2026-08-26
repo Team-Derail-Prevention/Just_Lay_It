@@ -29,8 +29,8 @@ public class GameManager : SingletonBase<GameManager>
 
     private const int RequiredStationCount = 4;
 
-    private readonly HashSet<string> _completedStationIds = new();
-    public int CompletedStationCount => _completedStationIds.Count;
+    private readonly HashSet<StationObject> _completedStations = new();
+    public int CompletedStationCount => _completedStations.Count;
 
     public int SessionKillCount => _sessionKillCount;
     public int SessionEarnedGold => _sessionEarnedGold;
@@ -171,13 +171,12 @@ public class GameManager : SingletonBase<GameManager>
             return;
         }
 
-        Rail?.RemoveAllRail();
         Train?.SpawnStationTrain(_activeStation, _startingCarriageCount);
         Train?.AddVisitedStation(_activeStation.transform);
 
         _activeStation.ExitStation(stoneTaken, citizenBoarded);
 
-        _completedStationIds.Add(_activeStation.StationId);
+        _completedStations.Add(_activeStation);
 
         _activeStation = null;
         UI?.CloseStationArrivalUI();
@@ -248,9 +247,12 @@ public class GameManager : SingletonBase<GameManager>
 
         ChangeGameState(GameState.GameClear);
         OnGameCleared?.Invoke();
-        
-        ReturnToLobby(); // 결과창ui대신 임시
-        Debug.Log($"[GameManager] 게임 클리어: 완료 역 {CompletedStationCount}/{RequiredStationCount}");
+
+        int completedStationCount = CompletedStationCount;
+        Debug.Log($"[GameManager] 게임 클리어: 완료 역 {completedStationCount}/{RequiredStationCount}.");
+
+        // 아직 결과 UI가 연결되어 있지 않은 현재 흐름에서는 클리어 즉시 로비로 돌아간다.
+        ReturnToLobby();
     }
 
     private void OpenScoreReport(Action onConfirm)
@@ -551,7 +553,7 @@ public class GameManager : SingletonBase<GameManager>
         _lastNotifiedTime = 0;
         _sessionKillCount = 0;
         _sessionEarnedGold = 0;
-        _completedStationIds.Clear();
+        _completedStations.Clear();
     }
 
     private void ClearCurrentSession()
