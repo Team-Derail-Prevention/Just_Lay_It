@@ -23,7 +23,8 @@ public class TrainManager : SingletonBase<TrainManager>
     public static event Action OnTrainRelocated;
 
     private Transform _headTrain;
-
+    private Train _activeTrain;
+    private Vector3 _lastEnterDirection = Vector3.forward;
 
     protected override void Init()
     {
@@ -55,7 +56,7 @@ public class TrainManager : SingletonBase<TrainManager>
         }
 
         //머리 진행 방향 기준 (0: 서쪽, 1: 동쪽)
-        Vector3 forward = (_headTrain != null) ? _headTrain.forward : Vector3.forward;
+        Vector3 forward = (_headTrain != null) ? _headTrain.forward : _lastEnterDirection;
         int exitIndex = (forward.x >= 0f) ? 1 : 0;
 
         StationObject.RailSpawnInfo exitInfo = station.GetStartPoint(exitIndex);
@@ -99,9 +100,14 @@ public class TrainManager : SingletonBase<TrainManager>
             return;
         }
 
+        if (_headTrain != null)
+        {
+            RelocateExistingTrain(spawnPos, spawnRot);
+            return;
+        }
+
         ClearExistingTrain();
 
-        //  기차 헤드 소환 및 회전값 등록
         GameObject newHead = Instantiate(_headPrefab, spawnPos, spawnRot);
         if (newHead == null)
         {
@@ -116,6 +122,8 @@ public class TrainManager : SingletonBase<TrainManager>
         Train trainScript = newHead.GetComponent<Train>();
         if (trainScript != null && DataManager.Instance != null)
         {
+            RegisterTrain(trainScript);
+
             TrainData headData = DataManager.Instance.GetData<TrainData>("TRAIN_HEAD_01");
             trainScript.TrainInit(headData);
         }
@@ -149,13 +157,9 @@ public class TrainManager : SingletonBase<TrainManager>
         return head != null ? head.TotalDistance : 0f;
     }
 
-    public void RelocateTrain(Vector3 spawnPos, Quaternion spawnRot) // 출구 선택 시 스폰으로 소환 예정이기에 폐기 예정
+    private void RelocateExistingTrain(Vector3 spawnPos, Quaternion spawnRot)
     {
-        if (_headTrain == null)
-        {
-            Debug.Log("[TrainManager] 재배치할 기차 헤드가 없습니다.");
-            return;
-        }
+        if (_headTrain == null) return;
 
         _headTrain.position = spawnPos;
         _headTrain.rotation = spawnRot;
@@ -163,7 +167,9 @@ public class TrainManager : SingletonBase<TrainManager>
         Train head = _headTrain.GetComponent<Train>();
         if (head != null)
         {
+            RegisterTrain(head);
             head.SetTargetIndex(0);
+            
         }
 
         Vector3 backspawn = -(spawnRot * Vector3.forward);
@@ -187,9 +193,11 @@ public class TrainManager : SingletonBase<TrainManager>
             }
         }
 
-        OnTrainRelocated?.Invoke();
+        SetCarriagesActive(true);
+        IsStation = false;
 
-        Debug.Log($"[TrainManager] 출구 위치({spawnPos})로 기차 재배치 완료!");
+        OnTrainRelocated?.Invoke();
+        Debug.Log($"[TrainManager] 기존 기차(체력 유지됨)를 새로운 출구 위치({spawnPos})로 재배치 완료!");
     }
 
 
@@ -267,6 +275,10 @@ public class TrainManager : SingletonBase<TrainManager>
         {
             return;
         }
+        if (_headTrain != null)
+        {
+            _lastEnterDirection = _headTrain.forward;
+        }
 
         visitedStation.Add(stationObj.transform);
         IsStation = true;
@@ -293,6 +305,32 @@ public class TrainManager : SingletonBase<TrainManager>
             {
                 carList[i].SetActive(isActive);
             }
+        }
+    }
+
+    public void RegisterTrain(Train train)
+    {
+        _activeTrain = train;
+    }
+
+    public bool IsTrainHpFull()
+    {
+        if (_activeTrain != null)
+        {
+            return _activeTrain.CurrentHp >= _activeTrain.MaxHp;
+        }
+        return true;
+    }
+
+    public void HealActiveTrain(int healAmount)
+    {
+        if (_activeTrain != null)
+        {
+            _activeTrain.Heal(healAmount);
+        }
+        else
+        {
+            Debug.LogWarning("[TrainManager] 회복할 활성 기관차가 없습니다.");
         }
     }
 
