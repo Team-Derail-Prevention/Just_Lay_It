@@ -6,7 +6,7 @@
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
     "Description": "장착한 모든 무기의 재장전 속도가 감소 합니다",
-    "IconPath": null
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_RELOAD_Icon]"
   },
   {
     "Id": "LOBBY_WEAPON_MAGAZINE",
@@ -15,7 +15,7 @@
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
     "Description": "장착한 모든 무기의 탄창 수가 증가 합니다",
-    "IconPath": null
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_MAGAZINE_Icon]"
   },
   {
     "Id": "LOBBY_WEAPON_ATK",
@@ -24,7 +24,7 @@
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
     "Description": "장착한 모든 무기의 공격력이 증가 합니다",
-    "IconPath": null
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_ATK_Icon]"
   },
   {
     "Id": "LOBBY_WEAPON_RANGE",
@@ -33,7 +33,7 @@
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
     "Description": "장착한 모든 무기의 공격 가능 범위가 증가 합니다",
-    "IconPath": null
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_RANGE_Icon]"
   },
   {
     "Id": "LOBBY_GACHA_REROLL",
@@ -42,7 +42,7 @@
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
     "Description": "무기 가챠 진행시 뽑힌 무기를 다시 돌릴 수 있는 횟수가 증가 합니다",
-    "IconPath": null
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_GACHA_REROLL_Icon]"
   },
   {
     "Id": "LOBBY_RESCUE_REWARD",
@@ -51,7 +51,7 @@
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
     "Description": "정거장에서 구출한 시민 숫자에 따른 캐쉬 보상량이 증가 합니다",
-    "IconPath": null
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_RESCUE_REWARD_Icon]"
   },
   {
     "Id": "LOBBY_RAIL_CRAFT_SPEED",
@@ -60,7 +60,7 @@
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
     "Description": "선로를 제작 하는 속도가 빨라집니다",
-    "IconPath": null
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_RAIL_CRAFT_SPEED_Icon]"
   },
   {
     "Id": "LOBBY_BASE_MATERIAL_AMOUNT",
@@ -69,7 +69,7 @@
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
     "Description": "게임 시작시 처음에 가지고 시작하는 나무와 돌의 량이 증가합니다",
-    "IconPath": null
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_BASE_MATERIAL_AMOUNT_Icon]"
   },
   {
     "Id": "LOBBY_BASE_CARGO_LIMIT",
@@ -78,6 +78,6 @@
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
     "Description": "게임 시작시 나무와 돌의 가지고 있을 수 있는 제한량이 증가 합니다",
-    "IconPath": null
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_BASE_CARGO_LIMIT_Icon]"
   }
 ]

@@ -265,7 +265,7 @@ public class GameManager : SingletonBase<GameManager>
 
         float totalDistance = Train != null ? Train.GetHeadTrainDistance() : 0f;
 
-        UI?.OpenScoreUI(totalDistance, rescuedHumanCount, collectedResourceCount, _sessionKillCount, onConfirm);
+       // UI?.OpenScoreUI(totalDistance, rescuedHumanCount, collectedResourceCount, _sessionKillCount, onConfirm);
     }
 
     private void InitManagerRoot()
@@ -486,7 +486,7 @@ public class GameManager : SingletonBase<GameManager>
             }
 
             OnCountdownChanged?.Invoke(0);
-
+          
             ResumeMonsterSpawning();
             ResumeGameplayTime();
             ChangeGameState(GameState.Playing);

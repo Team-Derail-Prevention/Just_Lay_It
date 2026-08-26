@@ -5,6 +5,9 @@ using TMPro;
 
 public class ScoreUI : UIBase
 {
+    [Header("제목")]
+    [SerializeField] private TextMeshProUGUI Text_Title;
+
     [Header("운행 거리")]
     [SerializeField] private TextMeshProUGUI Text_DistanceScore;
 
@@ -16,6 +19,10 @@ public class ScoreUI : UIBase
 
     [Header("처치한 몬스터 수")]
     [SerializeField] private TextMeshProUGUI Text_KillScore;
+
+    private const string TITLE_BASE_ARRIVAL = "운행 중간 점검";
+    private const string TITLE_GAME_CLEAR = "운행 결과 : Game Clear";
+    private const string TITLE_GAME_OVER = "운행 결과 : Game Over";
 
     private readonly ScoreViewModel _viewModel = new ScoreViewModel();
     private Action _onConfirm;
@@ -41,12 +48,13 @@ public class ScoreUI : UIBase
         _onConfirm = null;
     }
 
-    public void Init(float totalDistance, int rescuedHumanCount, int collectedResourceCount, int killCount, Action onConfirm)
+    public void Init(float totalDistance, int rescuedHumanCount, int collectedResourceCount, int killCount, ScoreResultType resultType, Action onConfirm)
     {
         _viewModel.TotalDistance = totalDistance;
         _viewModel.RescuedHumanCount = rescuedHumanCount;
         _viewModel.CollectedResourceCount = collectedResourceCount;
         _viewModel.KillCount = killCount;
+        _viewModel.ResultType = resultType;
 
         _onConfirm = onConfirm;
 
@@ -69,6 +77,9 @@ public class ScoreUI : UIBase
             case nameof(ScoreViewModel.KillCount):
                 SetKillText();
                 break;
+            case nameof(ScoreViewModel.ResultType):
+                SetTitleText();
+                break;
         }
     }
 
@@ -78,6 +89,29 @@ public class ScoreUI : UIBase
         SetRescueText();
         SetResourceText();
         SetKillText();
+        SetTitleText();
+    }
+
+    private void SetTitleText()
+    {
+        if (Text_Title == null)
+        {
+            return;
+        }
+
+        switch (_viewModel.ResultType)
+        {
+            case ScoreResultType.GameClear:
+                Text_Title.text = TITLE_GAME_CLEAR;
+                break;
+            case ScoreResultType.GameOver:
+                Text_Title.text = TITLE_GAME_OVER;
+                break;
+            case ScoreResultType.BaseArrival:
+            default:
+                Text_Title.text = TITLE_BASE_ARRIVAL;
+                break;
+        }
     }
 
     private void SetDistanceText()

@@ -69,4 +69,21 @@ public class ScoreViewModel : ViewModelBase
             }
         }
     }
+
+    private ScoreResultType _resultType;
+    public ScoreResultType ResultType
+    {
+        get
+        {
+            return _resultType;
+        }
+        set
+        {
+            if (_resultType != value)
+            {
+                _resultType = value;
+                OnPropertyChanged(nameof(ResultType));
+            }
+        }
+    }
 }
