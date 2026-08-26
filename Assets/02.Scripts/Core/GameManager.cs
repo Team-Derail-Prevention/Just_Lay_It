@@ -27,7 +27,7 @@ public class GameManager : SingletonBase<GameManager>
     private float _playTime;
     private int _lastNotifiedTime;
 
-    private const int RequiredStationCount = 4;
+    public const int RequiredStationCount = 4;
 
     private readonly HashSet<StationObject> _completedStations = new();
     public int CompletedStationCount => _completedStations.Count;
@@ -177,6 +177,7 @@ public class GameManager : SingletonBase<GameManager>
         _activeStation.ExitStation(stoneTaken, citizenBoarded);
 
         _completedStations.Add(_activeStation);
+        ResourceStatusEventHub?.NotifyStationProgressChanged(CompletedStationCount, RequiredStationCount);
 
         _activeStation = null;
         UI?.CloseStationArrivalUI();
@@ -204,7 +205,6 @@ public class GameManager : SingletonBase<GameManager>
         }
 
         Debug.Log($"[GameManager] 출구 방향 {directionIndex}번을 선택했습니다.");
-        // TODO: TrainManager에서 출구 방향별 기차 위치·경로설정 메서드 필요
         CentralTerminal.RailSpawnInfo exitInfo = _activeTerminal.GetStartPoint(directionIndex);
         Transform exitDirRoot = _activeTerminal.ExitDirRoots[directionIndex];
 
@@ -227,7 +227,10 @@ public class GameManager : SingletonBase<GameManager>
 
     public void GameOver()
     {
-        if (_currentGameState == GameState.GameOver) return;
+        if (_currentGameState == GameState.GameOver)
+        {
+            return;
+        }
 
         Debug.Log("[GameManager] 게임 오버: 진행 중인 시스템을 정리합니다.");
         ChangeGameState(GameState.GameOver);
@@ -235,7 +238,7 @@ public class GameManager : SingletonBase<GameManager>
 
         int rescuedHumanCount = NetworkResourceService?.GetLocalResourceViewModel().RescuedHumanCount ?? 0;
         NetworkUpgradeService?.GrantRescueReward(rescuedHumanCount);
-        OpenScoreReport(ReturnToLobby);
+        OpenScoreReport(ScoreResultType.GameOver, ReturnToLobby);
     }
 
     public void GameClear()
@@ -251,11 +254,10 @@ public class GameManager : SingletonBase<GameManager>
         int completedStationCount = CompletedStationCount;
         Debug.Log($"[GameManager] 게임 클리어: 완료 역 {completedStationCount}/{RequiredStationCount}.");
 
-        // 아직 결과 UI가 연결되어 있지 않은 현재 흐름에서는 클리어 즉시 로비로 돌아간다.
-        ReturnToLobby();
+        OpenScoreReport(ScoreResultType.GameClear, ReturnToLobby);
     }
 
-    private void OpenScoreReport(Action onConfirm)
+    private void OpenScoreReport(ScoreResultType resultType, Action onConfirm)
     {
         int rescuedHumanCount = NetworkResourceService?.GetLocalResourceViewModel().RescuedHumanCount ?? 0;
 
@@ -265,7 +267,7 @@ public class GameManager : SingletonBase<GameManager>
 
         float totalDistance = Train != null ? Train.GetHeadTrainDistance() : 0f;
 
-       // UI?.OpenScoreUI(totalDistance, rescuedHumanCount, collectedResourceCount, _sessionKillCount, onConfirm);
+        UI?.OpenScoreUI(totalDistance, rescuedHumanCount, collectedResourceCount, _sessionKillCount, resultType, onConfirm);
     }
 
     private void InitManagerRoot()
@@ -324,7 +326,10 @@ public class GameManager : SingletonBase<GameManager>
     }
     private async UniTaskVoid InitializeGameFlowAsync()
     {
-        if (!await WaitForRequiredManagersAsync()) return;
+        if (!await WaitForRequiredManagersAsync())
+        {
+            return;
+        }
 
         await EnsureGameDataLoadedAsync();
         ChangeGameState(GameState.Ready);
@@ -422,8 +427,7 @@ public class GameManager : SingletonBase<GameManager>
 
         ChangeGameState(GameState.EventPaused);
 
-        OpenScoreReport(OpenBaseArrivalAfterScore);
-        Debug.Log("[GameManager] 터미널 도착: 출구 방향 선택을 기다립니다.");
+        OpenScoreReport(ScoreResultType.BaseArrival, OpenBaseArrivalAfterScore); Debug.Log("[GameManager] 터미널 도착: 출구 방향 선택을 기다립니다.");
 
         UI?.OpenBaseArrivalUI();
         // TODO: Terminal UI를 열고 CentralTerminal.SelectExitGate(int)와 연결필요(?)
