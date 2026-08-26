@@ -13,6 +13,9 @@ public class HudTrainStatusUI : UIBase
     [SerializeField] private Color _colorHpMid = new Color(1f, 0.55f, 0f);
     [SerializeField] private Color _colorHpLow = Color.red;
 
+    [Header("체력 텍스트 대비 (아웃라인)")]
+    [SerializeField] private Color _textOutlineColor = Color.black;
+    [SerializeField, Range(0f, 1f)] private float _textOutlineWidth = 0.2f;
 
     [Header("속도")]
     [SerializeField] private TextMeshProUGUI Text_Speed;
@@ -22,6 +25,23 @@ public class HudTrainStatusUI : UIBase
 
     [Header("이동 거리")]
     [SerializeField] private TextMeshProUGUI Text_Distance;
+
+    private void Awake()
+    {
+        InitHpTextOutline();
+    }
+
+    private void InitHpTextOutline()
+    {
+        if (Text_Hp == null)
+        {
+            return;
+        }
+
+        Text_Hp.color = Color.white;
+        Text_Hp.outlineWidth = _textOutlineWidth;
+        Text_Hp.outlineColor = _textOutlineColor;
+    }
 
     private void OnEnable()
     {
@@ -90,11 +110,6 @@ public class HudTrainStatusUI : UIBase
         if (Image_HpFill != null)
         {
             Image_HpFill.color = targetColor;
-        }
-
-        if (Text_Hp != null)
-        {
-            Text_Hp.color = targetColor;
         }
     }
 

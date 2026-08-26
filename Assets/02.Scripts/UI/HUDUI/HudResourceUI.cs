@@ -17,9 +17,6 @@ public class HudResourceUI : UIBase
     [Header("구출한 사람 수")]
     [SerializeField] private TextMeshProUGUI Text_RescuedHuman;
 
-    [Header("점거 역 현황")]
-    [SerializeField] private TextMeshProUGUI Text_StationProgress;
-
     private UpgradeViewModel _upgradeVm;
 
     private void OnEnable()
@@ -34,7 +31,6 @@ public class HudResourceUI : UIBase
             ResourceStatusEventHub.Instance.OnWoodChanged += SetWood;
             ResourceStatusEventHub.Instance.OnStoneChanged += SetStone;
             ResourceStatusEventHub.Instance.OnRescuedHumanChanged += SetRescuedHuman;
-            ResourceStatusEventHub.Instance.OnStationProgressChanged += SetStationProgress;
         }
 
         if (NetworkResourceService.Instance != null)
@@ -65,7 +61,6 @@ public class HudResourceUI : UIBase
             ResourceStatusEventHub.Instance.OnWoodChanged -= SetWood;
             ResourceStatusEventHub.Instance.OnStoneChanged -= SetStone;
             ResourceStatusEventHub.Instance.OnRescuedHumanChanged -= SetRescuedHuman;
-            ResourceStatusEventHub.Instance.OnStationProgressChanged -= SetStationProgress;
         }
 
         if (_upgradeVm != null)
@@ -111,14 +106,6 @@ public class HudResourceUI : UIBase
         if (Text_RescuedHuman != null)
         {
             Text_RescuedHuman.text = curRescuedCount.ToString();
-        }
-    }
-
-    public void SetStationProgress(int completedStationCount, int requiredStationCount)
-    {
-        if (Text_StationProgress != null)
-        {
-            Text_StationProgress.text = $"{completedStationCount} / {requiredStationCount}";
         }
     }
 }

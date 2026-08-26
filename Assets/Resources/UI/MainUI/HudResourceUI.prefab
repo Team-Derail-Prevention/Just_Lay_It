@@ -1287,6 +1287,7 @@ MonoBehaviour:
   Text_Wood: {fileID: 2227021068123673061}
   Text_Stone: {fileID: 8077695137909697201}
   Text_RescuedHuman: {fileID: 3630442960976607256}
+  Text_StationProgress: {fileID: 4155314120895867061}
 --- !u!1 &5573225049075539492
 GameObject:
   m_ObjectHideFlags: 0
@@ -1433,6 +1434,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7750823300303988596}
+  - component: {fileID: 3479021066296059197}
   m_Layer: 5
   m_Name: Station
   m_TagString: Untagged
@@ -1462,6 +1464,23 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -200}
   m_SizeDelta: {x: 250, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &3479021066296059197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5632260578093272782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 903c13de1c3ce9a41bfb0654789d1a7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StationProgressUI
+  GameObject_LevelChecks:
+  - {fileID: 8068903724786635708}
+  - {fileID: 8532625086099329690}
+  - {fileID: 3596848574351443223}
+  - {fileID: 4787137202334214273}
 --- !u!1 &5994884893900689813
 GameObject:
   m_ObjectHideFlags: 0

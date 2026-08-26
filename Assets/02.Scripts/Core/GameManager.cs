@@ -117,7 +117,7 @@ public class GameManager : SingletonBase<GameManager>
         CentralTerminal.OnExitDirectionSelected -= SelectExitDirection;
         MonsterHealth.OnMonsterDiedWithGold -= HandleMonsterDied;
     }
-
+    
     public async UniTask StartGame()
     {
         if (_isStartingGame || _currentGameState == GameState.Playing)

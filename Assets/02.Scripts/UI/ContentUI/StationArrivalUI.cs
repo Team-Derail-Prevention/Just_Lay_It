@@ -70,6 +70,7 @@ public class StationArrivalUI : UIBase
         {
             Text_RepairCost.text = REPAIR_STONE_COST.ToString();
         }
+        SyncHpFromActiveTrain();
 
         RefreshTopIndicators();
         RefreshTakeAmountTexts();
@@ -118,6 +119,16 @@ public class StationArrivalUI : UIBase
         {
             Text_StationCitizenAmount.text = _stationAvailableCitizen.ToString();
         }
+    }
+
+    private void SyncHpFromActiveTrain()
+    {
+        if (TrainStatusEventHub.Instance == null)
+        {
+            return;
+        }
+
+        OnHpChanged(TrainStatusEventHub.Instance.CurrentHp, TrainStatusEventHub.Instance.CurrentMaxHp);
     }
 
     private void OnHpChanged(float curHp, float maxHp)
