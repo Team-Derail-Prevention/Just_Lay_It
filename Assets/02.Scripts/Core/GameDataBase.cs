@@ -45,11 +45,8 @@ public class TrainData : GameDataBase
     public string Description;
     public float MoveSpeed;
     public float RotateSpeed;
-    public int MaxCargo;
     public int MaxHp;
     public int Defense;
-    public int MaxWeaponMount;
-    public int MaxCrew;
     public string PrefabPath;
 }
 
@@ -61,6 +58,11 @@ public class WeaponData : GameDataBase
     public float FireRate;
     public int MagazineSize;
     public float ReloadTime;
+    public float Range;
+
+    public string Description;
+    public string GradeName;
+    public string IconPath;
     public string UseFireSound;
     public string UseReloadSound;
 }
