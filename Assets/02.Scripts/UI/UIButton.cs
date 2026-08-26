@@ -3,17 +3,29 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class UIButton : MonoBehaviour
+public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private Button Button_Base;
     [SerializeField] private TextMeshProUGUI Text_Base;
     [SerializeField] private Image Image_Base;
     [SerializeField] private Image Image_Select;
 
+    [Header("호버 효과")]
+    [SerializeField] private Image Image_BKFrame;
+    [SerializeField] private Color _normalFrameColor = Color.white;
+    [SerializeField] private Color _hoverFrameColor = Color.green;
+
+    [Header("호버 설명")]
+    [SerializeField][TextArea] private string _description;
+
     private bool _isManualUnbindEvent;
     private Action _boundCallback;
     private UnityAction _boundUnityAction;
+
+    public event Action<string> OnPointerEnterButton;
+    public event Action OnPointerExitButton;
 
     private void Awake()
     {
@@ -40,6 +52,11 @@ public class UIButton : MonoBehaviour
         if (Image_Select != null)
         {
             Image_Select.gameObject.SetActive(false);
+        }
+
+        if (Image_BKFrame != null)
+        {
+            Image_BKFrame.color = _normalFrameColor;
         }
     }
 
@@ -111,5 +128,25 @@ public class UIButton : MonoBehaviour
         }
 
         Button_Base.interactable = isInteractable;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (Image_BKFrame != null)
+        {
+            Image_BKFrame.color = _hoverFrameColor;
+        }
+
+        OnPointerEnterButton?.Invoke(_description);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (Image_BKFrame != null)
+        {
+            Image_BKFrame.color = _normalFrameColor;
+        }
+
+        OnPointerExitButton?.Invoke();
     }
 }
