@@ -570,6 +570,8 @@ MonoBehaviour:
   _colorHpHigh: {r: 0.7630597, g: 0.98490566, b: 0.48130295, a: 1}
   _colorHpMid: {r: 1, g: 0.55, b: 0, a: 1}
   _colorHpLow: {r: 1, g: 0, b: 0, a: 1}
+  _textOutlineColor: {r: 0, g: 0, b: 0, a: 1}
+  _textOutlineWidth: 0.25
   Text_Speed: {fileID: 7566550853514755794}
   Text_Time: {fileID: 2002532402353729544}
   Text_Distance: {fileID: 7587207726332521202}
