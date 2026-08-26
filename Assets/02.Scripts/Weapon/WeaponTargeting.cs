@@ -18,6 +18,7 @@ public class WeaponTargeting : MonoBehaviour
             return _LockTarget;
         }
     }
+
     private void Update()
     {
         if (!HasTarget)
@@ -26,6 +27,30 @@ public class WeaponTargeting : MonoBehaviour
         }
         transform.LookAt(CurrentTarget);
     }
+
+    public void ApplyRange(float range)
+    {
+        Collider col = GetComponent<Collider>();
+        if (col == null)
+        {
+            Debug.LogWarning("[WeaponTargeting] 사거리를 적용할 Collider가 없습니다.");
+            return;
+        }
+
+        if (col is SphereCollider sphereCollider)
+        {
+            sphereCollider.radius = range;
+        }
+        else if (col is BoxCollider boxCollider)
+        {
+            boxCollider.size = Vector3.one * range * 2f;
+        }
+        else
+        {
+            Debug.LogWarning($"[WeaponTargeting] 지원하지 않는 Collider 타입입니다: {col.GetType().Name}");
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag(_enemyTag))
@@ -41,6 +66,7 @@ public class WeaponTargeting : MonoBehaviour
             }
         }
     }
+
     private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag(_enemyTag))
@@ -59,6 +85,7 @@ public class WeaponTargeting : MonoBehaviour
             }
         }
     }
+
     // 오브젝트에 대한 참조 가져오는 로직
     private Transform GetNearTarget()
     {
