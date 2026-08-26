@@ -7,6 +7,7 @@ public class ResourceStatusEventHub : SingletonBase<ResourceStatusEventHub>
     public event Action<int> OnStoneChanged;
     public event Action<int> OnRescuedHumanChanged;
     public event Action<int> OnMoneyChanged;
+    public event Action<int, int> OnStationProgressChanged;
 
     private void Start()
     {
@@ -31,5 +32,10 @@ public class ResourceStatusEventHub : SingletonBase<ResourceStatusEventHub>
     public void NotifyMoneyChanged(int curMoneyCount)
     {
         OnMoneyChanged?.Invoke(curMoneyCount);
+    }
+
+    public void NotifyStationProgressChanged(int completedStationCount, int requiredStationCount)
+    {
+        OnStationProgressChanged?.Invoke(completedStationCount, requiredStationCount);
     }
 }

@@ -388,7 +388,7 @@ public static class UIManagerExtension
         uiManager.ClosePopupUI(UIType.WeaponGachaUI);
     }
 
-    public static ScoreUI OpenScoreUI(this UIManager uiManager, float totalDistance, int rescuedHumanCount, int collectedResourceCount, int killCount, Action onConfirm)
+    public static ScoreUI OpenScoreUI(this UIManager uiManager, float totalDistance, int rescuedHumanCount, int collectedResourceCount, int killCount, ScoreResultType resultType, Action onConfirm)
     {
         var uiBase = uiManager.OpenPopupUI(UIType.ScoreUI);
         if (uiBase == null)
@@ -399,7 +399,7 @@ public static class UIManagerExtension
 
         if (uiBase is ScoreUI scoreUI)
         {
-            scoreUI.Init(totalDistance, rescuedHumanCount, collectedResourceCount, killCount, onConfirm);
+            scoreUI.Init(totalDistance, rescuedHumanCount, collectedResourceCount, killCount, resultType, onConfirm);
         }
 
         return uiBase as ScoreUI;
