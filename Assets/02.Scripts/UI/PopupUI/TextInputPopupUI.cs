@@ -27,6 +27,13 @@ public class TextInputPopupUI : UIBase
         if (isEnterPressed == true && InputField_Amount != null)
         {
             OnSubmitAmount(InputField_Amount.text);
+            return;                                         
+        }
+
+        bool isEscPressed = Input.GetKeyDown(KeyCode.Escape); 
+        if (isEscPressed == true)                         
+        {                                                     
+            OnCancel();                                       
         }
     }
 
@@ -70,5 +77,10 @@ public class TextInputPopupUI : UIBase
         Action<int> confirmCallback = _onConfirm;
         UIManager.Instance.CloseTextInputPopup();
         confirmCallback?.Invoke(amount);
+    }
+
+    private void OnCancel()
+    {
+        UIManager.Instance.CloseTextInputPopup();
     }
 }
