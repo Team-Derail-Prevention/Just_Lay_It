@@ -121,18 +121,23 @@ public class Train : MonoBehaviour
 
 
     //기차역 도착 했을때 회복시킬 경우 사용 예정.
-    public void Heal(int healAmount)
+    public void Heal(int healPercent)
     {
-        if (_isBroken || healAmount <= 0)
+        if (_isBroken || healPercent <= 0)
         {
             return;
         }
 
+        int healAmount = Mathf.RoundToInt(_maxHp * (healPercent / 100f));
+
         _currentHp = Mathf.Min(_maxHp, _currentHp + healAmount);
 
-        if (TrainStatusEventHub.Instance != null)
+        Debug.Log($"[Train] 열차 수리 완료! 회복량: {healAmount} ({healPercent}%), 현재 HP: {_currentHp}/{_maxHp}");
+        
+
+        if (GameManager.TrainStatusEventHub != null)
         {
-            TrainStatusEventHub.Instance.NotifyHpChanged(_currentHp, _maxHp);
+            GameManager.TrainStatusEventHub.NotifyHpChanged(_currentHp, _maxHp);
         }
     }
 

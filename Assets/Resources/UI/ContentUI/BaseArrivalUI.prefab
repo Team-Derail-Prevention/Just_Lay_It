@@ -275,6 +275,10 @@ MonoBehaviour:
   Text_Base: {fileID: 1079773045966939857}
   Image_Base: {fileID: 2511180251521806227}
   Image_Select: {fileID: 0}
+  Image_BKFrame: {fileID: 7403509937382284187}
+  _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
+  _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
+  _description: 
 --- !u!1 &231374630101952870
 GameObject:
   m_ObjectHideFlags: 0
@@ -845,7 +849,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uAE30\uCC28 \uCD9C\uBC1C"
+  m_text: "\uC5F4\uCC28 \uCD9C\uBC1C"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
   m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
@@ -3348,6 +3352,15 @@ MonoBehaviour:
   Text_Base: {fileID: 6196937622963320588}
   Image_Base: {fileID: 2615046397359280951}
   Image_Select: {fileID: 0}
+  Image_BKFrame: {fileID: 5690991315997702997}
+  _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
+  _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
+  _description: "\uBF51\uAE30\uB97C \uD1B5\uD574 \uC5BB\uC740 \uBB34\uAE30\uB97C
+    \uBCF4\uAD00\uD569\uB2C8\uB2E4.\n\uBB34\uAE30\uB97C \uC88C\uD074\uB9AD \uB4DC\uB798\uADF8\uB97C
+    \uC774\uC6A9\uD574, \uC5F4\uCC28\uC5D0 \uC7A5\uCC29\uD558\uAC70\uB098, \uC5F4\uCC28\uC5D0
+    \uC7A5\uCC29\uB41C \uBB34\uAE30\uB97C \uC778\uBCA4\uD1A0\uB9AC\uB85C \uC9D1\uC5B4\uB123\uC744
+    \uC218 \uC788\uC2B5\uB2C8\uB2E4.\n\uBB34\uAE30\uB97C \uC6B0\uD074\uB9AD\uD558\uBA74
+    \uD574\uB2F9 \uBB34\uAE30\uB97C \uD310\uB9E4\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
 --- !u!1 &4093837997421861281
 GameObject:
   m_ObjectHideFlags: 0
@@ -4106,13 +4119,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BaseArrivalUI
   Text_Wood: {fileID: 2007715256226871330}
   Text_Stone: {fileID: 3693904682183868938}
-  Text_Cash: {fileID: 0}
+  Text_Cash: {fileID: 3222230143570902840}
   Button_WeaponGacha: {fileID: 3774515065916912495}
   Button_TrainStrengthening: {fileID: 7851382782860391605}
   Button_Inventory: {fileID: 6488896085315558017}
   Button_TrainRepair: {fileID: 7524542716290757458}
   Button_TrainDeparture: {fileID: 7794128199393366696}
   Button_Warehouse: {fileID: 2911118678419151863}
+  Text_BK: {fileID: 281446643223337893}
 --- !u!1 &4580169551139623509
 GameObject:
   m_ObjectHideFlags: 0
@@ -4829,7 +4843,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uAE30\uCC28 \uC218\uB9AC"
+  m_text: "\uC5F4\uCC28 \uC218\uB9AC"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
   m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
@@ -5114,6 +5128,13 @@ MonoBehaviour:
   Text_Base: {fileID: 2390841992159334785}
   Image_Base: {fileID: 5710640996876799372}
   Image_Select: {fileID: 0}
+  Image_BKFrame: {fileID: 8562907281017120927}
+  _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
+  _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
+  _description: "\uC804\uD22C, \uC801\uC7AC, \uB4DC\uB860\uC5D0 \uAD00\uB828\uB41C
+    \uC5C5\uADF8\uB808\uC774\uB4DC\uB97C \uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.\n\uC774
+    \uC5C5\uADF8\uB808\uC774\uB4DC\uB294 \uC0C8 \uAC8C\uC784\uC5D0\uB294 \uC801\uC6A9\uB418\uC9C0
+    \uC54A\uC2B5\uB2C8\uB2E4."
 --- !u!1 &5462907245787926253
 GameObject:
   m_ObjectHideFlags: 0
@@ -6923,6 +6944,12 @@ MonoBehaviour:
   Text_Base: {fileID: 9160442582670025111}
   Image_Base: {fileID: 6162504169323872231}
   Image_Select: {fileID: 0}
+  Image_BKFrame: {fileID: 9144056676388600327}
+  _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
+  _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
+  _description: "\uBCA0\uC774\uC2A4\uC5D0\uC11C \uBC16\uC73C\uB85C \uCD9C\uBC1C\uD560
+    \uBC29\uD5A5\uC744 \uC120\uD0DD\uD574\uC11C \uCD9C\uBC1C\uD569\uB2C8\uB2E4. (\uB3D9,
+    \uC11C, \uB0A8, \uBD81)"
 --- !u!1 &7957630184904463856
 GameObject:
   m_ObjectHideFlags: 0
@@ -7340,6 +7367,13 @@ MonoBehaviour:
   Text_Base: {fileID: 3844154038991419339}
   Image_Base: {fileID: 6523346283319786739}
   Image_Select: {fileID: 0}
+  Image_BKFrame: {fileID: 8653105597945155430}
+  _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
+  _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
+  _description: "\uC5F4\uCC28\uC5D0 \uC7A5\uCC29\uD560 \uC218 \uC788\uB294 \uBB34\uAE30\uB97C
+    \uB79C\uB364\uC73C\uB85C 3\uAC1C \uBF51\uACE0, \uD558\uB098\uB97C \uC815\uD574\uC11C
+    \uC778\uBCA4\uD1A0\uB9AC\uB85C \uAC00\uC838\uAC08 \uC218 \uC788\uC2B5\uB2C8\uB2E4.\n\uAC00\uACA9
+    : \uB3CC 00\uAC1C"
 --- !u!1 &8246307588593682121
 GameObject:
   m_ObjectHideFlags: 0
@@ -8044,7 +8078,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uAE30\uCC28 \uC5C5\uAE00"
+  m_text: "\uC5F4\uCC28 \uC5C5\uAE00"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
   m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
