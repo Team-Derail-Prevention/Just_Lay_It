@@ -1,6 +1,6 @@
 [
   {
-    "string": "weapon_01",
+    "Id": "weapon_01",
     "WeaponName": "NomalGun",
     "Atk": 20,
     "FireRate": 3,
@@ -14,13 +14,13 @@
     "IconPath": null
   },
   {
-    "string": "weapon_02",
+    "Id": "weapon_02",
     "WeaponName": "MiniGun",
     "Atk": 10,
     "FireRate": 1,
     "MagazineSize": 60,
     "ReloadTime": 4,
-    "Range": 6,
+    "Range": 4,
     "UseFireSound": null,
     "UseReloadSound": null,
     "GradeName": "Common",
