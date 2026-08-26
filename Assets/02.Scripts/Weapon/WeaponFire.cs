@@ -113,6 +113,11 @@ public class WeaponFire : MonoBehaviour
             _magazineSize = weaponData.MagazineSize;
             _reloadTime = weaponData.ReloadTime;
             _currentAmmo = _magazineSize;
+
+            if (_weaponTargeting != null)
+            {
+                _weaponTargeting.ApplyRange(weaponData.Range);
+            }
         }
         else
         {
