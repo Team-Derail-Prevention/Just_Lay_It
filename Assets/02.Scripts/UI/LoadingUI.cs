@@ -74,6 +74,7 @@ public class LoadingUI : UIBase
         UIManager.Instance.OpenRailBuildUI();
         UIManager.Instance.OpenHudTrainStatusUI();
         UIManager.Instance.OpenHudResourceUI();
+        UIManager.Instance.OpenHudMinimapUI();
         UIManager.Instance.OpenInGameMenuButtonUI();
     }
 
