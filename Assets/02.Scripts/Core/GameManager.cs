@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using Enums;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,7 +15,7 @@ public class GameManager : SingletonBase<GameManager>
 
     [Header("Session Records")]
     [SerializeField] private int _sessionKillCount = 0;
-    [SerializeField] private int _sessionEarnedGold = 0;
+    [SerializeField] private int _sessionEarnedStone = 0;
 
     private readonly TimeManager _timeManager = new TimeManager();
 
@@ -33,7 +34,7 @@ public class GameManager : SingletonBase<GameManager>
     public int CompletedStationCount => _completedStations.Count;
 
     public int SessionKillCount => _sessionKillCount;
-    public int SessionEarnedGold => _sessionEarnedGold;
+    public int SessionEarnedStone => _sessionEarnedStone;
 
     public event Action<int> OnStationProgressChanged;
     public event Action<int> OnCountdownChanged;
@@ -84,7 +85,7 @@ public class GameManager : SingletonBase<GameManager>
         StationObject.OnStationEntered += HandleStationEntered;
         CentralTerminal.OnCentralTerminalEntered += HandleCentralTerminalEntered;
         CentralTerminal.OnExitDirectionSelected += SelectExitDirection;
-        MonsterHealth.OnMonsterDiedWithGold += HandleMonsterDied;
+        MonsterHealth.OnMonsterDiedWithStone += HandleMonsterDied;
     }
 
     private void Start()
@@ -94,7 +95,7 @@ public class GameManager : SingletonBase<GameManager>
 
     private void Update()
     {
-        if (_currentGameState != GameState.Playing)
+        if (CurrentGameState != GameState.Playing)
         {
             return;
         }
@@ -116,12 +117,12 @@ public class GameManager : SingletonBase<GameManager>
         StationObject.OnStationEntered -= HandleStationEntered;
         CentralTerminal.OnCentralTerminalEntered -= HandleCentralTerminalEntered;
         CentralTerminal.OnExitDirectionSelected -= SelectExitDirection;
-        MonsterHealth.OnMonsterDiedWithGold -= HandleMonsterDied;
+        MonsterHealth.OnMonsterDiedWithStone -= HandleMonsterDied;
     }
     
     public async UniTask StartGame()
     {
-        if (_isStartingGame || _currentGameState == GameState.Playing)
+        if (_isStartingGame || CurrentGameState == GameState.Playing)
         {
             Debug.LogWarning("[GameManager] 게임 시작 요청이 이미 처리 중이거나 게임이 진행 중입니다.");
             return;
@@ -139,6 +140,9 @@ public class GameManager : SingletonBase<GameManager>
 
             ClearCurrentSession();
             ChangeGameState(GameState.Ready);
+
+            NetworkResourceService.ResetRun();
+            NetworkWarehouseService.ResetRun();
 
             bool isMapGenerated = await Map.GenerateMapAsync(this.GetCancellationTokenOnDestroy());
             if (!isMapGenerated)
@@ -166,7 +170,7 @@ public class GameManager : SingletonBase<GameManager>
 
     public void CompleteStation(int stoneTaken, int citizenBoarded)
     {
-        if (_currentGameState != GameState.EventPaused || _activeStation == null)
+        if (CurrentGameState != GameState.EventPaused || _activeStation == null)
         {
             Debug.LogWarning("[GameManager] 완료할 활성 역 이벤트가 없습니다.");
             return;
@@ -200,7 +204,7 @@ public class GameManager : SingletonBase<GameManager>
 
     public void SelectExitDirection(int directionIndex)
     {
-        if (_currentGameState != GameState.EventPaused)
+        if (CurrentGameState != GameState.EventPaused)
         {
             Debug.LogWarning("[GameManager] 이벤트가 정지 상태가 아니므로 출구 선택을 무시합니다.");
             return;
@@ -229,7 +233,7 @@ public class GameManager : SingletonBase<GameManager>
 
     public void GameOver()
     {
-        if (_currentGameState == GameState.GameOver)
+        if (CurrentGameState == GameState.GameOver)
         {
             return;
         }
@@ -245,7 +249,7 @@ public class GameManager : SingletonBase<GameManager>
 
     public void GameClear()
     {
-        if (_currentGameState == GameState.GameClear)
+        if (CurrentGameState == GameState.GameClear)
         {
             return;
         }
@@ -387,7 +391,7 @@ public class GameManager : SingletonBase<GameManager>
 
     private void HandleStationArrival(StationObject station, string stationId)
     {
-        if (_currentGameState != GameState.Playing) return;
+        if (CurrentGameState != GameState.Playing) return;
 
         StationArrivalUI stationUI = UI?.OpenStationArrivalUI();
         if (stationUI != null)
@@ -406,7 +410,7 @@ public class GameManager : SingletonBase<GameManager>
 
     private void HandleTerminalArrival(CentralTerminal terminal)
     {
-        if (_currentGameState != GameState.Playing)
+        if (CurrentGameState != GameState.Playing)
         {
             return;
         }
@@ -492,10 +496,10 @@ public class GameManager : SingletonBase<GameManager>
             }
 
             OnCountdownChanged?.Invoke(0);
-          
+            ChangeGameState(GameState.Playing);
+
             ResumeMonsterSpawning();
             ResumeGameplayTime();
-            ChangeGameState(GameState.Playing);
         }
         finally
         {
@@ -505,7 +509,7 @@ public class GameManager : SingletonBase<GameManager>
 
     private void ResumeMonsterSpawning()
     {
-        if (Monster != null)
+        if (Monster != null && CurrentGameState == GameState.Playing)
         {
             Monster.StartSpawning();
         }
@@ -536,19 +540,19 @@ public class GameManager : SingletonBase<GameManager>
         Debug.Log("[GameManager] 플레이어가 설치한 레일을 모두 제거했습니다.");
     }
 
-    private void HandleMonsterDied(int dropGold)
+    private void HandleMonsterDied(int dropStone)
     {
-        if (_currentGameState != GameState.Playing)
+        if (CurrentGameState != GameState.Playing)
         {
             return;
         }
 
         _sessionKillCount++;
-        _sessionEarnedGold += dropGold;
+        _sessionEarnedStone += dropStone;
 
-        NetworkResourceService?.AddStone(dropGold);
+        NetworkResourceService?.AddStone(dropStone);
 
-        Debug.Log($"몬스터 처치 현재 킬: {_sessionKillCount} / 누적 골드: {_sessionEarnedGold} (+{dropGold})");
+        Debug.Log($"몬스터 처치 현재 킬: {_sessionKillCount} / 누적 돌: {_sessionEarnedStone} (+{dropStone})");
     }
 
     private void ResetSessionState()
@@ -558,7 +562,7 @@ public class GameManager : SingletonBase<GameManager>
         _playTime = 0f;
         _lastNotifiedTime = 0;
         _sessionKillCount = 0;
-        _sessionEarnedGold = 0;
+        _sessionEarnedStone = 0;
         _completedStations.Clear();
         OnStationProgressChanged?.Invoke(CompletedStationCount);
     }
@@ -615,7 +619,7 @@ public class GameManager : SingletonBase<GameManager>
     private void ChangeGameState(GameState newState)
     {
         _currentGameState = newState;
-        Debug.Log($"[GameManager] 게임 상태 변경: {_currentGameState}");
+        Debug.Log($"[GameManager] 게임 상태 변경: {CurrentGameState}");
     }
 }
 

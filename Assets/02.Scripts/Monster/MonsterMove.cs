@@ -9,7 +9,6 @@ public class MonsterMove : MonoBehaviour
     [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private Transform firePosition;
 
-    private string _monsterId;
     private float _moveSpeed;
     private int _monsterAtk;
     private Transform _target;
@@ -29,15 +28,18 @@ public class MonsterMove : MonoBehaviour
 
     private Rigidbody _rb;
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (_target == null)
         {
             return;
         }
 
+        
+
         Vector3 flatTargetPos = new Vector3(_target.position.x, transform.position.y, _target.position.z);
         float distanceToTarget = Vector3.Distance(transform.position, flatTargetPos);
+
 
         if (distanceToTarget > _attackRange)
         {
