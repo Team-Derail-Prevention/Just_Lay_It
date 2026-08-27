@@ -77,14 +77,14 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
             {
                 if (_currentMonsterCount < _maxMonsterLimit)
                 {
-                    SpawnMonster();
+                    SpawnMonsterAsync().Forget();
                 }
             }
             await UniTask.Delay(System.TimeSpan.FromSeconds(_spawnInterval), cancellationToken: token);
         }
     }
 
-    private void SpawnMonster()
+    private async UniTask SpawnMonsterAsync()
     {
         Vector3 spawnPos = GetSafeSpawnPosition();
 
@@ -94,11 +94,21 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
         }
         string monsterId = GetMonsterIdForCurrentPhase();
 
-        GameObject newMonster = PoolManager.Instance.SpawnFromPool(monsterId, spawnPos);
+        GameObject newMonster = PoolManager.Instance.SpawnFromPool(monsterId, new Vector3(0, -9999f, 0));
 
         if (newMonster != null)
         {
+            await UniTask.DelayFrame(2);
+
+            if (newMonster == null || !newMonster.activeInHierarchy)
+            {
+                return;
+            }
+
+            newMonster.transform.position = spawnPos;
+
             MonsterData monsterData = DataManager.Instance.GetData<MonsterData>(monsterId);
+
             if (monsterData != null)
             {
                 MonsterMove moveScript = newMonster.GetComponent<MonsterMove>();
@@ -107,7 +117,9 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
                     moveScript.Initialize(monsterData, _mainTrain);
                 }
             }
+
             MonsterHealth healthScript = newMonster.GetComponent<MonsterHealth>();
+
             if (healthScript != null)
             {
                 healthScript.Initialize(monsterData);
@@ -119,20 +131,27 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
 
     private Vector3 GetSafeSpawnPosition()
     {
-        int maxAttempts = 10;
+        int maxAttempts = 20;
 
         for (int i = 0; i < maxAttempts; i++)
         {
             Vector2 randomCircle = Random.insideUnitCircle.normalized;
             Vector3 spawnDirection = new Vector3(randomCircle.x, 0f, randomCircle.y);
+            Vector3 targetPos = _mainTrain.position + (spawnDirection * _spawnRadius);
 
-            Vector3 spawnPos = _mainTrain.position + (spawnDirection * _spawnRadius);
+            Vector3 rayOrigin = new Vector3(targetPos.x, targetPos.y + 10f, targetPos.z);
 
-            spawnPos.y = _mainTrain.position.y + _spawnYOffset;
-
-            if (!Physics.CheckSphere(spawnPos, _checkRadius, _obstacleLayer))
+            if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 20f))
             {
-                return spawnPos;
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Ground"))
+                {
+                    Vector3 finalSpawnPos = new Vector3(targetPos.x, hit.point.y + _spawnYOffset, targetPos.z);
+
+                    if (!Physics.CheckSphere(finalSpawnPos, _checkRadius, _obstacleLayer))
+                    {
+                        return finalSpawnPos;
+                    }
+                }
             }
         }
 
