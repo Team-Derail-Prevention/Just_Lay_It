@@ -36,6 +36,7 @@ public enum UIType
     GameStartCountdownPopup,
     WeaponGachaUI,
     ScoreUI,
+    HudMinimapUI,
 }
 public static class UIManagerExtension
 {
@@ -217,6 +218,23 @@ public static class UIManagerExtension
     public static void CloseHudResourceUI(this UIManager uiManager)
     {
         uiManager.CloseMainUI(UIType.HudResourceUI);
+    }
+
+    public static HudMinimapUI OpenHudMinimapUI(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenMainUI(UIType.HudMinimapUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("HudMinimapUI가 생성되지 않았습니다");
+            return null;
+        }
+
+        return uiBase as HudMinimapUI;
+    }
+
+    public static void CloseHudMinimapUI(this UIManager uiManager)
+    {
+        uiManager.CloseMainUI(UIType.HudMinimapUI);
     }
 
     public static void OpenInGameMenuButtonUI(this UIManager uiManager)
