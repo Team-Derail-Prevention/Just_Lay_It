@@ -3,21 +3,14 @@ using System;
 
 public class RailPlaceConfirmPopup : UIBase
 {
-    [SerializeField] private UIButton Button_Rotate;
     [SerializeField] private UIButton Button_Confirm;
     [SerializeField] private UIButton Button_Cancel;
 
-    private Action _onRotate;
     private Action _onConfirm;
     private Action _onCancel;
 
     private void OnEnable()
     {
-        if (Button_Rotate != null)
-        {
-            Button_Rotate.BindOnClickButtonEvent(OnClick_Rotate);
-        }
-
         if (Button_Confirm != null)
         {
             Button_Confirm.BindOnClickButtonEvent(OnClick_Confirm);
@@ -31,11 +24,6 @@ public class RailPlaceConfirmPopup : UIBase
 
     private void OnDisable()
     {
-        if (Button_Rotate != null)
-        {
-            Button_Rotate.UnBindOnClickButtonEvent(OnClick_Rotate);
-        }
-
         if (Button_Confirm != null)
         {
             Button_Confirm.UnBindOnClickButtonEvent(OnClick_Confirm);
@@ -46,21 +34,14 @@ public class RailPlaceConfirmPopup : UIBase
             Button_Cancel.UnBindOnClickButtonEvent(OnClick_Cancel);
         }
 
-        _onRotate = null;
         _onConfirm = null;
         _onCancel = null;
     }
 
-    public void Init(Action onRotate, Action onConfirm, Action onCancel)
+    public void Init(Action onConfirm, Action onCancel)
     {
-        _onRotate = onRotate;
         _onConfirm = onConfirm;
         _onCancel = onCancel;
-    }
-
-    private void OnClick_Rotate()
-    {
-        _onRotate?.Invoke();
     }
 
     private void OnClick_Confirm()
