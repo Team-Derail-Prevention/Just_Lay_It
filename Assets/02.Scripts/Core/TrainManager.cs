@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class TrainManager : SingletonBase<TrainManager>
@@ -9,13 +10,7 @@ public class TrainManager : SingletonBase<TrainManager>
     [Header("Train Carriage Setting")]
     [SerializeField] private float _followDistance = 3f;
 
-    [Header("Connected Train Carriages")]
     public List<GameObject> carList = new List<GameObject>();
-
-    [Header("Train Settings")]
-    [SerializeField] private GameObject _headPrefab;
-    [SerializeField] private GameObject[] _CarPrefab;
-
     private HashSet<Transform> visitedStation = new HashSet<Transform>();
 
     public static event Action<Transform> OnTrainSpawn;
@@ -34,6 +29,11 @@ public class TrainManager : SingletonBase<TrainManager>
     // 터미널 스폰 + 동,서,남,북 선택 시 이동
     public void SpawnTerminalTrain(int carriageCount)
     {
+        SpawnTerminalTrainAsync(carriageCount).Forget();
+    }
+
+    private async UniTaskVoid SpawnTerminalTrainAsync(int carriageCount)
+    {
         CentralTerminal terminal = GameManager.Map.MapRoot.GetComponentInChildren<CentralTerminal>();
 
         if (terminal == null)
@@ -44,10 +44,15 @@ public class TrainManager : SingletonBase<TrainManager>
 
         CentralTerminal.RailSpawnInfo startInfo = terminal.GetStartPoint(0);
         GameManager.Rail?.InitStartingRailPath(terminal.ExitDirRoots[0]);
-        SpawnFullTrain(startInfo.position, startInfo.rotation, carriageCount);
+        await SpawnFullTrainAsync(startInfo.position, startInfo.rotation, carriageCount);
     }
 
     public void SpawnStationTrain(StationObject station, int carriageCount)
+    {
+        SpawnStationTrainAsync(station, carriageCount).Forget();
+    }       
+
+    private async UniTaskVoid SpawnStationTrainAsync(StationObject station, int carriageCount)
     {
         if (station == null)
         {
@@ -67,8 +72,8 @@ public class TrainManager : SingletonBase<TrainManager>
             GameManager.Rail?.InitStartingRailPath(exitDirRoot);
         }
 
-        SpawnFullTrain(exitInfo.position, exitInfo.rotation, carriageCount);
-    }       
+        await SpawnFullTrainAsync(exitInfo.position, exitInfo.rotation, carriageCount);
+    }
 
     public void ClearExistingTrain()
     {
@@ -94,12 +99,11 @@ public class TrainManager : SingletonBase<TrainManager>
 
     public void SpawnFullTrain(Vector3 spawnPos, Quaternion spawnRot, int carriageCount)
     {
-        if (_headPrefab == null)
-        {
-            Debug.LogWarning("[TrainManager] Head Prefab이 할당되지 않았습니다.");
-            return;
-        }
+        SpawnFullTrainAsync(spawnPos, spawnRot, carriageCount).Forget();
+    }
 
+    public async UniTask SpawnFullTrainAsync(Vector3 spawnPos, Quaternion spawnRot, int carriageCount)
+    {
         if (_headTrain != null)
         {
             RelocateExistingTrain(spawnPos, spawnRot);
@@ -108,7 +112,21 @@ public class TrainManager : SingletonBase<TrainManager>
 
         ClearExistingTrain();
 
-        GameObject newHead = Instantiate(_headPrefab, spawnPos, spawnRot);
+        TrainData headData = DataManager.Instance?.GetData<TrainData>("TRAIN_HEAD_01");
+        if (headData == null || string.IsNullOrEmpty(headData.PrefabPath))
+        {
+            Debug.LogError("[TrainManager] TRAIN_HEAD_01 데이터 또는 PrefabPath 가 없습니다..");
+            return;
+        }
+
+        GameObject headPrefab = await GameManager.Resource.LoadAsset<GameObject>(headData.PrefabPath);
+        if (headPrefab == null)
+        {
+            Debug.LogError($"[TrainManager] 기관차 프리팹 로드 실패: {headData.PrefabPath}");
+            return;
+        }
+
+        GameObject newHead = Instantiate(headPrefab, spawnPos, spawnRot);
         if (newHead == null)
         {
             Debug.LogError("[TrainManager] 기관차 Instantiate 생성에 실패했습니다.");
@@ -123,31 +141,27 @@ public class TrainManager : SingletonBase<TrainManager>
         if (trainScript != null && DataManager.Instance != null)
         {
             RegisterTrain(trainScript);
-
-            TrainData headData = DataManager.Instance.GetData<TrainData>("TRAIN_HEAD_01");
             trainScript.TrainInit(headData);
         }
 
-        if (_CarPrefab != null && _CarPrefab.Length > 0)
+        TrainData carData = DataManager.Instance?.GetData<TrainData>("TRAIN_CARGO_01");
+        if (carData != null && !string.IsNullOrEmpty(carData.PrefabPath))
         {
-            int count = Mathf.Min(carriageCount, _CarPrefab.Length);
-
-            for (int i = 0; i < count; i++)
+            GameObject carPrefab = await GameManager.Resource.LoadAsset<GameObject>(carData.PrefabPath);
+            if (carPrefab != null)
             {
-                TrainData carData = null;
-                if (DataManager.Instance != null)
+                for (int i = 0; i < carriageCount; i++)
                 {
-                    carData = DataManager.Instance.GetData<TrainData>("TRAIN_CARGO_01");
+                    SpawnCarriage(carPrefab, carData);
                 }
-
-                SpawnCarriage(_CarPrefab[i], carData);
             }
         }
 
         OnTrainSpawn?.Invoke(_headTrain);
-
         Debug.Log($"[TrainManager] 기관차 1대와 객차 {carriageCount}대 전체 소환 완료!");
     }
+
+
 
     public float GetHeadTrainDistance()
     {
@@ -187,6 +201,7 @@ public class TrainManager : SingletonBase<TrainManager>
                 if (follow != null)
                 {
                     follow.SetFrontTrain(front);
+                    follow.SetTargetIndex(0);
                 }
 
                 front = carList[i].transform;
