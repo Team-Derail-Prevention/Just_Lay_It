@@ -95,7 +95,7 @@ public class GameManager : SingletonBase<GameManager>
 
     private void Update()
     {
-        if (_currentGameState != GameState.Playing)
+        if (CurrentGameState != GameState.Playing)
         {
             return;
         }
@@ -122,7 +122,7 @@ public class GameManager : SingletonBase<GameManager>
     
     public async UniTask StartGame()
     {
-        if (_isStartingGame || _currentGameState == GameState.Playing)
+        if (_isStartingGame || CurrentGameState == GameState.Playing)
         {
             Debug.LogWarning("[GameManager] 게임 시작 요청이 이미 처리 중이거나 게임이 진행 중입니다.");
             return;
@@ -167,7 +167,7 @@ public class GameManager : SingletonBase<GameManager>
 
     public void CompleteStation(int stoneTaken, int citizenBoarded)
     {
-        if (_currentGameState != GameState.EventPaused || _activeStation == null)
+        if (CurrentGameState != GameState.EventPaused || _activeStation == null)
         {
             Debug.LogWarning("[GameManager] 완료할 활성 역 이벤트가 없습니다.");
             return;
@@ -201,7 +201,7 @@ public class GameManager : SingletonBase<GameManager>
 
     public void SelectExitDirection(int directionIndex)
     {
-        if (_currentGameState != GameState.EventPaused)
+        if (CurrentGameState != GameState.EventPaused)
         {
             Debug.LogWarning("[GameManager] 이벤트가 정지 상태가 아니므로 출구 선택을 무시합니다.");
             return;
@@ -230,7 +230,7 @@ public class GameManager : SingletonBase<GameManager>
 
     public void GameOver()
     {
-        if (_currentGameState == GameState.GameOver)
+        if (CurrentGameState == GameState.GameOver)
         {
             return;
         }
@@ -246,7 +246,7 @@ public class GameManager : SingletonBase<GameManager>
 
     public void GameClear()
     {
-        if (_currentGameState == GameState.GameClear)
+        if (CurrentGameState == GameState.GameClear)
         {
             return;
         }
@@ -388,7 +388,7 @@ public class GameManager : SingletonBase<GameManager>
 
     private void HandleStationArrival(StationObject station, string stationId)
     {
-        if (_currentGameState != GameState.Playing) return;
+        if (CurrentGameState != GameState.Playing) return;
 
         StationArrivalUI stationUI = UI?.OpenStationArrivalUI();
         if (stationUI != null)
@@ -407,7 +407,7 @@ public class GameManager : SingletonBase<GameManager>
 
     private void HandleTerminalArrival(CentralTerminal terminal)
     {
-        if (_currentGameState != GameState.Playing)
+        if (CurrentGameState != GameState.Playing)
         {
             return;
         }
@@ -539,7 +539,7 @@ public class GameManager : SingletonBase<GameManager>
 
     private void HandleMonsterDied(int dropGold)
     {
-        if (_currentGameState != GameState.Playing)
+        if (CurrentGameState != GameState.Playing)
         {
             return;
         }
@@ -616,7 +616,7 @@ public class GameManager : SingletonBase<GameManager>
     private void ChangeGameState(GameState newState)
     {
         _currentGameState = newState;
-        Debug.Log($"[GameManager] 게임 상태 변경: {_currentGameState}");
+        Debug.Log($"[GameManager] 게임 상태 변경: {CurrentGameState}");
     }
 }
 
