@@ -58,12 +58,24 @@ public class Drone : MonoBehaviour
 
     private float GetDesiredSpeed(float distance)
     {
+        float moveSpeed = GetUpgradedMoveSpeed();
+
         if (_slowDownDistance <= 0f || distance >= _slowDownDistance)
+        {
+            return moveSpeed;
+        }
+
+        return Mathf.Lerp(_arriveSpeed, moveSpeed, distance / _slowDownDistance);
+    }
+
+    private float GetUpgradedMoveSpeed()
+    {
+        if (DroneManager.Instance == null)
         {
             return _moveSpeed;
         }
 
-        return Mathf.Lerp(_arriveSpeed, _moveSpeed, distance / _slowDownDistance);
+        return _moveSpeed * DroneManager.Instance.MoveSpeedMultiplier;
     }
 
     private void Arrive()

@@ -57,6 +57,11 @@ public class DroneManager : SingletonBase<DroneManager>
     private int _nextPlacementSequence;
     private int _placementTurn;
 
+    private float _gatherSpeedMultiplier = 1f;
+    private float _moveSpeedMultiplier = 1f;
+    private int _yieldBonus;
+    private bool _isUpgradeSubscribed;
+
     private DroneRailPreloader _preloader;
     private DroneOrderMarkerView _markerView;
 
@@ -208,6 +213,126 @@ public class DroneManager : SingletonBase<DroneManager>
         }
 
         _spawned.Clear();
+    }
+
+    public float GatherSpeedMultiplier { get { return _gatherSpeedMultiplier; } }
+    public float MoveSpeedMultiplier { get { return _moveSpeedMultiplier; } }
+
+    // 채집량 파이프라인이 생기면 캘 때마다 이 값을 더해 주세요. 지금은 읽는 곳이 없습니다.
+    public int YieldBonus { get { return _yieldBonus; } }
+
+    private void OnEnable()
+    {
+        TrySubscribeUpgrade();
+    }
+
+    private void Start()
+    {
+        TrySubscribeUpgrade();
+    }
+
+    private void OnDisable()
+    {
+        if (_isUpgradeSubscribed == false)
+        {
+            return;
+        }
+
+        _isUpgradeSubscribed = false;
+
+        if (UpgradeEventHub.Instance == null)
+        {
+            return;
+        }
+
+        UpgradeEventHub.Instance.OnInGameUpgraded -= HandleInGameUpgraded;
+    }
+
+    private void TrySubscribeUpgrade()
+    {
+        if (_isUpgradeSubscribed)
+        {
+            return;
+        }
+
+        if (UpgradeEventHub.Instance == null)
+        {
+            return;
+        }
+
+        UpgradeEventHub.Instance.OnInGameUpgraded += HandleInGameUpgraded;
+
+        _isUpgradeSubscribed = true;
+    }
+
+    private void HandleInGameUpgraded(string slotDataId, int newLevel)
+    {
+        if (slotDataId == DroneUpgradeIdConst.GatherSpeed)
+        {
+            _gatherSpeedMultiplier = BuildMultiplier(slotDataId, newLevel);
+
+            return;
+        }
+
+        if (slotDataId == DroneUpgradeIdConst.MoveSpeed)
+        {
+            _moveSpeedMultiplier = BuildMultiplier(slotDataId, newLevel);
+
+            return;
+        }
+
+        if (slotDataId == DroneUpgradeIdConst.GatherEfficiency)
+        {
+            _yieldBonus = BuildFlatBonus(slotDataId, newLevel);
+        }
+    }
+
+    private float BuildMultiplier(string slotDataId, int newLevel)
+    {
+        if (TryGetAppliedValue(slotDataId, newLevel, out float total) == false)
+        {
+            return 1f;
+        }
+
+        return 1f + total;
+    }
+
+    private int BuildFlatBonus(string slotDataId, int newLevel)
+    {
+        if (TryGetAppliedValue(slotDataId, newLevel, out float total) == false)
+        {
+            return 0;
+        }
+
+        return Mathf.RoundToInt(total);
+    }
+
+    private bool TryGetAppliedValue(string slotDataId, int newLevel, out float total)
+    {
+        total = 0f;
+
+        if (newLevel <= 0)
+        {
+            return true;
+        }
+
+        if (DataManager.Instance == null || DataManager.Instance.IsLoaded == false)
+        {
+            return false;
+        }
+
+        DroneUpgradeData data = DataManager.Instance.GetData<DroneUpgradeData>(slotDataId);
+
+        if (data == null)
+        {
+            return false;
+        }
+
+        int applied = Mathf.Clamp(newLevel, 0, data.MaxLevel);
+
+        total = data.Value * applied;
+
+        return true;
     }
 
     public void Register(IDroneWorker worker)

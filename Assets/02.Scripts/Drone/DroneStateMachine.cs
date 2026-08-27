@@ -10,7 +10,6 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
     [SerializeField] private Collider _workTrigger;
 
     [Header("작업")]
-    // TODO: 업그레이드 슬롯(DRONE_WORK_SPEED)이 연결되면 인스펙터 값 대신 배율을 주입받는다.
     [SerializeField, Min(0.01f)] private float _workSpeedMultiplier = 1f;
 
     public DroneState State { get { return _state; } }
@@ -289,7 +288,7 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
 
         SetState(DroneState.Working);
 
-        if (_workTarget == null || _workTarget.TryStartMining(_workSpeedMultiplier) == false)
+        if (_workTarget == null || _workTarget.TryStartMining(GetUpgradedWorkSpeed()) == false)
         {
             BeginReturn();
 
@@ -297,6 +296,16 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
         }
 
         BindWorkTarget();
+    }
+
+    private float GetUpgradedWorkSpeed()
+    {
+        if (DroneManager.Instance == null)
+        {
+            return _workSpeedMultiplier;
+        }
+
+        return _workSpeedMultiplier * DroneManager.Instance.GatherSpeedMultiplier;
     }
 
     private void SnapToDock()
