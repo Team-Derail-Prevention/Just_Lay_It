@@ -47,6 +47,21 @@ public class Train : MonoBehaviour
         get { return _maxHp; }
     }
 
+  
+    // TODO : 인게임 기차 업그레이드 요소 추가하면 구독or취소 할거 (체력강화나 이것저것)
+  //private void OnEnable()
+    //{
+    //    UpgradeEventHub.Instance.OnInGameUpgraded += ;
+    //}
+
+   
+
+    //private void OnDisable()
+    //{
+    //    UpgradeEventHub.Instance.OnInGameUpgraded -= ;
+
+    //}
+
 
     private void Update()
     {
@@ -202,17 +217,6 @@ public class Train : MonoBehaviour
         }
 
     }
-
-    public void StartMove()
-    {
-        _isMoving = true;
-    }
-
-    public void StopMove()
-    {
-        _isMoving = false;
-    }
-
 
     public void SetTargetIndex(int index)
     {
