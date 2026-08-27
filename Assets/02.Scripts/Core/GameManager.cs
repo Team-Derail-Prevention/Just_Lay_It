@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using Enums;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -492,10 +493,10 @@ public class GameManager : SingletonBase<GameManager>
             }
 
             OnCountdownChanged?.Invoke(0);
-          
+            ChangeGameState(GameState.Playing);
+
             ResumeMonsterSpawning();
             ResumeGameplayTime();
-            ChangeGameState(GameState.Playing);
         }
         finally
         {
@@ -505,7 +506,7 @@ public class GameManager : SingletonBase<GameManager>
 
     private void ResumeMonsterSpawning()
     {
-        if (Monster != null)
+        if (Monster != null && CurrentGameState == GameState.Playing)
         {
             Monster.StartSpawning();
         }
