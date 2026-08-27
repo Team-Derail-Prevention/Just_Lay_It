@@ -4,21 +4,21 @@ using System.ComponentModel;
 
 public class MonsterHealth : MonoBehaviour
 {
-    public static event Action<int> OnMonsterDiedWithGold;
+    public static event Action<int> OnMonsterDiedWithStone;
     public event Action<Transform>OnMonsterDied;
 
     private int _maxHp;
     private int _currentHp;
     private bool _isDead = false;
 
-    public int _dropGold;
+    public int _dropStone;
     public void Initialize(MonsterData data)
     {
         if(data != null)
         {
             _maxHp = data.Hp;
             _currentHp = _maxHp;
-            _dropGold = data.DropGold;
+            _dropStone = data.DropGold;
         }
 
         _isDead = false;
@@ -44,7 +44,7 @@ public class MonsterHealth : MonoBehaviour
     {
         _isDead = true;
 
-        OnMonsterDiedWithGold?.Invoke(_dropGold);
+        OnMonsterDiedWithStone?.Invoke(_dropStone);
         OnMonsterDied?.Invoke(transform);
 
         if (MonsterSpawn.Instance != null)
