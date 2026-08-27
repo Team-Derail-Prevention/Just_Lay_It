@@ -8,6 +8,9 @@ public class TrainStatusEventHub : SingletonBase<TrainStatusEventHub>
     public event Action<float> OnDistanceChanged;
     public event Action<float> OnPlayTimeChanged;
 
+    public float CurrentHp { get; private set; }
+    public float CurrentMaxHp { get; private set; }
+
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
@@ -15,6 +18,9 @@ public class TrainStatusEventHub : SingletonBase<TrainStatusEventHub>
 
     public void NotifyHpChanged(float curHp, float maxHp)
     {
+        CurrentHp = curHp; 
+        CurrentMaxHp = maxHp;
+
         OnHpChanged?.Invoke(curHp, maxHp);
     }
 

@@ -388,7 +388,7 @@ public static class UIManagerExtension
         uiManager.ClosePopupUI(UIType.WeaponGachaUI);
     }
 
-    public static ScoreUI OpenScoreUI(this UIManager uiManager, float totalDistance, int rescuedHumanCount, int collectedResourceCount, int killCount, Action onConfirm)
+    public static ScoreUI OpenScoreUI(this UIManager uiManager, float totalDistance, int rescuedHumanCount, int collectedResourceCount, int killCount, ScoreResultType resultType, Action onConfirm)
     {
         var uiBase = uiManager.OpenPopupUI(UIType.ScoreUI);
         if (uiBase == null)
@@ -399,7 +399,7 @@ public static class UIManagerExtension
 
         if (uiBase is ScoreUI scoreUI)
         {
-            scoreUI.Init(totalDistance, rescuedHumanCount, collectedResourceCount, killCount, onConfirm);
+            scoreUI.Init(totalDistance, rescuedHumanCount, collectedResourceCount, killCount, resultType, onConfirm);
         }
 
         return uiBase as ScoreUI;
@@ -410,7 +410,7 @@ public static class UIManagerExtension
         uiManager.ClosePopupUI(UIType.ScoreUI);
     }
 
-    public static void OpenRailPlaceConfirmPopup(this UIManager uiManager, Action onRotate, Action onConfirm, Action onCancel)
+    public static void OpenRailPlaceConfirmPopup(this UIManager uiManager, Action onConfirm, Action onCancel)
     {
         var uiBase = uiManager.OpenMainUI(UIType.RailPlaceConfirmPopup);
         if (uiBase == null)
@@ -421,7 +421,7 @@ public static class UIManagerExtension
 
         if (uiBase is RailPlaceConfirmPopup confirmPopup)
         {
-            confirmPopup.Init(onRotate, onConfirm, onCancel);
+            confirmPopup.Init(onConfirm, onCancel);
         }
     }
 

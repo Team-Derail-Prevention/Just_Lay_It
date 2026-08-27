@@ -9,6 +9,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
     {
         Idle,
         ToTarget,
+        Waiting,
         Returning,
     }
 
@@ -19,6 +20,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         public GameObject Ghost;
         public Vector3 Target;
         public Quaternion Rotation;
+        public int Sequence;
         public Action<GameObject> OnPlaced;
     }
 
@@ -187,7 +189,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         return true;
     }
 
-    public bool Assign(GameObject payload, GameObject ghost, Vector3 target, Quaternion rotation, Action<GameObject> onPlaced = null)
+    public bool Assign(GameObject payload, GameObject ghost, Vector3 target, Quaternion rotation, int sequence, Action<GameObject> onPlaced = null)
     {
         if (payload == null || CanAcceptWork == false)
         {
@@ -208,6 +210,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
             Ghost = ghost,
             Target = target,
             Rotation = rotation,
+            Sequence = sequence,
             OnPlaced = onPlaced,
         };
 
@@ -317,7 +320,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
     {
         topY = 0f;
 
-        if (_phase == Phase.ToTarget)
+        if (_phase == Phase.ToTarget || _phase == Phase.Waiting)
         {
             if (_cargo.Count == 0)
             {
@@ -372,6 +375,16 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
     private void Update()
     {
+        if (_phase == Phase.Waiting)
+        {
+            if (IsPlacementTurn())
+            {
+                PlaceOrWait();
+            }
+
+            return;
+        }
+
         if (_phase != Phase.Returning)
         {
             return;
@@ -473,16 +486,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
     {
         if (_phase == Phase.ToTarget)
         {
-            DropFront();
-
-            if (_cargo.Count > 0)
-            {
-                _drone.MoveTo(_cargo[0].Target);
-
-                return;
-            }
-
-            BeginReturn();
+            PlaceOrWait();
 
             return;
         }
@@ -491,6 +495,44 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         {
             _phase = Phase.Idle;
         }
+    }
+
+    private void PlaceOrWait()
+    {
+        if (IsPlacementTurn() == false)
+        {
+            _phase = Phase.Waiting;
+
+            return;
+        }
+
+        _phase = Phase.ToTarget;
+
+        DropFront();
+
+        if (_cargo.Count > 0)
+        {
+            _drone.MoveTo(_cargo[0].Target);
+
+            return;
+        }
+
+        BeginReturn();
+    }
+
+    private bool IsPlacementTurn()
+    {
+        if (_cargo.Count == 0)
+        {
+            return true;
+        }
+
+        if (DroneManager.Instance == null)
+        {
+            return true;
+        }
+
+        return DroneManager.Instance.IsPlacementTurn(_cargo[0].Sequence);
     }
 
     private void DropFront()
@@ -516,14 +558,14 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
         cargo.Payload.transform.SetParent(cargo.Parent, true);
 
-        DroneRailDrop.Begin(cargo.Payload, cargo.Target, cargo.Rotation, cargo.Ghost, () => FinishDrop(cargo));
+        DroneRailDrop.Begin(cargo.Payload, cargo.Target, cargo.Rotation, cargo.Ghost, placed => FinishDrop(cargo, placed));
     }
 
-    private void FinishDrop(Cargo cargo)
+    private void FinishDrop(Cargo cargo, GameObject placed)
     {
-        DroneManager.SetPayloadCollision(cargo.Payload, true);
+        DroneManager.SetPayloadCollision(placed, true);
 
-        cargo.OnPlaced?.Invoke(cargo.Payload);
+        cargo.OnPlaced?.Invoke(placed);
     }
 
     private int FindCargoIndex(GameObject payload)
@@ -614,16 +656,14 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
         DestroyGhost(cargo.Ghost);
 
-        if (cargo.Payload == null)
+        if (cargo.Payload != null)
         {
-            return;
+            cargo.Payload.transform.SetParent(cargo.Parent, true);
+            cargo.Payload.transform.SetPositionAndRotation(cargo.Target, cargo.Rotation);
+            cargo.Payload.SetActive(true);
+
+            DroneManager.SetPayloadCollision(cargo.Payload, true);
         }
-
-        cargo.Payload.transform.SetParent(cargo.Parent, true);
-        cargo.Payload.transform.SetPositionAndRotation(cargo.Target, cargo.Rotation);
-        cargo.Payload.SetActive(true);
-
-        DroneManager.SetPayloadCollision(cargo.Payload, true);
 
         cargo.OnPlaced?.Invoke(cargo.Payload);
     }

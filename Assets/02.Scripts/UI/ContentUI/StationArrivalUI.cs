@@ -4,7 +4,7 @@ using TMPro;
 public class StationArrivalUI : UIBase
 {
     private const int REPAIR_HEAL_PERCENT = 20;   // 임시 값 추후 수정
-    private const int REPAIR_STONE_COST = 300;  // 임시 값 추후 수정
+    private const int REPAIR_STONE_COST = 0;  // 임시 값 추후 수정
 
     [Header("좌상단 표시")]
     [SerializeField] private TextMeshProUGUI Text_MyStone;
@@ -70,6 +70,7 @@ public class StationArrivalUI : UIBase
         {
             Text_RepairCost.text = REPAIR_STONE_COST.ToString();
         }
+        SyncHpFromActiveTrain();
 
         RefreshTopIndicators();
         RefreshTakeAmountTexts();
@@ -118,6 +119,16 @@ public class StationArrivalUI : UIBase
         {
             Text_StationCitizenAmount.text = _stationAvailableCitizen.ToString();
         }
+    }
+
+    private void SyncHpFromActiveTrain()
+    {
+        if (TrainStatusEventHub.Instance == null)
+        {
+            return;
+        }
+
+        OnHpChanged(TrainStatusEventHub.Instance.CurrentHp, TrainStatusEventHub.Instance.CurrentMaxHp);
     }
 
     private void OnHpChanged(float curHp, float maxHp)
@@ -228,6 +239,12 @@ public class StationArrivalUI : UIBase
 
     private void OnClick_Repair()
     {
+        if (GameManager.Train != null && GameManager.Train.IsTrainHpFull())
+        {
+            UIManager.Instance.OpenExitConfirmPopup(null, null, "열차 체력이 이미 가득 찼습니다!");
+            return;
+        }
+
         bool isSpent = NetworkResourceService.Instance.TrySpendStone(REPAIR_STONE_COST);
         if (isSpent == false)
         {
@@ -237,8 +254,9 @@ public class StationArrivalUI : UIBase
 
         RefreshTopIndicators();
 
-        // 실제 체력 회복 적용은 열차 담당자 쪽 로직과 연동 필요 (TODO)
-        Debug.Log($"[StationArrivalUI] 수리 {REPAIR_HEAL_PERCENT}% 요청, 돌 {REPAIR_STONE_COST} 소모");
+        GameManager.Train.HealActiveTrain(REPAIR_HEAL_PERCENT);
+
+        Debug.Log($"[StationArrivalUI] 수리 요청 완료 (최대 체력의 {REPAIR_HEAL_PERCENT}% 회복), 돌 {REPAIR_STONE_COST} 소모");
     }
 
     private void OnClick_Departure()

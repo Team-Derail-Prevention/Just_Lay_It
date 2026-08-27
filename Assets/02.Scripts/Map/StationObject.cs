@@ -73,9 +73,9 @@ public class StationObject : BaseColliderTrigger
     {
         _isInteractionCompleted = true;
 
-        if (GameManager.ResourceStatusEventHub != null)
+        if (NetworkResourceService.Instance != null)
         {
-            GameManager.ResourceStatusEventHub.NotifyRescuedHumanChanged(citizenBoarded);
+            NetworkResourceService.Instance.AddRescuedHuman(citizenBoarded);
         }
 
         Debug.Log($"[StationObject] '{_stationId}' 완료. 골드 {_rewardGold} 획득, 구출 {_rescueCount}명.");

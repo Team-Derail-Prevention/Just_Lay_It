@@ -573,7 +573,7 @@ public class RailManager : SingletonBase<RailManager>
         // 회전은 더 이상 수동으로 하지 않으므로 onRotate는 넘기지 않음(null).
         // UIManager 쪽 팝업 프리팹에서도 회전 버튼을 숨기거나 비활성화해줘야 함.
         UIManager.Instance.OpenRailPlaceConfirmPopup(
-            onRotate: null,
+            // onRotate: null,
             onConfirm: OnPopupConfirm,
             onCancel: OnPopupCancel
         );
