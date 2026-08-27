@@ -141,6 +141,9 @@ public class GameManager : SingletonBase<GameManager>
             ClearCurrentSession();
             ChangeGameState(GameState.Ready);
 
+            NetworkResourceService.ResetRun();
+            NetworkWarehouseService.ResetRun();
+
             bool isMapGenerated = await Map.GenerateMapAsync(this.GetCancellationTokenOnDestroy());
             if (!isMapGenerated)
             {
