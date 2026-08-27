@@ -410,7 +410,7 @@ public static class UIManagerExtension
         uiManager.ClosePopupUI(UIType.ScoreUI);
     }
 
-    public static void OpenRailPlaceConfirmPopup(this UIManager uiManager, Action onRotate, Action onConfirm, Action onCancel)
+    public static void OpenRailPlaceConfirmPopup(this UIManager uiManager, Action onConfirm, Action onCancel)
     {
         var uiBase = uiManager.OpenMainUI(UIType.RailPlaceConfirmPopup);
         if (uiBase == null)
@@ -421,7 +421,7 @@ public static class UIManagerExtension
 
         if (uiBase is RailPlaceConfirmPopup confirmPopup)
         {
-            confirmPopup.Init(onRotate, onConfirm, onCancel);
+            confirmPopup.Init(onConfirm, onCancel);
         }
     }
 
