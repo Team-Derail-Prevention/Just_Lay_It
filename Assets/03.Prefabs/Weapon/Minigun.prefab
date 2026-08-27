@@ -139,8 +139,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb902943419949c499efd67a54dceffa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponFire
-  _weaponId: weapon_02
-  _projectileId: WeaponProjectile
+  _weaponId: weapon_2_01
+  _projectileId: MiniGunProjectile
   _firePosition: {fileID: 4327927592965014162}
   _weaponTargeting: {fileID: 5059821468252789910}
 --- !u!114 &5059821468252789910
@@ -187,7 +187,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4113700522050563859}
   m_Layer: 0
-  m_Name: Minigun
+  m_Name: MiniGun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
