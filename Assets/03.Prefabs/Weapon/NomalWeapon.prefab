@@ -170,8 +170,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb902943419949c499efd67a54dceffa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponFire
-  _weaponId: weapon_01
-  _projectileId: WeaponProjectile
+  _weaponId: weapon_1_01
+  _projectileId: NomalProjectile
   _firePosition: {fileID: 7786393527460159393}
   _weaponTargeting: {fileID: 2569285876436646186}
 --- !u!114 &2569285876436646186
