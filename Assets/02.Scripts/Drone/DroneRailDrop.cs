@@ -40,7 +40,7 @@ public class DroneRailDrop : MonoBehaviour
         }
 
         Vector3 target = drop._target;
-        Quaternion rotation = drop._rotation;
+        Quaternion rotation = newPayload.transform.rotation;
         GameObject ghost = drop._ghost;
         Action<GameObject> onLanded = drop._onLanded;
 
