@@ -90,9 +90,9 @@ public class DroneUpgradeData : GameDataBase
 
 public static class DroneUpgradeIdConst
 {
-    public const string WorkSpeed = "DRONE_WORK_SPEED";
+    public const string GatherSpeed = "DRONE_GATHER_SPEED";
     public const string MoveSpeed = "DRONE_MOVE_SPEED";
-    public const string YieldBonus = "DRONE_YIELD_BONUS";
+    public const string GatherEfficiency = "DRONE_GATHER_EFFICIENCY";
 }
 
 public static class UpgradeOperationConst
