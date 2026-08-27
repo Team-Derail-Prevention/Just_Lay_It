@@ -167,9 +167,21 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
     private async UniTask InitializePoolAsync()
     {
         string targetMonsterId = "Monster_01";
+        string targetMonster2Id = "Monster_02";
+        string targetMonster3Id = "Monster_03";
+        string targetDebuffMonsterId = "DebuffMonster_01";
+        string targetDebuffMonster2Id = "DebuffMonster_02";
+        string targetDebuffMonster3Id = "DebuffMonster_03";
+        string targetDebuffMonster4Id = "DebuffMonster_04";
         string projectileId = "MonsterProjectile";
 
         GameObject monsterPrefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetMonsterId);
+        GameObject monster2Prefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetMonster2Id);
+        GameObject monster3Prefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetMonster3Id);
+        GameObject debuffMonsterPrefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetDebuffMonsterId);
+        GameObject debuffMonster2Prefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetDebuffMonster2Id);
+        GameObject debuffMonster3Prefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetDebuffMonster3Id);
+        GameObject debuffMonster4Prefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetDebuffMonster4Id);
         GameObject projectilePrefab = await ResourceManager.Instance.LoadAsset<GameObject>(projectileId);
 
         if (monsterPrefab == null)
@@ -181,12 +193,24 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
         Dictionary<string, int> initialPool = new Dictionary<string, int>
         {
             { targetMonsterId, 10 },
+            { targetMonster2Id, 10 },
+            { targetMonster3Id, 10 },
+            { targetDebuffMonsterId, 5 },
+            { targetDebuffMonster2Id, 5 },
+            { targetDebuffMonster3Id, 5 },
+            { targetDebuffMonster4Id, 5 },
             { projectileId, 20 }
         };
 
         Dictionary<string, GameObject> prefabMap = new Dictionary<string, GameObject>
         {
             { targetMonsterId, monsterPrefab },
+            { targetMonster2Id, monster2Prefab },
+            { targetMonster3Id, monster3Prefab },
+            { targetDebuffMonsterId, debuffMonsterPrefab },
+            { targetDebuffMonster2Id, debuffMonster2Prefab },
+            { targetDebuffMonster3Id, debuffMonster3Prefab },
+            { targetDebuffMonster4Id, debuffMonster4Prefab },
             { projectileId, projectilePrefab }
         };
 
