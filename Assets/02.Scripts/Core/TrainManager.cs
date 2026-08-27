@@ -256,13 +256,13 @@ public class TrainManager : SingletonBase<TrainManager>
         return null;
     }
 
-    public void AddVisitedStation(Transform stationTransform)
-    {
-        if (stationTransform != null && !visitedStation.Contains(stationTransform))
-        {
-            visitedStation.Add(stationTransform);
-        }
-    }
+    //public void AddVisitedStation(Transform stationTransform)
+    //{
+    //    if (stationTransform != null && !visitedStation.Contains(stationTransform))
+    //    {
+    //        visitedStation.Add(stationTransform);
+    //    }
+    //}
 
     public bool IsVisitedStation(Transform stationTransform)
     {
