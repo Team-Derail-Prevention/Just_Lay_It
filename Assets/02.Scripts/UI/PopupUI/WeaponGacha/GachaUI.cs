@@ -34,7 +34,14 @@ public class GachaUI : UIBase
             _isSlotsCreated = true;
         }
 
-        NetworkGachaService.Instance.OpenGachaBox();
+        bool isOpened = NetworkGachaService.Instance.OpenGachaBox();
+        if (isOpened == false)
+        {
+            UIManager.Instance.OpenExitConfirmPopup(null, null, "재화가 부족합니다.");
+            UIManager.Instance.CloseWeaponGachaUI();
+            return;
+        }
+
         PlayDrawAnimationForAllSlots();
         RefreshRerollUI();
     }
