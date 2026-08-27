@@ -13,8 +13,9 @@ GameObject:
   - component: {fileID: -381454180143105190}
   - component: {fileID: 8969029064315857464}
   - component: {fileID: 990825028463747129}
+  - component: {fileID: 782556437475916473}
   m_Layer: 0
-  m_Name: Monster_01
+  m_Name: DebuffMonster_02
   m_TagString: Monster
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -114,6 +115,20 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 1.9812008
   m_Center: {x: -0.000000059604645, y: 0.1767767, z: 0.00000011920929}
+--- !u!114 &782556437475916473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3659351755270545061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27ddd1ea73a084447839c7ac8f76ecd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CorrosionMonster
+  _debuffDuration: 5
+  _debuffPower: 10
 --- !u!1 &4549538245107254790
 GameObject:
   m_ObjectHideFlags: 0
@@ -200,7 +215,7 @@ PrefabInstance:
     - target: {fileID: 2300000, guid: 28723f10c2a8e094a9351e892f5271b8, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 2954963d08a0b044e8f84eece7126e53, type: 2}
+      objectReference: {fileID: 2100000, guid: 08dc4a4c271ac2f44b0c04aeee5fe1c8, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
