@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: f41d3e7d206223841ae2ab9a477d856e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1222,6 +1222,10 @@ MonoBehaviour:
   Text_Base: {fileID: 0}
   Image_Base: {fileID: 0}
   Image_Select: {fileID: 0}
+  Image_BKFrame: {fileID: 0}
+  _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
+  _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
+  _description: 
 --- !u!1 &7840382531642494243
 GameObject:
   m_ObjectHideFlags: 0
@@ -1360,7 +1364,7 @@ MonoBehaviour:
   - {fileID: 5662799806682334008}
   - {fileID: 486757222976845815}
   - {fileID: 814751229646320786}
-  Image_GoldIcon: {fileID: 5166185043147975183}
+  Image_CashIcon: {fileID: 0}
   Text_Price: {fileID: 2388578456502730838}
   GameObject_Selected: {fileID: 8638521844373688002}
   Button_SlotClick: {fileID: 4210756919305233002}

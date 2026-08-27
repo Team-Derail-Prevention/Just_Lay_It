@@ -3,7 +3,7 @@ using Enums;
 
 public class NetworkResourceService : SingletonBase<NetworkResourceService>
 {
-    private const int BASE_CARGO_LIMIT = 500;
+    private const int BASE_CARGO_LIMIT = 300;
 
     private ResourceViewModel _localVm;
     private int _cargoLimit = BASE_CARGO_LIMIT;
@@ -15,6 +15,7 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         if (UpgradeEventHub.Instance != null)
         {
             UpgradeEventHub.Instance.OnLobbyUpgraded += OnLobbyUpgraded;
+            UpgradeEventHub.Instance.OnInGameUpgraded += OnInGameUpgraded;
         }
     }
 
@@ -23,6 +24,7 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         if (UpgradeEventHub.Instance != null)
         {
             UpgradeEventHub.Instance.OnLobbyUpgraded -= OnLobbyUpgraded;
+            UpgradeEventHub.Instance.OnInGameUpgraded -= OnInGameUpgraded;
         }
     }
 
@@ -30,11 +32,19 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
     {
         if (slotDataId == "LOBBY_BASE_CARGO_LIMIT")
         {
-            IncreaseCargoLimit(20);
+            IncreaseCargoLimit(100);
         }
         else if (slotDataId == "LOBBY_BASE_MATERIAL_AMOUNT")
         {
             _bonusBaseMaterialAmount += 20;
+        }
+    }
+
+    private void OnInGameUpgraded(string slotDataId, int newLevel)
+    {
+        if (slotDataId == "CARGO_RESOURCE_LIMIT")
+        {
+            IncreaseCargoLimit(100);
         }
     }
 
@@ -235,4 +245,5 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
             ResourceStatusEventHub.Instance.NotifyRescuedHumanChanged(0);
         }
     }
+
 }

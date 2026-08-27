@@ -5,7 +5,7 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
     private UpgradeViewModel _localUpgradeViewModel;
 
     [Header("보상 설정")]
-    [SerializeField] private int _cashPerRescuedCitizen = 10;
+    [SerializeField] private int _cashPerRescuedCitizen = 100;
 
     private void Start()
     {
@@ -123,7 +123,7 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
 
     private int CalcRefundAmount(UpgradeSlotViewModel slotVm)
     {
-        return slotVm.NextCost;
+        return slotVm.CurrentLevelCost;
     }
 
     public void GainCash(int amount)

@@ -82,10 +82,19 @@ public class LobbyUpgradeSlotUI : MonoBehaviour
         }
     }
 
-    private void RefreshAll()
+    private async void RefreshAll()
     {
         SetLevel(_viewModel.CurrentLevel);
         SetPrice(_viewModel.NextCost);
+
+        if (Image_Icon != null && string.IsNullOrEmpty(_viewModel.IconPath) == false)
+        {
+            var sprite = await ResourceManager.Instance.LoadAsset<Sprite>(_viewModel.IconPath);
+            if (Image_Icon != null && sprite != null)
+            {
+                Image_Icon.sprite = sprite;
+            }
+        }
     }
 
     private void SetLevel(int curLevel)
@@ -106,7 +115,7 @@ public class LobbyUpgradeSlotUI : MonoBehaviour
     {
         if (Text_Price != null)
         {
-            Text_Price.text = price.ToString();
+            Text_Price.text = _viewModel.IsMaxLevel ? "MAX" : price.ToString();
         }
     }
 

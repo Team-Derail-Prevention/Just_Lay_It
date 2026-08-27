@@ -6,7 +6,6 @@ public class NetworkTrainStrengtheningService : SingletonBase<NetworkTrainStreng
     private const int CARGO_BASE_UNLOCKED_COUNT = 3;
 
     private TrainStrengtheningViewModel _localVm;
-    private string _pendingSlotDataId;
 
     private void Start()
     {
@@ -57,11 +56,10 @@ public class NetworkTrainStrengtheningService : SingletonBase<NetworkTrainStreng
             return;
         }
 
-        _pendingSlotDataId = slotDataId;
-        MoneyRequestEventHub.Instance.RequestSpendMoney(slotVm.NextCost, OnPurchaseResult);
+        MoneyRequestEventHub.Instance.RequestSpendMoney(slotVm.NextCost, isApproved => OnPurchaseResult(slotDataId, isApproved));
     }
 
-    private void OnPurchaseResult(bool isApproved)
+    private void OnPurchaseResult(string slotDataId, bool isApproved)
     {
         if (isApproved == false)
         {
@@ -70,7 +68,7 @@ public class NetworkTrainStrengtheningService : SingletonBase<NetworkTrainStreng
         }
 
         var vm = GetLocalTrainStrengtheningViewModel();
-        var slotVm = vm.GetSlot(_pendingSlotDataId);
+        var slotVm = vm.GetSlot(slotDataId);
         if (slotVm == null)
         {
             return;
