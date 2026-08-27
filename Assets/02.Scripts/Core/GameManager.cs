@@ -35,9 +35,10 @@ public class GameManager : SingletonBase<GameManager>
     public int SessionKillCount => _sessionKillCount;
     public int SessionEarnedGold => _sessionEarnedGold;
 
+    public event Action<int> OnStationProgressChanged;
     public event Action<int> OnCountdownChanged;
     public event Action OnGameCleared;
-
+    
     public static DataManager Data => DataManager.Instance;
     public static ResourceManager Resource => ResourceManager.Instance;
     public static PoolManager Pool => PoolManager.Instance;
@@ -177,6 +178,7 @@ public class GameManager : SingletonBase<GameManager>
         _activeStation.ExitStation(stoneTaken, citizenBoarded);
 
         _completedStations.Add(_activeStation);
+        OnStationProgressChanged?.Invoke(CompletedStationCount);
         ResourceStatusEventHub?.NotifyStationProgressChanged(CompletedStationCount, RequiredStationCount);
 
         _activeStation = null;
@@ -558,6 +560,7 @@ public class GameManager : SingletonBase<GameManager>
         _sessionKillCount = 0;
         _sessionEarnedGold = 0;
         _completedStations.Clear();
+        OnStationProgressChanged?.Invoke(CompletedStationCount);
     }
 
     private void ClearCurrentSession()
