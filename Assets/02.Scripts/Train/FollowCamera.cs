@@ -49,6 +49,10 @@ public class FollowCamera : MonoBehaviour
         {
             transform.LookAt(_target);
         }
+        else
+        {
+            transform.rotation = Quaternion.Euler(_fixedRotation);
+        }
     }
 
     public void SetTarget(Transform targetTransform)
