@@ -103,28 +103,20 @@ public class MonsterMove : MonoBehaviour
     {
         _isAttackRange = false;
         _attackTimer = 0f;
-
-        if (_animator != null)
-        {
-            _animator.SetBool(_walk, true);
-        }
+        
+        transform.LookAt(targetPos);
 
         if (_rb != null)
         {
-            _rb.linearVelocity = Vector3.zero;
-            _rb.angularVelocity = Vector3.zero;
-        }
+            Vector3 direction = (targetPos - transform.position).normalized;
 
-        Vector3 newPos = Vector3.MoveTowards(transform.position, targetPos, _moveSpeed * Time.deltaTime);
-        if (_rb != null)
-        {
-            _rb.MovePosition(newPos);
+            _rb.linearVelocity = new Vector3(direction.x * _moveSpeed, _rb.linearVelocity.y, direction.z * _moveSpeed);
         }
         else
         {
+            Vector3 newPos = Vector3.MoveTowards(transform.position, targetPos, _moveSpeed * Time.deltaTime);
             transform.position = newPos;
         }
-        transform.LookAt(targetPos);
     }
     private void HandleAttack(Vector3 targetPos)
     {
@@ -137,6 +129,10 @@ public class MonsterMove : MonoBehaviour
                 _animator.SetBool(_walk, false);
             }
 
+        }
+        if (_rb != null)
+        {
+            _rb.linearVelocity = Vector3.zero;
         }
 
         transform.LookAt(targetPos);
