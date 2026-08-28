@@ -143,6 +143,7 @@ public class GameManager : SingletonBase<GameManager>
 
             NetworkResourceService.ResetRun();
             NetworkWarehouseService.ResetRun();
+            NetworkRailService.ResetRun();
 
             bool isMapGenerated = await Map.GenerateMapAsync(this.GetCancellationTokenOnDestroy());
             if (!isMapGenerated)
@@ -177,7 +178,7 @@ public class GameManager : SingletonBase<GameManager>
         }
 
         Train?.SpawnStationTrain(_activeStation, _startingCarriageCount);
-        Train?.AddVisitedStation(_activeStation.transform);
+        // Train?.AddVisitedStation(_activeStation.transform);
 
         _activeStation.ExitStation(stoneTaken, citizenBoarded);
 
@@ -218,10 +219,10 @@ public class GameManager : SingletonBase<GameManager>
 
         Train?.SpawnFullTrain(exitInfo.position, exitInfo.rotation, _startingCarriageCount);
 
-        if (_activeTerminal != null)
-        {
-            Train?.AddVisitedStation(_activeTerminal.transform);
-        }
+        //if (_activeTerminal != null)
+        //{
+        //    Train?.AddVisitedStation(_activeTerminal.transform);
+        //}
 
         _activeTerminal = null;
 
@@ -586,9 +587,11 @@ public class GameManager : SingletonBase<GameManager>
 
         NetworkResourceService.ResetRun();
         NetworkWarehouseService.ResetRun();
+        NetworkRailService.ResetRun();
 
         UI?.CloseHudTrainStatusUI();
         UI?.CloseHudResourceUI();
+        UI?.CloseHudMinimapUI();
         UI?.CloseInGameMenuButtonUI();
         UI?.CloseRailBuildUI();
         UI?.OpenContentUI(UIType.LobbyUI);
