@@ -23,7 +23,7 @@ public class MapManager : SingletonBase<MapManager>
     [SerializeField, Min(0f)] private float _stage2ClearTimeLimit = 300f;
     [SerializeField, Min(0f)] private float _stage3ClearTimeLimit = 300f;
 
-    private readonly Vector3Int[] _mapOffsets =
+    private readonly Vector3Int[] _initialMapOffsets =
     {
         new Vector3Int(-1, 0, 1),  new Vector3Int(0, 0, 1),  new Vector3Int(1, 0, 1),
         new Vector3Int(1, 0, 0),   new Vector3Int(1, 0, -1), new Vector3Int(0, 0, -1),
@@ -34,7 +34,6 @@ public class MapManager : SingletonBase<MapManager>
     private readonly Dictionary<Vector3Int, int> _mapTypeData = new();
     private readonly List<MapTileInfo> _spawnedTiles = new();
 
-    private int _currentMapSize = 3;
     private int _currentRadius = 1;
     private bool _isExpanding;
 
@@ -51,16 +50,6 @@ public class MapManager : SingletonBase<MapManager>
     {
         await NeedDataLoadAsync();
         Debug.Log("[MapManager] 데이터 로드 대기 완료. GameManager의 시작 명령을 기다립니다.");
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Equals))
-        {
-            Debug.Log("[MapManager] 맵 리셋 및 재생성 테스트 시작");
-            ClearMap();
-            _ = GenerateMapAsync();
-        }
     }
 
     private void InitMapRoot()
@@ -157,11 +146,11 @@ public class MapManager : SingletonBase<MapManager>
 
         await SpawnMapFromDataAsync(centralData, Vector3Int.zero, 2, "CentralTerminal", cancellationToken);
 
-        List<bool> assignedTypes = RandomStationLayout();
+        List<bool> assignedTypes = CreateInitialStationLayout();
 
-        for (int i = 0; i < _mapOffsets.Length; i++)
+        for (int i = 0; i < _initialMapOffsets.Length; i++)
         {
-            Vector3Int gridPos = _mapOffsets[i];
+            Vector3Int gridPos = _initialMapOffsets[i];
             bool isStation = assignedTypes[i];
 
             MapData selectedData = isStation ? stationDatas[Random.Range(0, stationDatas.Count)] : normalDatas[Random.Range(0, normalDatas.Count)];
@@ -176,7 +165,7 @@ public class MapManager : SingletonBase<MapManager>
 
         OnMapGenerated?.Invoke(_mapTypeData);
 
-        Debug.Log("[MapManager] 3x3 맵 생성 완료. 스테이션 4개 배치 완료.");
+        Debug.Log("[MapManager] 초기 맵 생성 완료. 스테이션 배치 완료.확장 대기 중");
         return true;
     }
 
@@ -468,19 +457,14 @@ public class MapManager : SingletonBase<MapManager>
         }
     }
 
-    private async UniTask<GameObject> PlaceSingleRailAsync(
-        Vector3 targetPos,
-        Quaternion rotation,
-        float height,
-        Transform parent)
+    private async UniTask<GameObject> PlaceSingleRailAsync(Vector3 targetPos, Quaternion rotation, float height,Transform parent)
     {
         if (string.IsNullOrEmpty(_straightRailAddress))
         {
             return null;
         }
 
-        GameObject railPrefab = await GameManager.Resource.LoadAsset<GameObject>(
-            _straightRailAddress);
+        GameObject railPrefab = await GameManager.Resource.LoadAsset<GameObject>(_straightRailAddress);
 
         if (railPrefab == null)
         {
@@ -491,17 +475,13 @@ public class MapManager : SingletonBase<MapManager>
 
         Vector3 finalPos = new(targetPos.x, height, targetPos.z);
 
-        GameObject railObject = Instantiate(
-            railPrefab,
-            finalPos,
-            rotation,
-            parent);
+        GameObject railObject = Instantiate(railPrefab, finalPos, rotation, parent);
 
         railObject.name = "AutoSpawned_StraightRail";
         return railObject;
     }
 
-    private List<bool> RandomStationLayout()
+    private List<bool> CreateInitialStationLayout()
     {
         List<bool> layout = new()
         {
@@ -516,8 +496,7 @@ public class MapManager : SingletonBase<MapManager>
             {
                 int randomIndex = Random.Range(0, i + 1);
 
-                (layout[i], layout[randomIndex]) =
-                    (layout[randomIndex], layout[i]);
+                (layout[i], layout[randomIndex]) = (layout[randomIndex], layout[i]);
             }
 
             if (IsValidLayout(layout))
