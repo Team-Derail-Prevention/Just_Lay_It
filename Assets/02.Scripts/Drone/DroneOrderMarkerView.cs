@@ -12,7 +12,7 @@ public class DroneOrderMarkerView
     private readonly float _lastOrderAlphaScale;
     private readonly float _heightOffset;
     private readonly float _size;
-    private readonly int _maxOrders;
+    private int _maxOrders;
 
     private readonly List<Renderer> _markers = new List<Renderer>();
     private MaterialPropertyBlock _block;
@@ -29,12 +29,14 @@ public class DroneOrderMarkerView
         _maxOrders = maxOrders;
     }
 
-    public void Refresh(List<IDroneWorker> workers, List<MaterialObject> pendingMining)
+    public void Refresh(List<IDroneWorker> workers, List<MaterialObject> pendingMining, int maxOrders)
     {
         if (_material == null)
         {
             return;
         }
+
+        _maxOrders = maxOrders;
 
         int usedCount = 0;
 

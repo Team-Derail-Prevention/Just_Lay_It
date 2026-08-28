@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,11 +15,17 @@ public class DroneDockPoint : MonoBehaviour
     [SerializeField] private Vector3 _localOffset = new Vector3(0f, 2f, -3f);
     [SerializeField, Min(0f)] private float _topGap = 1f;
 
+    [Header("배회")]
+    [SerializeField, Min(0f)] private float _orbitRadius = 2.5f;
+    [SerializeField] private float _orbitSpeed = 25f;
+
     public bool IsAttached { get { return _anchor != null; } }
     public int CarIndex { get { return _carIndex; } }
 
     private Transform _anchor;
     private Vector3 _offset;
+    private float _phaseDegrees;
+    private bool _isOrbiting;
 
     private void OnEnable()
     {
@@ -128,9 +134,34 @@ public class DroneDockPoint : MonoBehaviour
         OnAttached?.Invoke();
     }
 
+    public void SetOrbitSlot(int slot, int total)
+    {
+        if (total <= 0)
+        {
+            return;
+        }
+
+        _phaseDegrees = 360f * slot / total;
+        _isOrbiting = true;
+    }
+
     private void Apply()
     {
-        transform.SetPositionAndRotation(_anchor.TransformPoint(_offset), _anchor.rotation);
+        Vector3 center = _anchor.TransformPoint(_offset);
+
+        transform.SetPositionAndRotation(center + ResolveOrbitOffset(), _anchor.rotation);
+    }
+
+    private Vector3 ResolveOrbitOffset()
+    {
+        if (_isOrbiting == false || _orbitRadius <= 0f)
+        {
+            return Vector3.zero;
+        }
+
+        float angle = (_phaseDegrees + _orbitSpeed * Time.time) * Mathf.Deg2Rad;
+
+        return new Vector3(Mathf.Cos(angle) * _orbitRadius, 0f, Mathf.Sin(angle) * _orbitRadius);
     }
 
     private Transform ResolveCar(Transform head)
