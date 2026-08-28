@@ -111,6 +111,9 @@ MonoBehaviour:
     rotation: {x: 0, y: 0, z: 0, w: 0}
   - position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
+  _exitDirRoots:
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!65 &2056534865114745679
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -130,5 +133,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.7797318, y: 0.34897202, z: 1.9707237}
-  m_Center: {x: 0.01544094, y: 0.17448601, z: -0.114746094}
+  m_Size: {x: 1.2226908, y: 0.34897202, z: 1.7743238}
+  m_Center: {x: 0.025202036, y: 0.17448601, z: -0.10448055}
