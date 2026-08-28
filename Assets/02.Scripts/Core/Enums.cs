@@ -60,4 +60,10 @@
         Stage3 = 3
     }
 
+    public enum TrainCarSection
+    {
+        Head = 0,       // 머리칸
+        Standard1 = 1,  // 일반칸 1번
+        Standard2 = 2,  // 일반칸 2번
+    }
 }
