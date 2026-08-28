@@ -5,10 +5,21 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
 {
     private const int REROLL_COUNT_DEFAULT = 3; 
     public const int REROLL_COST_SINGLE = 1;
-    public const int REROLL_COST_ALL = 3;  
+    public const int REROLL_COST_ALL = 3;
+    private const int GACHA_BASE_COST = 30;
+    private const int GACHA_COST_INCREASE_PER_PULL = 5;
+    private int _gachaPullCount = 0;
 
     private GachaViewModel _localVm;
     private List<WeaponData> _dataPool;
+
+    public int CurrentGachaCost
+    {
+        get
+        {
+            return GACHA_BASE_COST + (_gachaPullCount * GACHA_COST_INCREASE_PER_PULL);
+        }
+    }
 
     private void OnEnable()
     {
@@ -47,6 +58,11 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
         return _localVm;
     }
 
+    public void ResetRun()
+    {
+        _localVm = null;
+        _gachaPullCount = 0;
+    }
 
     private List<WeaponData> GetDataPool()
     {
@@ -64,8 +80,24 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
         return _dataPool;
     }
 
-    public void OpenGachaBox()
+    public bool OpenGachaBox()
     {
+        if (MoneyRequestEventHub.Instance == null)
+        {
+            return false;
+        }
+
+        bool isSpent = false;
+        MoneyRequestEventHub.Instance.RequestSpendMoney(CurrentGachaCost, result => isSpent = result);
+
+        if (isSpent == false)
+        {
+            Debug.LogWarning("[NetworkGachaService] 가챠 비용이 부족합니다.");
+            return false;
+        }
+
+        _gachaPullCount++;
+
         var vm = GetLocalGachaViewModel();
         vm.SetRerollCount(vm.RerollCountMax, vm.RerollCountMax);
 
@@ -73,6 +105,8 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
         {
             DrawCardIntoSlot(i);
         }
+
+        return true;
     }
 
     public void ApplyRerollCountMaxUpgrade(int newMax)
@@ -149,8 +183,4 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
         UIManager.Instance.OpenExitConfirmPopup(null, null, "무기가 인벤토리로 들어갔습니다.");
     }
 
-    public void ResetRun()
-    {
-        _localVm = null;
-    }
 }

@@ -86,6 +86,16 @@ public class SettingUI : UIBase
         ApplyDisplayMode(index);
     }
 
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (hasFocus == false)
+        {
+            return;
+        }
+
+        ApplyDisplayMode(_dropdownDisplayMode.value);
+    }
+
     private void ApplyBgmVolume(float value)
     {
         if (SoundManager.Instance == null)
@@ -112,12 +122,15 @@ public class SettingUI : UIBase
         {
             case 0:
                 Screen.fullScreenMode = FullScreenMode.Windowed;
+                Cursor.lockState = CursorLockMode.Confined;
                 break;
             case 1:
                 Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
+                Cursor.lockState = CursorLockMode.None;
                 break;
             case 2:
                 Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
+                Cursor.lockState = CursorLockMode.Confined;
                 break;
         }
     }
