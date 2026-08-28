@@ -16,10 +16,15 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
     [Header("Phase Settings")]
     [SerializeField] private List<string> _phase1Monsters = new List<string> { "Monster_01" };
     [SerializeField] private List<string> _phase2Monsters = new List<string> { "Monster_01", "Monster_02" };
+    [SerializeField] private List<string> _phase3Monsters = new List<string> { "Monster_02", "Monster_03","DebuffMonster_01" };
+    [SerializeField] private List<string> _phase4Monsters = new List<string> { "Monster_03", "DebuffMonster_01", "DebuffMonster_02","DebuffMonster_03" };
     [SerializeField] private float _phase2StartTime = 120f;
+    [SerializeField] private float _phase3StartTime = 240f;
+    [SerializeField] private float _phase4StartTime = 360f;
 
     [SerializeField] private LayerMask _obstacleLayer;
     [SerializeField] private float _checkRadius = 1f;
+
 
     private float _elapsedTime = 0;
     private int _currentMonsterCount = 0;
@@ -162,7 +167,15 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
     {
         List<string> currentPool;
 
-        if (_elapsedTime >= _phase2StartTime)
+        if (_elapsedTime >= _phase4StartTime)
+        {
+            currentPool = _phase4Monsters;
+        }
+        else if (_elapsedTime >= _phase3StartTime)
+        {
+            currentPool = _phase3Monsters;
+        }
+        else if (_elapsedTime >= _phase2StartTime)
         {
             currentPool = _phase2Monsters;
         }
