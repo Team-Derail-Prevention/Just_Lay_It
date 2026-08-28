@@ -8,7 +8,6 @@ public class Train : MonoBehaviour
     [SerializeField] private bool _isMoving = true;
 
     [Header("Acceleration Setting")]
-    [SerializeField] private float _acceleration = 0.1f;
     [SerializeField] private float _currentSpeed = 0f; // 현재 속도
     [Header("Debuff State")]
     private bool _isFrozen = false;
@@ -20,7 +19,7 @@ public class Train : MonoBehaviour
 
     private TrainData _trainData;
     private float _maxMoveSpeed = 2f;
-    //private float _currentSpeed = 0f;
+    private float _acceleration = 0.1f; // 가속도 (점점 빨라지는 폭)
     private float _rotateSpeed = 5f;
     private int _maxHp;
     private int _currentHp;
