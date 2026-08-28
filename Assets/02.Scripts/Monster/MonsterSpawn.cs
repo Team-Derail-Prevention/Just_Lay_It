@@ -1,7 +1,8 @@
-﻿using UnityEngine;
-using Cysharp.Threading.Tasks;
-using System.Threading;
+﻿using Cysharp.Threading.Tasks;
+using Enums;
 using System.Collections.Generic;
+using System.Threading;
+using UnityEngine;
 
 public class MonsterSpawn : SingletonBase<MonsterSpawn>
 {
@@ -21,6 +22,9 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
     [SerializeField] private float _phase2StartTime = 120f;
     [SerializeField] private float _phase3StartTime = 240f;
     [SerializeField] private float _phase4StartTime = 360f;
+
+    [Header("Difficulty Scaling")]
+    [SerializeField] private float _hpIncreasePerMinute = 0.25f;
 
     [SerializeField] private LayerMask _obstacleLayer;
     [SerializeField] private float _checkRadius = 1f;
@@ -127,7 +131,8 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
 
             if (healthScript != null)
             {
-                healthScript.Initialize(monsterData);
+                float currentHpMultiplier = GetMonsterHpMultiplier();
+                healthScript.Initialize(monsterData, currentHpMultiplier);
             }
 
             _currentMonsterCount++;
@@ -268,5 +273,34 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
             Debug.Log("몬스터 스폰 시작");
             StartSpawning();
         }
+    }
+
+    private float GetMonsterHpMultiplier()
+    {
+        float stageMultiplier = 1.0f;
+
+        if (GameManager.Instance != null)
+        {
+            switch (GameManager.Instance.CurrentGameStage)
+            {
+                case GameStage.Stage1:
+                    stageMultiplier = 1.0f;
+                    break;
+                case GameStage.Stage2:
+                    stageMultiplier = 1.5f;
+                    break;
+                case GameStage.Stage3:
+                    stageMultiplier = 2.0f;
+                    break;
+                default:
+                    stageMultiplier = 1.0f;
+                    break;
+            }
+        }
+
+        float minutesPlayed = _elapsedTime / 60f;
+        float timeMultiplier = 1.0f + (minutesPlayed * _hpIncreasePerMinute);
+
+        return stageMultiplier * timeMultiplier;
     }
 }
