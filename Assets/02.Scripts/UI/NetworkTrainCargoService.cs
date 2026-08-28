@@ -30,6 +30,29 @@ public class NetworkTrainCargoService : SingletonBase<NetworkTrainCargoService>
             return Mathf.Max(0, remaining);
         }
     }
+    private void OnEnable()
+    {
+        if (UpgradeEventHub.Instance != null)
+        {
+            UpgradeEventHub.Instance.OnInGameUpgraded += OnInGameUpgraded;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (UpgradeEventHub.Instance != null)
+        {
+            UpgradeEventHub.Instance.OnInGameUpgraded -= OnInGameUpgraded;
+        }
+    }
+
+    private void OnInGameUpgraded(string slotDataId, int newLevel)
+    {
+        if (slotDataId == "CARGO_CREW_LIMIT")
+        {
+            IncreaseBoardingLimit(5); // 임시 값
+        }
+    }
 
     private void Start()
     {

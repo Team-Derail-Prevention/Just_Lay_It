@@ -493,6 +493,7 @@ public class GameManager : SingletonBase<GameManager>
         PauseGameplayTime();
         StopAndDespawnMonsters();
         RemovePlayerPlacedRails();
+        RemoveCompletedStations();
 
         Debug.Log($"[GameManager] 스테이션 순회: {CompletedStationCount}/{RequiredStationCount}");
         if (CompletedStationCount >= RequiredStationCount)
@@ -512,6 +513,17 @@ public class GameManager : SingletonBase<GameManager>
     private void OpenBaseArrivalAfterScore()
     {
         UI?.OpenBaseArrivalUI();
+    }
+
+    private void RemoveCompletedStations()
+    {
+        foreach (StationObject station in _completedStations)
+        {
+            if (station != null)
+            {
+                station.RemoveStationAndRails();
+            }
+        }
     }
 
     private void PauseGameplayTime()

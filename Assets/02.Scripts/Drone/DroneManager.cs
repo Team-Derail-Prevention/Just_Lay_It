@@ -34,7 +34,7 @@ public class DroneManager : SingletonBase<DroneManager>
     [SerializeField, Min(0f)] private float _altitudeStepPerSlot = 0.6f;
 
     [Header("채집 명령")]
-    [SerializeField, Min(1)] private int _maxMiningOrders = 3;
+    [SerializeField, Min(1)] private int _maxMiningOrdersPerMiner = 3;
 
     [Header("채집 표시")]
     [SerializeField] private Material _orderMarkerMaterial;
@@ -84,7 +84,7 @@ public class DroneManager : SingletonBase<DroneManager>
         {
             if (_markerView == null)
             {
-                _markerView = new DroneOrderMarkerView(transform, _orderMarkerMaterial, _miningColor, _reservedColor, _lastOrderAlphaScale, _markerHeightOffset, _markerSize, _maxMiningOrders);
+                _markerView = new DroneOrderMarkerView(transform, _orderMarkerMaterial, _miningColor, _reservedColor, _lastOrderAlphaScale, _markerHeightOffset, _markerSize, MaxMiningOrders);
             }
 
             return _markerView;
@@ -96,7 +96,7 @@ public class DroneManager : SingletonBase<DroneManager>
         DispatchPendingDeliveries();
         DispatchPendingMining();
         Preloader.Tick();
-        MarkerView.Refresh(_workers, _pendingMining);
+        MarkerView.Refresh(_workers, _pendingMining, MaxMiningOrders);
     }
 
     public async UniTask SpawnAllAsync()
@@ -148,7 +148,7 @@ public class DroneManager : SingletonBase<DroneManager>
             {
                 GameObject drone = Instantiate(prefab, root);
 
-                ApplyCarSlot(drone, n);
+                ApplyDroneSlot(drone, n, entry.Count);
 
                 _spawned.Add(drone);
             }
@@ -157,18 +157,25 @@ public class DroneManager : SingletonBase<DroneManager>
         Debug.Log($"[DroneManager] 드론 {_spawned.Count}대 스폰 완료");
     }
 
-    private void ApplyCarSlot(GameObject drone, int slot)
+    private void ApplyDroneSlot(GameObject drone, int slot, int slotCount)
     {
-        if (slot <= 0)
-        {
-            return;
-        }
-
         ApplyCruiseOffset(drone, slot);
 
         DroneDockPoint dock = drone.GetComponentInChildren<DroneDockPoint>(true);
 
         if (dock == null)
+        {
+            return;
+        }
+
+        if (drone.GetComponentInChildren<DroneStateMachine>(true) != null)
+        {
+            dock.SetOrbitSlot(slot, slotCount);
+
+            return;
+        }
+
+        if (slot <= 0)
         {
             return;
         }
@@ -374,6 +381,11 @@ public class DroneManager : SingletonBase<DroneManager>
             return false;
         }
 
+        if (IsTargetClaimed(target))
+        {
+            return false;
+        }
+
         DroneStateMachine miner = FindNearestIdleMiner(target.transform.position, target);
 
         if (miner != null && miner.Assign(target))
@@ -381,9 +393,9 @@ public class DroneManager : SingletonBase<DroneManager>
             return true;
         }
 
-        if (_pendingMining.Count >= _maxMiningOrders)
+        if (_pendingMining.Count >= MaxMiningOrders)
         {
-            Debug.Log($"[DroneManager] 채집 예약이 가득 찼습니다. 최대 {_maxMiningOrders}개");
+            Debug.Log($"[DroneManager] 채집 예약이 가득 찼습니다. 최대 {MaxMiningOrders}개");
 
             return false;
         }
@@ -401,7 +413,7 @@ public class DroneManager : SingletonBase<DroneManager>
         {
             MaterialObject target = _pendingMining[0];
 
-            if (target == null || target.IsBroken || target.IsMining)
+            if (target == null || target.IsBroken || target.IsMining || IsTargetClaimed(target))
             {
                 _pendingMining.RemoveAt(0);
 
@@ -433,12 +445,17 @@ public class DroneManager : SingletonBase<DroneManager>
             return false;
         }
 
+        if (IsTargetClaimed(target))
+        {
+            return false;
+        }
+
         if (FindNearestIdleMiner(target.transform.position, target) != null)
         {
             return true;
         }
 
-        return _pendingMining.Count < _maxMiningOrders;
+        return _pendingMining.Count < MaxMiningOrders;
     }
 
     public static void Deliver(GameObject payload, Vector3 target, Quaternion rotation, Action<GameObject> onPlaced = null)
@@ -781,6 +798,56 @@ public class DroneManager : SingletonBase<DroneManager>
 
             _workers[i].Recall();
         }
+    }
+
+    private int MaxMiningOrders
+    {
+        get
+        {
+            int minerCount = CountMiners();
+
+            if (minerCount < 1)
+            {
+                minerCount = 1;
+            }
+
+            return _maxMiningOrdersPerMiner * minerCount;
+        }
+    }
+
+    private int CountMiners()
+    {
+        int count = 0;
+
+        for (int i = 0; i < _workers.Count; i++)
+        {
+            if (_workers[i] is DroneStateMachine)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private bool IsTargetClaimed(MaterialObject target)
+    {
+        for (int i = 0; i < _workers.Count; i++)
+        {
+            DroneStateMachine miner = _workers[i] as DroneStateMachine;
+
+            if (miner == null)
+            {
+                continue;
+            }
+
+            if (miner.CurrentTarget == target)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private DroneStateMachine FindNearestIdleMiner(Vector3 near, MaterialObject target)

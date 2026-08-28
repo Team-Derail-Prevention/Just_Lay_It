@@ -129,7 +129,7 @@ public class DroneRailPreloader
     private DroneDeliveryWorker FindPreloadableCarrier()
     {
         DroneDeliveryWorker best = null;
-        int bestCount = -1;
+        int bestCount = int.MaxValue;
 
         for (int i = 0; i < _workers.Count; i++)
         {
@@ -140,7 +140,7 @@ public class DroneRailPreloader
                 continue;
             }
 
-            if (carrier.PreloadCount <= bestCount)
+            if (carrier.PreloadCount >= bestCount)
             {
                 continue;
             }

@@ -8,9 +8,11 @@ public class TrainContainer : MonoBehaviour
     [SerializeField] private GameObject[] _containerLevelObject;
 
     [Header("Container Setting")]
-    [SerializeField] private float _maxCargo = 100f;
     [SerializeField] private float _currentAmount = 0f;
 
+    private float _maxCargo = 500f;
+    private int _cachedWood = 0;
+    private int _cachedStone = 0;
     private ContainerLevel _currentLevel = ContainerLevel.Empty;
 
     //테스트
@@ -37,25 +39,57 @@ public class TrainContainer : MonoBehaviour
         get { return _currentLevel; }
     }
 
-
-
-    private void Start()
+    private void OnEnable()
     {
-        RefreshVisual();
-    }
-
-    public void ContainerInit(TrainData data)
-    {
-        if (data == null)
+        if (ResourceStatusEventHub.Instance != null)
         {
-            return;
+            ResourceStatusEventHub.Instance.OnWoodChanged += OnWoodChanged;
+            ResourceStatusEventHub.Instance.OnStoneChanged += OnStoneChanged;
         }
-        _currentAmount = 0f;
-        RefreshVisual();
+
+        if (NetworkResourceService.Instance != null)
+        {
+            var resourceVm = NetworkResourceService.Instance.GetLocalResourceViewModel();
+            if (resourceVm != null)
+            {
+                _cachedWood = resourceVm.CurrentWood;
+                _cachedStone = resourceVm.CurrentStone;
+                UpdateTotalCargoVisual();
+            }
+        }
+        else
+        {
+            RefreshVisual();
+        }
     }
 
+    private void OnDisable()
+    {
+        if (ResourceStatusEventHub.Instance != null)
+        {
+            ResourceStatusEventHub.Instance.OnWoodChanged -= OnWoodChanged;
+            ResourceStatusEventHub.Instance.OnStoneChanged -= OnStoneChanged;
+        }
+    }
 
+    public void ContainerInit()
+    {
+        UpdateTotalCargoVisual();
+    }
 
+    private void OnWoodChanged(int newWoodCount)
+    {
+        _cachedWood = newWoodCount;
+        UpdateTotalCargoVisual();
+
+    }
+
+    private void OnStoneChanged(int newStoneCount)
+    {
+        _cachedStone = newStoneCount;
+        UpdateTotalCargoVisual();
+
+    }
 
     private void RefreshVisual()
     {
@@ -64,6 +98,12 @@ public class TrainContainer : MonoBehaviour
         _currentLevel = CalculateContainerLevel(ratio);
 
         SetVisualLevel(_currentLevel);
+    }
+
+    private void UpdateTotalCargoVisual()
+    {
+        _currentAmount = Mathf.Clamp(_cachedWood + _cachedStone, 0f, _maxCargo);
+        RefreshVisual();
     }
 
     private ContainerLevel CalculateContainerLevel(float ratio)
