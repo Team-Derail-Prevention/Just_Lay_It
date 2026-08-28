@@ -107,18 +107,18 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
             return;
         }
 
-        bool isParsed = System.Enum.TryParse(data.Type, out MaterialObejct materialType);
+        bool isParsed = System.Enum.TryParse(data.Type, out MaterialObejctType materialType);
         if (isParsed == false)
         {
             Debug.LogWarning($"[NetworkResourceService] 알 수 없는 자원 타입입니다 : {data.Type}");
             return;
         }
 
-        if (materialType == MaterialObejct.Rock)
+        if (materialType == MaterialObejctType.Rock)
         {
             AddStone(data.amount);
         }
-        else if (materialType == MaterialObejct.DeadTree)
+        else if (materialType == MaterialObejctType.DeadTree)
         {
             AddWood(data.amount);
         }
