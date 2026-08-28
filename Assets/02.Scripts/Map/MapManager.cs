@@ -425,10 +425,10 @@ public class MapManager : SingletonBase<MapManager>
         }
         else
         {
-            (Vector3 dir, Quaternion rot)[] paths =
+            var paths = new (Vector3 dir, Quaternion trainRot, Quaternion railRot)[]
             {
-                (new Vector3(-1, 0, 0), Quaternion.identity),
-                (new Vector3(1, 0, 0), Quaternion.identity)
+                (new Vector3(-1, 0, 0), Quaternion.Euler(0, 270, 0), Quaternion.identity),
+                (new Vector3(1, 0, 0), Quaternion.Euler(0, 90, 0), Quaternion.identity)
             };
 
             for (int d = 0; d < paths.Length; d++)
@@ -446,11 +446,11 @@ public class MapManager : SingletonBase<MapManager>
                 {
                     Vector3 offset = paths[d].dir * (_railSpawnOffset + i * railLength);
 
-                    GameObject railObj = await PlaceSingleRailAsync(centerPos + offset, paths[d].rot, railHeight, dirRoot.transform);
+                    GameObject railObj = await PlaceSingleRailAsync(centerPos + offset, paths[d].railRot, railHeight, dirRoot.transform);
 
                     if (i == 0 && railObj != null && station != null)
                     {
-                        station.RegisterStartPoint(d, railObj.transform.position, railObj.transform.rotation);
+                        station.RegisterStartPoint(d, railObj.transform.position, paths[d].trainRot);
                     }
                 }
             }
