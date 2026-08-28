@@ -5,7 +5,7 @@ public class RailBuildViewModel : ViewModelBase
 {
     private readonly Dictionary<RailType, RailSlotViewModel> _slotDic = new Dictionary<RailType, RailSlotViewModel>();
 
-    private const int INITIAL_STRAIGHT_RAIL_COUNT = 4;
+    private const int INITIAL_STRAIGHT_RAIL_COUNT = 10;
 
     public RailBuildViewModel(int bonusStraightRailCount = 0)
     {

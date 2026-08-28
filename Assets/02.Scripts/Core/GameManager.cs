@@ -140,15 +140,15 @@ public class GameManager : SingletonBase<GameManager>
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.F2))
+        if (Input.GetKeyDown(KeyCode.F1))
         {
             SetGameStageForCheat(GameStage.Stage1);
         }
-        else if (Input.GetKeyDown(KeyCode.F3))
+        else if (Input.GetKeyDown(KeyCode.F2))
         {
             SetGameStageForCheat(GameStage.Stage2);
         }
-        else if (Input.GetKeyDown(KeyCode.F4))
+        else if (Input.GetKeyDown(KeyCode.F3))
         {
             SetGameStageForCheat(GameStage.Stage3);
         }
@@ -242,6 +242,8 @@ public class GameManager : SingletonBase<GameManager>
 
         _activeStation = null;
         UI?.CloseStationArrivalUI();
+
+        HandleStationArrival();
 
         Train?.DepartStation();
         StartCountdownAsync().Forget();
@@ -606,6 +608,7 @@ public class GameManager : SingletonBase<GameManager>
         Monster?.StopSpawning();
         Pool?.AllDespawnToPool();
 
+        Debug.Log("[GameManager] 몬스터스폰 정지");
         // TODO: Weapon 투사체 정리
         // TODO: PoolManager 몬스터 정리(스킬정리도 필요한지 확인필요)
     }

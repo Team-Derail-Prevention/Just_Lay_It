@@ -8,7 +8,7 @@
   {
     "Id": "DeadTree_001",
     "Type": "DeadTree",
-    "amount": 1,
+    "amount": 2,
     "AddressablePath": "DeadTree_001"
   },
   {
@@ -20,13 +20,13 @@
   {
     "Id": "DeadTree_002",
     "Type": "DeadTree",
-    "amount": 2,
+    "amount": 4,
     "AddressablePath": "DeadTree_002"
   },
   {
     "Id": "DeadTree_003",
     "Type": "DeadTree",
-    "amount": 3,
+    "amount": 6,
     "AddressablePath": "DeadTree_003"
   }
 ]
