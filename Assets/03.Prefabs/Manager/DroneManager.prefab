@@ -47,17 +47,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DroneManager
   _spawnEntries:
   - Address: Prefab/Drone
-    Count: 1
+    Count: 2
   - Address: Prefab/Drone_Rail
     Count: 2
   _spawnRoot: {fileID: 1310377152663819632}
-  _maxMiningOrders: 3
+  _altitudeStepPerSlot: 0.6
+  _maxMiningOrdersPerMiner: 3
   _orderMarkerMaterial: {fileID: 2100000, guid: 02a6d890caa9fe543952460ecc9658b2, type: 2}
   _miningColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   _reservedColor: {r: 0.3, g: 1, b: 0.45, a: 0.8}
   _lastOrderAlphaScale: 0.35
   _markerHeightOffset: 0.05
   _markerSize: 2
+  _preloadRailAddress: Prefab/Rail_Straight
 --- !u!1001 &7863227164525866567
 PrefabInstance:
   m_ObjectHideFlags: 0
