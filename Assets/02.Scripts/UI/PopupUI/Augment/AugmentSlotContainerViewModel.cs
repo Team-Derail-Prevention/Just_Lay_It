@@ -43,4 +43,30 @@ public class AugmentSlotContainerViewModel : ViewModelBase
 
         return null;
     }
+
+    public int GetEquippedCount()
+    {
+        int count = 0;
+        foreach (var slotState in _slotList)
+        {
+            if (slotState.IsLocked == false && slotState.Augment != null)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int GetUnlockedCount()
+    {
+        int count = 0;
+        foreach (var slotState in _slotList)
+        {
+            if (slotState.IsLocked == false)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
 }
