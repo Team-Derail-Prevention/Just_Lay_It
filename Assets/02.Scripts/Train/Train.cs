@@ -7,6 +7,9 @@ public class Train : MonoBehaviour
     [SerializeField] public int _targetIndex = 0;
     [SerializeField] private bool _isMoving = true;
 
+    [Header("Acceleration Setting")]
+    [SerializeField] private float _acceleration = 0.1f;
+    [SerializeField] private float _currentSpeed = 0f; // 현재 속도
     [Header("Debuff State")]
     private bool _isFrozen = false;
     private bool _isElectrified = false;
@@ -16,7 +19,8 @@ public class Train : MonoBehaviour
     public bool IsElectrified => _isElectrified;
 
     private TrainData _trainData;
-    private float _moveSpeed = 2f;
+    private float _maxMoveSpeed = 2f;
+    //private float _currentSpeed = 0f;
     private float _rotateSpeed = 5f;
     private int _maxHp;
     private int _currentHp;
@@ -47,14 +51,19 @@ public class Train : MonoBehaviour
         get { return _maxHp; }
     }
 
-  
+    public float CurrentSpeed
+    {
+        get { return _currentSpeed; }
+    }
+
+
     // TODO : 인게임 기차 업그레이드 요소 추가하면 구독or취소 할거 (체력강화나 이것저것)
-  //private void OnEnable()
+    //private void OnEnable()
     //{
     //    UpgradeEventHub.Instance.OnInGameUpgraded += ;
     //}
 
-   
+
 
     //private void OnDisable()
     //{
@@ -73,6 +82,11 @@ public class Train : MonoBehaviour
         if (GameManager.Instance.CurrentGameState == GameState.Playing && _isMoving && !_isBroken)
         {
             MoveTrain();
+        }
+        else
+        {
+            _currentSpeed = 0f;
+            TrainStatusEventHub.Instance?.NotifySpeedChanged(0f);
         }
 
         if (Input.GetKeyDown(KeyCode.I))
@@ -96,12 +110,14 @@ public class Train : MonoBehaviour
 
         if (data != null)
         {
-            _moveSpeed = data.MoveSpeed;
+            _maxMoveSpeed = data.MoveSpeed;
             _rotateSpeed = data.RotateSpeed;
             _maxHp = data.MaxHp;
             _currentHp = data.MaxHp;
             _defense = data.Defense;
         }
+
+        _currentSpeed = 0f;
 
         if (TrainStatusEventHub.Instance != null)
         {
@@ -172,6 +188,7 @@ public class Train : MonoBehaviour
     {
         if (TrainManager.Instance == null || TrainManager.Instance.IsStation)
         {
+            _currentSpeed = 0f;
             if (TrainStatusEventHub.Instance != null)
             {
                 TrainStatusEventHub.Instance.NotifySpeedChanged(0f);
@@ -184,10 +201,13 @@ public class Train : MonoBehaviour
         {
             if (TrainStatusEventHub.Instance != null)
             {
-                TrainStatusEventHub.Instance.NotifySpeedChanged(0f);
+                _currentSpeed = 0f;
+                TrainStatusEventHub.Instance.NotifySpeedChanged(0);
             }
             return;
         }
+
+        _currentSpeed = Mathf.MoveTowards(_currentSpeed, _maxMoveSpeed, _acceleration * Time.deltaTime);
 
         Vector3 direction = (targetNode.position - transform.position).normalized;
         direction.y = 0f;
@@ -199,14 +219,14 @@ public class Train : MonoBehaviour
         }
 
         Vector3 prevPos = transform.position;
-        transform.position = Vector3.MoveTowards(transform.position, targetNode.position, _moveSpeed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, targetNode.position, _currentSpeed * Time.deltaTime);
 
         float movedDelta = Vector3.Distance(prevPos, transform.position);
         _totalDistance += movedDelta;
 
         if (TrainStatusEventHub.Instance != null)
         {
-            TrainStatusEventHub.Instance.NotifySpeedChanged(_moveSpeed * 10f);
+            TrainStatusEventHub.Instance.NotifySpeedChanged(_currentSpeed * 10f);
             TrainStatusEventHub.Instance.NotifyDistanceChanged(_totalDistance);
         }
 
