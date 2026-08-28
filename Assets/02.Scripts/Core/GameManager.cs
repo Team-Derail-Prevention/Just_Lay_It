@@ -140,15 +140,15 @@ public class GameManager : SingletonBase<GameManager>
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.F2))
+        if (Input.GetKeyDown(KeyCode.F1))
         {
             SetGameStageForCheat(GameStage.Stage1);
         }
-        else if (Input.GetKeyDown(KeyCode.F3))
+        else if (Input.GetKeyDown(KeyCode.F2))
         {
             SetGameStageForCheat(GameStage.Stage2);
         }
-        else if (Input.GetKeyDown(KeyCode.F4))
+        else if (Input.GetKeyDown(KeyCode.F3))
         {
             SetGameStageForCheat(GameStage.Stage3);
         }
