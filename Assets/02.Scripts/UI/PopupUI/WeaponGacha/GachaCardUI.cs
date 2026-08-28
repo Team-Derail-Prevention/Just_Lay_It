@@ -27,7 +27,8 @@ public class GachaCardUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI Text_Stat_Attack;
     [SerializeField] private TextMeshProUGUI Text_Stat_Range;
     [SerializeField] private TextMeshProUGUI Text_Stat_AttackSpeed;
-    [SerializeField] private TextMeshProUGUI Text_Stat_DamageRange;
+    [SerializeField] private TextMeshProUGUI Text_Stat_ReloadSpeed;
+    [SerializeField] private TextMeshProUGUI Text_Stat_MagazineCount;
 
     [Header("상세 설명")]
     [SerializeField] private GameObject GameObject_DetailSection;
@@ -82,8 +83,6 @@ public class GachaCardUI : MonoBehaviour
         }
     }
 
-    // GachaUI가 뽑기/재굴림 직후 명시적으로 호출. 연출 시작 -> 데이터 반영 -> 공개.
-    // startDelay를 슬롯마다 다르게 주면 멈추는 순서(0 -> 1 -> 2)를 만들 수 있음.
     public void PlayDrawAnimation(float startDelay = 0f)
     {
         if (_isSpinning == true)
@@ -116,7 +115,6 @@ public class GachaCardUI : MonoBehaviour
         _isSpinning = false;
     }
 
-    // GachaUI가 공용 재굴림 횟수 변경 시마다 호출. 카드는 자기 횟수를 안 들고 있고 그대로 반영만 함.
     public void SetRerollInteractable(bool isInteractable)
     {
         if (UIButton_RerollSingle != null)
@@ -173,7 +171,8 @@ public class GachaCardUI : MonoBehaviour
         ApplyStatRow(Text_Stat_Attack, 0);
         ApplyStatRow(Text_Stat_Range, 1);
         ApplyStatRow(Text_Stat_AttackSpeed, 2);
-        ApplyStatRow(Text_Stat_DamageRange, 3);
+        ApplyStatRow(Text_Stat_ReloadSpeed, 3);
+        ApplyStatRow(Text_Stat_MagazineCount, 4);
 
         if (Text_Description != null)
         {

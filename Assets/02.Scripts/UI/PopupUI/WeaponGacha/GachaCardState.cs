@@ -106,14 +106,26 @@ public class GachaCardState : ViewModelBase
 
     public void FillFromData(WeaponData data)
     {
-        /*
+        if (data == null)
+        {
+            return;
+        }
+
         WeaponDataId = data.Id;
-        DisplayName = data.DisplayName;
+        DisplayName = data.WeaponName;
         GradeName = data.GradeName;
         IconPath = data.IconPath;
-        Dps = data.Dps;
+        Dps = data.Atk;
         Description = data.Description;
-        StatTextList = data.StatTextList;
-        IsSelected = false; */
+
+        var statList = new List<string>();
+        statList.Add($"{data.Atk}");
+        statList.Add($"{data.Range}");
+        statList.Add($"{data.FireRate}");
+        statList.Add($"{data.ReloadTime}");
+        statList.Add($"{data.MagazineSize}");
+
+        StatTextList = statList;
+        IsSelected = false;
     } 
 }

@@ -8,7 +8,13 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
     [SerializeField] private Image Image_Icon;
     [SerializeField] private GameObject GameObject_LockedOverlay;
     [SerializeField] private GameObject GameObject_Description;
-    [SerializeField] private TMPro.TextMeshProUGUI Text_Description;
+
+    [SerializeField] private TMPro.TextMeshProUGUI Text_NameGrade;
+    [SerializeField] private TMPro.TextMeshProUGUI Text_Atk;
+    [SerializeField] private TMPro.TextMeshProUGUI Text_Range;
+    [SerializeField] private TMPro.TextMeshProUGUI Text_FireRate;
+    [SerializeField] private TMPro.TextMeshProUGUI Text_ReloadTime;
+    [SerializeField] private TMPro.TextMeshProUGUI Text_MagazineSize;
 
     private AugmentSlotState _slotState;
     private AugmentSlotContainerViewModel _ownerContainer;
@@ -185,8 +191,48 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
             return;
         }
 
-        // 증강 정해지면 추후 수정
+        FillDescription(_slotState.Augment.AugmentDataId);
         ShowDescription();
+    }
+
+    private void FillDescription(string weaponDataId)
+    {
+        /*
+        WeaponStatSnapshot stat = WeaponFire.GetCurrentStats(weaponDataId);
+        if (stat == null)
+        {
+            return;
+        }
+
+        if (Text_NameGrade != null)
+        {
+            Text_NameGrade.text = $"{stat.WeaponName} ({stat.GradeName})";
+        }
+
+        if (Text_Atk != null)
+        {
+            Text_Atk.text = $"{stat.Atk}";
+        }
+
+        if (Text_Range != null)
+        {
+            Text_Range.text = $"{stat.Range}";
+        }
+
+        if (Text_FireRate != null)
+        {
+            Text_FireRate.text = $"{stat.FireRate}";
+        }
+
+        if (Text_ReloadTime != null)
+        {
+            Text_ReloadTime.text = $"{stat.ReloadTime}";
+        }
+
+        if (Text_MagazineSize != null)
+        {
+            Text_MagazineSize.text = $"{stat.MagazineSize}";
+        } */
     }
 
     public void OnPointerExit(PointerEventData eventData)
