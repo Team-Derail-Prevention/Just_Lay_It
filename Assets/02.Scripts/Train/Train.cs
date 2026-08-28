@@ -13,7 +13,7 @@ public class Train : MonoBehaviour
     [Header("Debuff State")]
     private bool _isFrozen = false;
     private bool _isElectrified = false;
-    private float _corrodeMultiplier = 1.0f;
+    private float _corrosionMultiplier = 1.0f;
 
     public bool IsFrozen => _isFrozen;
     public bool IsElectrified => _isElectrified;
@@ -27,6 +27,10 @@ public class Train : MonoBehaviour
     private int _defense;
     private float _totalDistance = 0f;
     private bool _isBroken = false;
+
+    private Coroutine _freezeCoroutine;
+    private Coroutine _electricCoroutine;
+    private Coroutine _corrosionCoroutine;
 
     public float TotalDistance { get { return _totalDistance; } }
 
@@ -132,11 +136,11 @@ public class Train : MonoBehaviour
             return;
         }
 
-        int totalDamage = Mathf.Max(1, Mathf.RoundToInt(damage * _corrodeMultiplier));
+        int totalDamage = Mathf.Max(1, Mathf.RoundToInt(damage * _corrosionMultiplier));
 
         _currentHp = Mathf.Max(0, _currentHp - totalDamage);
 
-        Debug.Log($"[Train] 기관차 피격! 받은 피해: {totalDamage} (기본 피해: {damage}, 받는 데미지 배율: {_corrodeMultiplier}배), 남은 HP: {_currentHp}/{_maxHp}");
+        Debug.Log($"[Train] 기관차 피격! 받은 피해: {totalDamage} (기본 피해: {damage}, 받는 데미지 배율: {_corrosionMultiplier}배), 남은 HP: {_currentHp}/{_maxHp}");
 
         if (_currentHp <= 0)
         {
@@ -149,7 +153,6 @@ public class Train : MonoBehaviour
             TrainStatusEventHub.Instance.NotifyHpChanged(_currentHp, _maxHp);
         }
     }
-
 
     //기차역 도착 했을때 회복시킬 경우 사용 예정.
     public void Heal(int healPercent)
@@ -245,26 +248,26 @@ public class Train : MonoBehaviour
 
     public void ApplyDebuff(string debuffType, float duration, float power)
     {
-        if (_isBroken) return;
-
-        Debug.Log($" 디버프 적용 타입: {debuffType}, 지속시간: {duration}초, 위력: {power}");
-
+        if (_isBroken)
+        {
+            return;
+        }
         switch (debuffType)
         {
             case "Freeze":
-                StartCoroutine(FreezeRoutine(duration));
+                if (_freezeCoroutine != null) StopCoroutine(_freezeCoroutine);
+                _freezeCoroutine = StartCoroutine(FreezeRoutine(duration));
                 break;
             case "Electric":
-                StartCoroutine(ElectricRoutine(duration));
+                if (_electricCoroutine != null) StopCoroutine(_electricCoroutine);
+                _electricCoroutine = StartCoroutine(ElectricRoutine(duration));
                 break;
-            case "Corrode":
-                StartCoroutine(CorrodeRoutine(duration, power));
+            case "Corrosion":
+                if (_corrosionCoroutine != null) StopCoroutine(_corrosionCoroutine);
+                _corrosionCoroutine = StartCoroutine(CorrosionRoutine(duration, power));
                 break;
             case "Steal":
                 StealCargo(power);
-                break;
-            case "None":
-            default:
                 break;
         }
     }
@@ -283,13 +286,13 @@ public class Train : MonoBehaviour
         _isElectrified = false;
     }
 
-    private System.Collections.IEnumerator CorrodeRoutine(float duration, float damageMultiplier)
+    private System.Collections.IEnumerator CorrosionRoutine(float duration, float damageMultiplier)
     {
-        _corrodeMultiplier = damageMultiplier;
+        _corrosionMultiplier = damageMultiplier;
 
         yield return new WaitForSeconds(duration);
 
-        _corrodeMultiplier = 1.0f;
+        _corrosionMultiplier = 1.0f;
     }
 
     private void StealCargo(float stealAmount)
