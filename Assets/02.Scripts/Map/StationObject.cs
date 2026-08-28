@@ -88,4 +88,17 @@ public class StationObject : BaseColliderTrigger
             _exitDirRoots[dirIndex] = dirRoot;
         }
     }
+
+    public void RemoveStationAndRails()
+    {
+        foreach (Transform railRoot in _exitDirRoots)
+        {
+            if (railRoot != null)
+            {
+                Destroy(railRoot.gameObject);
+            }
+        }
+
+        Destroy(gameObject);
+    }
 }
