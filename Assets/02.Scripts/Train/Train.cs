@@ -8,7 +8,6 @@ public class Train : MonoBehaviour
     [SerializeField] private bool _isMoving = true;
 
     [Header("Acceleration Setting")]
-    [SerializeField] private float _acceleration = 0.1f;
     [SerializeField] private float _currentSpeed = 0f; // 현재 속도
     [Header("Debuff State")]
     private bool _isFrozen = false;
@@ -20,7 +19,7 @@ public class Train : MonoBehaviour
 
     private TrainData _trainData;
     private float _maxMoveSpeed = 2f;
-    //private float _currentSpeed = 0f;
+    private float _acceleration = 0.1f; // 가속도 (점점 빨라지는 폭)
     private float _rotateSpeed = 5f;
     private int _maxHp;
     private int _currentHp;
@@ -58,6 +57,11 @@ public class Train : MonoBehaviour
     public float CurrentSpeed
     {
         get { return _currentSpeed; }
+    }
+
+    public float Defense
+    {
+        get { return _defense; }
     }
 
 
@@ -129,6 +133,34 @@ public class Train : MonoBehaviour
         }
     }
 
+    public void UpgradeMaxHp(int addHp, bool healAmount)
+    {
+        if (addHp <= 0)
+        {
+            return;
+        }
+
+        _maxHp += addHp;
+        if (healAmount)
+        {
+            _currentHp += addHp;
+        }
+
+        Debug.Log($"[Train Upgrade] 최대 HP 강화! MaxHP: {_maxHp}, CurrentHP: {_currentHp}");
+        TrainStatusEventHub.Instance?.NotifyHpChanged(_currentHp, _maxHp);
+    }
+
+    public void UpgradeDefense(int addDefense)
+    {
+        if (addDefense <= 0)
+        {
+            return;
+        }
+
+        _defense += addDefense;
+        Debug.Log($"[Train Upgrade] 방어력 강화! 현재 방어력: {_defense}");
+    }
+
     public void TakeDamage(int damage)
     {
         if (_isBroken)
@@ -136,11 +168,12 @@ public class Train : MonoBehaviour
             return;
         }
 
-        int totalDamage = Mathf.Max(1, Mathf.RoundToInt(damage * _corrosionMultiplier));
+        int calculateDmg = Mathf.Max(1, damage - _defense);
+        int totalDamage = Mathf.Max(1, Mathf.RoundToInt(calculateDmg * _corrosionMultiplier));
 
         _currentHp = Mathf.Max(0, _currentHp - totalDamage);
 
-        Debug.Log($"[Train] 기관차 피격! 받은 피해: {totalDamage} (기본 피해: {damage}, 받는 데미지 배율: {_corrosionMultiplier}배), 남은 HP: {_currentHp}/{_maxHp}");
+        Debug.Log($"[Train] 기관차 피격! 받은 피해: {totalDamage} (기본 피해: {damage}, 방어력: {_defense}, 받는 데미지 배율: {_corrosionMultiplier}배), 남은 HP: {_currentHp}/{_maxHp}");
 
         if (_currentHp <= 0)
         {
@@ -304,5 +337,13 @@ public class Train : MonoBehaviour
             Debug.Log($"몬스터가 자재를 {stealAmount}만큼 훔침 남은 자재: {container.CurrentAmount}");
         }
     }
+
+
+   // 업그레이드 테스트용 
+    [ContextMenu("Test / Upgrade MaxHp (+50)")]
+    private void TestUpgradeHp() => UpgradeMaxHp(50, true);
+
+    [ContextMenu("Test / Upgrade Defense (+5)")]
+    private void TestUpgradeDef() => UpgradeDefense(5);
 
 }

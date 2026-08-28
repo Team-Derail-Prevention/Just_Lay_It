@@ -1,9 +1,13 @@
-﻿using UnityEngine;
+﻿using Enums;
+using UnityEngine;
 
 public class AugmentEquipViewModel : AugmentSlotContainerViewModel
 {
-    public AugmentEquipViewModel(int totalSlotCount, int initialUnlockedCount)
+    public TrainCarSection Section { get; private set; }
+
+    public AugmentEquipViewModel(TrainCarSection section, int totalSlotCount, int initialUnlockedCount)
     {
+        Section = section;
         CreateSlots(totalSlotCount, initialUnlockedCount);
     }
 

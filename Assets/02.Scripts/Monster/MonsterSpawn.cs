@@ -1,7 +1,8 @@
-﻿using UnityEngine;
-using Cysharp.Threading.Tasks;
-using System.Threading;
+﻿using Cysharp.Threading.Tasks;
+using Enums;
 using System.Collections.Generic;
+using System.Threading;
+using UnityEngine;
 
 public class MonsterSpawn : SingletonBase<MonsterSpawn>
 {
@@ -16,10 +17,18 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
     [Header("Phase Settings")]
     [SerializeField] private List<string> _phase1Monsters = new List<string> { "Monster_01" };
     [SerializeField] private List<string> _phase2Monsters = new List<string> { "Monster_01", "Monster_02" };
+    [SerializeField] private List<string> _phase3Monsters = new List<string> { "Monster_02", "Monster_03","DebuffMonster_01" };
+    [SerializeField] private List<string> _phase4Monsters = new List<string> { "Monster_03", "DebuffMonster_01", "DebuffMonster_02","DebuffMonster_03" };
     [SerializeField] private float _phase2StartTime = 120f;
+    [SerializeField] private float _phase3StartTime = 240f;
+    [SerializeField] private float _phase4StartTime = 360f;
+
+    [Header("Difficulty Scaling")]
+    [SerializeField] private float _hpIncreasePerMinute = 0.25f;
 
     [SerializeField] private LayerMask _obstacleLayer;
     [SerializeField] private float _checkRadius = 1f;
+
 
     private float _elapsedTime = 0;
     private int _currentMonsterCount = 0;
@@ -77,14 +86,14 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
             {
                 if (_currentMonsterCount < _maxMonsterLimit)
                 {
-                    SpawnMonster();
+                    SpawnMonsterAsync().Forget();
                 }
             }
             await UniTask.Delay(System.TimeSpan.FromSeconds(_spawnInterval), cancellationToken: token);
         }
     }
 
-    private void SpawnMonster()
+    private async UniTask SpawnMonsterAsync()
     {
         Vector3 spawnPos = GetSafeSpawnPosition();
 
@@ -94,11 +103,21 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
         }
         string monsterId = GetMonsterIdForCurrentPhase();
 
-        GameObject newMonster = PoolManager.Instance.SpawnFromPool(monsterId, spawnPos);
+        GameObject newMonster = PoolManager.Instance.SpawnFromPool(monsterId, new Vector3(0, -9999f, 0));
 
         if (newMonster != null)
         {
+            await UniTask.DelayFrame(2);
+
+            if (newMonster == null || !newMonster.activeInHierarchy)
+            {
+                return;
+            }
+
+            newMonster.transform.position = spawnPos;
+
             MonsterData monsterData = DataManager.Instance.GetData<MonsterData>(monsterId);
+
             if (monsterData != null)
             {
                 MonsterMove moveScript = newMonster.GetComponent<MonsterMove>();
@@ -107,10 +126,13 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
                     moveScript.Initialize(monsterData, _mainTrain);
                 }
             }
+
             MonsterHealth healthScript = newMonster.GetComponent<MonsterHealth>();
+
             if (healthScript != null)
             {
-                healthScript.Initialize(monsterData);
+                float currentHpMultiplier = GetMonsterHpMultiplier();
+                healthScript.Initialize(monsterData, currentHpMultiplier);
             }
 
             _currentMonsterCount++;
@@ -119,20 +141,27 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
 
     private Vector3 GetSafeSpawnPosition()
     {
-        int maxAttempts = 10;
+        int maxAttempts = 20;
 
         for (int i = 0; i < maxAttempts; i++)
         {
             Vector2 randomCircle = Random.insideUnitCircle.normalized;
             Vector3 spawnDirection = new Vector3(randomCircle.x, 0f, randomCircle.y);
+            Vector3 targetPos = _mainTrain.position + (spawnDirection * _spawnRadius);
 
-            Vector3 spawnPos = _mainTrain.position + (spawnDirection * _spawnRadius);
+            Vector3 rayOrigin = new Vector3(targetPos.x, targetPos.y + 10f, targetPos.z);
 
-            spawnPos.y = _mainTrain.position.y + _spawnYOffset;
-
-            if (!Physics.CheckSphere(spawnPos, _checkRadius, _obstacleLayer))
+            if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 20f))
             {
-                return spawnPos;
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Ground"))
+                {
+                    Vector3 finalSpawnPos = new Vector3(targetPos.x, hit.point.y + _spawnYOffset, targetPos.z);
+
+                    if (!Physics.CheckSphere(finalSpawnPos, _checkRadius, _obstacleLayer))
+                    {
+                        return finalSpawnPos;
+                    }
+                }
             }
         }
 
@@ -143,7 +172,15 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
     {
         List<string> currentPool;
 
-        if (_elapsedTime >= _phase2StartTime)
+        if (_elapsedTime >= _phase4StartTime)
+        {
+            currentPool = _phase4Monsters;
+        }
+        else if (_elapsedTime >= _phase3StartTime)
+        {
+            currentPool = _phase3Monsters;
+        }
+        else if (_elapsedTime >= _phase2StartTime)
         {
             currentPool = _phase2Monsters;
         }
@@ -167,9 +204,21 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
     private async UniTask InitializePoolAsync()
     {
         string targetMonsterId = "Monster_01";
+        string targetMonster2Id = "Monster_02";
+        string targetMonster3Id = "Monster_03";
+        string targetDebuffMonsterId = "DebuffMonster_01";
+        string targetDebuffMonster2Id = "DebuffMonster_02";
+        string targetDebuffMonster3Id = "DebuffMonster_03";
+        string targetDebuffMonster4Id = "DebuffMonster_04";
         string projectileId = "MonsterProjectile";
 
         GameObject monsterPrefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetMonsterId);
+        GameObject monster2Prefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetMonster2Id);
+        GameObject monster3Prefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetMonster3Id);
+        GameObject debuffMonsterPrefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetDebuffMonsterId);
+        GameObject debuffMonster2Prefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetDebuffMonster2Id);
+        GameObject debuffMonster3Prefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetDebuffMonster3Id);
+        GameObject debuffMonster4Prefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetDebuffMonster4Id);
         GameObject projectilePrefab = await ResourceManager.Instance.LoadAsset<GameObject>(projectileId);
 
         if (monsterPrefab == null)
@@ -181,12 +230,24 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
         Dictionary<string, int> initialPool = new Dictionary<string, int>
         {
             { targetMonsterId, 10 },
+            { targetMonster2Id, 10 },
+            { targetMonster3Id, 10 },
+            { targetDebuffMonsterId, 5 },
+            { targetDebuffMonster2Id, 5 },
+            { targetDebuffMonster3Id, 5 },
+            { targetDebuffMonster4Id, 5 },
             { projectileId, 20 }
         };
 
         Dictionary<string, GameObject> prefabMap = new Dictionary<string, GameObject>
         {
             { targetMonsterId, monsterPrefab },
+            { targetMonster2Id, monster2Prefab },
+            { targetMonster3Id, monster3Prefab },
+            { targetDebuffMonsterId, debuffMonsterPrefab },
+            { targetDebuffMonster2Id, debuffMonster2Prefab },
+            { targetDebuffMonster3Id, debuffMonster3Prefab },
+            { targetDebuffMonster4Id, debuffMonster4Prefab },
             { projectileId, projectilePrefab }
         };
 
@@ -212,5 +273,34 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
             Debug.Log("몬스터 스폰 시작");
             StartSpawning();
         }
+    }
+
+    private float GetMonsterHpMultiplier()
+    {
+        float stageMultiplier = 1.0f;
+
+        if (GameManager.Instance != null)
+        {
+            switch (GameManager.Instance.CurrentGameStage)
+            {
+                case GameStage.Stage1:
+                    stageMultiplier = 1.0f;
+                    break;
+                case GameStage.Stage2:
+                    stageMultiplier = 1.5f;
+                    break;
+                case GameStage.Stage3:
+                    stageMultiplier = 2.0f;
+                    break;
+                default:
+                    stageMultiplier = 1.0f;
+                    break;
+            }
+        }
+
+        float minutesPlayed = _elapsedTime / 60f;
+        float timeMultiplier = 1.0f + (minutesPlayed * _hpIncreasePerMinute);
+
+        return stageMultiplier * timeMultiplier;
     }
 }

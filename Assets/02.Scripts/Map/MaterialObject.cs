@@ -13,8 +13,6 @@ public class MaterialObject : BaseColliderTrigger
     [SerializeField] private int _materialObjectAmount;
     [SerializeField]private string _materialObjectType;
 
-    private MaterialObjectData _myData;
-
     [Header("상태 변화 및 수집 연출 설정")]
     [SerializeField] private float _brokenScale = 0.5f;
     [SerializeField] private float _hoverHeight = 0.5f;
@@ -59,7 +57,10 @@ public class MaterialObject : BaseColliderTrigger
 
     public void InitializeData(MaterialObjectData data)
     {
-        _myData = data; 
+        if (data == null)
+        {
+            return;
+        }
 
         _materialObjectID = data.Id;
         _materialObjectType = data.Type;
@@ -155,13 +156,20 @@ public class MaterialObject : BaseColliderTrigger
 
         GameManager.Map?.RefreshTileAtWorldPosition(transform.position);
 
-        if (_myData != null)
+        MaterialObjectData collectedData = null;
+
+        if (!string.IsNullOrWhiteSpace(_materialObjectID))
         {
-            OnMaterialObjectCollected?.Invoke(_myData);
+            collectedData = GameManager.Data?.GetData<MaterialObjectData>(_materialObjectID);
+        }
+
+        if (collectedData != null)
+        {
+            OnMaterialObjectCollected?.Invoke(collectedData);
         }
         else
         {
-            Debug.LogWarning($"[MaterialObject] 데이터가 비어 있습니다! 맵메이커의 주입이 정상적으로 이루어졌는지 확인하세요.");
+            Debug.LogWarning($"[MaterialObject] 수집 데이터를 찾을 수 없습니다. ID: {_materialObjectID}, Object: {gameObject.name}");
         }
 
         Vector3 startPos = transform.position;

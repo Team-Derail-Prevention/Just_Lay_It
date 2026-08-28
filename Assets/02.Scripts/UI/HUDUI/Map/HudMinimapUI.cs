@@ -229,7 +229,7 @@ public class HudMinimapUI : UIBase
         {
             return;
         }
-        /*
+
         Transform headTransform = GameManager.Train.HeadTransform;
         if (headTransform == null)
         {
@@ -245,7 +245,7 @@ public class HudMinimapUI : UIBase
         {
             float headingAngle = Mathf.Atan2(headTransform.forward.x, headTransform.forward.z) * Mathf.Rad2Deg;
             Icon_Train.localRotation = Quaternion.Euler(0f, 0f, -headingAngle);
-        } */
+        }
     }
 
     private void SetIconAnchoredPosition(RectTransform icon, Vector2 normalizedPosition)
