@@ -7,6 +7,7 @@ public class TrainManager : SingletonBase<TrainManager>
 {
     public bool IsStation { get; private set; } = false;
     public Transform HeadTransform => _headTrain;
+    public Train ActiveTrain => _activeTrain;
 
     [Header("Train Carriage Setting")]
     [SerializeField] private float _followDistance = 3f;
@@ -72,7 +73,7 @@ public class TrainManager : SingletonBase<TrainManager>
 
         //머리 진행 방향 기준 (0: 서쪽, 1: 동쪽)
         Vector3 forward = (_headTrain != null) ? _headTrain.forward : _lastEnterDirection;
-        int exitIndex = (forward.x >= 0f) ? 1 : 0;
+        int exitIndex = (forward.x < 0.1f) ? 0 : 1;
 
         StationObject.RailSpawnInfo exitInfo = station.GetStartPoint(exitIndex);
         Transform exitDirRoot = station._exitDirRoots[exitIndex];
@@ -273,7 +274,7 @@ public class TrainManager : SingletonBase<TrainManager>
         TrainContainer trainContainer = newCar.GetComponent<TrainContainer>();
         if (trainContainer != null && data != null)
         {
-            trainContainer.ContainerInit(data);
+            trainContainer.ContainerInit();
         }
 
         carList.Add(newCar);
