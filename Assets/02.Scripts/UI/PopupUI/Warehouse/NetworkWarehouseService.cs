@@ -45,7 +45,7 @@ public class NetworkWarehouseService : SingletonBase<NetworkWarehouseService>
         return _localVm;
     }
 
-    private void OnRequestPutIntoWarehouse(MaterialObejct materialType, int amount, Action<bool> onResult)
+    private void OnRequestPutIntoWarehouse(MaterialObejctType materialType, int amount, Action<bool> onResult)
     {
         if (NetworkResourceService.Instance == null)
         {
@@ -54,7 +54,7 @@ public class NetworkWarehouseService : SingletonBase<NetworkWarehouseService>
         }
 
         bool isSpent;
-        if (materialType == MaterialObejct.Rock)
+        if (materialType == MaterialObejctType.Rock)
         {
             isSpent = NetworkResourceService.Instance.TrySpendStone(amount);
         }
@@ -71,7 +71,7 @@ public class NetworkWarehouseService : SingletonBase<NetworkWarehouseService>
 
         var vm = GetLocalWarehouseViewModel();
 
-        if (materialType == MaterialObejct.Rock)
+        if (materialType == MaterialObejctType.Rock)
         {
             vm.CurrentStone += amount;
             NotifyWarehouseStone(vm.CurrentStone);
@@ -85,12 +85,12 @@ public class NetworkWarehouseService : SingletonBase<NetworkWarehouseService>
         onResult?.Invoke(true);
     }
 
-    private void OnRequestTakeFromWarehouse(MaterialObejct materialType, int amount, Action<bool> onResult)
+    private void OnRequestTakeFromWarehouse(MaterialObejctType materialType, int amount, Action<bool> onResult)
     {
         var vm = GetLocalWarehouseViewModel();
 
         bool hasEnough;
-        if (materialType == MaterialObejct.Rock)
+        if (materialType == MaterialObejctType.Rock)
         {
             hasEnough = vm.CurrentStone >= amount;
         }
@@ -105,7 +105,7 @@ public class NetworkWarehouseService : SingletonBase<NetworkWarehouseService>
             return;
         }
 
-        if (materialType == MaterialObejct.Rock)
+        if (materialType == MaterialObejctType.Rock)
         {
             vm.CurrentStone -= amount;
             NetworkResourceService.Instance.AddStone(amount);

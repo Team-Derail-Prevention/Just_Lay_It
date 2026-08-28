@@ -7,8 +7,8 @@ public class MaterialTransferEventHub : SingletonBase<MaterialTransferEventHub>
     public event Action<int> OnWarehouseStoneChanged;
     public event Action<int> OnWarehouseWoodChanged;
 
-    public event Action<MaterialObejct, int, Action<bool>> OnRequestPutIntoWarehouse;
-    public event Action<MaterialObejct, int, Action<bool>> OnRequestTakeFromWarehouse;
+    public event Action<MaterialObejctType, int, Action<bool>> OnRequestPutIntoWarehouse;
+    public event Action<MaterialObejctType, int, Action<bool>> OnRequestTakeFromWarehouse;
 
     private void Start()
     {
@@ -25,7 +25,7 @@ public class MaterialTransferEventHub : SingletonBase<MaterialTransferEventHub>
         OnWarehouseWoodChanged?.Invoke(curWoodCount);
     }
 
-    public void RequestPutIntoWarehouse(MaterialObejct materialType, int amount, Action<bool> onResult)
+    public void RequestPutIntoWarehouse(MaterialObejctType materialType, int amount, Action<bool> onResult)
     {
         if (OnRequestPutIntoWarehouse == null)
         {
@@ -37,7 +37,7 @@ public class MaterialTransferEventHub : SingletonBase<MaterialTransferEventHub>
         OnRequestPutIntoWarehouse.Invoke(materialType, amount, onResult);
     }
 
-    public void RequestTakeFromWarehouse(MaterialObejct materialType, int amount, Action<bool> onResult)
+    public void RequestTakeFromWarehouse(MaterialObejctType materialType, int amount, Action<bool> onResult)
     {
         if (OnRequestTakeFromWarehouse == null)
         {

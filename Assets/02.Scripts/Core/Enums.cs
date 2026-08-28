@@ -8,8 +8,7 @@
         CentralTerminal
     }
 
-
-    public enum MaterialObejct
+    public enum MaterialObejctType
     {
         Rock,
         DeadTree
@@ -54,5 +53,11 @@
         East = 3,   // 동
     }
 
+    public enum GameStage
+    {
+        Stage1 = 1,
+        Stage2 = 2,
+        Stage3 = 3
+    }
 
 }
