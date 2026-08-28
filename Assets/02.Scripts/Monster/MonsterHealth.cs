@@ -12,11 +12,11 @@ public class MonsterHealth : MonoBehaviour
     private bool _isDead = false;
 
     public int _dropStone;
-    public void Initialize(MonsterData data)
+    public void Initialize(MonsterData data,float hpMultiplier = 1.0f)
     {
         if(data != null)
         {
-            _maxHp = data.Hp;
+            _maxHp = Mathf.RoundToInt(data.Hp * hpMultiplier);
             _currentHp = _maxHp;
             _dropStone = data.DropGold;
         }
@@ -61,4 +61,5 @@ public class MonsterHealth : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
 }
