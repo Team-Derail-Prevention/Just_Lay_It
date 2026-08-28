@@ -3,6 +3,7 @@
 public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
 {
     private UpgradeViewModel _localUpgradeViewModel;
+    private bool _isSlotsCreated;
 
     [Header("보상 설정")]
     [SerializeField] private int _cashPerRescuedCitizen = 100;
@@ -10,26 +11,49 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
+
+        if (DataManager.Instance != null)
+        {
+            DataManager.Instance.OnDataLoadCompleted += OnDataLoadCompleted;
+        }
     }
+
+    private void OnDestroy()
+    {
+        if (DataManager.Instance != null)
+        {
+            DataManager.Instance.OnDataLoadCompleted -= OnDataLoadCompleted;
+        }
+    }
+
+    private void OnDataLoadCompleted()
+    {
+        CreateSlotsFromData();
+    }
+
 
     public UpgradeViewModel GetLocalUpgradeViewModel()
     {
         if (_localUpgradeViewModel == null)
         {
-            CreateLocalUpgradeViewModel();
+            _localUpgradeViewModel = new UpgradeViewModel();
+        }
+
+        if (_isSlotsCreated == false)
+        {
+            CreateSlotsFromData();
         }
 
         return _localUpgradeViewModel;
     }
 
-    private void CreateLocalUpgradeViewModel()
-    {
-        _localUpgradeViewModel = new UpgradeViewModel();
-        CreateSlotsFromData();
-    }
-
     private void CreateSlotsFromData()
     {
+        if (_isSlotsCreated == true)
+        {
+            return;
+        }
+
         if (DataManager.Instance == null || DataManager.Instance.IsLoaded == false)
         {
             Debug.LogWarning("[NetworkUpgradeService] 데이터가 아직 로드되지 않았습니다.");
@@ -43,6 +67,8 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
             var slotVm = new UpgradeSlotViewModel(data.Id, data.Name, data.IconPath, data.Description, data.MaxLevel, data.BaseCost, data.CostIncreasePerLevel);
             _localUpgradeViewModel.AddSlot(slotVm);
         }
+
+        _isSlotsCreated = true;
     }
 
     public bool RequestPurchase(string slotDataId)

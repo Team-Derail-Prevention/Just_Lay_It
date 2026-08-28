@@ -41,11 +41,6 @@ public class HudResourceUI : UIBase
             SetRescuedHuman(resourceVm.RescuedHumanCount);
         }
 
-        if (GameManager.Instance != null)
-        {
-            // SetStationProgress(GameManager.Instance.CompletedStationCount, GameManager.RequiredStationCount);
-        }
-
         if (NetworkUpgradeService.Instance != null)
         {
             _upgradeVm = NetworkUpgradeService.Instance.GetLocalUpgradeViewModel();
