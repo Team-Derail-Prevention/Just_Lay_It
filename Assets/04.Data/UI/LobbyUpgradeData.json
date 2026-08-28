@@ -63,13 +63,13 @@
     "IconPath": "LobbyUpgrade_Icon[LOBBY_RAIL_CRAFT_SPEED_Icon]"
   },
   {
-    "Id": "LOBBY_BASE_MATERIAL_AMOUNT",
-    "Name": "기본 자재량 증가",
+    "Id": "LOBBY_BASE_RAIL_COUNT",
+    "Name": "기본 선로 갯수 증가",
     "MaxLevel": 4,
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
-    "Description": "게임 시작시 처음에 가지고 시작하는 나무와 돌의 량이 증가합니다",
-    "IconPath": "LobbyUpgrade_Icon[LOBBY_BASE_MATERIAL_AMOUNT_Icon]"
+    "Description": "게임 시작시 처음에 가지고 시작하는 선로의 개수가 증가합니다",
+    "IconPath": "LOBBY_BASE_RAIL_COUNT_Icon"
   },
   {
     "Id": "LOBBY_BASE_CARGO_LIMIT",

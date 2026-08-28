@@ -54,6 +54,19 @@ public class UpgradeSlotViewModel : ViewModelBase
         }
     }
 
+    public int CurrentLevelCost
+    {
+        get
+        {
+            if (CurrentLevel <= 0)
+            {
+                return 0;
+            }
+
+            return _baseCost + ((CurrentLevel - 1) * _costIncreasePerLevel);
+        }
+    }
+
     public UpgradeSlotViewModel(string slotDataId, string displayName, string iconPath, int maxLevel, int baseCost, int costIncreasePerLevel)
     {
         SlotDataId = slotDataId;

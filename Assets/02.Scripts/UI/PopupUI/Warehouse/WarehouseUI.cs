@@ -25,7 +25,7 @@ public class WarehouseUI : UIBase
     [Header("나가기")]
     [SerializeField] private UIButton Button_Exit;
 
-    private MaterialObejct? _selectedMaterialType;
+    private MaterialObejctType? _selectedMaterialType;
     private int _confirmedAmount;
 
     private void OnEnable()
@@ -122,27 +122,27 @@ public class WarehouseUI : UIBase
 
     private void OnClick_SelectStone()
     {
-        SelectMaterial(MaterialObejct.Rock);
+        SelectMaterial(MaterialObejctType.Rock);
     }
 
     private void OnClick_SelectWood()
     {
-        SelectMaterial(MaterialObejct.DeadTree);
+        SelectMaterial(MaterialObejctType.DeadTree);
     }
 
     // + 돌/나무 중 하나만 선택 가능, Check 표시로 어떤 걸 골랐는지 시각적으로 알려줌
-    private void SelectMaterial(MaterialObejct materialType)
+    private void SelectMaterial(MaterialObejctType materialType)
     {
         _selectedMaterialType = materialType;
 
         if (GameObject_StoneCheck != null)
         {
-            GameObject_StoneCheck.SetActive(materialType == MaterialObejct.Rock);
+            GameObject_StoneCheck.SetActive(materialType == MaterialObejctType.Rock);
         }
 
         if (GameObject_WoodCheck != null)
         {
-            GameObject_WoodCheck.SetActive(materialType == MaterialObejct.DeadTree);
+            GameObject_WoodCheck.SetActive(materialType == MaterialObejctType.DeadTree);
         }
     }
 

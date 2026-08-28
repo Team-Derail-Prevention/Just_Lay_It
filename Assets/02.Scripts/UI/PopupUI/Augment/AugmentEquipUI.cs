@@ -1,37 +1,72 @@
-﻿using UnityEngine;
+﻿using Enums;
+using UnityEngine;
 
 public class AugmentEquipUI : MonoBehaviour
 {
-    [SerializeField] private GameObject Prefab_Slot;
-    [SerializeField] private Transform Transform_SlotRoot;
+    [System.Serializable]
+    private class SectionRow
+    {
+        public TrainCarSection Section;
+        public Transform Transform_SlotRoot;
+    }
 
-    private AugmentEquipViewModel _vm;
+    [SerializeField] private GameObject Prefab_Slot;
+    [SerializeField] private SectionRow[] _sectionRowList;
+
     private bool _isSlotsCreated;
 
     private void OnEnable()
     {
-        _vm = NetworkAugmentService.Instance.GetLocalAugmentEquipViewModel();
-
         if (_isSlotsCreated == false)
         {
-            CreateAllSlots();
+            CreateAllRows();
             _isSlotsCreated = true;
         }
     }
 
-    private void CreateAllSlots()
+    private void CreateAllRows()
     {
-        int slotCount = _vm.GetSlotCount();
-        for (int i = 0; i < slotCount; i++)
+        if (_sectionRowList == null)
         {
-            var slotState = _vm.GetSlot(i);
-            CreateSlot(slotState);
+            return;
+        }
+
+        for (int i = 0; i < _sectionRowList.Length; i++)
+        {
+            CreateRow(_sectionRowList[i]);
         }
     }
 
-    private void CreateSlot(AugmentSlotState slotState)
+    private void CreateRow(SectionRow row)
     {
-        var gObj = Instantiate(Prefab_Slot, Transform_SlotRoot);
+        if (row == null || row.Transform_SlotRoot == null)
+        {
+            return;
+        }
+
+        ClearExistingChildren(row.Transform_SlotRoot);
+
+        AugmentEquipViewModel vm = NetworkAugmentService.Instance.GetLocalWeaponEquipViewModel(row.Section);
+
+        int slotCount = vm.GetSlotCount();
+        for (int i = 0; i < slotCount; i++)
+        {
+            AugmentSlotState slotState = vm.GetSlot(i);
+            CreateSlot(row.Transform_SlotRoot, slotState, vm);
+        }
+    }
+
+    private void ClearExistingChildren(Transform slotRoot)
+    {
+        for (int i = slotRoot.childCount - 1; i >= 0; i--)
+        {
+            Destroy(slotRoot.GetChild(i).gameObject);
+        }
+    }
+
+    private void CreateSlot(Transform slotRoot, AugmentSlotState slotState, AugmentEquipViewModel vm)
+    {
+        var gObj = Instantiate(Prefab_Slot, slotRoot);
         if (gObj == null)
         {
             return;
@@ -43,6 +78,6 @@ public class AugmentEquipUI : MonoBehaviour
             return;
         }
 
-        slotComponent.InitSlot(slotState, _vm);
+        slotComponent.InitSlot(slotState, vm);
     }
 }

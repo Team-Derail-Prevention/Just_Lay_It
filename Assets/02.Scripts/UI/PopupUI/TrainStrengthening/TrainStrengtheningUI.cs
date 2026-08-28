@@ -30,7 +30,7 @@ public class TrainStrengtheningUI :UIBase
 
         if (Button_Purchase != null)
         {
-            Button_Purchase.BindOnClickButtonEvent(OnClick_Purchase); ;
+            Button_Purchase.BindOnClickButtonEvent(OnClick_Purchase);
         }
 
         _vm = NetworkTrainStrengtheningService.Instance.GetLocalTrainStrengtheningViewModel();

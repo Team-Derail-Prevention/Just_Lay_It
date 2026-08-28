@@ -17,6 +17,13 @@ public class GameManager : SingletonBase<GameManager>
     [SerializeField] private int _sessionKillCount = 0;
     [SerializeField] private int _sessionEarnedStone = 0;
 
+    [Header("Game Stage")]
+    [SerializeField] private GameStage _currentGameStage = GameStage.Stage1;
+
+    [SerializeField, Min(0f)] private float _stage1ClearTimeLimit = 300f;
+    [SerializeField, Min(0f)] private float _stage2ClearTimeLimit = 300f;
+    [SerializeField, Min(0f)] private float _stage3ClearTimeLimit = 300f;
+
     private readonly TimeManager _timeManager = new TimeManager();
 
     private Transform _managerRoot;
@@ -28,7 +35,6 @@ public class GameManager : SingletonBase<GameManager>
     private float _playTime;
     private int _lastNotifiedTime;
 
-    public const int RequiredStationCount = 4;
 
     private readonly HashSet<StationObject> _completedStations = new();
     public int CompletedStationCount => _completedStations.Count;
@@ -39,7 +45,10 @@ public class GameManager : SingletonBase<GameManager>
     public event Action<int> OnStationProgressChanged;
     public event Action<int> OnCountdownChanged;
     public event Action OnGameCleared;
-    
+
+    public int RequiredStationCount => (_currentMapSize - 1) * 2;
+    private int _currentMapSize = 3;
+
     public static DataManager Data => DataManager.Instance;
     public static ResourceManager Resource => ResourceManager.Instance;
     public static PoolManager Pool => PoolManager.Instance;
@@ -66,6 +75,7 @@ public class GameManager : SingletonBase<GameManager>
     public static NetworkWarehouseService NetworkWarehouseService => NetworkWarehouseService.Instance;
 
     public GameState CurrentGameState => _currentGameState;
+    public GameStage CurrentGameStage => _currentGameStage;
 
     protected override void Init()
     {
@@ -91,10 +101,13 @@ public class GameManager : SingletonBase<GameManager>
     private void Start()
     {
         RefreshManagerHierarchyAsync().Forget();
+        Debug.Log($"[GamaManager] 스테이지 체크 {CurrentGameStage}");
     }
 
     private void Update()
     {
+        HandleStageCheatKeys();
+
         if (CurrentGameState != GameState.Playing)
         {
             return;
@@ -119,7 +132,35 @@ public class GameManager : SingletonBase<GameManager>
         CentralTerminal.OnExitDirectionSelected -= SelectExitDirection;
         MonsterHealth.OnMonsterDiedWithStone -= HandleMonsterDied;
     }
-    
+
+    private void HandleStageCheatKeys()
+    {
+        if (CurrentGameState != GameState.Ready)
+        {
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            SetGameStageForCheat(GameStage.Stage1);
+        }
+        else if (Input.GetKeyDown(KeyCode.F3))
+        {
+            SetGameStageForCheat(GameStage.Stage2);
+        }
+        else if (Input.GetKeyDown(KeyCode.F4))
+        {
+            SetGameStageForCheat(GameStage.Stage3);
+        }
+    }
+
+    private void SetGameStageForCheat(GameStage stage)
+    {
+        _currentGameStage = stage;
+
+        Debug.Log($"[GameManager] 치트 적용: Stage {(int)_currentGameStage} 선택. 다음 게임은 {GetMapSize(_currentGameStage)}x{GetMapSize(_currentGameStage)} 맵으로 시작합니다.");
+    }
+
     public async UniTask StartGame()
     {
         if (_isStartingGame || CurrentGameState == GameState.Playing)
@@ -143,6 +184,9 @@ public class GameManager : SingletonBase<GameManager>
 
             NetworkResourceService.ResetRun();
             NetworkWarehouseService.ResetRun();
+            NetworkRailService.ResetRun();
+
+            _currentMapSize = GetMapSize(_currentGameStage);
 
             bool isMapGenerated = await Map.GenerateMapAsync(this.GetCancellationTokenOnDestroy());
             if (!isMapGenerated)
@@ -150,7 +194,18 @@ public class GameManager : SingletonBase<GameManager>
                 Debug.LogError("[GameManager] 맵 생성에 실패하여 게임 시작을 취소합니다.");
                 return;
             }
-                        
+
+            if (_currentMapSize > 3)
+            {
+                bool isExpanded = await Map.ExpandMapAsync(_currentMapSize, this.GetCancellationTokenOnDestroy());
+
+                if (!isExpanded)
+                {
+                    Debug.LogError("[GameManager] 맵 확장 실패");
+                    return;
+                }
+            }
+
             if (Drone != null)
             {
                 await Drone.SpawnAllAsync();
@@ -177,7 +232,7 @@ public class GameManager : SingletonBase<GameManager>
         }
 
         Train?.SpawnStationTrain(_activeStation, _startingCarriageCount);
-        Train?.AddVisitedStation(_activeStation.transform);
+        // Train?.AddVisitedStation(_activeStation.transform);
 
         _activeStation.ExitStation(stoneTaken, citizenBoarded);
 
@@ -218,10 +273,10 @@ public class GameManager : SingletonBase<GameManager>
 
         Train?.SpawnFullTrain(exitInfo.position, exitInfo.rotation, _startingCarriageCount);
 
-        if (_activeTerminal != null)
-        {
-            Train?.AddVisitedStation(_activeTerminal.transform);
-        }
+        //if (_activeTerminal != null)
+        //{
+        //    Train?.AddVisitedStation(_activeTerminal.transform);
+        //}
 
         _activeTerminal = null;
 
@@ -255,11 +310,27 @@ public class GameManager : SingletonBase<GameManager>
         }
 
         ChangeGameState(GameState.GameClear);
+
+        GameStage clearedStage = _currentGameStage;
+        float timeLimit = GetClearTimeLimit(clearedStage);
+        bool clearedInTime = _playTime <= timeLimit;
+
+        if (clearedInTime && clearedStage < GameStage.Stage3)
+        {
+            _currentGameStage = (GameStage)((int)clearedStage + 1);
+
+            Debug.Log($"[GameManager] Stage {(int)clearedStage} 클리어 성공. 기록: {_playTime:F1}초 / 제한: {timeLimit:F1}초. 다음 스테이지: {(int)_currentGameStage}");
+        }
+        else if (!clearedInTime)
+        {
+            Debug.Log($"[GameManager] Stage {(int)clearedStage}는 클리어했지만 제한 시간 초과: {_playTime:F1}초 / {timeLimit:F1}초. 다음 게임도 현재 스테이지입니다.");
+        }
+        else
+        {
+            Debug.Log("[GameManager] Stage 3 최종 클리어!");
+        }
+
         OnGameCleared?.Invoke();
-
-        int completedStationCount = CompletedStationCount;
-        Debug.Log($"[GameManager] 게임 클리어: 완료 역 {completedStationCount}/{RequiredStationCount}.");
-
         OpenScoreReport(ScoreResultType.GameClear, ReturnToLobby);
     }
 
@@ -361,9 +432,7 @@ public class GameManager : SingletonBase<GameManager>
 
     private async UniTask<bool> WaitForRequiredManagersAsync()
     {
-        await UniTask.WaitUntil(
-            () => UI != null && Data != null && Resource != null && Map != null && Train != null,
-            cancellationToken: this.GetCancellationTokenOnDestroy());
+        await UniTask.WaitUntil(() => UI != null && Data != null && Resource != null && Map != null && Train != null, cancellationToken: this.GetCancellationTokenOnDestroy());
 
         return ValidateStartDependencies();
     }
@@ -425,6 +494,7 @@ public class GameManager : SingletonBase<GameManager>
         StopAndDespawnMonsters();
         RemovePlayerPlacedRails();
 
+        Debug.Log($"[GameManager] 스테이션 순회: {CompletedStationCount}/{RequiredStationCount}");
         if (CompletedStationCount >= RequiredStationCount)
         {
             GameClear();
@@ -586,12 +656,36 @@ public class GameManager : SingletonBase<GameManager>
 
         NetworkResourceService.ResetRun();
         NetworkWarehouseService.ResetRun();
+        NetworkRailService.ResetRun();
 
         UI?.CloseHudTrainStatusUI();
         UI?.CloseHudResourceUI();
+        UI?.CloseHudMinimapUI();
         UI?.CloseInGameMenuButtonUI();
         UI?.CloseRailBuildUI();
         UI?.OpenContentUI(UIType.LobbyUI);
+    }
+
+    private int GetMapSize(GameStage stage)
+    {
+        return stage switch
+        {
+            GameStage.Stage1 => 3,
+            GameStage.Stage2 => 5,
+            GameStage.Stage3 => 7,
+            _ => 3
+        };
+    }
+
+    private float GetClearTimeLimit(GameStage stage)
+    {
+        return stage switch
+        {
+            GameStage.Stage1 => _stage1ClearTimeLimit,
+            GameStage.Stage2 => _stage2ClearTimeLimit,
+            GameStage.Stage3 => _stage3ClearTimeLimit,
+            _ => 0f
+        };
     }
 
     private void SetManagerParent(Component manager)

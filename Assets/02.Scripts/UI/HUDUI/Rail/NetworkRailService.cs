@@ -6,6 +6,10 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
     // 임시 선로 제작 소요 시간 3초
     private const float CRAFT_DURATION = 1.5f;
     private float _craftSpeedPercent = 0f;
+    private const int CRAFT_WOOD_COST = 4;
+
+    private const int BONUS_RAIL_COUNT_PER_LEVEL = 2;
+    private int _bonusBaseRailCount = 0;
 
     private RailBuildViewModel _localRailBuildViewModel;
 
@@ -33,6 +37,10 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
         {
             _craftSpeedPercent += 0.1f;
         }
+        else if (slotDataId == "LOBBY_BASE_RAIL_COUNT")
+        {
+            _bonusBaseRailCount += BONUS_RAIL_COUNT_PER_LEVEL;
+        }
     }
 
     private void Start()
@@ -50,7 +58,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
     {
         if (_localRailBuildViewModel == null)
         {
-            _localRailBuildViewModel = new RailBuildViewModel();
+            _localRailBuildViewModel = new RailBuildViewModel(_bonusBaseRailCount);
         }
 
         return _localRailBuildViewModel;
@@ -78,7 +86,12 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
 
     public bool RequestCraft(RailType railType)
     {
-        // 선로 제작 필요 재료 정해지면 수정
+        if (NetworkResourceService.Instance == null || NetworkResourceService.Instance.TrySpendWood(CRAFT_WOOD_COST) == false)
+        {
+            Debug.LogWarning("[NetworkRailService] 나무가 부족합니다.");
+            return false;
+        }
+
         var slot = GetLocalRailBuildViewModel().GetSlot(railType);
         slot.CraftQueueCount += 1;
         return true;
@@ -112,5 +125,10 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
     {
         var slot = GetLocalRailBuildViewModel().GetSlot(railType);
         slot.OwnedCount += 1;
+    }
+
+    public void ResetRun()
+    {
+        _localRailBuildViewModel = new RailBuildViewModel(_bonusBaseRailCount);
     }
 }

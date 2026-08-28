@@ -3,8 +3,8 @@ using TMPro;
 
 public class StationArrivalUI : UIBase
 {
-    private const int REPAIR_HEAL_PERCENT = 20;   // 임시 값 추후 수정
-    private const int REPAIR_STONE_COST = 0;  // 임시 값 추후 수정
+    private const int REPAIR_HEAL_PERCENT = 20; 
+    private const int REPAIR_STONE_COST = 40;  
 
     [Header("좌상단 표시")]
     [SerializeField] private TextMeshProUGUI Text_MyStone;

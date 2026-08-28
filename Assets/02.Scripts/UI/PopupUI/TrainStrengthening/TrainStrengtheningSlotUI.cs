@@ -58,7 +58,7 @@ public class TrainStrengtheningSlotUI : MonoBehaviour
         RefreshAll();
     }
 
-    private void RefreshAll()
+    private async void RefreshAll()
     {
         if (Text_Name != null)
         {
@@ -83,8 +83,17 @@ public class TrainStrengtheningSlotUI : MonoBehaviour
                 Image_LevelPipArray[i].gameObject.SetActive(isFilled);
             }
         }
+
+        if (Image_Icon != null && string.IsNullOrEmpty(_viewModel.IconPath) == false)
+        {
+            var sprite = await ResourceManager.Instance.LoadAsset<Sprite>(_viewModel.IconPath);
+            if (Image_Icon != null && sprite != null)
+            {
+                Image_Icon.sprite = sprite;
+            }
+        }
     }
-    
+
     public void SetSelected(bool isSelected)
     {
         if (GameObject_Selected != null)

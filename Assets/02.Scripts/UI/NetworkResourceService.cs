@@ -3,18 +3,17 @@ using Enums;
 
 public class NetworkResourceService : SingletonBase<NetworkResourceService>
 {
-    private const int BASE_CARGO_LIMIT = 500;
+    private const int BASE_CARGO_LIMIT = 300;
 
     private ResourceViewModel _localVm;
     private int _cargoLimit = BASE_CARGO_LIMIT;
-
-    private int _bonusBaseMaterialAmount = 0;
 
     private void OnEnable()
     {
         if (UpgradeEventHub.Instance != null)
         {
             UpgradeEventHub.Instance.OnLobbyUpgraded += OnLobbyUpgraded;
+            UpgradeEventHub.Instance.OnInGameUpgraded += OnInGameUpgraded;
         }
     }
 
@@ -23,6 +22,7 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         if (UpgradeEventHub.Instance != null)
         {
             UpgradeEventHub.Instance.OnLobbyUpgraded -= OnLobbyUpgraded;
+            UpgradeEventHub.Instance.OnInGameUpgraded -= OnInGameUpgraded;
         }
     }
 
@@ -30,11 +30,15 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
     {
         if (slotDataId == "LOBBY_BASE_CARGO_LIMIT")
         {
-            IncreaseCargoLimit(20);
+            IncreaseCargoLimit(100);
         }
-        else if (slotDataId == "LOBBY_BASE_MATERIAL_AMOUNT")
+    }
+
+    private void OnInGameUpgraded(string slotDataId, int newLevel)
+    {
+        if (slotDataId == "CARGO_RESOURCE_LIMIT")
         {
-            _bonusBaseMaterialAmount += 20;
+            IncreaseCargoLimit(100);
         }
     }
 
@@ -103,18 +107,18 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
             return;
         }
 
-        bool isParsed = System.Enum.TryParse(data.Type, out MaterialObejct materialType);
+        bool isParsed = System.Enum.TryParse(data.Type, out MaterialObejctType materialType);
         if (isParsed == false)
         {
             Debug.LogWarning($"[NetworkResourceService] 알 수 없는 자원 타입입니다 : {data.Type}");
             return;
         }
 
-        if (materialType == MaterialObejct.Rock)
+        if (materialType == MaterialObejctType.Rock)
         {
             AddStone(data.amount);
         }
-        else if (materialType == MaterialObejct.DeadTree)
+        else if (materialType == MaterialObejctType.DeadTree)
         {
             AddWood(data.amount);
         }
@@ -225,9 +229,6 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         _localVm = new ResourceViewModel();
         _cargoLimit = BASE_CARGO_LIMIT;
 
-        _localVm.CurrentWood = _bonusBaseMaterialAmount;
-        _localVm.CurrentStone = _bonusBaseMaterialAmount;
-
         if (ResourceStatusEventHub.Instance != null)
         {
             ResourceStatusEventHub.Instance.NotifyWoodChanged(_localVm.CurrentWood);
@@ -235,4 +236,5 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
             ResourceStatusEventHub.Instance.NotifyRescuedHumanChanged(0);
         }
     }
+
 }

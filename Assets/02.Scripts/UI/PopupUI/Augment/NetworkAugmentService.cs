@@ -1,13 +1,18 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
+using Enums;
 
 public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
 {
-    private const int TOTAL_INVENTORY_SLOT_COUNT = 49; 
-    private const int TOTAL_EQUIP_SLOT_COUNT = 21; 
-    private const int INITIAL_UNLOCKED_EQUIP_COUNT = 3;
+    private const int TOTAL_INVENTORY_SLOT_COUNT = 49;
+    private const int SLOT_COUNT_PER_CAR = 5;
+
+    private static readonly int[] HEAD_UNLOCK_BY_LEVEL = { 2, 2, 2, 3, 4, 5 };
+    private static readonly int[] STANDARD1_UNLOCK_BY_LEVEL = { 0, 2, 2, 3, 4, 5 };
+    private static readonly int[] STANDARD2_UNLOCK_BY_LEVEL = { 0, 0, 2, 3, 4, 5 };
 
     private AugmentInventoryViewModel _localInventoryVm;
-    private AugmentEquipViewModel _localEquipVm;
+    private readonly Dictionary<TrainCarSection, AugmentEquipViewModel> _localEquipVmDic = new Dictionary<TrainCarSection, AugmentEquipViewModel>();
     private long _lastAugmentUniqueId = 0;
 
     private void Start()
@@ -25,14 +30,46 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
         return _localInventoryVm;
     }
 
-    public AugmentEquipViewModel GetLocalAugmentEquipViewModel()
+    public AugmentEquipViewModel GetLocalWeaponEquipViewModel(TrainCarSection section)
     {
-        if (_localEquipVm == null)
+        AugmentEquipViewModel vm;
+        if (_localEquipVmDic.TryGetValue(section, out vm) == false)
         {
-            _localEquipVm = new AugmentEquipViewModel(TOTAL_EQUIP_SLOT_COUNT, INITIAL_UNLOCKED_EQUIP_COUNT);
+            int initialUnlockedCount = GetUnlockedCountByLevel(section, 0);
+            vm = new AugmentEquipViewModel(section, SLOT_COUNT_PER_CAR, initialUnlockedCount);
+            _localEquipVmDic.Add(section, vm);
         }
 
-        return _localEquipVm;
+        return vm;
+    }
+
+    public void ApplyWeaponSlotUnlockLevel(int upgradeLevel)
+    {
+        GetLocalWeaponEquipViewModel(TrainCarSection.Head).SetUnlockedCount(GetUnlockedCountByLevel(TrainCarSection.Head, upgradeLevel));
+        GetLocalWeaponEquipViewModel(TrainCarSection.Standard1).SetUnlockedCount(GetUnlockedCountByLevel(TrainCarSection.Standard1, upgradeLevel));
+        GetLocalWeaponEquipViewModel(TrainCarSection.Standard2).SetUnlockedCount(GetUnlockedCountByLevel(TrainCarSection.Standard2, upgradeLevel));
+    }
+
+    private int GetUnlockedCountByLevel(TrainCarSection section, int upgradeLevel)
+    {
+        int[] table = GetUnlockTable(section);
+        int clampedLevel = Mathf.Clamp(upgradeLevel, 0, table.Length - 1);
+        return table[clampedLevel];
+    }
+
+    private int[] GetUnlockTable(TrainCarSection section)
+    {
+        switch (section)
+        {
+            case TrainCarSection.Head:
+                return HEAD_UNLOCK_BY_LEVEL;
+            case TrainCarSection.Standard1:
+                return STANDARD1_UNLOCK_BY_LEVEL;
+            case TrainCarSection.Standard2:
+                return STANDARD2_UNLOCK_BY_LEVEL;
+            default:
+                return HEAD_UNLOCK_BY_LEVEL;
+        }
     }
 
     public bool AddAugment(string augmentDataId)
@@ -80,8 +117,13 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
             return false;
         }
 
+        string movedWeaponDataId = fromSlot.Augment.AugmentDataId;
+
         toSlot.Augment = fromSlot.Augment;
         fromSlot.Augment = null;
+
+        NotifyEquipChanged(fromContainer, fromIndex, null);
+        NotifyEquipChanged(toContainer, toIndex, movedWeaponDataId);
 
         return true;
     }
@@ -94,20 +136,28 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
             return false;
         }
 
-        // 증가 정해지면 추후 수정
         slotState.Augment = null;
+        NotifyEquipChanged(container, slotIndex, null);
+
         return true;
     }
 
-    // 무기 적제 관련 스탯이 변경 될때 호출
-    public void SetEquipUnlockedCount(int unlockedCount)
+    private void NotifyEquipChanged(AugmentSlotContainerViewModel container, int slotIndex, string weaponDataId)
     {
-        GetLocalAugmentEquipViewModel().SetUnlockedCount(unlockedCount);
-    }
+        AugmentEquipViewModel equipVm = container as AugmentEquipViewModel;
+        if (equipVm == null)
+        {
+            return;
+        }
 
-    public void UnlockEquipSlot(int slotIndex)
-    {
-        GetLocalAugmentEquipViewModel().UnlockSlot(slotIndex);
+        if (string.IsNullOrEmpty(weaponDataId))
+        {
+            WeaponEquipEventHub.Instance.NotifyWeaponUnequipped(equipVm.Section, slotIndex);
+        }
+        else
+        {
+            WeaponEquipEventHub.Instance.NotifyWeaponEquipped(equipVm.Section, slotIndex, weaponDataId);
+        }
     }
 
     private long GenerateAugmentUniqueId()
