@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -26,6 +27,8 @@ public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public event Action<string> OnPointerEnterButton;
     public event Action OnPointerExitButton;
+
+    private readonly List<UnityAction> _boundUnityActions = new List<UnityAction>();
 
     private void Awake()
     {
@@ -77,11 +80,11 @@ public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void BindOnClickButtonEvent(Action onClickCallback, bool isManualUnbindEvent = false)
     {
-        if (Button_Base == null) return;
+        if (Button_Base == null || onClickCallback == null) return;
 
-        _boundCallback = onClickCallback;
-        _boundUnityAction = onClickCallback.Invoke;
-        Button_Base.onClick.AddListener(_boundUnityAction);
+        UnityAction unityAction = onClickCallback.Invoke;
+        _boundUnityActions.Add(unityAction);
+        Button_Base.onClick.AddListener(unityAction);
         _isManualUnbindEvent = isManualUnbindEvent;
     }
 

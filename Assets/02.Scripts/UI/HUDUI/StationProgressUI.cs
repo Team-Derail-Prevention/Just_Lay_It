@@ -10,7 +10,7 @@ public class StationProgressUI : UIBase
     {
         if (GameManager.Instance != null)
         {
-           // GameManager.Instance.OnStationProgressChanged += RefreshProgress;
+            GameManager.Instance.OnStationProgressChanged += RefreshProgress;
             RefreshProgress(GameManager.Instance.CompletedStationCount);
         }
         else
@@ -23,7 +23,7 @@ public class StationProgressUI : UIBase
     {
         if (GameManager.Instance != null)
         {
-          //  GameManager.Instance.OnStationProgressChanged -= RefreshProgress;
+            GameManager.Instance.OnStationProgressChanged -= RefreshProgress;
         }
     }
 

@@ -130,12 +130,40 @@ public class LobbyUpgradeUI : UIBase
     {
         _curSelectedSlotId = slotDataId;
 
-        // 내용 정해지면 추후 수정
-
         foreach (var slotKv in _slotList)
         {
             var slot = slotKv.Value;
             slot.SetSelectedUI(slotKv.Key == _curSelectedSlotId);
+        }
+
+        RefreshDetailPanel();
+    }
+
+    private async void RefreshDetailPanel()
+    {
+        var slotVm = _vm.GetSlot(_curSelectedSlotId);
+        if (slotVm == null)
+        {
+            return;
+        }
+
+        if (Text_DetailTitle != null)
+        {
+            Text_DetailTitle.text = slotVm.DisplayName;
+        }
+
+        if (Text_DetailDescription != null)
+        {
+            Text_DetailDescription.text = slotVm.Description; 
+        }
+
+        if (Image_DetailIcon != null && string.IsNullOrEmpty(slotVm.IconPath) == false)
+        {
+            var sprite = await ResourceManager.Instance.LoadAsset<Sprite>(slotVm.IconPath);
+            if (Image_DetailIcon != null && sprite != null)
+            {
+                Image_DetailIcon.sprite = sprite;
+            }
         }
     }
 
