@@ -207,11 +207,9 @@ public class RailManager : SingletonBase<RailManager>
         BuildCubeLookup();
     }
 
-    // 코너는 더 이상 수동 선택 대상이 아님: 직선 레일 하나만 배치하면
-    // ApplyAutoConnect가 주변 상황에 맞춰 코너 모양으로 자동 전환함 (마인크래프트 레일 방식)
     private void HandlePlaceModeEntryInput()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.W))
         {
             NetworkRailService.Instance?.RequestStartPlacement(RailType.Straight);
         }
@@ -410,7 +408,6 @@ public class RailManager : SingletonBase<RailManager>
         }
     }
 
-    // 상하좌우 인접 칸 중 이미 레일이 깔린 방향을 찾음 (0=북, 1=동, 2=남, 3=서)
     private static readonly Vector2Int[] _cardinalOffsets =
     {
         new Vector2Int(0, 1),
@@ -419,27 +416,78 @@ public class RailManager : SingletonBase<RailManager>
         new Vector2Int(-1, 0),
     };
 
+    private List<int> GetRailPorts(RailType type, int rotStep)
+    {
+        List<int> ports = new List<int>();
+        if (type == RailType.Straight)
+        {
+            if (rotStep % 2 == 0) { ports.Add(1); ports.Add(3); } // 동, 서 (가로)
+            else { ports.Add(0); ports.Add(2); } // 북, 남 (세로)
+        }
+        else if (type == RailType.Corner)
+        {
+            // [교정완료] 실제 프리팹의 시각적 회전값에 맞게 포트 매핑 완전 수정
+            if (rotStep == 0) { ports.Add(0); ports.Add(3); } // 북, 서 (0도)
+            else if (rotStep == 1) { ports.Add(0); ports.Add(1); } // 북, 동 (90도 회전)
+            else if (rotStep == 2) { ports.Add(1); ports.Add(2); } // 동, 남 (180도 회전)
+            else if (rotStep == 3) { ports.Add(2); ports.Add(3); } // 남, 서 (270도 회전)
+        }
+        return ports;
+    }
+
+    // [신규 로직] 특정 레일의 구멍(포트)에 실제로 다른 레일이 연결되어 있는지(사용 중인지) 카운트
+    private int GetActiveConnectionCount(Vector2Int target)
+    {
+        if (!_placedRails.TryGetValue(target, out PlacedRailInfo info)) return 0;
+        List<int> ports = GetRailPorts(info.Type, info.RotationStep);
+        int count = 0;
+        foreach (int port in ports)
+        {
+            if (_installedCubes.Contains(target + _cardinalOffsets[port])) count++;
+        }
+        return count;
+    }
+
+    // [핵심 수정] 상대방 구멍이 나를 향하고 있거나, 아직 미완성된 레일일 때만 스마트하게 연결을 시도합니다.
     private List<int> GetConnectedDirections(Vector2Int gridIndex)
     {
         List<int> connected = new List<int>();
         for (int dir = 0; dir < 4; dir++)
         {
             Vector2Int neighbor = gridIndex + _cardinalOffsets[dir];
-            if (_installedCubes.Contains(neighbor))
+
+            if (_placedRails.TryGetValue(neighbor, out PlacedRailInfo info))
             {
-                connected.Add(dir);
+                int dirFromNeighborToMe = OppositeDirection(dir);
+                List<int> neighborPorts = GetRailPorts(info.Type, info.RotationStep);
+
+                // 상대방 구멍이 나를 향하고 있거나 || 상대방이 아직 완성 안 된 끝부분(연결 1개 이하)일 때만 연결!
+                if (neighborPorts.Contains(dirFromNeighborToMe) || GetActiveConnectionCount(neighbor) < 2)
+                {
+                    connected.Add(dir);
+                }
             }
         }
         return connected;
     }
 
-    // 인접 레일 방향에 맞춰 레일 타입/회전을 자동으로 결정해서 프리뷰에 적용
     private void ApplyAutoConnect(Vector2Int gridIndex)
     {
         List<int> connectedDirs = GetConnectedDirections(gridIndex);
         if (connectedDirs.Count == 0)
         {
-            return; // 주변에 레일이 없으면 수동 선택(1/2키, R키)을 그대로 유지
+            _lastRotationStep = 0;
+
+            if (_currentRailType != RailType.Straight)
+            {
+                SwapPreviewType(RailType.Straight);
+            }
+            else if (_previewController != null)
+            {
+                _previewController.SetRotationStep(0);
+            }
+
+            return;
         }
 
         RailType autoType;
@@ -450,7 +498,7 @@ public class RailManager : SingletonBase<RailManager>
 
         if (autoType != _currentRailType)
         {
-            SwapPreviewType(autoType); // 호버 상태(_isHoveredCube)는 유지한 채로 프리뷰 프리팹만 교체
+            SwapPreviewType(autoType);
             return;
         }
 
@@ -460,7 +508,6 @@ public class RailManager : SingletonBase<RailManager>
         }
     }
 
-    // ChangeRailType과 달리 ClearHover를 거치지 않아 호버 상태를 유지한 채로 프리뷰 프리팹만 새로 로드함
     private void SwapPreviewType(RailType newType)
     {
         _currentRailType = newType;
@@ -481,37 +528,41 @@ public class RailManager : SingletonBase<RailManager>
         if (connectedDirs.Count == 1)
         {
             type = RailType.Straight;
-            rotationStep = (connectedDirs[0] % 2 == 0) ? 1 : 0; // 0=동서, 1=남북 (프리팹 기본 방향에 맞춰 반전)
+            rotationStep = (connectedDirs[0] % 2 == 0) ? 1 : 0;
+            return;
+        }
+
+        int oppositeAxisDir = FindOppositeAxisDirection(connectedDirs);
+        if (oppositeAxisDir != -1)
+        {
+            type = RailType.Straight;
+            rotationStep = (oppositeAxisDir % 2 == 0) ? 1 : 0;
             return;
         }
 
         int dirA = connectedDirs[0];
-        int dirB = connectedDirs[1]; // 3개 이상 연결된 경우는 현재 에셋으로 표현 불가하여 앞의 2방향만 사용
+        int dirB = connectedDirs[1];
 
-        bool isOpposite = Mathf.Abs(dirA - dirB) == 2;
-        if (isOpposite)
-        {
-            type = RailType.Straight;
-            rotationStep = (dirA % 2 == 0) ? 1 : 0;
-        }
-        else
-        {
-            type = RailType.Corner;
-            rotationStep = GetCornerRotationStep(dirA, dirB);
-        }
+        type = RailType.Corner;
+        rotationStep = GetCornerRotationStep(dirA, dirB);
     }
 
-    // 코너 프리팹의 rotationStep=0이 "북+동" 연결이라고 가정했던 원래 매핑에서
-    // 직선 레일과 동일하게 실제 프리팹 기본 방향과 90도(한 스텝) 어긋나 있어 보정함
+    private int FindOppositeAxisDirection(List<int> connectedDirs)
+    {
+        if (connectedDirs.Contains(0) && connectedDirs.Contains(2)) return 0;
+        if (connectedDirs.Contains(1) && connectedDirs.Contains(3)) return 1;
+        return -1;
+    }
+
     private int GetCornerRotationStep(int dirA, int dirB)
     {
         int min = Mathf.Min(dirA, dirB);
         int max = Mathf.Max(dirA, dirB);
 
-        if (min == 0 && max == 1) return 1; // 북+동
-        if (min == 1 && max == 2) return 2; // 동+남
-        if (min == 2 && max == 3) return 3; // 남+서
-        if (min == 0 && max == 3) return 0; // 서+북
+        if (min == 0 && max == 1) return 1; // 북+동 
+        if (min == 1 && max == 2) return 2; // 동+남 
+        if (min == 2 && max == 3) return 3; // 남+서 
+        if (min == 0 && max == 3) return 0; // 서+북 
 
         return 0;
     }
@@ -538,17 +589,8 @@ public class RailManager : SingletonBase<RailManager>
     {
         if (!Input.GetMouseButtonDown(0)) return;
 
-        if (!_isHoveredCube)
-        {
-            Debug.Log("[RailManager] 지형이 없음");
-            return;
-        }
-
-        if (!IsPlacementValid(_hoveredGridIndex, _hoveredCubeInfo))
-        {
-            Debug.Log("[RailManager] 설치 불가능한 위치입니다: " + _hoveredCubeInfo.Name);
-            return;
-        }
+        if (!_isHoveredCube) return;
+        if (!IsPlacementValid(_hoveredGridIndex, _hoveredCubeInfo)) return;
 
         OpenConfirmPopup(_hoveredGridIndex, _hoveredCubeInfo);
     }
@@ -556,12 +598,7 @@ public class RailManager : SingletonBase<RailManager>
     private void OpenConfirmPopup(Vector2Int gridIndex, CubeInfo cubeInfo)
     {
         if (_isConfirmPopupOpen) return;
-
-        if (UIManager.Instance == null)
-        {
-            Debug.LogError("[RailManager] UIManager.Instance가 없습니다.");
-            return;
-        }
+        if (UIManager.Instance == null) return;
 
         _isConfirmPopupOpen = true;
         _pendingGridIndex = gridIndex;
@@ -570,8 +607,6 @@ public class RailManager : SingletonBase<RailManager>
         _previewController?.Show(cubeInfo);
         _previewOutline?.Show(cubeInfo, isValid: true);
 
-        // 회전은 더 이상 수동으로 하지 않으므로 onRotate는 넘기지 않음(null).
-        // UIManager 쪽 팝업 프리팹에서도 회전 버튼을 숨기거나 비활성화해줘야 함.
         UIManager.Instance.OpenRailPlaceConfirmPopup(
             onConfirm: OnPopupConfirm,
             onCancel: OnPopupCancel
@@ -581,7 +616,6 @@ public class RailManager : SingletonBase<RailManager>
     private void CloseConfirmPopup()
     {
         if (UIManager.Instance == null) return;
-
         UIManager.Instance.CloseRailPlaceConfirmPopup();
     }
 
@@ -600,11 +634,7 @@ public class RailManager : SingletonBase<RailManager>
 
     private void TryInstallRail(Vector2Int gridIndex, CubeInfo cubeInfo)
     {
-        if (!IsPlacementValid(gridIndex, cubeInfo))
-        {
-            Debug.Log("[RailManager] 설치 불가능한 위치입니다: " + cubeInfo.Name);
-            return;
-        }
+        if (!IsPlacementValid(gridIndex, cubeInfo)) return;
 
         _installedCubes.Add(gridIndex);
 
@@ -624,20 +654,12 @@ public class RailManager : SingletonBase<RailManager>
     private async UniTask SpawnPlacedRailAsync(Vector2Int gridIndex, Vector3 worldPos, Quaternion rotation, RailType railType, int rotationStep)
     {
         string address = railType == RailType.Corner ? _cornerRailAddress : _straightRailAddress;
-        if (string.IsNullOrEmpty(address))
-        {
-            Debug.LogWarning($"[RailManager] {railType} Rail Address가 비어있음");
-            return;
-        }
+        if (string.IsNullOrEmpty(address)) return;
 
         AsyncOperationHandle<GameObject> handle = Addressables.InstantiateAsync(address, worldPos, rotation, Transform_RailRoot);
         GameObject spawnedRail = await handle.ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
 
-        if (handle.Status != AsyncOperationStatus.Succeeded)
-        {
-            Debug.LogWarning($"[RailManager] {railType} 레일 어드레서블 로드 실패");
-            return;
-        }
+        if (handle.Status != AsyncOperationStatus.Succeeded) return;
 
         RailOutline outline = spawnedRail.GetComponent<RailOutline>();
         if (outline != null) outline.enabled = false;
@@ -646,27 +668,17 @@ public class RailManager : SingletonBase<RailManager>
         if (controller != null) controller.enabled = false;
 
         Collider placedCollider = spawnedRail.GetComponentInChildren<Collider>();
-        if (placedCollider != null)
-        {
-            placedCollider.enabled = true;
-        }
+        if (placedCollider != null) placedCollider.enabled = true;
 
         _placedRails[gridIndex] = new PlacedRailInfo { Obj = spawnedRail, Type = railType, RotationStep = rotationStep };
-        Debug.Log($"[RailManager] {railType} 레일 설치됨: " + spawnedRail.name);
 
         DroneManager.Deliver(spawnedRail, worldPos, rotation, AddRailToPath);
 
-        // 방금 설치한 레일 때문에 옆에 이미 깔려있던 레일의 모양(직선↔코너, 회전)이
-        // 바뀌어야 하는지 재계산해서, 필요하면 그 레일을 다시 스폰함
         UpdateNeighborShapes(gridIndex);
-
 
         ExitPlaceMode(clearPlacedRails: false);
     }
 
-    // 인접한 4칸 중 이미 설치된 레일들을 대상으로, 방금 생긴 연결 때문에
-    // 모양(직선/코너)이나 회전이 달라져야 하는지 다시 계산해서 다르면 재생성함
-    // 단, 이미 양쪽이 다 연결된 '중간' 칸은 새로 하나 더 붙어도 모양을 바꾸지 않음(끝 칸만 갱신)
     private void UpdateNeighborShapes(Vector2Int changedIndex)
     {
         for (int dir = 0; dir < 4; dir++)
@@ -677,19 +689,11 @@ public class RailManager : SingletonBase<RailManager>
             if (!_placedRails.TryGetValue(neighbor, out PlacedRailInfo currentInfo)) continue;
 
             List<int> connectedDirs = GetConnectedDirections(neighbor);
-            if (connectedDirs.Count == 0) continue; // 방금 자기 자신이 연결됐으니 이론상 발생 안 함
+            if (connectedDirs.Count == 0) continue;
 
-            // neighbor 입장에서 changedIndex 쪽을 가리키는 방향(방금 새로 생긴 연결)을 제외하면
-            // 원래 몇 개의 연결이 있었는지 계산
-            int dirTowardChanged = OppositeDirection(dir);
-            int priorConnectionCount = connectedDirs.Contains(dirTowardChanged)
-                ? connectedDirs.Count - 1
-                : connectedDirs.Count;
-
-            if (priorConnectionCount >= 2)
+            // [핵심 수정] 이미 구멍 2개가 다 차서 완성된 레일은 모양이 절대 바뀌지 않도록 잠금
+            if (GetActiveConnectionCount(neighbor) >= 2)
             {
-                // 이미 양 끝이 연결된 중간 레일 - 여기서 옆으로 더 이어붙여도
-                // 기존 직선/코너 모양을 유지해야 경로가 끊기지 않음. 끝 칸에서만 모양이 바뀜.
                 continue;
             }
 
@@ -699,42 +703,32 @@ public class RailManager : SingletonBase<RailManager>
 
             if (desiredType == currentInfo.Type && desiredRotationStep == currentInfo.RotationStep)
             {
-                continue; // 모양 변화 없음
+                continue;
             }
 
             RespawnPlacedRailAsync(neighbor, desiredType, desiredRotationStep).Forget();
         }
     }
 
-    // dir(0=북,1=동,2=남,3=서)의 반대 방향을 반환
     private static int OppositeDirection(int dir)
     {
         return (dir + 2) % 4;
     }
 
-    // 이미 깔린 레일 하나를 새 모양/회전으로 다시 스폰함 (기존 오브젝트는 제거)
     private async UniTask RespawnPlacedRailAsync(Vector2Int gridIndex, RailType newType, int newRotationStep)
     {
         if (!_placedRails.TryGetValue(gridIndex, out PlacedRailInfo oldInfo)) return;
         if (!_cubeGrid.TryGetValue(gridIndex, out CubeInfo cubeInfo)) return;
 
         string address = newType == RailType.Corner ? _cornerRailAddress : _straightRailAddress;
-        if (string.IsNullOrEmpty(address))
-        {
-            Debug.LogWarning($"[RailManager] {newType} Rail Address가 비어있음(모양 갱신 실패): " + gridIndex);
-            return;
-        }
+        if (string.IsNullOrEmpty(address)) return;
 
         Quaternion newRotation = Quaternion.Euler(0f, newRotationStep * 90f, 0f);
 
         AsyncOperationHandle<GameObject> handle = Addressables.InstantiateAsync(address, cubeInfo.Center, newRotation, Transform_RailRoot);
         GameObject spawnedRail = await handle.ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
 
-        if (handle.Status != AsyncOperationStatus.Succeeded)
-        {
-            Debug.LogWarning($"[RailManager] {newType} 레일 모양 갱신용 로드 실패: " + gridIndex);
-            return;
-        }
+        if (handle.Status != AsyncOperationStatus.Succeeded) return;
 
         if (oldInfo.Obj != null)
         {
@@ -755,26 +749,17 @@ public class RailManager : SingletonBase<RailManager>
         if (controller != null) controller.enabled = false;
 
         Collider placedCollider = spawnedRail.GetComponentInChildren<Collider>();
-        if (placedCollider != null)
-        {
-            placedCollider.enabled = true;
-        }
+        if (placedCollider != null) placedCollider.enabled = true;
 
         _placedRails[gridIndex] = new PlacedRailInfo { Obj = spawnedRail, Type = newType, RotationStep = newRotationStep };
-        Debug.Log($"[RailManager] 인접 설치로 레일 모양 갱신됨: {gridIndex} → {newType} (rotStep={newRotationStep})");
     }
 
-    private void RemoveRail(Vector2Int gridIndex)
+    private void RemoveRail(Vector2Int gridIndex, bool updateNeighbors = true)
     {
-        if (!_installedCubes.Contains(gridIndex))
-        {
-            Debug.Log("[RailManager] 회수할 레일이 없습니다: " + gridIndex);
-            return;
-        }
+        if (!_installedCubes.Contains(gridIndex)) return;
 
         if (!_placedRails.TryGetValue(gridIndex, out PlacedRailInfo placedInfo))
         {
-            Debug.LogWarning("[RailManager] _installedCubes엔 있는데 _placedRails엔 없는 좌표입니다(데이터 불일치): " + gridIndex);
             _installedCubes.Remove(gridIndex);
             return;
         }
@@ -795,30 +780,27 @@ public class RailManager : SingletonBase<RailManager>
 
         NetworkRailService.Instance?.ReturnRailToInventory(placedInfo.Type);
 
-        // 이 칸이 사라졌으니 인접 레일들도 모양이 다시 바뀔 수 있음 (코너였던 게 직선으로 복귀 등)
-        UpdateNeighborShapes(gridIndex);
+        if (updateNeighbors)
+        {
+            UpdateNeighborShapes(gridIndex);
+        }
 
         Debug.Log($"[RailManager] {placedInfo.Type} 레일 회수됨: " + gridIndex);
     }
 
     public void RemoveAllRail()
     {
-        if (_placedRails.Count == 0)
-        {
-            Debug.Log("[RailManager] 회수할 레일이 없습니다.");
-            return;
-        }
+        if (_placedRails.Count == 0) return;
 
         List<Vector2Int> gridIndices = new List<Vector2Int>(_placedRails.Keys);
         foreach (Vector2Int gridIndex in gridIndices)
         {
-            RemoveRail(gridIndex);
+            RemoveRail(gridIndex, false);
         }
 
         Debug.Log("[RailManager] 설치된 레일 전체 회수 완료");
     }
 
-    // 막혀있다고 기록된 타일들만 주기적으로 다시 확인해서, 오브젝트가 사라져 레이어가 바뀌었으면 캐시를 갱신
     private void RecheckBlockedTiles()
     {
         if (_cubeGrid.Count == 0) return;
@@ -829,7 +811,7 @@ public class RailManager : SingletonBase<RailManager>
             Vector2Int key = keys[i];
             CubeInfo info = _cubeGrid[key];
 
-            if (info.IsGroundLayer) continue; // 이미 설치 가능한 칸이면 재검사 불필요
+            if (info.IsGroundLayer) continue;
             if (info.Obj == null) continue;
 
             bool isGroundLayerNow = IsInGroundLayer(info.Obj.layer);
@@ -837,7 +819,6 @@ public class RailManager : SingletonBase<RailManager>
             {
                 info.IsGroundLayer = isGroundLayerNow;
                 _cubeGrid[key] = info;
-                Debug.Log($"[RailManager] 재검사로 타일 상태 변경 감지: {info.Name} → IsGroundLayer={isGroundLayerNow}");
             }
         }
     }
@@ -856,18 +837,14 @@ public class RailManager : SingletonBase<RailManager>
         }
         _placedRails.Clear();
     }
+
     private void ConnectStationRails(Transform placedRail)
     {
         if (placedRail == null) return;
-
-        if (!_installedRailPath.Contains(placedRail))
-        {
-            return;
-        }
+        if (!_installedRailPath.Contains(placedRail)) return;
 
         Vector3 placedPos = placedRail.position;
 
-        // 주변 1M(1칸) 내의 레일 콜라이더 탐색
         Collider[] hits = Physics.OverlapSphere(placedPos, 1.0f);
         List<Transform> stationRailsToAppend = new List<Transform>();
 
@@ -875,10 +852,8 @@ public class RailManager : SingletonBase<RailManager>
         {
             Transform hitTrans = hits[i].transform;
 
-            // 이미 경로에 추가된 레일이면 제외
             if (_installedRailPath.Contains(hitTrans)) continue;
 
-            // MapManager가 생성한 기본 레일 이름 감지
             if (hits[i].name.Contains("AutoSpawned"))
             {
                 Transform dirRoot = hitTrans.parent;
@@ -899,25 +874,20 @@ public class RailManager : SingletonBase<RailManager>
 
         if (stationRailsToAppend.Count > 0)
         {
-            // 방금 플레이어가 설치한 레일과 가까운 순서대로 정렬 (역 입구 -> 역 안쪽 순서)
             stationRailsToAppend.Sort((a, b) =>
                 Vector3.Distance(placedPos, a.position).CompareTo(Vector3.Distance(placedPos, b.position))
             );
 
-            // 경로 리스트 맨 뒤에 차례대로 추가
             for (int i = 0; i < stationRailsToAppend.Count; i++)
             {
                 _installedRailPath.Add(stationRailsToAppend[i]);
             }
-
-            Debug.Log($"[RailManager] 기차역 진입 레일 {stationRailsToAppend.Count}개가 경로 끝에 연결되었습니다!");
         }
     }
-   
+
     public void InitStartingRailPath(Transform dirRoot)
     {
         _installedRailPath.Clear();
-
         if (dirRoot == null) return;
 
         for (int i = 0; i < dirRoot.childCount; i++)
@@ -925,16 +895,11 @@ public class RailManager : SingletonBase<RailManager>
             Transform rail = dirRoot.GetChild(i);
             _installedRailPath.Add(rail);
         }
-
-        Debug.Log($"[RailManager] 시작 출구 레일이 기본 경로로 등록되었습니다.");
     }
 
     private void AddRailToPath(GameObject rail)
     {
-        if (rail == null)
-        {
-            return;
-        }
+        if (rail == null) return;
 
         Transform railTrans = rail.transform;
         _installedRailPath.Add(rail.transform);
@@ -950,10 +915,8 @@ public class RailManager : SingletonBase<RailManager>
         return null;
     }
 
-    //레일 총개수 확인용
     public int GetRailCount()
     {
         return _installedRailPath.Count;
     }
-
 }
