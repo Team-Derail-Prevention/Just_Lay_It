@@ -11,6 +11,15 @@ public class TrainManager : SingletonBase<TrainManager>
     [Header("Train Carriage Setting")]
     [SerializeField] private float _followDistance = 3f;
 
+    [Header("Spawn Carriage ID List")]
+    [SerializeField]
+    private List<string> _spawnCarriageIds = new List<string>
+    {
+        "TRAIN_STANDARD_01",
+        "TRAIN_CARGO_01",
+        "TRAIN_STANDARD_02"
+    };
+
     public List<GameObject> carList = new List<GameObject>();
     private HashSet<Transform> visitedStation = new HashSet<Transform>();
 
@@ -145,13 +154,21 @@ public class TrainManager : SingletonBase<TrainManager>
             trainScript.TrainInit(headData);
         }
 
-        TrainData carData = DataManager.Instance?.GetData<TrainData>("TRAIN_CARGO_01");
-        if (carData != null && !string.IsNullOrEmpty(carData.PrefabPath))
+        if (_spawnCarriageIds != null && _spawnCarriageIds.Count > 0)
         {
-            GameObject carPrefab = await GameManager.Resource.LoadAsset<GameObject>(carData.PrefabPath);
-            if (carPrefab != null)
+            for (int i = 0; i < carriageCount; i++)
             {
-                for (int i = 0; i < carriageCount; i++)
+                string targetId = _spawnCarriageIds[i % _spawnCarriageIds.Count];
+
+                TrainData carData = DataManager.Instance?.GetData<TrainData>(targetId);
+                if (carData == null || string.IsNullOrEmpty(carData.PrefabPath))
+                {
+                    Debug.LogWarning($"[TrainManager] {targetId} 데이터 또는 PrefabPath가 유효하지 않습니다.");
+                    continue;
+                }
+
+                GameObject carPrefab = await GameManager.Resource.LoadAsset<GameObject>(carData.PrefabPath);
+                if (carPrefab != null)
                 {
                     SpawnCarriage(carPrefab, carData);
                 }
