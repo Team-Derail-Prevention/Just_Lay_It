@@ -6,6 +6,7 @@ using UnityEngine;
 public class TrainManager : SingletonBase<TrainManager>
 {
     public bool IsStation { get; private set; } = false;
+    public Transform HeadTransform => _headTrain;
 
     [Header("Train Carriage Setting")]
     [SerializeField] private float _followDistance = 3f;
@@ -270,14 +271,6 @@ public class TrainManager : SingletonBase<TrainManager>
         }
         return null;
     }
-
-    //public void AddVisitedStation(Transform stationTransform)
-    //{
-    //    if (stationTransform != null && !visitedStation.Contains(stationTransform))
-    //    {
-    //        visitedStation.Add(stationTransform);
-    //    }
-    //}
 
     public bool IsVisitedStation(Transform stationTransform)
     {
