@@ -243,6 +243,8 @@ public class GameManager : SingletonBase<GameManager>
         _activeStation = null;
         UI?.CloseStationArrivalUI();
 
+        HandleStationArrival();
+
         Train?.DepartStation();
         StartCountdownAsync().Forget();
     }
@@ -606,6 +608,7 @@ public class GameManager : SingletonBase<GameManager>
         Monster?.StopSpawning();
         Pool?.AllDespawnToPool();
 
+        Debug.Log("[GameManager] 몬스터스폰 정지");
         // TODO: Weapon 투사체 정리
         // TODO: PoolManager 몬스터 정리(스킬정리도 필요한지 확인필요)
     }

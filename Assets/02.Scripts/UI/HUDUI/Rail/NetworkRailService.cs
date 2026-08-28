@@ -6,7 +6,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
     // 임시 선로 제작 소요 시간 3초
     private const float CRAFT_DURATION = 1.5f;
     private float _craftSpeedPercent = 0f;
-    private const int CRAFT_WOOD_COST = 4;
+    private const int CRAFT_WOOD_COST = 2;
 
     private const int BONUS_RAIL_COUNT_PER_LEVEL = 2;
     private int _bonusBaseRailCount = 0;
