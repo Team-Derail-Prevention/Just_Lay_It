@@ -2,6 +2,16 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
+public struct WeaponCurrentStats
+{
+    public int Atk;
+    public float FireRate;
+    public int MagazineSize;
+    public float ReloadTime;
+    public float Range;
+    public int CurrentAmmo;
+}
+
 public class WeaponFire : MonoBehaviour
 {
     [SerializeField] private string _weaponId;
@@ -9,18 +19,14 @@ public class WeaponFire : MonoBehaviour
     [SerializeField] private Transform _firePosition;
     [SerializeField] private WeaponTargeting _weaponTargeting;
 
-    [Header("레벨당 증가 스탯")]
-    [SerializeField] private int _magazineByLevel = 5; // 레벨당 탄창 증가량
-    [SerializeField] private int _atkByLevel = 2; // 레벨당 공격력 증가량
-    [SerializeField] private float _reloadByLevel = 0.2f; // 레벨당 재장전 속도 감소량
-    [SerializeField] private float _rangeByLevel = 1f; // 레벨당 사거리 증가량
-
+    private WeaponData _weaponData;
     private GameObject _projectilePrefab;
 
     private int _weaponAtk;
     private float _fireRate;
     private int _magazineSize;
     private float _reloadTime;
+    private float _currentRange;
 
     private int _currentAmmo;
     private float _fireTimer = 0f;
@@ -32,6 +38,7 @@ public class WeaponFire : MonoBehaviour
 
     private int _lobbyAtkBonus;
     private int _battleDamageBonus;
+
 
     private void Awake()
     {
@@ -103,53 +110,59 @@ public class WeaponFire : MonoBehaviour
         }
     }
 
+    public void SetWeaponId(string weaponId)
+    {
+        _weaponId = weaponId;
+    }
+
+    public WeaponCurrentStats GetCurrentStats()
+    {
+        WeaponCurrentStats stats;
+        stats.Atk = _weaponAtk;
+        stats.FireRate = _fireRate;
+        stats.MagazineSize = _magazineSize;
+        stats.ReloadTime = _reloadTime;
+        stats.Range = _currentRange;
+        stats.CurrentAmmo = _currentAmmo;
+
+        return stats;
+    }
+
     private void OnInGameUpgraded(string slotDataId, int newLevel)
     {
-        if (slotDataId != "BATTLE_DAMAGE")
+        if (slotDataId != "BATTLE_DAMAGE" || _weaponData == null)
         {
             return;
         }
 
-        _battleDamageBonus = newLevel * _atkByLevel;
+        _battleDamageBonus = newLevel * _weaponData.InGameATKByLevel;
         RecalculateAtk();
     }
 
     private void InitWeponLevel()
     {
-        int reloadLevel = GetLobbyUpgradeLevel("LOBBY_WEAPON_RELOAD");
-        int magazineLevel = GetLobbyUpgradeLevel("LOBBY_WEAPON_MAGAZINE");
-        int atkLevel = GetLobbyUpgradeLevel("LOBBY_WEAPON_ATK");
-        int rangeLevel = GetLobbyUpgradeLevel("LOBBY_WEAPON_RANGE");
+        if (_weaponData == null)
+        {
+            return;
+        }
 
-        _reloadTime = Mathf.Max(0f, _reloadTime - (reloadLevel * _reloadByLevel));
-        _magazineSize += magazineLevel * _magazineByLevel;
+        int reloadLevel = WeaponStatManager.GetLobbyUpgradeLevel("LOBBY_WEAPON_RELOAD");
+        int magazineLevel = WeaponStatManager.GetLobbyUpgradeLevel("LOBBY_WEAPON_MAGAZINE");
+        int atkLevel = WeaponStatManager.GetLobbyUpgradeLevel("LOBBY_WEAPON_ATK");
+        int rangeLevel = WeaponStatManager.GetLobbyUpgradeLevel("LOBBY_WEAPON_RANGE");
+
+        _reloadTime = Mathf.Max(0f, _reloadTime - (reloadLevel * _weaponData.LobbyReloadByLevel));
+        _magazineSize += magazineLevel * _weaponData.LobbyMagazineByLevel;
         _currentAmmo = _magazineSize;
 
-        _lobbyAtkBonus = atkLevel * _atkByLevel;
+        _lobbyAtkBonus = atkLevel * _weaponData.LobbyATKByLevel;
         RecalculateAtk();
 
-        float finalRange = _baseRange + (rangeLevel * _rangeByLevel);
+        _currentRange = _baseRange + (rangeLevel * _weaponData.LobbyRangeByLevel);
         if (_weaponTargeting != null)
         {
-            _weaponTargeting.ApplyRange(finalRange);
+            _weaponTargeting.ApplyRange(_currentRange);
         }
-    }
-
-    private int GetLobbyUpgradeLevel(string slotDataId)
-    {
-        UpgradeViewModel upgradeValue = NetworkUpgradeService.Instance.GetLocalUpgradeViewModel();
-        if (upgradeValue == null)
-        {
-            return 0;
-        }
-
-        UpgradeSlotViewModel slotValue = upgradeValue.GetSlot(slotDataId);
-        if (slotValue == null)
-        {
-            return 0;
-        }
-
-        return slotValue.CurrentLevel;
     }
 
     private void RecalculateAtk()
@@ -190,15 +203,15 @@ public class WeaponFire : MonoBehaviour
 
     private void LoadWeaponData()
     {
-        WeaponData weaponData = DataManager.Instance.GetData<WeaponData>(_weaponId);
+        _weaponData = DataManager.Instance.GetData<WeaponData>(_weaponId);
 
-        if (weaponData != null)
+        if (_weaponData != null)
         {
-            _baseAtk = weaponData.Atk;
-            _fireRate = weaponData.FireRate;
-            _magazineSize = weaponData.MagazineSize;
-            _reloadTime = weaponData.ReloadTime;
-            _baseRange = weaponData.Range;
+            _baseAtk = _weaponData.Atk;
+            _fireRate = _weaponData.FireRate;
+            _magazineSize = _weaponData.MagazineSize;
+            _reloadTime = _weaponData.ReloadTime;
+            _baseRange = _weaponData.Range;
             _currentAmmo = _magazineSize;
         }
         else
@@ -249,4 +262,5 @@ public class WeaponFire : MonoBehaviour
             _isReloading = false;
         }
     }
+    
 }
