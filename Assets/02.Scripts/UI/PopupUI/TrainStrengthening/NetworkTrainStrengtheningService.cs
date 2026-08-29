@@ -60,7 +60,7 @@ public class NetworkTrainStrengtheningService : SingletonBase<NetworkTrainStreng
     {
         if (isApproved == false)
         {
-            Debug.LogWarning("[NetworkTrainStrengtheningService] 재화가 부족합니다.");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, "돌이 부족합니다.");
             return;
         }
 

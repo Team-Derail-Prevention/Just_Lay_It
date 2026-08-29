@@ -129,6 +129,21 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
         return true;
     }
 
+    public bool HasAnyRefundableSlot()
+    {
+        var vm = GetLocalUpgradeViewModel();
+
+        foreach (var slotKv in vm.SlotDic)
+        {
+            if (slotKv.Value.CurrentLevel > 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void RequestRefundAll()
     {
         var vm = GetLocalUpgradeViewModel();
