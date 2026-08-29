@@ -10,12 +10,14 @@ public class SaveManager : SingletonBase<SaveManager>
     private const string TotalPlayCountKey = "TotalPlayCount";
     private const string LifetimeStatsKey = "LifetimeStatsData";
     private const string AllStagesClearedKey = "HasClearedAllStagesSpecial";
+    private const string SettingsSaveKey = "SettingsSaveData";
 
     private readonly HashSet<UpgradeSlotViewModel> _subscribedSlotSet = new HashSet<UpgradeSlotViewModel>();
 
     private UpgradeViewModel _upgradeViewModel;
     private UpgradeSaveData _loadedSaveData;
     private LifetimeStatsData _lifetimeStatsData;
+    private SettingsSaveData _settingsSaveData;
     private bool _isLoading;
 
     public bool HasSeenFirstPlayNotice
@@ -46,6 +48,39 @@ public class SaveManager : SingletonBase<SaveManager>
         {
             PlayerPrefs.SetInt(AllStagesClearedKey, value ? 1 : 0);
             PlayerPrefs.Save();
+        }
+    }
+
+    public float BgmVolume
+    {
+        get => GetSettingsSaveData().BgmVolume;
+        set
+        {
+            SettingsSaveData data = GetSettingsSaveData();
+            data.BgmVolume = value;
+            SaveSettingsData(data);
+        }
+    }
+
+    public float SfxVolume
+    {
+        get => GetSettingsSaveData().SfxVolume;
+        set
+        {
+            SettingsSaveData data = GetSettingsSaveData();
+            data.SfxVolume = value;
+            SaveSettingsData(data);
+        }
+    }
+
+    public int DisplayMode
+    {
+        get => GetSettingsSaveData().DisplayMode;
+        set
+        {
+            SettingsSaveData data = GetSettingsSaveData();
+            data.DisplayMode = value;
+            SaveSettingsData(data);
         }
     }
 
@@ -119,6 +154,38 @@ public class SaveManager : SingletonBase<SaveManager>
         PlayerPrefs.Save();
 
         _lifetimeStatsData = data;
+    }
+
+    private SettingsSaveData GetSettingsSaveData()
+    {
+        if (_settingsSaveData == null)
+        {
+            _settingsSaveData = LoadSettingsData();
+        }
+
+        return _settingsSaveData;
+    }
+
+    private SettingsSaveData LoadSettingsData()
+    {
+        if (PlayerPrefs.HasKey(SettingsSaveKey) == false)
+        {
+            return new SettingsSaveData();
+        }
+
+        string json = PlayerPrefs.GetString(SettingsSaveKey);
+        SettingsSaveData data = JsonUtility.FromJson<SettingsSaveData>(json);
+
+        return data ?? new SettingsSaveData();
+    }
+
+    private void SaveSettingsData(SettingsSaveData data)
+    {
+        string json = JsonUtility.ToJson(data);
+        PlayerPrefs.SetString(SettingsSaveKey, json);
+        PlayerPrefs.Save();
+
+        _settingsSaveData = data;
     }
 
     private void Start()
@@ -318,4 +385,12 @@ public class LifetimeStatsData
     public int TotalRailCrafted;
     public int TotalRailInstalled;
     public int TotalEarnedCash;
+}
+
+[Serializable]
+public class SettingsSaveData
+{
+    public float BgmVolume = 1f;
+    public float SfxVolume = 1f;
+    public int DisplayMode = 1;
 }

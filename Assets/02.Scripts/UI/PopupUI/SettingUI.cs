@@ -58,9 +58,9 @@ public class SettingUI : UIBase
 
     private void LoadSavedSettings()
     {
-        _savedBgmVolume = PlayerPrefs.GetFloat("BgmVolume", 1f);
-        _savedSfxVolume = PlayerPrefs.GetFloat("SfxVolume", 1f);
-        _savedDisplayMode = PlayerPrefs.GetInt("DisplayMode", 1);
+        _savedBgmVolume = SaveManager.Instance.BgmVolume;
+        _savedSfxVolume = SaveManager.Instance.SfxVolume;
+        _savedDisplayMode = SaveManager.Instance.DisplayMode;
 
         _sliderBgmVolume.value = _savedBgmVolume;
         _sliderSfxVolume.value = _savedSfxVolume;
@@ -156,10 +156,9 @@ public class SettingUI : UIBase
         _savedSfxVolume = _sliderSfxVolume.value;
         _savedDisplayMode = _dropdownDisplayMode.value;
 
-        PlayerPrefs.SetFloat("BgmVolume", _savedBgmVolume);
-        PlayerPrefs.SetFloat("SfxVolume", _savedSfxVolume);
-        PlayerPrefs.SetInt("DisplayMode", _savedDisplayMode);
-        PlayerPrefs.Save();
+        SaveManager.Instance.BgmVolume = _savedBgmVolume;
+        SaveManager.Instance.SfxVolume = _savedSfxVolume;
+        SaveManager.Instance.DisplayMode = _savedDisplayMode;
 
         Debug.Log("환경설정 저장 완료!");
     }
