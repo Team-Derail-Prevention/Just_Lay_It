@@ -1,10 +1,15 @@
 ﻿using Cysharp.Threading.Tasks;
-using System.Collections.Generic;
 using Enums;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class WeaponSpawn : MonoBehaviour
+public class WeaponSpawn : SingletonBase<WeaponSpawn>
 {
+    protected override void Init()
+    {
+        base.Init();
+    }
+
     private void OnEnable()
     {
         if (WeaponEquipEventHub.Instance != null)
@@ -105,5 +110,28 @@ public class WeaponSpawn : MonoBehaviour
         }
 
         return train;
+    }
+
+    public WeaponCurrentStats? GetCurrentWeaponStats(TrainCarSection section, int slotIndex)
+    {
+        TrainFollow train = GetTrainBySection(section);
+        if (train == null)
+        {
+            return null;
+        }
+
+        GameObject weaponObj = train.GetWeaponStat(slotIndex);
+        if (weaponObj == null)
+        {
+            return null;
+        }
+
+        WeaponFire weaponFire = weaponObj.GetComponent<WeaponFire>();
+        if (weaponFire == null)
+        {
+            return null;
+        }
+
+        return weaponFire.GetCurrentStats();
     }
 }
