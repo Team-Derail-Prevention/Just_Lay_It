@@ -360,4 +360,43 @@ public class TrainManager : SingletonBase<TrainManager>
         }
     }
 
+    public bool EquipWeaponTrain(GameObject weaponPrefab)
+    {
+        if (weaponPrefab == null)
+        {
+            Debug.LogWarning("[TrainManager] 장착할 무기 프리팹이 유효하지 않습니다.");
+            return false;
+        }
+
+        if (carList == null || carList.Count == 0)
+        {
+            Debug.LogWarning("[TrainManager] 연결된 객차가 없습니다.");
+            return false;
+        }
+
+        for (int i = 0; i < carList.Count; i++)
+        {
+            if (carList[i] == null)
+            {
+                continue;
+            }
+
+            TrainFollow follow = carList[i].GetComponent<TrainFollow>();
+
+            //if (follow != null && !follow.HasWeapon && follow.WeaponMountPoint != null)
+            //{
+            //    bool success = follow.MountWeapon(weaponPrefab);
+            //    if (success)
+            //    {
+            //        Debug.Log($"[TrainManager] {i}번 객차에 무기({weaponPrefab.name}) 장착 성공!");
+            //        return true;
+            //    }
+            //}
+        }
+
+        Debug.LogWarning("[TrainManager] 무기를 장착할 수 있는 빈 객차가 없습니다.");
+        return false;
+    }
+
+
 }

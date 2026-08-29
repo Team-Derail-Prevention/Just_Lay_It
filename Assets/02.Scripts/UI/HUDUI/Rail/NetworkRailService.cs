@@ -12,6 +12,11 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
     private int _bonusBaseRailCount = 0;
 
     private RailBuildViewModel _localRailBuildViewModel;
+    private int _sessionCraftedCount;
+    private int _sessionInstalledCount;
+
+    public int SessionCraftedCount => _sessionCraftedCount;
+    public int SessionInstalledCount => _sessionInstalledCount;
 
     public event Action<RailType> OnRequestPlaceMode;
 
@@ -82,6 +87,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
         slot.CraftProgress01 = 0f;
         slot.CraftQueueCount -= 1;
         slot.OwnedCount += 1;
+        _sessionCraftedCount += 1;
     }
 
     public bool RequestCraft(RailType railType)
@@ -119,6 +125,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
         }
 
         slot.OwnedCount -= 1;
+        _sessionInstalledCount += 1;
     }
 
     public void ReturnRailToInventory(RailType railType)
@@ -130,5 +137,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
     public void ResetRun()
     {
         _localRailBuildViewModel = new RailBuildViewModel(_bonusBaseRailCount);
+        _sessionCraftedCount = 0;
+        _sessionInstalledCount = 0;
     }
 }

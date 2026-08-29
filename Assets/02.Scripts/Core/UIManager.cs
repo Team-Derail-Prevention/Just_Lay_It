@@ -117,7 +117,7 @@ public class UIManager : SingletonBase<UIManager>
         }
 
         _createdUIDic.TryGetValue(uiType, out var uiBase);
-        return _createdUIDic[uiType];
+        return uiBase;
     }
 
     public UIBase GetOpenedUI(UIRootType uiRootType, UIType uiType)
