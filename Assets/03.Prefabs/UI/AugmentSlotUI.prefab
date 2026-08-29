@@ -494,6 +494,7 @@ MonoBehaviour:
   Text_FireRate: {fileID: 4389498401381577509}
   Text_ReloadTime: {fileID: 9120725273074093829}
   Text_MagazineSize: {fileID: 3525077013419775879}
+  Text_Price: {fileID: 7386796239035400479}
 --- !u!1 &3342037859981542116
 GameObject:
   m_ObjectHideFlags: 0
