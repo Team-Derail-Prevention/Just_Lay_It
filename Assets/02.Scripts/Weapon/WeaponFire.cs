@@ -102,6 +102,11 @@ public class WeaponFire : MonoBehaviour
             UpgradeEventHub.Instance.OnInGameUpgraded -= OnInGameUpgraded;
         }
     }
+    
+    public void SetWeaponId(string weaponId)
+    {
+        _weaponId = weaponId;
+    }
 
     private void OnInGameUpgraded(string slotDataId, int newLevel)
     {
@@ -233,6 +238,7 @@ public class WeaponFire : MonoBehaviour
 
         _currentAmmo--;
     }
+
 
     private void StartReload()
     {
