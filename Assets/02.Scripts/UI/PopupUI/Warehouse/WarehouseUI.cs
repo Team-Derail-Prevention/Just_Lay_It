@@ -66,6 +66,13 @@ public class WarehouseUI : UIBase
             MaterialTransferEventHub.Instance.OnWarehouseWoodChanged += SetWoodAmountText;
         }
 
+        if (NetworkWarehouseService.Instance != null)
+        {
+            var warehouseVm = NetworkWarehouseService.Instance.GetLocalWarehouseViewModel();
+            SetStoneAmountText(warehouseVm.CurrentStone);
+            SetWoodAmountText(warehouseVm.CurrentWood);
+        }
+
         _selectedMaterialType = null;
         _confirmedAmount = 0;
         RefreshAmountText();

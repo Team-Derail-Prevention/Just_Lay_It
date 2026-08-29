@@ -12,7 +12,9 @@
         "UseAttackSound": "Monster_01_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
         "UseDieSound": "Monster_01_Die_Sound",
-        "ProjectileColor": "#FF0000"
+        "UseIconName": "Monster_01_Icon",
+        "ProjectileColor": "#FF0000",
+        "Description": "강압적인 미래도시에서 벗어난 사람들을 처리하기 위해 만들어진 로봇.대량으로 생산되어 기본적인 공격력과 체력을 가지고 있지만, 기본적으로 순찰을 위해 만들어졌다."
     },
     {
         "Id": "Monster_02",
@@ -21,10 +23,15 @@
         "Atk": 10,
         "Speed": 5,
         "DropGold": 10,
+        "AttackType": "None",
+        "DebuffDuration": 0,
+        "DebuffPower": 0,
         "UseAttackSound": "Monster_01_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
         "UseDieSound": "Monster_01_Die_Sound",
-        "ProjectileColor": "#FF0000"
+        "UseIconName": "Monster_02_Icon",
+        "ProjectileColor": "#FF0000",
+        "Description": "롸봇강화형태의 프로토타입이며 일반 롸봇보다 2배가량 성능이 강화되었다.하지만 아직 프로토타입이라 금방 과열이 일어나 장갑이 붉어진다."
     },
     {
         "Id": "Monster_03",
@@ -33,10 +40,15 @@
         "Atk": 20,
         "Speed": 5,
         "DropGold": 20,
+        "AttackType": "None",
+        "DebuffDuration": 0,
+        "DebuffPower": 0,
         "UseAttackSound": "Monster_01_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
         "UseDieSound": "Monster_01_Die_Sound",
-        "ProjectileColor": "#FF0000"
+        "UseIconName": "Monster_03_Icon",
+        "ProjectileColor": "#FF0000",
+        "Description": "롸봇의 최종강화형으로 강한롸봇 프로토타입의 문제점을 보완해 장갑을 티타늄으로 교체했으며 그로인해 강화롸봇보다도 2배이상 성능이 증가하였다."
     },
     {
         "Id": "DebuffMonster_01",
@@ -45,13 +57,15 @@
         "Atk": 5,
         "Speed": 5,
         "DropGold": 10,
-        "AttackType": "Freeze",
+        "AttackType": "Electric",
         "DebuffDuration": 5,
         "DebuffPower": 0,
         "UseAttackSound": "DebuffMonster_01_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
         "UseDieSound": "Monster_01_Die_Sound",
-        "ProjectileColor": "#FFFF00"
+        "UseIconName": "DebuffMonster_01_Icon",
+        "ProjectileColor": "#FFFF00",
+        "Description": "감전롸봇,이 로봇은 사람을 제압하기위해 만들어졌으며 높은 전류도 방출할 수 있다.피격시 무기성능이 50%감소한다."
     },
     {
         "Id": "DebuffMonster_02",
@@ -66,7 +80,9 @@
         "UseAttackSound": "DebuffMonster_02_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
         "UseDieSound": "Monster_01_Die_Sound",
-        "ProjectileColor": "#00FF00"
+        "UseIconName": "DebuffMonster_02_Icon",
+        "ProjectileColor": "#00FF00",
+        "Description": "부식롸봇,이 로봇은 광물채굴용으로 만들어졌으며 산도가 높지는 않지만 부식을 맞고 데미지를 입을시 위험하다.피격시 장갑의 내구도가 2배로 빨리 감소한다."
     },
     {
         "Id": "DebuffMonster_03",
@@ -81,7 +97,9 @@
         "UseAttackSound": "DebuffMonster_03_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
         "UseDieSound": "Monster_01_Die_Sound",
-        "ProjectileColor": "#00FFFF"
+        "UseIconName": "DebuffMonster_03_Icon",
+        "ProjectileColor": "#00FFFF",
+        "Description": "빙결롸봇,이 로봇은 과열을 막기위해 만들어졌으며 아주 낮은 냉기도 방출할 수 있다.피격시 무기의 발사속도가 50%감소한다"
     },
     {
         "Id": "DebuffMonster_04",
@@ -95,6 +113,8 @@
         "DebuffPower": 0,
         "UseAttackSound": "DebuffMonster_04_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
-        "UseDieSound": "Monster_01_Die_Sound"
+        "UseDieSound": "Monster_01_Die_Sound",
+        "UseIconName": "DebuffMonster_04_Icon",
+        "Description": "도둑롸봇,이 로봇은 외부의 자원을 채취할 수 있도록 만들어졌으며 눈앞에 보이는 자원은 일단 가져간다.피격시 자원이 일정량 감소된다."
     }
 ]

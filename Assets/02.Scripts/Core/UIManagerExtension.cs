@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+﻿using Enums;
 using System;
+using UnityEngine;
 
 public enum UIRootType
 {
@@ -37,6 +38,9 @@ public enum UIType
     WeaponGachaUI,
     ScoreUI,
     HudMinimapUI,
+    NoticePopup,
+    GameClearResultUI,
+    StageSelectPopup,
 }
 public static class UIManagerExtension
 {
@@ -60,19 +64,30 @@ public static class UIManagerExtension
     }
 
     public static async Cysharp.Threading.Tasks.UniTask StartGameFromLobby(this UIManager uiManager)
-    {
+    { /*
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("GameManager.Instance가 null입니다. 게임 매니저가 초기화되지 않았습니다.");
+            uiManager.CloseLoadingUI();
+            return;
+        }
+
+        if (GameManager.Instance.IsStageSelectUnlocked)
+        {
+            GameStage? selectedStage = await uiManager.RequestStageSelectionAsync();
+            if (selectedStage.HasValue == false)
+            {
+                return;
+            }
+
+            GameManager.Instance.SetGameStage(selectedStage.Value);
+        }
+
         uiManager.CloseContentUI(UIType.LobbyUI);
 
         var loadingUI = uiManager.OpenLoadingUI();
         if (loadingUI == null)
         {
-            return;
-        }
-
-        if (GameManager.Instance == null)
-        {
-            Debug.LogError("GameManager.Instance가 null입니다. 게임 매니저가 초기화되지 않았습니다.");
-            uiManager.CloseLoadingUI();
             return;
         }
 
@@ -84,7 +99,41 @@ public static class UIManagerExtension
             loadingUI.SetDataLoaded();
         }
 
-        return;
+        return; */
+    }
+
+    public static async Cysharp.Threading.Tasks.UniTask<GameStage?> RequestStageSelectionAsync(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenPopupUI(UIType.StageSelectPopup);
+        StageSelectPopupUI stageSelectPopup = uiBase as StageSelectPopupUI;
+        if (stageSelectPopup == null)
+        {
+            Debug.LogWarning("StageSelectPopup가 생성되지 않았습니다");
+            return null;
+        }
+
+        GameStage? selectedStage = null;
+        bool isDecided = false;
+
+        stageSelectPopup.Init(
+            onSelectStage: stage =>
+            {
+                selectedStage = stage;
+                isDecided = true;
+            },
+            onCancel: () =>
+            {
+                isDecided = true;
+            });
+
+        await Cysharp.Threading.Tasks.UniTask.WaitUntil(() => isDecided);
+
+        return selectedStage;
+    }
+
+    public static void CloseStageSelectPopup(this UIManager uiManager)
+    {
+        uiManager.ClosePopupUI(UIType.StageSelectPopup);
     }
 
     public static LoadingUI OpenLoadingUI(this UIManager uiManager)
@@ -446,5 +495,47 @@ public static class UIManagerExtension
     public static void CloseRailPlaceConfirmPopup(this UIManager uiManager)
     {
         uiManager.CloseMainUI(UIType.RailPlaceConfirmPopup);
+    }
+
+    public static void OpenNoticePopup(this UIManager uiManager, string message, Action onConfirm)
+    {
+        var uiBase = uiManager.OpenPopupUI(UIType.NoticePopup);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("NoticePopup가 생성되지 않았습니다");
+            return;
+        }
+
+        if (uiBase is NoticePopupUI noticePopup)
+        {
+            noticePopup.Init(message, onConfirm);
+        }
+    }
+
+    public static void CloseNoticePopup(this UIManager uiManager)
+    {
+        uiManager.ClosePopupUI(UIType.NoticePopup);
+    }
+
+    public static GameClearResultUI OpenGameClearResultUI(this UIManager uiManager, GameClearResultData resultData, Action onConfirm)
+    {
+        var uiBase = uiManager.OpenPopupUI(UIType.GameClearResultUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("GameClearResultUI가 생성되지 않았습니다");
+            return null;
+        }
+
+        if (uiBase is GameClearResultUI gameClearResultUI)
+        {
+            gameClearResultUI.Init(resultData, onConfirm);
+        }
+
+        return uiBase as GameClearResultUI;
+    }
+
+    public static void CloseGameClearResultUI(this UIManager uiManager)
+    {
+        uiManager.ClosePopupUI(UIType.GameClearResultUI);
     }
 }

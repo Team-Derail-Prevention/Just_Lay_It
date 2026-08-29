@@ -59,12 +59,21 @@ public class WeaponData : GameDataBase
     public int MagazineSize;
     public float ReloadTime;
     public float Range;
+    public int Price;
 
     public string Description;
     public string GradeName;
     public string IconPath;
     public string UseFireSound;
     public string UseReloadSound;
+    public int InGameMagazineByLevel;
+    public int InGameATKByLevel;
+    public float InGameReloadByLevel;
+    public float InGameRangeByLevel;
+    public int LobbyMagazineByLevel;
+    public int LobbyATKByLevel;
+    public float LobbyReloadByLevel;
+    public float LobbyRangeByLevel;
 }
 
 public static class TrainTypeConst

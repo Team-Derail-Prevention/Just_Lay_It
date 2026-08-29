@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 
 public class GameBookSlotUI : UIBase
 {
@@ -43,11 +44,42 @@ public class GameBookSlotUI : UIBase
 
     public void InitSlot(string dataId, EGameBookCategory curCategory, Action<string, EGameBookCategory> onClickCallback)
     {
-        // 추후 도감 내용 정해지면 수정
+        string iconPath = null;
+
+        if (curCategory == EGameBookCategory.CategoryA)
+        {
+            var weaponData = DataManager.Instance.GetData<WeaponData>(dataId);
+            if (weaponData != null)
+            {
+                iconPath = weaponData.IconPath;
+            }
+        }
+        else if (curCategory == EGameBookCategory.CategoryB)
+        {
+            var monsterData = DataManager.Instance.GetData<MonsterData>(dataId);
+            if (monsterData != null)
+            {
+                iconPath = monsterData.UseIconName;
+            }
+        }
+
+        if (string.IsNullOrEmpty(iconPath) == false)
+        {
+            LoadSlotIconAsync(iconPath).Forget();
+        }
 
         _slotDataId = dataId;
         _curSlotCategory = curCategory;
-        _onClickSlot = onClickCallback;
+        _onClickSlot += onClickCallback;
+    }
+
+    private async UniTaskVoid LoadSlotIconAsync(string iconPath)
+    {
+        var sprite = await ResourceManager.Instance.LoadAsset<Sprite>(iconPath);
+        if (sprite != null && Image_SlotIcon != null)
+        {
+            Image_SlotIcon.sprite = sprite;
+        }
     }
 
     public void SetSelectedUI(bool isSelect)
