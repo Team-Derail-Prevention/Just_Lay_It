@@ -179,6 +179,18 @@ public class LobbyUpgradeUI : UIBase
             return;
         }
 
+        var slotVm = _vm.GetSlot(_curSelectedSlotId);
+        if (slotVm == null || slotVm.IsMaxLevel == true)
+        {
+            return;
+        }
+
+        if (_vm.CurrentCash < slotVm.NextCost)
+        {
+            UIManager.Instance.OpenExitConfirmPopup(null, null, "캐쉬가 모자랍니다.");
+            return;
+        }
+
         NetworkUpgradeService.Instance.RequestPurchase(_curSelectedSlotId);
     }
 
@@ -189,10 +201,25 @@ public class LobbyUpgradeUI : UIBase
             return;
         }
 
-        NetworkUpgradeService.Instance.RequestRefund(_curSelectedSlotId);
+        bool isRefunded = NetworkUpgradeService.Instance.RequestRefund(_curSelectedSlotId);
+        if (isRefunded == false)
+        {
+            UIManager.Instance.OpenExitConfirmPopup(null, null, "판매 할게 없습니다.");
+        }
     }
 
     public void OnClick_RefundAll()
+    {
+        if (NetworkUpgradeService.Instance.HasAnyRefundableSlot() == false)
+        {
+            UIManager.Instance.OpenExitConfirmPopup(null, null, "판매 할게 없습니다.");
+            return;
+        }
+
+        UIManager.Instance.OpenExitConfirmPopup(ConfirmRefundAll, null, "정말 모두 판매 하시겠습니까?");
+    }
+
+    private void ConfirmRefundAll()
     {
         NetworkUpgradeService.Instance.RequestRefundAll();
     }
