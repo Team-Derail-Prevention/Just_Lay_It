@@ -18,4 +18,7 @@ public class MonsterData : GameDataBase
     public string UseDieSound;
 
     public string ProjectileColor;
+
+    public string Description;
+    public string UseIconName;
 }
