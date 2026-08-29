@@ -59,6 +59,7 @@ public class WeaponData : GameDataBase
     public int MagazineSize;
     public float ReloadTime;
     public float Range;
+    public int Price;
 
     public string Description;
     public string GradeName;

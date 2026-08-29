@@ -15,6 +15,7 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
     [SerializeField] private TMPro.TextMeshProUGUI Text_FireRate;
     [SerializeField] private TMPro.TextMeshProUGUI Text_ReloadTime;
     [SerializeField] private TMPro.TextMeshProUGUI Text_MagazineSize;
+    [SerializeField] private TMPro.TextMeshProUGUI Text_Price;
 
     private AugmentSlotState _slotState;
     private AugmentSlotContainerViewModel _ownerContainer;
@@ -232,7 +233,18 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
         if (Text_MagazineSize != null)
         {
             Text_MagazineSize.text = $"{stat.MagazineSize}";
-        } */
+        }
+
+        if (Text_Price != null)
+        {
+            Text_Price.text = $"{weaponData.Price}";
+        }
+
+        if (Text_Price != null)
+        {
+            Text_Price.text = $"{stat.Price}";
+        }
+        */
     }
 
     public void OnPointerExit(PointerEventData eventData)
