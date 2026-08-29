@@ -160,17 +160,19 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
         // 저장 관련 정해지면 추후 수정
     }
 
-    public void GrantRescueReward(int rescuedHumanCount)
+    public int GrantRescueReward(int rescuedHumanCount)
     {
         if (rescuedHumanCount <= 0)
         {
-            return;
+            return 0;
         }
 
         int rewardCash = rescuedHumanCount * _cashPerRescuedCitizen;
         GainCash(rewardCash);
 
         Debug.Log($"[NetworkUpgradeService] 구출한 시민 {rescuedHumanCount}명 → 보상 캐쉬 {rewardCash} 지급");
+
+        return rewardCash;
     }
 
     public object GetSaveData()
