@@ -327,11 +327,15 @@ public static class UIManagerExtension
             Debug.LogWarning("InGameMenuPopup가 생성되지 않았습니다");
             return;
         }
+
+        GameManager.Time?.Pause();
     }
 
     public static void CloseInGameMenuPopup(this UIManager uiManager)
     {
         uiManager.ClosePopupUI(UIType.InGameMenuPopup);
+
+        GameManager.Time?.Resume();
     }
 
     public static void OpenAugmentInventoryUI(this UIManager uiManager)
