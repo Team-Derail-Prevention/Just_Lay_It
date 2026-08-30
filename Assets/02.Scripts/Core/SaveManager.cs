@@ -33,6 +33,14 @@ public class SaveManager : SingletonBase<SaveManager>
         }
     }
 
+#if UNITY_EDITOR
+    public void Debug_ResetFirstPlayNotice()
+    {
+        HasSeenFirstPlayNotice = false;
+        Debug.Log("[SaveManager] HasSeenFirstPlayNotice를 초기화했습니다.");
+    }
+#endif
+
     public int TotalPlayCount
     {
         get
@@ -394,3 +402,4 @@ public class SettingsSaveData
     public float SfxVolume = 1f;
     public int DisplayMode = 1;
 }
+
