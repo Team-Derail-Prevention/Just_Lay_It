@@ -73,7 +73,7 @@ public class GameClearResultUI : UIBase
 
     private void ScrollContentIfNeeded()
     {
-        if (_viewModel.IsFinalStage == false || _scrollContent == null || _viewportRect == null)
+        if (_scrollContent == null || _viewportRect == null)
         {
             return;
         }
@@ -84,7 +84,7 @@ public class GameClearResultUI : UIBase
             return;
         }
 
-        float targetY = -maxScrollY;
+        float targetY = maxScrollY;
 
         Vector2 anchoredPosition = _scrollContent.anchoredPosition;
         anchoredPosition.y = Mathf.MoveTowards(anchoredPosition.y, targetY, _creditsScrollSpeed * Time.deltaTime);
