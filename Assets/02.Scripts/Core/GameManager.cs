@@ -183,7 +183,6 @@ public class GameManager : SingletonBase<GameManager>
                 return;
             }
 
-            await ShowFirstPlayNoticeIfNeededAsync();
             Save?.IncreaseTotalPlayCount();
             ClearCurrentSession();
             ChangeGameState(GameState.Ready);
@@ -356,6 +355,22 @@ public class GameManager : SingletonBase<GameManager>
         }
     }
 
+#if UNITY_EDITOR
+    public void Debug_ForceGameClearInTime()
+    {
+        _playTime = 0f;
+        Debug.Log("[GameManager] (디버그) 제한시간 내 클리어를 강제로 트리거합니다.");
+        GameClear();
+    }
+
+    public void Debug_ForceGameClearOverTime()
+    {
+        _playTime = GetClearTimeLimit(_currentGameStage) + 1f;
+        Debug.Log("[GameManager] (디버그) 제한시간 초과 클리어를 강제로 트리거합니다.");
+        GameClear();
+    }
+#endif
+
     private void FinalizeRunStatsAndGrantReward()
     {
         int rescuedHumanCount = NetworkResourceService?.GetLocalResourceViewModel().RescuedHumanCount ?? 0;
@@ -427,22 +442,6 @@ public class GameManager : SingletonBase<GameManager>
             GameStage.Stage3 => "매우 어려움",
             _ => stage.ToString()
         };
-    }
-
-    private async UniTask ShowFirstPlayNoticeIfNeededAsync()
-    {
-        if (Save == null || Save.HasSeenFirstPlayNotice)
-        {
-            return;
-        }
-
-        const string message = "5분 안에 스테이션 4개를 모두 방문해 클리어하면\n다음 게임 시작 시 더 높은 난이도로 시작됩니다.";
-        bool isConfirmed = false;
-
-        UI?.OpenNoticePopup(message, () => isConfirmed = true);
-        await UniTask.WaitUntil(() => isConfirmed, cancellationToken: this.GetCancellationTokenOnDestroy());
-
-        Save.HasSeenFirstPlayNotice = true;
     }
 
     private void OpenScoreReport(ScoreResultType resultType, Action onConfirm)
