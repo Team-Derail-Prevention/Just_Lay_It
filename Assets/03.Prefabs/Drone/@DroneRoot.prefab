@@ -160,6 +160,8 @@ MonoBehaviour:
   _carIndex: 1
   _localOffset: {x: 0, y: 2, z: -3}
   _topGap: 1
+  _orbitRadius: 2.5
+  _orbitSpeed: 25
 --- !u!1 &1056660356471806847
 GameObject:
   m_ObjectHideFlags: 0
@@ -1420,10 +1422,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DroneDeliveryWorker
   _dock: {fileID: 5080001210236606873}
-  _rack: {fileID: 0}
   _carrySocket: {fileID: 0}
-  _pickUpDuration: 0.4
-  _dropDuration: 1
+  _capacity: 3
+  _stackGap: 0.4
+  _carryGap: 0.35
+  _dockCatchDistance: 0.8
 --- !u!114 &3689241468954350394
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1941,6 +1944,8 @@ MonoBehaviour:
   _carIndex: 0
   _localOffset: {x: 0, y: 2, z: -3}
   _topGap: 1
+  _orbitRadius: 2.5
+  _orbitSpeed: 25
 --- !u!1 &8535544671339508935
 GameObject:
   m_ObjectHideFlags: 0
@@ -2066,6 +2071,7 @@ GameObject:
   - component: {fileID: 1268735119693262071}
   - component: {fileID: 4052740878044825668}
   - component: {fileID: 8709548589285250355}
+  - component: {fileID: 694245506379060640}
   m_Layer: 0
   m_Name: Drone_Input
   m_TagString: Untagged
@@ -2100,9 +2106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aab2b54e8b10ff54ba75d4e5869c6c5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DroneClickCommand
-  _cursor: {fileID: 8709548589285250355}
   _stateMachine: {fileID: 0}
-  _orderModeKey: 16
   _recallKey: 36
 --- !u!114 &4052740878044825668
 MonoBehaviour:
@@ -2116,7 +2120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5f8461bf8ee1dd4fa0f04c0f5969a03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DroneCellIndicator
-  _command: {fileID: 1268735119693262071}
+  _buildMode: {fileID: 694245506379060640}
   _cursor: {fileID: 8709548589285250355}
   _stateMachine: {fileID: 0}
   _indicator: {fileID: 5226786926981250034}
@@ -2138,6 +2142,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DroneTargetCursor
   _camera: {fileID: 0}
   _rayDistance: 500
+  _groundMask:
+    serializedVersion: 2
+    m_Bits: 0
+  _materialMask:
+    serializedVersion: 2
+    m_Bits: 0
+  _cellCheckRadius: 1
+  _cellCheckHeight: 3
+--- !u!114 &694245506379060640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8604228717525145015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b36f061ca8e83884d8432de640f46f32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BuildModeController
+  _cursor: {fileID: 8709548589285250355}
+  _stateMachine: {fileID: 0}
+  _buildModeKey: 37
+  _exitKey: 19
+  _railType: 0
 --- !u!1 &8743302442161982077
 GameObject:
   m_ObjectHideFlags: 0
@@ -2289,7 +2318,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DroneStateMachine
   _dock: {fileID: 4869481357575484726}
   _workTrigger: {fileID: 0}
-  _workDuration: 1
+  _workSpeedMultiplier: 1
 --- !u!114 &664325176744943670
 MonoBehaviour:
   m_ObjectHideFlags: 0

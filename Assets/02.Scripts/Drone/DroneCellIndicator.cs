@@ -1,9 +1,9 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class DroneCellIndicator : MonoBehaviour
 {
     [Header("참조")]
-    [SerializeField] private DroneClickCommand _command;
+    [SerializeField] private BuildModeController _buildMode;
     [SerializeField] private DroneTargetCursor _cursor;
     [SerializeField] private DroneStateMachine _stateMachine;
     [SerializeField] private Renderer _indicator;
@@ -27,14 +27,14 @@ public class DroneCellIndicator : MonoBehaviour
 
     private void Update()
     {
-        if (_command == null || _cursor == null || _indicator == null)
+        if (_buildMode == null || _cursor == null || _indicator == null)
         {
             SetVisible(false);
 
             return;
         }
 
-        if (_command.IsOrderMode == false)
+        if (_buildMode.IsBuildMode == false)
         {
             SetVisible(false);
 
