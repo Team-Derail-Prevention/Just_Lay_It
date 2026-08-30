@@ -49,6 +49,7 @@ public class RailManager : SingletonBase<RailManager>
         public GameObject Obj;
         public RailType Type;
         public int RotationStep;
+        public bool IsFixed;
     }
     private Dictionary<Vector2Int, PlacedRailInfo> _placedRails = new Dictionary<Vector2Int, PlacedRailInfo>();
 
@@ -228,6 +229,54 @@ public class RailManager : SingletonBase<RailManager>
         Transform_MapRoot = MapManager_Ref.MapRoot;
         ClearAllPlacedRails();
         BuildCubeLookup();
+        RegisterFixedRails();
+    }
+
+    private void RegisterFixedRails()
+    {
+        if (Transform_MapRoot == null)
+        {
+            return;
+        }
+
+        Transform[] allChildren = Transform_MapRoot.GetComponentsInChildren<Transform>(true);
+        int registeredCount = 0;
+
+        for (int i = 0; i < allChildren.Length; i++)
+        {
+            Transform railTrans = allChildren[i];
+            if (!railTrans.name.Contains("AutoSpawned"))
+            {
+                continue;
+            }
+
+            Vector2Int gridIndex = WorldPointToGridIndex(railTrans.position);
+
+            if (_installedCubes.Contains(gridIndex))
+            {
+                continue;
+            }
+
+            int rotationStep = Mathf.RoundToInt(railTrans.eulerAngles.y / 90f) % 4;
+
+            _installedCubes.Add(gridIndex);
+            _placedRails[gridIndex] = new PlacedRailInfo
+            {
+                Obj = railTrans.gameObject,
+                Type = RailType.Straight,
+                RotationStep = rotationStep,
+                IsFixed = true
+            };
+
+            if (_cubeGrid.TryGetValue(gridIndex, out CubeInfo cubeInfo) && cubeInfo.TileScript != null)
+            {
+                cubeInfo.TileScript.HasRail = true;
+            }
+
+            registeredCount++;
+        }
+
+        Debug.Log($"[RailManager] 고정 레일 {registeredCount}개 격자 등록 완료");
     }
 
     private void BuildCubeLookup()
@@ -702,6 +751,7 @@ public class RailManager : SingletonBase<RailManager>
 
             if (!_installedCubes.Contains(neighbor)) continue;
             if (!_placedRails.TryGetValue(neighbor, out PlacedRailInfo currentInfo)) continue;
+            if (currentInfo.IsFixed) continue;
 
             List<int> connectedDirs = GetConnectedDirections(neighbor);
             if (connectedDirs.Count == 0) continue;
@@ -776,6 +826,12 @@ public class RailManager : SingletonBase<RailManager>
         if (!_placedRails.TryGetValue(gridIndex, out PlacedRailInfo placedInfo))
         {
             _installedCubes.Remove(gridIndex);
+            return;
+        }
+
+        if (placedInfo.IsFixed)
+        {
+            Debug.LogWarning($"[RailManager] {gridIndex}는 고정 레일이라 제거할 수 없습니다.");
             return;
         }
 
