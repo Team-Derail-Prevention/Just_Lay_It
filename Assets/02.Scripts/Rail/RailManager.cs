@@ -32,6 +32,8 @@ public class RailManager : SingletonBase<RailManager>
 
     public float GhostAlpha { get { return _ghostAlpha; } }
 
+    public bool IsPlaceModeActive { get { return _isPlaceModeActive; } }
+
     private RailType _currentRailType = RailType.Straight;
 
     private float _tileSize = 1f;
@@ -62,6 +64,7 @@ public class RailManager : SingletonBase<RailManager>
 
     private bool _isPlaceModeActive = false;
     private bool _isConfirmPopupOpen = false;
+    private bool _isHoverSuppressed = false;
 
     private Vector2Int _pendingGridIndex;
     private CubeInfo _pendingCubeInfo;
@@ -135,7 +138,6 @@ public class RailManager : SingletonBase<RailManager>
 
         if (!_isPlaceModeActive)
         {
-            HandlePlaceModeEntryInput();
             return;
         }
 
@@ -149,12 +151,32 @@ public class RailManager : SingletonBase<RailManager>
             return;
         }
 
+        if (_isHoverSuppressed)
+        {
+            return;
+        }
+
         UpdateHover();
         UpdateClickInput();
+    }
 
-        if (Input.GetKeyDown(KeyCode.E))
+    public void ExitPlaceModeExternal()
+    {
+        ExitPlaceMode(clearPlacedRails: false);
+    }
+
+    public void SetHoverSuppressed(bool suppressed)
+    {
+        if (_isHoverSuppressed == suppressed)
         {
-            ExitPlaceMode(clearPlacedRails: false);
+            return;
+        }
+
+        _isHoverSuppressed = suppressed;
+
+        if (_isHoverSuppressed)
+        {
+            ClearHover();
         }
     }
 
@@ -180,6 +202,7 @@ public class RailManager : SingletonBase<RailManager>
 
         _isPlaceModeActive = false;
         _isConfirmPopupOpen = false;
+        _isHoverSuppressed = false;
 
         ClearHover();
         CloseConfirmPopup();
@@ -205,14 +228,6 @@ public class RailManager : SingletonBase<RailManager>
         Transform_MapRoot = MapManager_Ref.MapRoot;
         ClearAllPlacedRails();
         BuildCubeLookup();
-    }
-
-    private void HandlePlaceModeEntryInput()
-    {
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            NetworkRailService.Instance?.RequestStartPlacement(RailType.Straight);
-        }
     }
 
     private void BuildCubeLookup()

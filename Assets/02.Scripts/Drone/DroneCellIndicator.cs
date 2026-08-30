@@ -1,9 +1,9 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class DroneCellIndicator : MonoBehaviour
 {
     [Header("참조")]
-    [SerializeField] private DroneClickCommand _command;
+    [SerializeField] private BuildModeController _buildMode;
     [SerializeField] private DroneTargetCursor _cursor;
     [SerializeField] private DroneStateMachine _stateMachine;
     [SerializeField] private Renderer _indicator;
@@ -27,21 +27,21 @@ public class DroneCellIndicator : MonoBehaviour
 
     private void Update()
     {
-        if (_command == null || _cursor == null || _indicator == null)
+        if (_buildMode == null || _cursor == null || _indicator == null)
         {
             SetVisible(false);
 
             return;
         }
 
-        if (_command.IsOrderMode == false)
+        if (_buildMode.IsBuildMode == false)
         {
             SetVisible(false);
 
             return;
         }
 
-        if (_cursor.TryGetTarget(out MaterialObject target) == false)
+        if (_cursor.TryGetCell(out Vector3 cellCenter, out MaterialObject target) == false)
         {
             SetVisible(false);
 
@@ -49,13 +49,13 @@ public class DroneCellIndicator : MonoBehaviour
         }
 
         SetVisible(true);
-        PlaceAt(target);
+        PlaceAt(cellCenter);
         Colorize(target);
     }
 
-    private void PlaceAt(MaterialObject target)
+    private void PlaceAt(Vector3 cellCenter)
     {
-        Vector3 position = target.transform.position;
+        Vector3 position = cellCenter;
 
         position.y += _heightOffset;
 
