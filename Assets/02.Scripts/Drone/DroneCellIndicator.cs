@@ -41,7 +41,7 @@ public class DroneCellIndicator : MonoBehaviour
             return;
         }
 
-        if (_cursor.TryGetTarget(out MaterialObject target) == false)
+        if (_cursor.TryGetCell(out Vector3 cellCenter, out MaterialObject target) == false)
         {
             SetVisible(false);
 
@@ -49,13 +49,13 @@ public class DroneCellIndicator : MonoBehaviour
         }
 
         SetVisible(true);
-        PlaceAt(target);
+        PlaceAt(cellCenter);
         Colorize(target);
     }
 
-    private void PlaceAt(MaterialObject target)
+    private void PlaceAt(Vector3 cellCenter)
     {
-        Vector3 position = target.transform.position;
+        Vector3 position = cellCenter;
 
         position.y += _heightOffset;
 
