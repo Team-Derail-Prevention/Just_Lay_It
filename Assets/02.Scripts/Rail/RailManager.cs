@@ -499,15 +499,27 @@ public class RailManager : SingletonBase<RailManager>
         return ports;
     }
 
-    // [신규 로직] 특정 레일의 구멍(포트)에 실제로 다른 레일이 연결되어 있는지(사용 중인지) 카운트
     private int GetActiveConnectionCount(Vector2Int target)
     {
         if (!_placedRails.TryGetValue(target, out PlacedRailInfo info)) return 0;
+
         List<int> ports = GetRailPorts(info.Type, info.RotationStep);
         int count = 0;
+
         foreach (int port in ports)
         {
-            if (_installedCubes.Contains(target + _cardinalOffsets[port])) count++;
+            Vector2Int neighborPos = target + _cardinalOffsets[port];
+
+            if (_placedRails.TryGetValue(neighborPos, out PlacedRailInfo neighborInfo))
+            {
+                int dirFromNeighborToMe = OppositeDirection(port);
+                List<int> neighborPorts = GetRailPorts(neighborInfo.Type, neighborInfo.RotationStep);
+
+                if (neighborPorts.Contains(dirFromNeighborToMe))
+                {
+                    count++;
+                }
+            }
         }
         return count;
     }
@@ -751,12 +763,10 @@ public class RailManager : SingletonBase<RailManager>
 
             if (!_installedCubes.Contains(neighbor)) continue;
             if (!_placedRails.TryGetValue(neighbor, out PlacedRailInfo currentInfo)) continue;
-            if (currentInfo.IsFixed) continue;
 
             List<int> connectedDirs = GetConnectedDirections(neighbor);
             if (connectedDirs.Count == 0) continue;
 
-            // [핵심 수정] 이미 구멍 2개가 다 차서 완성된 레일은 모양이 절대 바뀌지 않도록 잠금
             if (GetActiveConnectionCount(neighbor) >= 2)
             {
                 continue;
@@ -804,7 +814,15 @@ public class RailManager : SingletonBase<RailManager>
             {
                 _installedRailPath[pathIndex] = spawnedRail.transform;
             }
-            Addressables.ReleaseInstance(oldInfo.Obj);
+
+            if (oldInfo.IsFixed)
+            {
+                Destroy(oldInfo.Obj);
+            }
+            else
+            {
+                Addressables.ReleaseInstance(oldInfo.Obj);
+            }
         }
 
         RailOutline outline = spawnedRail.GetComponent<RailOutline>();
@@ -816,7 +834,13 @@ public class RailManager : SingletonBase<RailManager>
         Collider placedCollider = spawnedRail.GetComponentInChildren<Collider>();
         if (placedCollider != null) placedCollider.enabled = true;
 
-        _placedRails[gridIndex] = new PlacedRailInfo { Obj = spawnedRail, Type = newType, RotationStep = newRotationStep };
+        _placedRails[gridIndex] = new PlacedRailInfo
+        {
+            Obj = spawnedRail,
+            Type = newType,
+            RotationStep = newRotationStep,
+            IsFixed = oldInfo.IsFixed
+        };
     }
 
     private void RemoveRail(Vector2Int gridIndex, bool updateNeighbors = true)
