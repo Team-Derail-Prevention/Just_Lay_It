@@ -1,4 +1,5 @@
-﻿using Enums;
+﻿using Cysharp.Threading.Tasks;
+using Enums;
 using System;
 using UnityEngine;
 
@@ -64,7 +65,7 @@ public static class UIManagerExtension
     }
 
     public static async Cysharp.Threading.Tasks.UniTask StartGameFromLobby(this UIManager uiManager)
-    { /*
+    { 
         if (GameManager.Instance == null)
         {
             Debug.LogError("GameManager.Instance가 null입니다. 게임 매니저가 초기화되지 않았습니다.");
@@ -83,6 +84,7 @@ public static class UIManagerExtension
             GameManager.Instance.SetGameStage(selectedStage.Value);
         }
 
+        await uiManager.ShowFirstPlayNoticeIfNeededAsync();
         uiManager.CloseContentUI(UIType.LobbyUI);
 
         var loadingUI = uiManager.OpenLoadingUI();
@@ -99,7 +101,23 @@ public static class UIManagerExtension
             loadingUI.SetDataLoaded();
         }
 
-        return; */
+        return; 
+    }
+
+    public static async Cysharp.Threading.Tasks.UniTask ShowFirstPlayNoticeIfNeededAsync(this UIManager uiManager)
+    {
+        if (SaveManager.Instance == null || SaveManager.Instance.HasSeenFirstPlayNotice)
+        {
+            return;
+        }
+
+        const string message = "5분 안에 스테이션 4개를 모두 방문해 클리어하면\n다음 게임 시작 시 더 높은 난이도로 시작됩니다.";
+        bool isConfirmed = false;
+
+        uiManager.OpenNoticePopup(message, () => isConfirmed = true);
+        await Cysharp.Threading.Tasks.UniTask.WaitUntil(() => isConfirmed, cancellationToken: uiManager.GetCancellationTokenOnDestroy());
+
+        SaveManager.Instance.HasSeenFirstPlayNotice = true;
     }
 
     public static async Cysharp.Threading.Tasks.UniTask<GameStage?> RequestStageSelectionAsync(this UIManager uiManager)
