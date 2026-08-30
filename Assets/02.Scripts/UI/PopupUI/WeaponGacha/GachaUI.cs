@@ -70,7 +70,7 @@ public class GachaUI : UIBase
             }
 
             var gObj = Instantiate(Prefab_CardSlot, Transform_CardGroup);
-            var cardComponent = gObj.GetComponent<GachaCardUI>();
+            var cardComponent = gObj.GetComponentInChildren<GachaCardUI>();
             if (cardComponent == null)
             {
                 continue;

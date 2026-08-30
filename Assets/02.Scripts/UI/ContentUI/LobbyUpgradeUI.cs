@@ -130,12 +130,40 @@ public class LobbyUpgradeUI : UIBase
     {
         _curSelectedSlotId = slotDataId;
 
-        // 내용 정해지면 추후 수정
-
         foreach (var slotKv in _slotList)
         {
             var slot = slotKv.Value;
             slot.SetSelectedUI(slotKv.Key == _curSelectedSlotId);
+        }
+
+        RefreshDetailPanel();
+    }
+
+    private async void RefreshDetailPanel()
+    {
+        var slotVm = _vm.GetSlot(_curSelectedSlotId);
+        if (slotVm == null)
+        {
+            return;
+        }
+
+        if (Text_DetailTitle != null)
+        {
+            Text_DetailTitle.text = slotVm.DisplayName;
+        }
+
+        if (Text_DetailDescription != null)
+        {
+            Text_DetailDescription.text = slotVm.Description; 
+        }
+
+        if (Image_DetailIcon != null && string.IsNullOrEmpty(slotVm.IconPath) == false)
+        {
+            var sprite = await ResourceManager.Instance.LoadAsset<Sprite>(slotVm.IconPath);
+            if (Image_DetailIcon != null && sprite != null)
+            {
+                Image_DetailIcon.sprite = sprite;
+            }
         }
     }
 
@@ -151,6 +179,18 @@ public class LobbyUpgradeUI : UIBase
             return;
         }
 
+        var slotVm = _vm.GetSlot(_curSelectedSlotId);
+        if (slotVm == null || slotVm.IsMaxLevel == true)
+        {
+            return;
+        }
+
+        if (_vm.CurrentCash < slotVm.NextCost)
+        {
+            UIManager.Instance.OpenExitConfirmPopup(null, null, "캐쉬가 모자랍니다.");
+            return;
+        }
+
         NetworkUpgradeService.Instance.RequestPurchase(_curSelectedSlotId);
     }
 
@@ -161,10 +201,25 @@ public class LobbyUpgradeUI : UIBase
             return;
         }
 
-        NetworkUpgradeService.Instance.RequestRefund(_curSelectedSlotId);
+        bool isRefunded = NetworkUpgradeService.Instance.RequestRefund(_curSelectedSlotId);
+        if (isRefunded == false)
+        {
+            UIManager.Instance.OpenExitConfirmPopup(null, null, "판매 할게 없습니다.");
+        }
     }
 
     public void OnClick_RefundAll()
+    {
+        if (NetworkUpgradeService.Instance.HasAnyRefundableSlot() == false)
+        {
+            UIManager.Instance.OpenExitConfirmPopup(null, null, "판매 할게 없습니다.");
+            return;
+        }
+
+        UIManager.Instance.OpenExitConfirmPopup(ConfirmRefundAll, null, "정말 모두 판매 하시겠습니까?");
+    }
+
+    private void ConfirmRefundAll()
     {
         NetworkUpgradeService.Instance.RequestRefundAll();
     }

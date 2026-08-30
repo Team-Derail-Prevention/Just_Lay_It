@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 
 public enum EGameBookCategory
 {
@@ -19,15 +20,26 @@ public class GameBookUI : UIBase
     [SerializeField] private GameObject Panel_CategoryA;
     [SerializeField] private GameObject Panel_CategoryB;
 
-    [Header("카테고리 A 영역")]
-    [SerializeField] private Image Image_CategoryAIcon;
-    [SerializeField] private TextMeshProUGUI Text_CategoryAName;
-    [SerializeField] private TextMeshProUGUI Text_CategoryADescription;
+    [Header("무기 상세 정보 영역")]
+    [SerializeField] private Image Image_WeaponIcon;
+    [SerializeField] private TextMeshProUGUI Text_WeaponName;
+    [SerializeField] private TextMeshProUGUI Text_WeaponGrade;
+    [SerializeField] private TextMeshProUGUI Text_WeaponDescription;
+    [SerializeField] private TextMeshProUGUI Text_Damage;
+    [SerializeField] private TextMeshProUGUI Text_FireRate;
+    [SerializeField] private TextMeshProUGUI Text_Range; 
+    [SerializeField] private TextMeshProUGUI Text_MagazineSize;
+    [SerializeField] private TextMeshProUGUI Text_ReloadTime;
 
-    [Header("카테고리 B 영역")]
-    [SerializeField] private Image Image_CategoryBIcon;
-    [SerializeField] private TextMeshProUGUI Text_CategoryBName;
-    [SerializeField] private TextMeshProUGUI Text_CategoryBDescription;
+    [Header("몬스터 상세 정보 영역")]
+    [SerializeField] private Image Image_MonsterIcon;
+    [SerializeField] private TextMeshProUGUI Text_MonsterName;
+    [SerializeField] private TextMeshProUGUI Text_MonsterDescription;
+    [SerializeField] private TextMeshProUGUI Text_Hp;
+    [SerializeField] private TextMeshProUGUI Text_MonsterAtk;
+    [SerializeField] private TextMeshProUGUI Text_Speed;
+    [SerializeField] private TextMeshProUGUI Text_AttackType;
+    [SerializeField] private TextMeshProUGUI Text_DropGold;
 
     [Header("카테고리 버튼")]
     [SerializeField] private UIButton Button_CategoryA;
@@ -43,8 +55,6 @@ public class GameBookUI : UIBase
 
     private void OnEnable()
     {
-        OnClick_CategoryA();
-
         if (Button_CloseUI != null)
         {
             Button_CloseUI.BindOnClickButtonEvent(OnClick_CloseGameBookUI);
@@ -59,6 +69,8 @@ public class GameBookUI : UIBase
         {
             Button_CategoryB.BindOnClickButtonEvent(OnClick_CategoryB);
         }
+
+        OnClick_CategoryA();
     }
 
     private void OnDisable()
@@ -66,6 +78,16 @@ public class GameBookUI : UIBase
         if (Button_CloseUI != null)
         {
             Button_CloseUI.UnBindOnClickButtonEvent(OnClick_CloseGameBookUI);
+        }
+
+        if (Button_CategoryA != null)
+        {
+            Button_CategoryA.UnBindOnClickButtonEvent(OnClick_CategoryA);
+        }
+
+        if (Button_CategoryB != null)
+        {
+            Button_CategoryB.UnBindOnClickButtonEvent(OnClick_CategoryB);
         }
 
         OnDestroyAndClearSlotList();
@@ -130,14 +152,46 @@ public class GameBookUI : UIBase
 
     private void ReadCategoryAListAndCreateSlot()
     {
-        // 도감 들어 갈거 정해지면 추후 수정
+        if (DataManager.Instance == null || DataManager.Instance.IsLoaded == false)
+        {
+            Debug.LogWarning("[GameBookUI] 데이터가 아직 로드되지 않았습니다.");
+            return;
+        }
+
+        var dataList = DataManager.Instance.GetAllData<WeaponData>();
+
+        foreach (var data in dataList)
+        {
+            if (data == null)
+            {
+                continue;
+            }
+
+            CreateGameBookSlot(data.Id, EGameBookCategory.CategoryA);
+        }
 
         SelectFirstSlot();
     }
 
     private void ReadCategoryBListAndCreateSlot()
     {
-        // 도감 들어 갈거 정해지면 추후 수정
+        if (DataManager.Instance == null || DataManager.Instance.IsLoaded == false)
+        {
+            Debug.LogWarning("[GameBookUI] 데이터가 아직 로드되지 않았습니다.");
+            return;
+        }
+
+        var dataList = DataManager.Instance.GetAllData<MonsterData>();
+
+        foreach (var data in dataList)
+        {
+            if (data == null)
+            {
+                continue;
+            }
+
+            CreateGameBookSlot(data.Id, EGameBookCategory.CategoryB);
+        }
 
         SelectFirstSlot();
     }
@@ -177,13 +231,70 @@ public class GameBookUI : UIBase
 
     private void OnClickChildSlotSelected(string slotDataId, EGameBookCategory selectedSlotCategory)
     {
-        // 추후 도감 내용 정해지면 수정
-
         foreach (var slotKv in _slotList)
         {
             var slot = slotKv.Value;
             var dataId = slot.GetSlotDataId();
             slot.SetSelectedUI(slotDataId == dataId);
         }
+
+        if (selectedSlotCategory == EGameBookCategory.CategoryA)
+        {
+            var weaponData = DataManager.Instance.GetData<WeaponData>(slotDataId);
+            if (weaponData == null)
+            {
+                return;
+            }
+
+            if (Text_WeaponName != null) Text_WeaponName.text = weaponData.WeaponName;
+            if (Text_WeaponGrade != null) Text_WeaponGrade.text = weaponData.GradeName;
+            if (Text_WeaponDescription != null) Text_WeaponDescription.text = weaponData.Description;
+            if (Text_Damage != null) Text_Damage.text = weaponData.Atk.ToString();
+            if (Text_FireRate != null) Text_FireRate.text = weaponData.FireRate.ToString();
+            if (Text_Range != null) Text_Range.text = weaponData.Range.ToString();
+            if (Text_MagazineSize != null) Text_MagazineSize.text = weaponData.MagazineSize.ToString();
+            if (Text_ReloadTime != null) Text_ReloadTime.text = $"{weaponData.ReloadTime} 초";
+
+            if (string.IsNullOrEmpty(weaponData.IconPath) == false)
+            {
+                LoadIconAsync(Image_WeaponIcon, weaponData.IconPath).Forget();
+            }
+        }
+        else if (selectedSlotCategory == EGameBookCategory.CategoryB)
+        {
+            var monsterData = DataManager.Instance.GetData<MonsterData>(slotDataId);
+            if (monsterData == null)
+            {
+                return;
+            }
+
+            if (Text_MonsterName != null) Text_MonsterName.text = monsterData.MonsterName;
+            if (Text_MonsterDescription != null) Text_MonsterDescription.text = monsterData.Description;
+            if (Text_Hp != null) Text_Hp.text = monsterData.Hp.ToString();
+            if (Text_MonsterAtk != null) Text_MonsterAtk.text = monsterData.Atk.ToString();
+            if (Text_Speed != null) Text_Speed.text = monsterData.Speed.ToString();
+            if (Text_AttackType != null) Text_AttackType.text = string.IsNullOrEmpty(monsterData.AttackType) ? "None" : monsterData.AttackType;
+            if (Text_DropGold != null) Text_DropGold.text = monsterData.DropGold.ToString();
+
+            if (string.IsNullOrEmpty(monsterData.UseIconName) == false)
+            {
+                LoadIconAsync(Image_MonsterIcon, monsterData.UseIconName).Forget();
+            }
+        }
+    }
+
+    private async UniTaskVoid LoadIconAsync(Image targetImage, string iconPath)
+    {
+        if (targetImage == null || string.IsNullOrEmpty(iconPath) == true)
+        {
+            return;
+        }
+
+        var sprite = await ResourceManager.Instance.LoadAsset<Sprite>(iconPath);
+        if (sprite != null && targetImage != null)
+        {
+            targetImage.sprite = sprite;
+        }
     }
 }
+

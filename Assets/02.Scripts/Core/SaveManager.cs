@@ -6,12 +6,187 @@ using UnityEngine;
 public class SaveManager : SingletonBase<SaveManager>
 {
     private const string UpgradeSaveKey = "UpgradeSaveData";
+    private const string FirstPlayNoticeSeenKey = "HasSeenFirstPlayNotice";
+    private const string TotalPlayCountKey = "TotalPlayCount";
+    private const string LifetimeStatsKey = "LifetimeStatsData";
+    private const string AllStagesClearedKey = "HasClearedAllStagesSpecial";
+    private const string SettingsSaveKey = "SettingsSaveData";
 
     private readonly HashSet<UpgradeSlotViewModel> _subscribedSlotSet = new HashSet<UpgradeSlotViewModel>();
 
     private UpgradeViewModel _upgradeViewModel;
     private UpgradeSaveData _loadedSaveData;
+    private LifetimeStatsData _lifetimeStatsData;
+    private SettingsSaveData _settingsSaveData;
     private bool _isLoading;
+
+    public bool HasSeenFirstPlayNotice
+    {
+        get
+        {
+            return PlayerPrefs.GetInt(FirstPlayNoticeSeenKey, 0) == 1;
+        }
+        set
+        {
+            PlayerPrefs.SetInt(FirstPlayNoticeSeenKey, value ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+    }
+
+    public int TotalPlayCount
+    {
+        get
+        {
+            return PlayerPrefs.GetInt(TotalPlayCountKey, 0);
+        }
+    }
+
+    public bool HasClearedAllStagesSpecial
+    {
+        get => PlayerPrefs.GetInt(AllStagesClearedKey, 0) == 1;
+        set
+        {
+            PlayerPrefs.SetInt(AllStagesClearedKey, value ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+    }
+
+    public float BgmVolume
+    {
+        get => GetSettingsSaveData().BgmVolume;
+        set
+        {
+            SettingsSaveData data = GetSettingsSaveData();
+            data.BgmVolume = value;
+            SaveSettingsData(data);
+        }
+    }
+
+    public float SfxVolume
+    {
+        get => GetSettingsSaveData().SfxVolume;
+        set
+        {
+            SettingsSaveData data = GetSettingsSaveData();
+            data.SfxVolume = value;
+            SaveSettingsData(data);
+        }
+    }
+
+    public int DisplayMode
+    {
+        get => GetSettingsSaveData().DisplayMode;
+        set
+        {
+            SettingsSaveData data = GetSettingsSaveData();
+            data.DisplayMode = value;
+            SaveSettingsData(data);
+        }
+    }
+
+    public int IncreaseTotalPlayCount()
+    {
+        int increasedCount = TotalPlayCount + 1;
+        PlayerPrefs.SetInt(TotalPlayCountKey, increasedCount);
+        PlayerPrefs.Save();
+
+        return increasedCount;
+    }
+
+    public float LifetimeTotalDistance => GetLifetimeStatsData().TotalDistance;
+    public float LifetimeTotalPlayTimeSeconds => GetLifetimeStatsData().TotalPlayTimeSeconds;
+    public int LifetimeTotalRescuedHumanCount => GetLifetimeStatsData().TotalRescuedHumanCount;
+    public int LifetimeTotalCollectedWood => GetLifetimeStatsData().TotalCollectedWood;
+    public int LifetimeTotalCollectedStone => GetLifetimeStatsData().TotalCollectedStone;
+    public int LifetimeTotalKillCount => GetLifetimeStatsData().TotalKillCount;
+    public int LifetimeTotalRailCrafted => GetLifetimeStatsData().TotalRailCrafted;
+    public int LifetimeTotalRailInstalled => GetLifetimeStatsData().TotalRailInstalled;
+    public int LifetimeTotalEarnedCash => GetLifetimeStatsData().TotalEarnedCash;
+
+    public void AddRunStatsToLifetime(RunStatsSnapshot snapshot)
+    {
+        if (snapshot == null)
+        {
+            return;
+        }
+
+        LifetimeStatsData data = GetLifetimeStatsData();
+        data.TotalDistance += snapshot.Distance;
+        data.TotalPlayTimeSeconds += snapshot.PlayTimeSeconds;
+        data.TotalRescuedHumanCount += snapshot.RescuedHumanCount;
+        data.TotalCollectedWood += snapshot.CollectedWoodCount;
+        data.TotalCollectedStone += snapshot.CollectedStoneCount;
+        data.TotalKillCount += snapshot.KillCount;
+        data.TotalRailCrafted += snapshot.RailCraftedCount;
+        data.TotalRailInstalled += snapshot.RailInstalledCount;
+        data.TotalEarnedCash += snapshot.EarnedCashCount;
+
+        SaveLifetimeStatsData(data);
+    }
+
+    private LifetimeStatsData GetLifetimeStatsData()
+    {
+        if (_lifetimeStatsData == null)
+        {
+            _lifetimeStatsData = LoadLifetimeStatsData();
+        }
+
+        return _lifetimeStatsData;
+    }
+
+    private LifetimeStatsData LoadLifetimeStatsData()
+    {
+        if (PlayerPrefs.HasKey(LifetimeStatsKey) == false)
+        {
+            return new LifetimeStatsData();
+        }
+
+        string json = PlayerPrefs.GetString(LifetimeStatsKey);
+        LifetimeStatsData data = JsonUtility.FromJson<LifetimeStatsData>(json);
+
+        return data ?? new LifetimeStatsData();
+    }
+
+    private void SaveLifetimeStatsData(LifetimeStatsData data)
+    {
+        string json = JsonUtility.ToJson(data);
+        PlayerPrefs.SetString(LifetimeStatsKey, json);
+        PlayerPrefs.Save();
+
+        _lifetimeStatsData = data;
+    }
+
+    private SettingsSaveData GetSettingsSaveData()
+    {
+        if (_settingsSaveData == null)
+        {
+            _settingsSaveData = LoadSettingsData();
+        }
+
+        return _settingsSaveData;
+    }
+
+    private SettingsSaveData LoadSettingsData()
+    {
+        if (PlayerPrefs.HasKey(SettingsSaveKey) == false)
+        {
+            return new SettingsSaveData();
+        }
+
+        string json = PlayerPrefs.GetString(SettingsSaveKey);
+        SettingsSaveData data = JsonUtility.FromJson<SettingsSaveData>(json);
+
+        return data ?? new SettingsSaveData();
+    }
+
+    private void SaveSettingsData(SettingsSaveData data)
+    {
+        string json = JsonUtility.ToJson(data);
+        PlayerPrefs.SetString(SettingsSaveKey, json);
+        PlayerPrefs.Save();
+
+        _settingsSaveData = data;
+    }
 
     private void Start()
     {
@@ -196,4 +371,26 @@ public class UpgradeSlotSaveData
 {
     public string SlotDataId;
     public int Level;
+}
+
+[Serializable]
+public class LifetimeStatsData
+{
+    public float TotalDistance;
+    public float TotalPlayTimeSeconds;
+    public int TotalRescuedHumanCount;
+    public int TotalCollectedWood;
+    public int TotalCollectedStone;
+    public int TotalKillCount;
+    public int TotalRailCrafted;
+    public int TotalRailInstalled;
+    public int TotalEarnedCash;
+}
+
+[Serializable]
+public class SettingsSaveData
+{
+    public float BgmVolume = 1f;
+    public float SfxVolume = 1f;
+    public int DisplayMode = 1;
 }

@@ -6,6 +6,7 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
 {
     private const int TOTAL_INVENTORY_SLOT_COUNT = 49;
     private const int SLOT_COUNT_PER_CAR = 5;
+    private const string STARTING_WEAPON_GRADE = "Common";
 
     private static readonly int[] HEAD_UNLOCK_BY_LEVEL = { 2, 2, 2, 3, 4, 5 };
     private static readonly int[] STANDARD1_UNLOCK_BY_LEVEL = { 0, 2, 2, 3, 4, 5 };
@@ -164,5 +165,58 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
     {
         _lastAugmentUniqueId += 1;
         return _lastAugmentUniqueId;
+    }
+
+    public void ResetRun()
+    {
+        _localInventoryVm = null;
+        _localEquipVmDic.Clear();
+        _lastAugmentUniqueId = 0;
+    }
+
+    public void GrantRandomStartingWeapon()
+    {
+        var equipVm = GetLocalWeaponEquipViewModel(TrainCarSection.Head);
+        var slotState = equipVm.GetSlot(0);
+        if (slotState == null || slotState.Augment != null)
+        {
+            return;
+        }
+
+        List<WeaponData> pool = GetStartingWeaponPool();
+        if (pool.Count == 0)
+        {
+            Debug.LogWarning("[NetworkAugmentService] 기본 지급용 무기 데이터가 없습니다.");
+            return;
+        }
+
+        WeaponData pickedData = pool[Random.Range(0, pool.Count)];
+
+        var augmentVm = new AugmentSlotViewModel();
+        augmentVm.AugmentUniqueId = GenerateAugmentUniqueId();
+        augmentVm.AugmentDataId = pickedData.Id;
+
+        slotState.Augment = augmentVm;
+        WeaponEquipEventHub.Instance.NotifyWeaponEquipped(TrainCarSection.Head, 0, pickedData.Id);
+    }
+
+    private List<WeaponData> GetStartingWeaponPool()
+    {
+        if (DataManager.Instance == null || DataManager.Instance.IsLoaded == false)
+        {
+            Debug.LogWarning("[NetworkAugmentService] 데이터가 아직 로드되지 않았습니다.");
+            return new List<WeaponData>();
+        }
+
+        List<WeaponData> commonWeaponList = new List<WeaponData>();
+        foreach (WeaponData weaponData in DataManager.Instance.GetAllData<WeaponData>())
+        {
+            if (weaponData.GradeName == STARTING_WEAPON_GRADE)
+            {
+                commonWeaponList.Add(weaponData);
+            }
+        }
+
+        return commonWeaponList;
     }
 }

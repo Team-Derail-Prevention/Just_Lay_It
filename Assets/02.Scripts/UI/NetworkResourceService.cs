@@ -7,6 +7,11 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
 
     private ResourceViewModel _localVm;
     private int _cargoLimit = BASE_CARGO_LIMIT;
+    private int _sessionTotalWoodCollected;
+    private int _sessionTotalStoneCollected;
+
+    public int SessionTotalWoodCollected => _sessionTotalWoodCollected;
+    public int SessionTotalStoneCollected => _sessionTotalStoneCollected;
 
     private void OnEnable()
     {
@@ -135,6 +140,7 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
 
         var vm = GetLocalResourceViewModel();
         vm.CurrentWood += addable;
+        _sessionTotalWoodCollected += addable;
 
         if (ResourceStatusEventHub.Instance != null)
         {
@@ -155,6 +161,7 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
 
         var vm = GetLocalResourceViewModel();
         vm.CurrentStone += addable;
+        _sessionTotalStoneCollected += addable;
 
         if (ResourceStatusEventHub.Instance != null)
         {
@@ -228,6 +235,8 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
     {
         _localVm = new ResourceViewModel();
         _cargoLimit = BASE_CARGO_LIMIT;
+        _sessionTotalWoodCollected = 0;
+        _sessionTotalStoneCollected = 0;
 
         if (ResourceStatusEventHub.Instance != null)
         {

@@ -176,8 +176,12 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
             return;
         }
 
-        // 실제 인벤토리 추가 처리 연동
-        Debug.Log($"[NetworkGachaService] {cardState.DisplayName} 인벤토리 추가 요청");
+        bool isAdded = NetworkAugmentService.Instance.AddAugment(cardState.WeaponDataId);
+        if (isAdded == false)
+        {
+            UIManager.Instance.OpenExitConfirmPopup(null, null, "인벤토리에 빈 칸이 없습니다.");
+            return;
+        }
 
         UIManager.Instance.CloseWeaponGachaUI();
         UIManager.Instance.OpenExitConfirmPopup(null, null, "무기가 인벤토리로 들어갔습니다.");
