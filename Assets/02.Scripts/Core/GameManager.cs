@@ -34,20 +34,19 @@ public class GameManager : SingletonBase<GameManager>
     private int _sessionVersion;
     private float _playTime;
     private int _lastNotifiedTime;
-
+    private int _currentMapSize = 3;
 
     private readonly HashSet<StationObject> _completedStations = new();
     public int CompletedStationCount => _completedStations.Count;
 
     public int SessionKillCount => _sessionKillCount;
     public int SessionEarnedStone => _sessionEarnedStone;
+    public int RequiredStationCount => (_currentMapSize - 1) * 2;
 
-    public event Action<int> OnStationProgressChanged;
     public event Action<int> OnCountdownChanged;
     public event Action OnGameCleared;
 
-    public int RequiredStationCount => (_currentMapSize - 1) * 2;
-    private int _currentMapSize = 3;
+    public bool IsStageSelectUnlocked => Save != null && Save.HasClearedAllStagesSpecial;
 
     public static DataManager Data => DataManager.Instance;
     public static ResourceManager Resource => ResourceManager.Instance;
@@ -156,9 +155,13 @@ public class GameManager : SingletonBase<GameManager>
 
     private void SetGameStageForCheat(GameStage stage)
     {
-        _currentGameStage = stage;
-
+        SetGameStage(stage);
         Debug.Log($"[GameManager] 치트 적용: Stage {(int)_currentGameStage} 선택. 다음 게임은 {GetMapSize(_currentGameStage)}x{GetMapSize(_currentGameStage)} 맵으로 시작합니다.");
+    }
+
+    public void SetGameStage(GameStage stage)
+    {
+        _currentGameStage = stage;
     }
 
     public async UniTask StartGame()
@@ -174,17 +177,22 @@ public class GameManager : SingletonBase<GameManager>
         try
         {
             RefreshManagerHierarchy();
+
             if (!await EnsureGameDataLoadedAsync())
-            { 
+            {
                 return;
             }
 
+            await ShowFirstPlayNoticeIfNeededAsync();
+            Save?.IncreaseTotalPlayCount();
             ClearCurrentSession();
             ChangeGameState(GameState.Ready);
 
             NetworkResourceService.ResetRun();
             NetworkWarehouseService.ResetRun();
             NetworkRailService.ResetRun();
+            NetworkTrainStrengtheningService.ResetRun();
+            NetworkTrainCargeService.ResetRun();
 
             _currentMapSize = GetMapSize(_currentGameStage);
 
@@ -237,8 +245,6 @@ public class GameManager : SingletonBase<GameManager>
         _activeStation.ExitStation(stoneTaken, citizenBoarded);
 
         _completedStations.Add(_activeStation);
-        OnStationProgressChanged?.Invoke(CompletedStationCount);
-        ResourceStatusEventHub?.NotifyStationProgressChanged(CompletedStationCount, RequiredStationCount);
 
         _activeStation = null;
         UI?.CloseStationArrivalUI();
@@ -299,8 +305,7 @@ public class GameManager : SingletonBase<GameManager>
         ChangeGameState(GameState.GameOver);
         PauseGameplayTime();
 
-        int rescuedHumanCount = NetworkResourceService?.GetLocalResourceViewModel().RescuedHumanCount ?? 0;
-        NetworkUpgradeService?.GrantRescueReward(rescuedHumanCount);
+        FinalizeRunStatsAndGrantReward();
         OpenScoreReport(ScoreResultType.GameOver, ReturnToLobby);
     }
 
@@ -315,15 +320,16 @@ public class GameManager : SingletonBase<GameManager>
 
         GameStage clearedStage = _currentGameStage;
         float timeLimit = GetClearTimeLimit(clearedStage);
-        bool clearedInTime = _playTime <= timeLimit;
+        bool isClearedInTime = _playTime <= timeLimit;
+        bool isFinalStage = clearedStage >= GameStage.Stage3;
 
-        if (clearedInTime && clearedStage < GameStage.Stage3)
+        if (isClearedInTime && !isFinalStage)
         {
             _currentGameStage = (GameStage)((int)clearedStage + 1);
 
             Debug.Log($"[GameManager] Stage {(int)clearedStage} 클리어 성공. 기록: {_playTime:F1}초 / 제한: {timeLimit:F1}초. 다음 스테이지: {(int)_currentGameStage}");
         }
-        else if (!clearedInTime)
+        else if (!isClearedInTime)
         {
             Debug.Log($"[GameManager] Stage {(int)clearedStage}는 클리어했지만 제한 시간 초과: {_playTime:F1}초 / {timeLimit:F1}초. 다음 게임도 현재 스테이지입니다.");
         }
@@ -333,7 +339,110 @@ public class GameManager : SingletonBase<GameManager>
         }
 
         OnGameCleared?.Invoke();
-        OpenScoreReport(ScoreResultType.GameClear, ReturnToLobby);
+        FinalizeRunStatsAndGrantReward();
+
+        if (isClearedInTime)
+        {
+            if (isFinalStage && Save != null)
+            {
+                Save.HasClearedAllStagesSpecial = true;
+            }
+
+            OpenGameClearResultUI(clearedStage, isFinalStage, ReturnToLobby);
+        }
+        else
+        {
+            OpenScoreReport(ScoreResultType.GameClear, ReturnToLobby);
+        }
+    }
+
+    private void FinalizeRunStatsAndGrantReward()
+    {
+        int rescuedHumanCount = NetworkResourceService?.GetLocalResourceViewModel().RescuedHumanCount ?? 0;
+        int earnedCashCount = NetworkUpgradeService?.GrantRescueReward(rescuedHumanCount) ?? 0;
+
+        RunStatsSnapshot snapshot = BuildRunStatsSnapshot(rescuedHumanCount, earnedCashCount);
+        Save?.AddRunStatsToLifetime(snapshot);
+    }
+
+    private RunStatsSnapshot BuildRunStatsSnapshot(int rescuedHumanCount, int earnedCashCount)
+    {
+        RunStatsSnapshot snapshot = new RunStatsSnapshot();
+        snapshot.Distance = Train != null ? Train.GetHeadTrainDistance() : 0f;
+        snapshot.PlayTimeSeconds = _playTime;
+        snapshot.RescuedHumanCount = rescuedHumanCount;
+        snapshot.CollectedWoodCount = NetworkResourceService != null ? NetworkResourceService.SessionTotalWoodCollected : 0;
+        snapshot.CollectedStoneCount = NetworkResourceService != null ? NetworkResourceService.SessionTotalStoneCollected : 0;
+        snapshot.KillCount = _sessionKillCount;
+        snapshot.RailCraftedCount = NetworkRailService != null ? NetworkRailService.SessionCraftedCount : 0;
+        snapshot.RailInstalledCount = NetworkRailService != null ? NetworkRailService.SessionInstalledCount : 0;
+        snapshot.EarnedCashCount = earnedCashCount;
+
+        return snapshot;
+    }
+
+    private void OpenGameClearResultUI(GameStage clearedStage, bool isFinalStage, Action onConfirm)
+    {
+        GameClearResultData resultData = BuildGameClearResultData(clearedStage, isFinalStage);
+        UI?.OpenGameClearResultUI(resultData, onConfirm);
+    }
+
+    private GameClearResultData BuildGameClearResultData(GameStage clearedStage, bool isFinalStage)
+    {
+        GameClearResultData resultData = new GameClearResultData();
+        resultData.TotalDistance = Save != null ? Save.LifetimeTotalDistance : 0f;
+        resultData.PlayTimeSeconds = Save != null ? Save.LifetimeTotalPlayTimeSeconds : 0f;
+        resultData.RescuedHumanCount = Save != null ? Save.LifetimeTotalRescuedHumanCount : 0;
+        resultData.CollectedWoodCount = Save != null ? Save.LifetimeTotalCollectedWood : 0;
+        resultData.CollectedStoneCount = Save != null ? Save.LifetimeTotalCollectedStone : 0;
+        resultData.KillCount = Save != null ? Save.LifetimeTotalKillCount : 0;
+        resultData.RailCraftedCount = Save != null ? Save.LifetimeTotalRailCrafted : 0;
+        resultData.RailInstalledCount = Save != null ? Save.LifetimeTotalRailInstalled : 0;
+        resultData.EarnedCashCount = Save != null ? Save.LifetimeTotalEarnedCash : 0;
+        resultData.TotalPlayCount = Save != null ? Save.TotalPlayCount : 0;
+        resultData.TitleMessage = BuildGameClearTitleMessage(clearedStage, isFinalStage);
+        resultData.NextStageNoticeMessage = isFinalStage ? string.Empty : "다음 난이도의 특수 클리어 성공을 기원합니다.";
+        resultData.IsFinalStage = isFinalStage;
+
+        return resultData;
+    }
+
+    private string BuildGameClearTitleMessage(GameStage clearedStage, bool isFinalStage)
+    {
+        if (isFinalStage)
+        {
+            return "축하드립니다. 모든 매우 어려움 난이도 특수 클리어를 성공하셨습니다.\n이로써 모든 난이도 특수 클리어를 달성하셨습니다. 다시 한번 축하드립니다.";
+        }
+
+        GameStage nextStage = _currentGameStage;
+        return $"{GetStageDisplayName(clearedStage)} 난이도 특수 클리어에 성공하셨습니다.\n자동으로 게임 시작 시 {GetStageDisplayName(nextStage)} 난이도가 시작됩니다.";
+    }
+
+    private string GetStageDisplayName(GameStage stage)
+    {
+        return stage switch
+        {
+            GameStage.Stage1 => "보통",
+            GameStage.Stage2 => "어려움",
+            GameStage.Stage3 => "매우 어려움",
+            _ => stage.ToString()
+        };
+    }
+
+    private async UniTask ShowFirstPlayNoticeIfNeededAsync()
+    {
+        if (Save == null || Save.HasSeenFirstPlayNotice)
+        {
+            return;
+        }
+
+        const string message = "5분 안에 스테이션 4개를 모두 방문해 클리어하면\n다음 게임 시작 시 더 높은 난이도로 시작됩니다.";
+        bool isConfirmed = false;
+
+        UI?.OpenNoticePopup(message, () => isConfirmed = true);
+        await UniTask.WaitUntil(() => isConfirmed, cancellationToken: this.GetCancellationTokenOnDestroy());
+
+        Save.HasSeenFirstPlayNotice = true;
     }
 
     private void OpenScoreReport(ScoreResultType resultType, Action onConfirm)
@@ -506,9 +615,9 @@ public class GameManager : SingletonBase<GameManager>
 
         ChangeGameState(GameState.EventPaused);
 
-        OpenScoreReport(ScoreResultType.BaseArrival, OpenBaseArrivalAfterScore); Debug.Log("[GameManager] 터미널 도착: 출구 방향 선택을 기다립니다.");
-
         UI?.OpenBaseArrivalUI();
+        OpenScoreReport(ScoreResultType.BaseArrival, null);
+        Debug.Log("[GameManager] 터미널 도착: 출구 방향 선택을 기다립니다.");
         // TODO: Terminal UI를 열고 CentralTerminal.SelectExitGate(int)와 연결필요(?)
     }
 
@@ -649,7 +758,6 @@ public class GameManager : SingletonBase<GameManager>
         _sessionKillCount = 0;
         _sessionEarnedStone = 0;
         _completedStations.Clear();
-        OnStationProgressChanged?.Invoke(CompletedStationCount);
     }
 
     private void ClearCurrentSession()
@@ -672,6 +780,8 @@ public class GameManager : SingletonBase<GameManager>
         NetworkResourceService.ResetRun();
         NetworkWarehouseService.ResetRun();
         NetworkRailService.ResetRun();
+        NetworkTrainStrengtheningService.ResetRun();
+        NetworkTrainCargeService.ResetRun();
 
         UI?.CloseHudTrainStatusUI();
         UI?.CloseHudResourceUI();
