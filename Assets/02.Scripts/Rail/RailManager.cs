@@ -916,9 +916,70 @@ public class RailManager : SingletonBase<RailManager>
     {
         if (rail == null) return;
 
-        Transform railTrans = rail.transform;
-        _installedRailPath.Add(rail.transform);
-        ConnectStationRails(railTrans);
+        if (_installedRailPath.Count == 0)
+        {
+            _installedRailPath.Add(rail.transform);
+            ConnectStationRails(rail.transform);
+            PropagateConnectedRails();
+            return;
+        }
+
+        Transform lastRail = _installedRailPath[_installedRailPath.Count - 1];
+
+        Vector2Int lastGrid = WorldPointToGridIndex(lastRail.position);
+        Vector2Int newGrid = WorldPointToGridIndex(rail.transform.position);
+
+        int diffx = Mathf.Abs(newGrid.x - lastGrid.x);
+        int diffy = Mathf.Abs(newGrid.y - lastGrid.y);
+
+        if (diffx + diffy == 1)
+        {
+            if (!_installedRailPath.Contains(rail.transform))
+            {
+                _installedRailPath.Add(rail.transform);
+                ConnectStationRails(rail.transform);
+            }
+
+            PropagateConnectedRails();
+        }
+    }
+
+    // 끊긴 곳을 메꿨을 때 뒤에 이미 깔려있던 레일들을 순서대로 리스트에 추가해주는 함수
+    private void PropagateConnectedRails()
+    {
+        for (int step = 0; step < 100; step++)
+        {
+            if (_installedRailPath.Count == 0)
+            {
+                break;
+            }
+
+            Transform currentLast = _installedRailPath[_installedRailPath.Count - 1];
+            Vector2Int currentGrid = WorldPointToGridIndex(currentLast.position);
+            Transform nextFoundRail = null;
+
+            for (int dir = 0; dir < 4; dir++)
+            {
+                Vector2Int neighborGrid = currentGrid + _cardinalOffsets[dir];
+
+                if (_placedRails.TryGetValue(neighborGrid, out PlacedRailInfo info))
+                {
+                    if (info.Obj == null) continue;
+
+                    Transform candidate = info.Obj.transform;
+
+                    if (_installedRailPath.Contains(candidate)) continue;
+
+                    nextFoundRail = candidate;
+                    break;
+                }
+            }
+
+            if (nextFoundRail == null) break;
+
+            _installedRailPath.Add(nextFoundRail);
+            ConnectStationRails(nextFoundRail);
+        }
     }
 
     public Transform GetRailNode(int index)
