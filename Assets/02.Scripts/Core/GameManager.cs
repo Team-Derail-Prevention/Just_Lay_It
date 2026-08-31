@@ -620,11 +620,6 @@ public class GameManager : SingletonBase<GameManager>
         // TODO: Terminal UI를 열고 CentralTerminal.SelectExitGate(int)와 연결필요(?)
     }
 
-    private void OpenBaseArrivalAfterScore()
-    {
-        UI?.OpenBaseArrivalUI();
-    }
-
     private void RemoveCompletedStations()
     {
         foreach (StationObject station in _completedStations)
@@ -636,7 +631,7 @@ public class GameManager : SingletonBase<GameManager>
         }
     }
 
-    private void PauseGameplayTime()
+    public void PauseGameplayTime()
     {
         if (Time != null && !Time.IsPaused)
         {
@@ -650,7 +645,7 @@ public class GameManager : SingletonBase<GameManager>
         Debug.Log("[GameManager] 게임 시간을 일시정지했습니다.");
     }
 
-    private void ResumeGameplayTime()
+    public void ResumeGameplayTime()
     {
         if (Time != null)
         {
@@ -828,7 +823,10 @@ public class GameManager : SingletonBase<GameManager>
 
     private bool ValidateManager(Component manager, string managerName)
     {
-        if (manager != null) return true;
+        if (manager != null)
+        {
+            return true;
+        }
 
         Debug.LogError($"[GameManager] 필수 매니저 '{managerName}'를 찾지 못했습니다.");
         return false;

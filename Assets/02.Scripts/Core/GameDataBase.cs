@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 [Serializable]
 public class SerializationWrapper<T>
@@ -137,4 +138,13 @@ public class InGameUpgradeData : GameDataBase
     public int MaxLevel;
     public int BaseCost;
     public int CostIncreasePerLevel;
+}
+
+[Serializable]
+public class CameraData : GameDataBase
+{
+    public string offset;
+    public string fixedRotation;
+    public bool lookAtTarget;
+    public string AddressablePath;
 }

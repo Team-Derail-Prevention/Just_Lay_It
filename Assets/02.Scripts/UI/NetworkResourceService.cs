@@ -190,6 +190,12 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         return true;
     }
 
+    public bool HasEnoughStone(int amount)
+    {
+        var vm = GetLocalResourceViewModel();
+        return vm.CurrentStone >= amount;
+    }
+
     public bool TrySpendStone(int amount)
     {
         var vm = GetLocalResourceViewModel();

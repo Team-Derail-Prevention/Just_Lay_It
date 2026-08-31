@@ -19,5 +19,6 @@ public class SingletonBase<T> : MonoBehaviour where T : MonoBehaviour
             return;
         }
         _instance = this as T;
+        transform.SetParent(null);
     }
 }

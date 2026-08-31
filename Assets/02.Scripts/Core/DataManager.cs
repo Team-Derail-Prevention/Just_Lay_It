@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class DataManager : SingletonBase<DataManager>
 {
@@ -75,6 +76,7 @@ public class DataManager : SingletonBase<DataManager>
         await LoadDataAsync<WeaponData>("WeaponData", cancellationToken);
         await LoadDataAsync<InGameUpgradeData>("InGameUpgradeData", cancellationToken);
         await LoadDataAsync<LobbyUpgradeData>("LobbyUpgradeData", cancellationToken);
+        await LoadDataAsync<CameraData>("CameraData", cancellationToken);
 
         IsLoaded = true;
         OnDataLoadCompleted?.Invoke();

@@ -23,7 +23,10 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
 
     private void OnEnable()
     {
-        UpgradeEventHub.Instance.OnLobbyUpgraded += OnLobbyUpgraded;
+        if (UpgradeEventHub.Instance != null)
+        {
+            UpgradeEventHub.Instance.OnLobbyUpgraded += OnLobbyUpgraded;
+        }
     }
 
     private void OnDisable()
@@ -45,6 +48,12 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
+
+        if (UpgradeEventHub.Instance != null)
+        {
+            UpgradeEventHub.Instance.OnLobbyUpgraded -= OnLobbyUpgraded;
+            UpgradeEventHub.Instance.OnLobbyUpgraded += OnLobbyUpgraded;
+        }
     }
 
     public GachaViewModel GetLocalGachaViewModel()
@@ -78,6 +87,11 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
         }
 
         return _dataPool;
+    }
+
+    public IReadOnlyList<WeaponData> GetGachaWeaponPool()
+    {
+        return GetDataPool();
     }
 
     public bool OpenGachaBox()

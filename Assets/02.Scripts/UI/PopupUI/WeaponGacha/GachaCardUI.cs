@@ -6,17 +6,20 @@ using UnityEngine.UI;
 
 public class GachaCardUI : MonoBehaviour
 {
-    private const int ICON_STOP_INDEX = 3;
-
     [Header("BK")]
     [SerializeField] private GameObject GameObject_Frame;
     [SerializeField] private GameObject GameObject_TopBox;
 
     [Header("아이콘")]
     [SerializeField] private RectTransform Transform_IconRollContainer;
-    [SerializeField] private Image Image_IconFinalResult;
+    [SerializeField] private Image[] Image_IconRollSlots;
     [SerializeField] private float IconSlotHeight = 100f;
-    [SerializeField] private float SpinDuration = 1.2f;
+
+    [Header("슬롯머신 연출")]
+    [SerializeField] private int MinSpinTicks = 13;
+    [SerializeField] private int MaxSpinTicks = 26;
+    [SerializeField] private float TickDurationMin = 0.05f;
+    [SerializeField] private float TickDurationMax = 0.28f;
 
     [Header("이름/등급")]
     [SerializeField] private TextMeshProUGUI Text_Name;
@@ -95,24 +98,155 @@ public class GachaCardUI : MonoBehaviour
 
     private async UniTaskVoid PlayDrawAnimationAsync(float startDelay)
     {
-        _isSpinning = true;
-        SetRevealVisible(false);
+        var cancellationToken = this.GetCancellationTokenOnDestroy();
 
-        if (Transform_IconRollContainer != null)
+        try
         {
+            _isSpinning = true;
+            SetRevealVisible(false);
+
+            if (Transform_IconRollContainer != null)
+            {
+                Transform_IconRollContainer.anchoredPosition = Vector2.zero;
+            }
+
+            if (startDelay > 0f)
+            {
+                await UniTask.Delay(System.TimeSpan.FromSeconds(startDelay), ignoreTimeScale: true, cancellationToken: cancellationToken);
+            }
+
+            await PlaySlotMachineReelAsync(cancellationToken);
+            ApplyCardData();
+            SetRevealVisible(true);
+        }
+        catch (System.OperationCanceledException)
+        {
+            
+        }
+        catch (System.Exception ex)
+        {
+            
+            Debug.LogError($"[GachaCardUI] 카드 연출 중 예외가 발생했습니다: {ex}");
+            SetRevealVisible(true);
+        }
+        finally
+        {
+            _isSpinning = false;
+            RebindCardButtonEvents();
+        }
+    }
+
+    private async UniTask PlaySlotMachineReelAsync(System.Threading.CancellationToken cancellationToken)
+    {
+        if (Transform_IconRollContainer == null || Image_IconRollSlots == null || Image_IconRollSlots.Length == 0 || _cardState == null)
+        {
+            return;
+        }
+
+        var pool = NetworkGachaService.Instance.GetGachaWeaponPool();
+        if (pool == null || pool.Count == 0)
+        {
+            return;
+        }
+
+        var orderedPool = new System.Collections.Generic.List<WeaponData>(pool);
+        orderedPool.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
+
+        int winningIndex = orderedPool.FindIndex(data => data.Id == _cardState.WeaponDataId);
+        if (winningIndex < 0)
+        {
+            winningIndex = 0;
+        }
+
+        var sprites = new Sprite[orderedPool.Count];
+        for (int i = 0; i < orderedPool.Count; i++)
+        {
+            sprites[i] = await ResourceManager.Instance.LoadAsset<Sprite>(orderedPool[i].IconPath);
+        }
+
+        int totalTicks = UnityEngine.Random.Range(MinSpinTicks, MaxSpinTicks + 1);
+
+        Sprite GetSpriteAtStep(int step)
+        {
+            int index = ModIndex(winningIndex - (totalTicks - step), orderedPool.Count);
+            return sprites[index];
+        }
+
+        var slotList = new System.Collections.Generic.List<Image>(Image_IconRollSlots);
+        for (int i = 0; i < slotList.Count; i++)
+        {
+            slotList[i].transform.SetSiblingIndex(i);
+            slotList[i].sprite = GetSpriteAtStep(i);
+        }
+
+        Transform_IconRollContainer.anchoredPosition = Vector2.zero;
+
+        for (int tick = 1; tick <= totalTicks; tick++)
+        {
+            float ratio = (float)tick / totalTicks;
+            float eased = ratio * ratio; 
+            float tickDuration = Mathf.Lerp(TickDurationMin, TickDurationMax, eased);
+
+            await MoveContainerOneSlotAsync(tickDuration, cancellationToken);
+
+            if (Transform_IconRollContainer == null)
+            {
+                return;
+            }
+
+            Image recycled = slotList[0];
+            slotList.RemoveAt(0);
+            slotList.Add(recycled);
+            recycled.transform.SetAsLastSibling();
+            recycled.sprite = GetSpriteAtStep(tick + slotList.Count - 1);
+
             Transform_IconRollContainer.anchoredPosition = Vector2.zero;
         }
+    }
 
-        if (startDelay > 0f)
+    private async UniTask MoveContainerOneSlotAsync(float duration, System.Threading.CancellationToken cancellationToken)
+    {
+        float elapsed = 0f;
+        Vector2 startPos = Transform_IconRollContainer.anchoredPosition;
+        Vector2 endPos = startPos + new Vector2(0f, -IconSlotHeight);
+
+        while (elapsed < duration)
         {
-            await UniTask.Delay(System.TimeSpan.FromSeconds(startDelay));
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            Transform_IconRollContainer.anchoredPosition = Vector2.Lerp(startPos, endPos, t);
+
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+
+            if (Transform_IconRollContainer == null)
+            {
+                return;
+            }
         }
 
-        await PlayIconReelAsync();
-        await ApplyCardDataAsync();
+        Transform_IconRollContainer.anchoredPosition = endPos;
+    }
 
-        SetRevealVisible(true);
-        _isSpinning = false;
+    private int ModIndex(int value, int mod)
+    {
+        int r = value % mod;
+        return r < 0 ? r + mod : r;
+    }
+
+    private void RebindCardButtonEvents()
+    {
+        if (UIButton_RerollSingle != null)
+        {
+            UIButton_RerollSingle.UnBindAllOnClickButtonEvent();
+            UIButton_RerollSingle.BindOnClickButtonEvent(OnClick_Reroll);
+        }
+
+        if (UIButton_Select != null)
+        {
+            UIButton_Select.UnBindAllOnClickButtonEvent();
+            UIButton_Select.BindOnClickButtonEvent(OnClick_Select);
+        }
+
     }
 
     public void SetRerollInteractable(bool isInteractable)
@@ -123,35 +257,7 @@ public class GachaCardUI : MonoBehaviour
         }
     }
 
-    private async UniTask PlayIconReelAsync()
-    {
-        if (Transform_IconRollContainer == null)
-        {
-            return;
-        }
-
-        float startY = 0f;
-        float endY = -(IconSlotHeight * ICON_STOP_INDEX);
-        float elapsed = 0f;
-        Vector2 pos = Transform_IconRollContainer.anchoredPosition;
-
-        while (elapsed < SpinDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / SpinDuration);
-            float eased = 1f - Mathf.Pow(1f - t, 3f); // ease-out : 점점 느려지다 멈춤
-
-            pos.y = Mathf.Lerp(startY, endY, eased);
-            Transform_IconRollContainer.anchoredPosition = pos;
-
-            await UniTask.Yield();
-        }
-
-        pos.y = endY;
-        Transform_IconRollContainer.anchoredPosition = pos;
-    }
-
-    private async UniTask ApplyCardDataAsync()
+    private void ApplyCardData()
     {
         if (_cardState == null)
         {
@@ -177,15 +283,6 @@ public class GachaCardUI : MonoBehaviour
         if (Text_Description != null)
         {
             Text_Description.text = _cardState.Description;
-        }
-
-        if (Image_IconFinalResult != null && string.IsNullOrEmpty(_cardState.IconPath) == false)
-        {
-            var sprite = await ResourceManager.Instance.LoadAsset<Sprite>(_cardState.IconPath);
-            if (sprite != null && Image_IconFinalResult != null)
-            {
-                Image_IconFinalResult.sprite = sprite;
-            }
         }
     }
 
