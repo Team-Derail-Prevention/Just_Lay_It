@@ -953,9 +953,11 @@ public class RailManager : SingletonBase<RailManager>
         if (!_installedRailPath.Contains(placedRail)) return;
 
         Vector3 placedPos = placedRail.position;
+        Vector2Int placedGrid = WorldPointToGridIndex(placedPos);
 
-        Collider[] hits = Physics.OverlapSphere(placedPos, 1.0f);
+        Collider[] hits = Physics.OverlapSphere(placedPos, 2.5f);
         List<Transform> stationRailsToAppend = new List<Transform>();
+        HashSet<Transform> processedRoots = new HashSet<Transform>();
 
         for (int i = 0; i < hits.Length; i++)
         {
@@ -963,11 +965,27 @@ public class RailManager : SingletonBase<RailManager>
 
             if (_installedRailPath.Contains(hitTrans)) continue;
 
-            if (hits[i].name.Contains("AutoSpawned"))
+            bool isAutoSpawned = hitTrans.name.Contains("AutoSpawned") || (hitTrans.parent != null && hitTrans.parent.name.Contains("AutoSpawned"));
+
+            if (isAutoSpawned)
             {
-                Transform dirRoot = hitTrans.parent;
-                if (dirRoot != null)
+                Transform touchedRail = hitTrans.name.Contains("AutoSpawned") ? hitTrans : hitTrans.parent;
+                Vector2Int touchedGrid = WorldPointToGridIndex(touchedRail.position);
+
+                int diffX = Mathf.Abs(touchedGrid.x - placedGrid.x);
+                int diffY = Mathf.Abs(touchedGrid.y - placedGrid.y);
+
+                if (diffX + diffY != 1)
                 {
+                    continue;
+                }
+
+                Transform dirRoot = touchedRail.parent;
+
+                if (dirRoot != null && !processedRoots.Contains(dirRoot))
+                {
+                    processedRoots.Add(dirRoot);
+
                     for (int c = 0; c < dirRoot.childCount; c++)
                     {
                         Transform rail = dirRoot.GetChild(c);
@@ -976,7 +994,6 @@ public class RailManager : SingletonBase<RailManager>
                             stationRailsToAppend.Add(rail);
                         }
                     }
-                    break;
                 }
             }
         }
@@ -991,6 +1008,7 @@ public class RailManager : SingletonBase<RailManager>
             {
                 _installedRailPath.Add(stationRailsToAppend[i]);
             }
+            Debug.Log("[RailManager] 기차역 레일 연결성공");
         }
     }
 
@@ -1023,10 +1041,10 @@ public class RailManager : SingletonBase<RailManager>
         Vector2Int lastGrid = WorldPointToGridIndex(lastRail.position);
         Vector2Int newGrid = WorldPointToGridIndex(rail.transform.position);
 
-        int diffx = Mathf.Abs(newGrid.x - lastGrid.x);
-        int diffy = Mathf.Abs(newGrid.y - lastGrid.y);
+        int diffX = Mathf.Abs(newGrid.x - lastGrid.x);
+        int diffY = Mathf.Abs(newGrid.y - lastGrid.y);
 
-        if (diffx + diffy == 1)
+        if (diffX + diffY == 1)
         {
             if (!_installedRailPath.Contains(rail.transform))
             {
