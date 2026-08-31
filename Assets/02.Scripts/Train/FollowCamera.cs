@@ -59,7 +59,7 @@ public class FollowCamera : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (_target == null)
+        if (_target == null || _cameraPresets == null || _cameraPresets.Count == 0)
         {
             return;
         }
