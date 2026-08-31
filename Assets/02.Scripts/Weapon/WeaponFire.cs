@@ -60,6 +60,7 @@ public class WeaponFire : MonoBehaviour
             Debug.LogError("[WeaponFire] 데이터 매니저가 인스탄스 되어있지 않습니다");
             return;
         }
+
         LoadWeaponData();
         await RegisterProjectilePoolAsync();
         InitWeponLevel();
@@ -207,6 +208,7 @@ public class WeaponFire : MonoBehaviour
 
         if (_weaponData != null)
         {
+
             _baseAtk = _weaponData.Atk;
             _fireRate = _weaponData.FireRate;
             _magazineSize = _weaponData.MagazineSize;
