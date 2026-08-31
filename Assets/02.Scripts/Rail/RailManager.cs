@@ -189,6 +189,11 @@ public class RailManager : SingletonBase<RailManager>
             return;
         }
 
+        if (GameManager.Instance.CurrentGameState != GameState.Playing)
+        {
+            ExitPlaceMode();
+        }
+
         _currentRailType = railType;
         _isPlaceModeActive = true;
         _isConfirmPopupOpen = false;
@@ -800,10 +805,19 @@ public class RailManager : SingletonBase<RailManager>
 
         Quaternion newRotation = Quaternion.Euler(0f, newRotationStep * 90f, 0f);
 
-        AsyncOperationHandle<GameObject> handle = Addressables.InstantiateAsync(address, cubeInfo.Center, newRotation, Transform_RailRoot);
+        Transform parentForNewRail = (oldInfo.IsFixed && oldInfo.Obj != null)
+            ? oldInfo.Obj.transform.parent
+            : Transform_RailRoot;
+
+        AsyncOperationHandle<GameObject> handle = Addressables.InstantiateAsync(address, cubeInfo.Center, newRotation, parentForNewRail);
         GameObject spawnedRail = await handle.ToUniTask(cancellationToken: this.GetCancellationTokenOnDestroy());
 
         if (handle.Status != AsyncOperationStatus.Succeeded) return;
+
+        if (oldInfo.IsFixed)
+        {
+            spawnedRail.name = "AutoSpawned_" + newType.ToString() + "Rail";
+        }
 
         if (oldInfo.Obj != null)
         {
