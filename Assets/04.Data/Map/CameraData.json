@@ -9,21 +9,21 @@
   {
     "Id": "LeftView",
     "offset": "6, 12, -12",
-    "fixedRotation": "43, 0, -25",
+    "fixedRotation": "47.5, -26.5, 0",
     "lookAtTarget": false,
     "AddressablePath": "LeftView_001"
   },
   {
     "Id": "RightView",
     "offset": "-6, 12, -12",
-    "fixedRotation": "-55, 0, 0",
+    "fixedRotation": "47.5, 26.5, 0",
     "lookAtTarget": false,
     "AddressablePath": "RightView_001"
   },
   {
     "Id": "TopView",
-    "offset": "0, 15, -10",
-    "fixedRotation": "55, 0, 0",
+    "offset": "0, 18, -10",
+    "fixedRotation": "70, 0, 0",
     "lookAtTarget": false,
     "AddressablePath": "TopView_001"
   }
