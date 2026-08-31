@@ -137,17 +137,15 @@ public class SettingUI : UIBase
 
     private void OnClick_Reset()
     {
-        float defaultBgmVolume = 1f;
-        float defaultSfxVolume = 1f;
-        int defaultDisplayMode = 1;
+        SettingsSaveData defaults = new SettingsSaveData();
 
-        _sliderBgmVolume.value = defaultBgmVolume;
-        _sliderSfxVolume.value = defaultSfxVolume;
-        _dropdownDisplayMode.value = defaultDisplayMode;
+        _sliderBgmVolume.value = defaults.BgmVolume;
+        _sliderSfxVolume.value = defaults.SfxVolume;
+        _dropdownDisplayMode.value = defaults.DisplayMode;
 
-        ApplyBgmVolume(defaultBgmVolume);
-        ApplySfxVolume(defaultSfxVolume);
-        ApplyDisplayMode(defaultDisplayMode);
+        ApplyBgmVolume(defaults.BgmVolume);
+        ApplySfxVolume(defaults.SfxVolume);
+        ApplyDisplayMode(defaults.DisplayMode);
     }
 
     private void OnClick_Save()
