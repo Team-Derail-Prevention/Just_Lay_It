@@ -1,6 +1,8 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
+[DefaultExecutionOrder(-100)]
 public class BuildModeController : MonoBehaviour
 {
     [Header("참조")]
@@ -157,9 +159,16 @@ public class BuildModeController : MonoBehaviour
             _hasResourceUnderCursor = _cursor.TryGetCell(out Vector3 _, out MaterialObject _);
         }
 
+        bool isPointerOverUI = false;
+
+        if (EventSystem.current != null)
+        {
+            isPointerOverUI = EventSystem.current.IsPointerOverGameObject();
+        }
+
         if (RailManager.Instance != null)
         {
-            RailManager.Instance.SetHoverSuppressed(_hasResourceUnderCursor);
+            RailManager.Instance.SetHoverSuppressed(_hasResourceUnderCursor || isPointerOverUI);
         }
     }
 

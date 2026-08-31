@@ -45,6 +45,7 @@ public class GameManager : SingletonBase<GameManager>
 
     public event Action<int> OnCountdownChanged;
     public event Action OnGameCleared;
+    public event Action<GameState> OnGameStateChanged;
 
     public bool IsStageSelectUnlocked => Save != null && Save.HasClearedAllStagesSpecial;
 
@@ -839,6 +840,8 @@ public class GameManager : SingletonBase<GameManager>
     {
         _currentGameState = newState;
         Debug.Log($"[GameManager] 게임 상태 변경: {CurrentGameState}");
+
+        OnGameStateChanged?.Invoke(newState);
     }
 }
 
