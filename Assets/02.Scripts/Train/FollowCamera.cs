@@ -1,62 +1,169 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using UnityEngine;
 
 public class FollowCamera : MonoBehaviour
 {
+    [Header("Runtime Debug / Editable")]
+    [SerializeField] private Transform _debugTarget;
+    [SerializeField] private int _debugPresetIndex;
+    [SerializeField] private int _debugPresetCount;
+    [SerializeField] private string _debugPresetId;
+    [SerializeField] private Vector3 _debugOffset;
+    [SerializeField] private Vector3 _debugTargetPosition;
+    [SerializeField] private bool _debugLookAtTarget;
+    [SerializeField] private Vector3 _debugFixedRotation;
+
     [Header("Target Setting")]
-    [SerializeField] private Transform _target;             // 추적할 대상 (기차 머리)
+    [SerializeField] private Transform _target;
 
     [Header("Camera Position Offset")]
-    [SerializeField] private Vector3 _offset = new Vector3(0f, 15f, -10f); // 쿼터뷰 기본 거리/높이 (조절 가능)
-    [SerializeField] private float _smoothSpeed = 5f;        // 추적 부드러움 (수치가 클수록 딱 붙어감)
+    [SerializeField] private float _smoothSpeed = 5f;
 
-    [Header("Camera Rotation")]
-    [SerializeField] private bool _lookAtTarget = false;     // 타겟을 실시간으로 바라볼지 여부
-    [SerializeField] private Vector3 _fixedRotation = new Vector3(55f, 0f, 0f); // 각도 고정용 (lookAtTarget이 false일 때)
+    private List<CameraData> _cameraPresets = new List<CameraData>();
+    private int _currentPresetIndex = 0;
+
+    public event Action<int> OnPresetIndex;
 
     private void Start()
     {
-        // 고정 각도 모드라면 시작할 때 카메라 각도 세팅
-        if (!_lookAtTarget)
+        InitializeCameraPresetsAsync(this.GetCancellationTokenOnDestroy()).Forget();
+
+        if (_target == null && TrainManager.Instance != null)
         {
-            transform.rotation = Quaternion.Euler(_fixedRotation);
+            SetTarget(TrainManager.Instance.HeadTransform);
         }
     }
 
     private void OnEnable()
     {
-        // TrainManager의 소환 이벤트가 있다면 자동 구독
         TrainManager.OnTrainSpawn += SetTarget;
+        TrainManager.OnTrainRelocated += HandleTrainRelocated;
     }
 
     private void OnDisable()
     {
         TrainManager.OnTrainSpawn -= SetTarget;
+        TrainManager.OnTrainRelocated -= HandleTrainRelocated;
     }
 
-    // 오브젝트 이동 후 카메라가 따라가도록 LateUpdate 사용 (떨림 현상 방지)
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            CycleNextPreset();
+        }
+    }
+
     private void LateUpdate()
     {
-        if (_target == null) return;
+        if (_target == null)
+        {
+            return;
+        }
 
-        // 1. 목표 위치 계산 (타겟 위치 + 오프셋)
-        Vector3 targetPosition = _target.position + _offset;
+        CameraData current = _cameraPresets[_currentPresetIndex];
 
-        // 2. 부드럽게 이동 (Lerp)
+        Vector3 offsetVector = ParseVector3(current.offset);
+        Vector3 targetPosition = _target.position + offsetVector;
+
         transform.position = Vector3.Lerp(transform.position, targetPosition, _smoothSpeed * Time.deltaTime);
 
-        // 3. 회전 처리
-        if (_lookAtTarget)
+        if (current.lookAtTarget)
         {
             transform.LookAt(_target);
         }
         else
         {
-            transform.rotation = Quaternion.Euler(_fixedRotation);
+            Vector3 rotVector = ParseVector3(current.fixedRotation);
+            Quaternion targetRot = Quaternion.Euler(rotVector);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, _smoothSpeed * Time.deltaTime);
+        }
+
+        _debugTarget = _target;
+        _debugPresetIndex = _currentPresetIndex;
+        _debugPresetCount = _cameraPresets.Count;
+        _debugPresetId = current.Id;
+        _debugOffset = offsetVector;
+        _debugTargetPosition = targetPosition;
+        _debugLookAtTarget = current.lookAtTarget;
+        _debugFixedRotation = ParseVector3(current.fixedRotation);
+    }
+
+    private async UniTask InitializeCameraPresetsAsync(CancellationToken cancellationToken)
+    {
+        await UniTask.WaitUntil(() => GameManager.Data != null && GameManager.Data.IsLoaded,cancellationToken: cancellationToken);
+
+        IReadOnlyList<CameraData> dataList = GameManager.Data.GetAllData<CameraData>();
+
+        if (dataList == null || dataList.Count == 0)
+        {
+            Debug.LogWarning("[FollowCamera] CameraData가 비어 있습니다.");
+            return;
+        }
+
+        _cameraPresets = new List<CameraData>(dataList);
+        _currentPresetIndex = 0;
+
+        ApplyCurrentPresetRotation();
+        OnPresetIndex?.Invoke(_currentPresetIndex);
+    }
+
+    private void CycleNextPreset()
+    {
+        if (_cameraPresets.Count == 0)
+        {
+            return;
+        }
+
+            _currentPresetIndex = (_currentPresetIndex + 1) % _cameraPresets.Count;
+
+        OnPresetIndex?.Invoke(_currentPresetIndex);
+    }
+
+    private Vector3 ParseVector3(string s)
+    {
+        if (string.IsNullOrEmpty(s)) return Vector3.zero;
+
+        string[] split = s.Split(',');
+        if (split.Length == 3 &&
+            float.TryParse(split[0], out float x) &&
+            float.TryParse(split[1], out float y) &&
+            float.TryParse(split[2], out float z))
+        {
+            return new Vector3(x, y, z);
+        }
+
+        return Vector3.zero;
+    }
+
+    private void ApplyCurrentPresetRotation()
+    {
+        if (_cameraPresets.Count == 0)
+        {
+            return;
+        }
+
+        CameraData current = _cameraPresets[_currentPresetIndex];
+
+        if (!current.lookAtTarget)
+        {
+            transform.rotation = Quaternion.Euler(ParseVector3(current.fixedRotation));
         }
     }
 
     public void SetTarget(Transform targetTransform)
     {
         _target = targetTransform;
+    }
+
+    private void HandleTrainRelocated()
+    {
+        if (TrainManager.Instance != null)
+        {
+            SetTarget(TrainManager.Instance.HeadTransform);
+        }
     }
 }
