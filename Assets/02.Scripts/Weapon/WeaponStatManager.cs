@@ -70,8 +70,11 @@ public static class WeaponStatManager
         int magazineLevel = GetLobbyUpgradeLevel("LOBBY_WEAPON_MAGAZINE");
         int reloadLevel = GetLobbyUpgradeLevel("LOBBY_WEAPON_RELOAD");
         int rangeLevel = GetLobbyUpgradeLevel("LOBBY_WEAPON_RANGE");
+        int battleDamageLevel = GetLobbyUpgradeLevel("BATTLE_DAMAGE");
 
-        atk = weaponData.Atk + (atkLevel * weaponData.LobbyATKByLevel);
+        atk = weaponData.Atk
+            + (atkLevel * weaponData.LobbyATKByLevel)
+            + (battleDamageLevel * weaponData.InGameATKByLevel);
         fireRate = weaponData.FireRate;
         magazine = weaponData.MagazineSize + (magazineLevel * weaponData.LobbyMagazineByLevel);
         reload = Mathf.Max(0f, weaponData.ReloadTime - (reloadLevel * weaponData.LobbyReloadByLevel));
