@@ -847,6 +847,7 @@ GameObject:
   - component: {fileID: 4523906457424135640}
   - component: {fileID: 911853885252729923}
   - component: {fileID: 1109667046322424571}
+  - component: {fileID: 9084793432629457986}
   m_Layer: 0
   m_Name: Drone
   m_TagString: Drone
@@ -987,6 +988,30 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.4, y: 2.76, z: 1.4}
   m_Center: {x: 0, y: -1, z: 0}
+--- !u!114 &9084793432629457986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5543407445265190575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8bfc9b820db1994e93f946cb5676fbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LoopSoundSource
+  _address: Sfx/Drone/Propeller
+  _playOnEnable: 1
+  _baseVolume: 0.3
+  _minDistance: 3
+  _maxDistance: 25
+  _usePitchBySpeed: 1
+  _speedForMaxPitch: 12
+  _minPitch: 0.85
+  _maxPitch: 1.15
+  _pitchSmoothTime: 0.25
+  _randomizeStartTime: 1
+  _pitchOffsetRange: 0.06
 --- !u!1 &6690797270028158932
 GameObject:
   m_ObjectHideFlags: 0

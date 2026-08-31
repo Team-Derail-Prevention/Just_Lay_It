@@ -74,6 +74,11 @@ public class DroneRailDrop : MonoBehaviour
 
         transform.SetPositionAndRotation(_target, _rotation);
 
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlaySFXAt(SfxAddress.Drone.RailDrop, _target);
+        }
+
         if (_ghost != null)
         {
             Destroy(_ghost);
