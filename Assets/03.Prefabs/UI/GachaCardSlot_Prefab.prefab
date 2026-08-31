@@ -600,7 +600,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -922,11 +922,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6298734449718612745}
-  m_Father: {fileID: 2504867091196485070}
+  m_Father: {fileID: 664223959799109899}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -20, y: -160}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1903115570578330284
@@ -957,8 +957,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 29a0f19cdfcc900489bcbddac379b2a2, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1203,6 +1203,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6298734449718612745}
   - component: {fileID: 6769136902334733783}
+  - component: {fileID: 6167682296609826585}
   m_Layer: 5
   m_Name: Icon_Roll_Container
   m_TagString: Untagged
@@ -1231,8 +1232,8 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_SizeDelta: {x: 100, y: 0}
+  m_Pivot: {x: 0, y: 1}
 --- !u!114 &6769136902334733783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1251,7 +1252,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 0
+  m_Spacing: 10
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -1259,6 +1260,20 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &6167682296609826585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3578579914145468604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
 --- !u!1 &3633989445394554704
 GameObject:
   m_ObjectHideFlags: 0
@@ -1579,7 +1594,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 0.8225579, b: 0, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1766,7 +1781,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 0.8225579, b: 0, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1793,6 +1808,7 @@ GameObject:
   - component: {fileID: 5771896745012537580}
   - component: {fileID: 6348044463835226145}
   - component: {fileID: 7665811561277708439}
+  - component: {fileID: 272141173264246769}
   m_Layer: 5
   m_Name: Icon_Dummy_3
   m_TagString: Untagged
@@ -1857,6 +1873,26 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &272141173264246769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4712143833948659298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: 100
+  m_PreferredHeight: 100
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &4854420299289920929
 GameObject:
   m_ObjectHideFlags: 0
@@ -1885,7 +1921,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3901974212891986104}
   - {fileID: 4704812290501880765}
   - {fileID: 6951226895610436552}
   m_Father: {fileID: 2827630923507184465}
@@ -1906,7 +1941,7 @@ GameObject:
   - component: {fileID: 2827630923507184465}
   - component: {fileID: 600405571065059243}
   - component: {fileID: 6454178922477878608}
-  - component: {fileID: 7450031807775233533}
+  - component: {fileID: 641794712777980609}
   m_Layer: 5
   m_Name: GachaCard
   m_TagString: Untagged
@@ -1980,7 +2015,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
   m_HorizontalFit: 0
   m_VerticalFit: 2
---- !u!114 &7450031807775233533
+--- !u!114 &641794712777980609
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1992,12 +2027,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3cda90235f9ac740b96238d86b1c867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GachaCardUI
-  GameObject_Frame: {fileID: 2411687541343246642}
+  GameObject_Frame: {fileID: 6649301610204366768}
   GameObject_TopBox: {fileID: 3568225651956208214}
   Transform_IconRollContainer: {fileID: 6298734449718612745}
-  Image_IconFinalResult: {fileID: 2481855614534673971}
+  Image_IconRollSlots:
+  - {fileID: 389388664267848778}
+  - {fileID: 6137147076022164601}
+  - {fileID: 7665811561277708439}
+  - {fileID: 2481855614534673971}
   IconSlotHeight: 100
-  SpinDuration: 1.2
+  MinSpinTicks: 13
+  MaxSpinTicks: 26
+  TickDurationMin: 0.05
+  TickDurationMax: 0.28
   Text_Name: {fileID: 6258823055466077005}
   Text_Grade: {fileID: 8554758523126173833}
   GameObject_StatGroup: {fileID: 7818623202985559211}
@@ -2697,7 +2739,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2786,6 +2828,7 @@ GameObject:
   - component: {fileID: 2824736929978142213}
   - component: {fileID: 1794158326225707398}
   - component: {fileID: 6137147076022164601}
+  - component: {fileID: 6362168041932166692}
   m_Layer: 5
   m_Name: Icon_Dummy_2
   m_TagString: Untagged
@@ -2850,6 +2893,26 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6362168041932166692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6573427900559458957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: 100
+  m_PreferredHeight: 100
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &6649301610204366768
 GameObject:
   m_ObjectHideFlags: 0
@@ -3109,6 +3172,7 @@ GameObject:
   - component: {fileID: 6951200341303901917}
   - component: {fileID: 950372821961500349}
   - component: {fileID: 389388664267848778}
+  - component: {fileID: 4974299326540011412}
   m_Layer: 5
   m_Name: Icon_Dummy_1
   m_TagString: Untagged
@@ -3173,6 +3237,26 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4974299326540011412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7500920303383347031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: 100
+  m_PreferredHeight: 100
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &7814747935106273045
 GameObject:
   m_ObjectHideFlags: 0
@@ -3265,8 +3349,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
-  m_fontSizeBase: 28
+  m_fontSize: 18
+  m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3361,6 +3445,7 @@ GameObject:
   - component: {fileID: 2765144402458508947}
   - component: {fileID: 4594817680306310993}
   - component: {fileID: 2481855614534673971}
+  - component: {fileID: 4071493650068398665}
   m_Layer: 5
   m_Name: Icon_FinalResult
   m_TagString: Untagged
@@ -3425,6 +3510,26 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4071493650068398665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8019398836725439648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: 120
+  m_PreferredHeight: 120
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &8375062726310814803
 GameObject:
   m_ObjectHideFlags: 0
@@ -3774,6 +3879,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 530624700802650696}
+  - {fileID: 3901974212891986104}
   m_Father: {fileID: 2827630923507184465}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
