@@ -1,0 +1,30 @@
+﻿[
+  {
+    "Id": "BackView",
+    "offset": "0, 15, -10",
+    "fixedRotation": "55, 0, 0",
+    "lookAtTarget": false,
+    "AddressablePath": "BackView_001"
+  },
+  {
+    "Id": "LeftView",
+    "offset": "6, 12, -12",
+    "fixedRotation": "43, 0, -25",
+    "lookAtTarget": false,
+    "AddressablePath": "LeftView_001"
+  },
+  {
+    "Id": "RightView",
+    "offset": "-6, 12, -12",
+    "fixedRotation": "-55, 0, 0",
+    "lookAtTarget": false,
+    "AddressablePath": "RightView_001"
+  },
+  {
+    "Id": "TopView",
+    "offset": "0, 15, -10",
+    "fixedRotation": "55, 0, 0",
+    "lookAtTarget": false,
+    "AddressablePath": "TopView_001"
+  }
+]
