@@ -78,7 +78,10 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
         _slotState.PropertyChanged += OnPropertyChanged_View;
 
         SubscribeAugment(_slotState.Augment);
-        RefreshAll();
+
+        RefreshIcon();
+        RefreshLockedOverlay();
+        RefreshDescriptionIfVisible();
     }
 
     private void OnDisable()
@@ -98,9 +101,44 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
         {
             UnsubscribeAugment();
             SubscribeAugment(_slotState.Augment);
+            RefreshIcon();
         }
 
-        RefreshAll();
+        RefreshLockedOverlay();
+        RefreshDescriptionIfVisible();
+    }
+
+    private void RefreshLockedOverlay()
+    {
+        if (GameObject_LockedOverlay != null)
+        {
+            GameObject_LockedOverlay.SetActive(_slotState.IsLocked);
+        }
+    }
+
+    private void RefreshIcon()
+    {
+        bool isFilled = (_slotState.Augment != null);
+
+        if (Image_Icon != null)
+        {
+            Image_Icon.gameObject.SetActive(isFilled);
+
+            if (isFilled == true)
+            {
+                LoadIconAsync(_slotState.Augment.IconPath).Forget();
+            }
+        }
+    }
+
+    private void RefreshDescriptionIfVisible()
+    {
+        bool isFilled = (_slotState.Augment != null);
+
+        if (isFilled == true && GameObject_Description != null && GameObject_Description.activeSelf == true)
+        {
+            FillDescription(_slotState.Augment);
+        }
     }
 
     private void SubscribeAugment(AugmentSlotViewModel augment)
@@ -125,31 +163,7 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
 
     private void OnAugmentPropertyChanged_View(object sender, PropertyChangedEventArgs e)
     {
-        RefreshAll();
-    }
-
-    private void RefreshAll()
-    {
-        if (GameObject_LockedOverlay != null)
-        {
-            GameObject_LockedOverlay.SetActive(_slotState.IsLocked);
-        }
-
-        bool isFilled = (_slotState.Augment != null);
-        if (Image_Icon != null)
-        {
-            Image_Icon.gameObject.SetActive(isFilled);
-
-            if (isFilled == true)
-            {
-                LoadIconAsync(_slotState.Augment.IconPath).Forget();
-            }
-        }
-
-        if (isFilled == true && GameObject_Description != null && GameObject_Description.activeSelf == true)
-        {
-            FillDescription(_slotState.Augment);
-        }
+        RefreshDescriptionIfVisible();
     }
 
     private async UniTaskVoid LoadIconAsync(string iconPath)

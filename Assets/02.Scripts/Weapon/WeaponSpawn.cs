@@ -40,7 +40,7 @@ public class WeaponSpawn : SingletonBase<WeaponSpawn>
         TrainManager.OnTrainSpawn -= OnTrainSpawned;
     }
 
-    private void OnTrainSpawned(Transform headTransform)
+    private async void OnTrainSpawned(Transform headTransform)
     {
         if (_pendingInstallList.Count == 0)
         {
@@ -53,7 +53,7 @@ public class WeaponSpawn : SingletonBase<WeaponSpawn>
         for (int i = 0; i < retryList.Count; i++)
         {
             PendingWeaponInstall pending = retryList[i];
-            WeaponInstall(pending.Section, pending.SlotIndex, pending.WeaponDataId).Forget();
+            await WeaponInstall(pending.Section, pending.SlotIndex, pending.WeaponDataId);
         }
     }
 
@@ -67,7 +67,7 @@ public class WeaponSpawn : SingletonBase<WeaponSpawn>
         WeaponUninstall(section, slotIndex);
     }
 
-    public async UniTaskVoid WeaponInstall(TrainCarSection section, int slotIndex, string weaponDataId)
+    public async UniTask WeaponInstall(TrainCarSection section, int slotIndex, string weaponDataId)
     {
         if (IsTrainReady() == false)
         {
