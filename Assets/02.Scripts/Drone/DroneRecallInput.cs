@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class DroneClickCommand : MonoBehaviour
+public class DroneRecallInput : MonoBehaviour
 {
     [Header("참조")]
     [SerializeField] private DroneStateMachine _stateMachine;

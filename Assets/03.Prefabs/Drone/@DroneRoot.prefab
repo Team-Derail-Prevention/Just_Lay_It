@@ -1316,9 +1316,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3657333664035388163}
-  - component: {fileID: 6435067386499210825}
   - component: {fileID: 4834521238636214673}
-  - component: {fileID: 6818303143621790853}
   - component: {fileID: 2860943705096957870}
   - component: {fileID: 4905132489468571813}
   - component: {fileID: 3689241468954350394}
@@ -1348,18 +1346,6 @@ Transform:
   - {fileID: 5267874526434365686}
   m_Father: {fileID: 9165016977823284023}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6435067386499210825
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4689609326682118221}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 514d536047833fd47a72165f279b60b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DroneMoveInput
 --- !u!114 &4834521238636214673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1371,23 +1357,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f3d5601a8baca984190619ac08a0a87e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Drone
+  m_EditorClassIdentifier: Assembly-CSharp::DroneMoveController
   _moveSpeed: 12
   _slowDownDistance: 1.5
   _arriveSpeed: 0.5
   _arriveDistance: 0.05
---- !u!114 &6818303143621790853
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4689609326682118221}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7ea5e40fea4eab44a0d5254790796b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TransformMover
   _rotationSpeed: 15
   _acceleration: 12
   _deceleration: 18
@@ -2105,7 +2079,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aab2b54e8b10ff54ba75d4e5869c6c5b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DroneClickCommand
+  m_EditorClassIdentifier: Assembly-CSharp::DroneRecallInput
   _stateMachine: {fileID: 0}
   _recallKey: 36
 --- !u!114 &4052740878044825668
@@ -2211,9 +2185,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 633754365080438799}
-  - component: {fileID: 7153697640917347653}
   - component: {fileID: 8727222740839238301}
-  - component: {fileID: 7247843478675177353}
   - component: {fileID: 2143401779266624674}
   - component: {fileID: 8962121661737224018}
   - component: {fileID: 664325176744943670}
@@ -2243,18 +2215,6 @@ Transform:
   - {fileID: 8291626449251738618}
   m_Father: {fileID: 9165016977823284023}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7153697640917347653
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8871580532915186497}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 514d536047833fd47a72165f279b60b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DroneMoveInput
 --- !u!114 &8727222740839238301
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2266,23 +2226,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f3d5601a8baca984190619ac08a0a87e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Drone
+  m_EditorClassIdentifier: Assembly-CSharp::DroneMoveController
   _moveSpeed: 12
   _slowDownDistance: 1.5
   _arriveSpeed: 0.5
   _arriveDistance: 0.05
---- !u!114 &7247843478675177353
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8871580532915186497}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7ea5e40fea4eab44a0d5254790796b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TransformMover
   _rotationSpeed: 15
   _acceleration: 12
   _deceleration: 18

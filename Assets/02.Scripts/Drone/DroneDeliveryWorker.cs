@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Drone))]
+[RequireComponent(typeof(DroneMoveController))]
 public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 {
     private enum Phase
@@ -88,7 +88,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         }
     }
 
-    private Drone _drone;
+    private DroneMoveController _drone;
     private IAgentMover _mover;
     private DroneDockPoint _dockPoint;
 
@@ -100,8 +100,8 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
     private void Awake()
     {
-        _drone = GetComponent<Drone>();
-        _mover = GetComponent<IAgentMover>();
+        _drone = GetComponent<DroneMoveController>();
+        _mover = _drone.Mover;
 
         if (_dock != null)
         {

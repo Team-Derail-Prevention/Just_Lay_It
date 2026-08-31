@@ -23,9 +23,13 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
     private AugmentSlotViewModel _subscribedAugment;
     private RectTransform _rectTransform;
     private Canvas _rootCanvas;
+    private CanvasGroup _canvasGroup;
     private Vector2 _originalAnchoredPos;
     private Transform _originalParent;
+    private int _originalSiblingIndex;
     private bool _isDragging;
+    private GameObject _dragGhost;
+    private RectTransform _dragGhostRect;
 
 
     private RectTransform _descriptionRectTransform;
@@ -52,6 +56,12 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
     {
         _rectTransform = GetComponent<RectTransform>();
         _rootCanvas = GetComponentInParent<Canvas>();
+
+        _canvasGroup = GetComponent<CanvasGroup>();
+        if (_canvasGroup == null)
+        {
+            _canvasGroup = gameObject.AddComponent<CanvasGroup>(); 
+        }
 
         if (GameObject_Description != null)
         {
@@ -163,42 +173,56 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
             return;
         }
 
+        HideDescription();
         _isDragging = true;
-        _originalParent = transform.parent;
-        _originalAnchoredPos = _rectTransform.anchoredPosition;
+        _canvasGroup.alpha = 0.4f;
 
-        transform.SetParent(_rootCanvas.transform, true);
+        CreateDragGhost();
+    }
+
+    private void CreateDragGhost()
+    {
+        _dragGhost = new GameObject("DragGhost", typeof(RectTransform), typeof(CanvasGroup), typeof(Image));
+        _dragGhost.transform.SetParent(_rootCanvas.transform, false);
+        _dragGhost.transform.SetAsLastSibling();
+
+        _dragGhostRect = _dragGhost.GetComponent<RectTransform>();
+        _dragGhostRect.sizeDelta = _rectTransform.rect.size;
+        _dragGhostRect.position = _rectTransform.position;
+
+        Image ghostImage = _dragGhost.GetComponent<Image>();
+        ghostImage.sprite = Image_Icon.sprite;
+        ghostImage.preserveAspect = true;
+        ghostImage.raycastTarget = false; 
+
+        CanvasGroup ghostCanvasGroup = _dragGhost.GetComponent<CanvasGroup>();
+        ghostCanvasGroup.blocksRaycasts = false;
+        ghostCanvasGroup.alpha = 0.9f;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (_isDragging == false)
+        if (_isDragging == false || _dragGhostRect == null)
         {
             return;
         }
 
-        _rectTransform.position = eventData.position;
+        _dragGhostRect.position = eventData.position;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (_isDragging == false)
-        {
-            return;
-        }
+        if (_isDragging == false) return;
 
         _isDragging = false;
+        _canvasGroup.alpha = 1f;
 
-        if (transform.parent == _rootCanvas.transform)
+        if (_dragGhost != null)
         {
-            ReturnToOriginalPosition();
+            Destroy(_dragGhost);
+            _dragGhost = null;
+            _dragGhostRect = null;
         }
-    }
-
-    public void ReturnToOriginalPosition()
-    {
-        transform.SetParent(_originalParent, true);
-        _rectTransform.anchoredPosition = _originalAnchoredPos;
     }
 
     public void OnDrop(PointerEventData eventData)
@@ -215,8 +239,18 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
             return;
         }
 
-        NetworkAugmentService.Instance.RequestMove(draggedSlot.OwnerContainer, draggedSlot.SlotIndex, _ownerContainer, SlotIndex);
-        draggedSlot.ReturnToOriginalPosition();
+        HideDescription();
+        if (_slotState.IsLocked == true)
+        {
+            UIManager.Instance.OpenExitConfirmPopup(null, null, "아직 열리지 않은 칸입니다.");
+            return;
+        }
+
+        bool isMoved = NetworkAugmentService.Instance.RequestMove(draggedSlot.OwnerContainer, draggedSlot.SlotIndex, _ownerContainer, SlotIndex);
+        if (isMoved == false && _slotState.Augment != null)
+        {
+            UIManager.Instance.OpenExitConfirmPopup(null, null, "이미 다른 무기가 장착된 칸입니다.");
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -300,7 +334,7 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
         bool isInBottomHalf = (_rectTransform.position.y < Screen.height / 2f);
         float slotHeight = _rectTransform.rect.height;
         float descriptionHeight = _descriptionRectTransform != null ? _descriptionRectTransform.rect.height : 0f;
-        float yOffset = isInBottomHalf ? (slotHeight + descriptionHeight) : -(slotHeight + descriptionHeight);
+        float yOffset = isInBottomHalf ? (slotHeight / 2f + descriptionHeight / 2f) : -(slotHeight / 2f + descriptionHeight / 2f);
 
         Vector3 slotPosition = _rectTransform.position;
         GameObject_Description.transform.position = new Vector3(slotPosition.x, slotPosition.y + yOffset, slotPosition.z);
