@@ -841,9 +841,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4556377227261816289}
-  - component: {fileID: 6104355327753980075}
   - component: {fileID: 5687305354087018355}
-  - component: {fileID: 6009367539001793127}
   - component: {fileID: 3048629367149640012}
   - component: {fileID: 5453813953631740604}
   - component: {fileID: 4523906457424135640}
@@ -873,18 +871,6 @@ Transform:
   - {fileID: 4963471040753010196}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6104355327753980075
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5543407445265190575}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 514d536047833fd47a72165f279b60b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DroneMoveInput
 --- !u!114 &5687305354087018355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -896,23 +882,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f3d5601a8baca984190619ac08a0a87e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Drone
+  m_EditorClassIdentifier: Assembly-CSharp::DroneMoveController
   _moveSpeed: 12
   _slowDownDistance: 1.5
   _arriveSpeed: 0.5
   _arriveDistance: 0.05
---- !u!114 &6009367539001793127
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5543407445265190575}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7ea5e40fea4eab44a0d5254790796b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TransformMover
   _rotationSpeed: 15
   _acceleration: 12
   _deceleration: 18
@@ -1060,6 +1034,8 @@ MonoBehaviour:
   _carIndex: 1
   _localOffset: {x: 0, y: 2, z: 0}
   _topGap: 1
+  _orbitRadius: 2.5
+  _orbitSpeed: 25
 --- !u!1 &8137033883469855729
 GameObject:
   m_ObjectHideFlags: 0

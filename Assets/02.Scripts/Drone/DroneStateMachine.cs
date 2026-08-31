@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Drone))]
+[RequireComponent(typeof(DroneMoveController))]
 public class DroneStateMachine : MonoBehaviour, IDroneWorker
 {
     [Header("참조")]
@@ -17,7 +17,7 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
     public Transform Transform { get { return transform; } }
     public MaterialObject CurrentTarget { get { return _workTarget; } }
 
-    private Drone _drone;
+    private DroneMoveController _drone;
     private IAgentMover _mover;
     private DroneDockPoint _dockPoint;
 
@@ -27,8 +27,8 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
 
     private void Awake()
     {
-        _drone = GetComponent<Drone>();
-        _mover = GetComponent<IAgentMover>();
+        _drone = GetComponent<DroneMoveController>();
+        _mover = _drone.Mover;
 
         if (_dock != null)
         {
