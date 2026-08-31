@@ -328,14 +328,14 @@ public static class UIManagerExtension
             return;
         }
 
-        GameManager.Time?.Pause();
+        GameManager.Instance?.PauseGameplayTime();
     }
 
     public static void CloseInGameMenuPopup(this UIManager uiManager)
     {
         uiManager.ClosePopupUI(UIType.InGameMenuPopup);
 
-        GameManager.Time?.Resume();
+        GameManager.Instance?.ResumeGameplayTime();
     }
 
     public static void OpenAugmentInventoryUI(this UIManager uiManager)

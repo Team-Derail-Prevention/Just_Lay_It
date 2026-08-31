@@ -631,7 +631,7 @@ public class GameManager : SingletonBase<GameManager>
         }
     }
 
-    private void PauseGameplayTime()
+    public void PauseGameplayTime()
     {
         if (Time != null && !Time.IsPaused)
         {
@@ -645,7 +645,7 @@ public class GameManager : SingletonBase<GameManager>
         Debug.Log("[GameManager] 게임 시간을 일시정지했습니다.");
     }
 
-    private void ResumeGameplayTime()
+    public void ResumeGameplayTime()
     {
         if (Time != null)
         {
