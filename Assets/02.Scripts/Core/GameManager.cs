@@ -192,6 +192,8 @@ public class GameManager : SingletonBase<GameManager>
             NetworkRailService.ResetRun();
             NetworkTrainStrengtheningService.ResetRun();
             NetworkTrainCargeService.ResetRun();
+            NetworkAugmentService.ResetRun();
+            NetworkAugmentService.GrantRandomStartingWeapon();
 
             _currentMapSize = GetMapSize(_currentGameStage);
 
@@ -776,6 +778,7 @@ public class GameManager : SingletonBase<GameManager>
         NetworkRailService.ResetRun();
         NetworkTrainStrengtheningService.ResetRun();
         NetworkTrainCargeService.ResetRun();
+        NetworkAugmentService.ResetRun();
 
         UI?.CloseHudTrainStatusUI();
         UI?.CloseHudResourceUI();
