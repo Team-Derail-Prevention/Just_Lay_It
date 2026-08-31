@@ -12,21 +12,29 @@ public class ResourceManager : SingletonBase<ResourceManager>
     {
         if (_handles.TryGetValue(address, out AsyncOperationHandle handle))
         {
-            return handle.Result as T;
+            if (handle.IsValid() == false)
+            {
+                _handles.Remove(address);
+            }
+            else
+            {
+                T cachedResult = await handle.Convert<T>().ToUniTask();
+                return cachedResult;
+            }
         }
 
         AsyncOperationHandle<T> loadHandle = Addressables.LoadAssetAsync<T>(address);
+        _handles[address] = loadHandle;
 
         try
         {
             T result = await loadHandle.ToUniTask();
-
-            _handles[address] = loadHandle;
             return result;
         }
         catch (System.Exception e)
         {
             Debug.LogError($" [ResourceManager:LoadAsset] {address} / Error: {e.Message}");
+            _handles.Remove(address);
 
             if (loadHandle.IsValid())
             {
