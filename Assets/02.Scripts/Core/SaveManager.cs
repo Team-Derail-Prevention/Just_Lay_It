@@ -398,8 +398,8 @@ public class LifetimeStatsData
 [Serializable]
 public class SettingsSaveData
 {
-    public float BgmVolume = 1f;
-    public float SfxVolume = 1f;
+    public float BgmVolume = 0.5f;
+    public float SfxVolume = 0.5f;
     public int DisplayMode = 1;
 }
 
