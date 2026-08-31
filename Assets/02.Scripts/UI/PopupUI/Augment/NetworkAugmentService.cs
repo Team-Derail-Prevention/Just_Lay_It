@@ -21,6 +21,20 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
         DontDestroyOnLoad(gameObject);
     }
 
+    private void OnEnable()
+    {
+        AugmentStatEventHub.Instance.OnStatCalculated += OnStatCalculated;
+    }
+
+    private void OnDisable()
+    {
+        if (AugmentStatEventHub.Instance != null)
+        {
+            AugmentStatEventHub.Instance.OnStatCalculated -= OnStatCalculated;
+        }
+
+    }
+
     public AugmentInventoryViewModel GetLocalAugmentInventoryViewModel()
     {
         if (_localInventoryVm == null)
@@ -83,11 +97,21 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
             return false;
         }
 
+        WeaponData weaponData = DataManager.Instance.GetData<WeaponData>(augmentDataId);
+        if (weaponData == null)
+        {
+            Debug.LogWarning($"[NetworkAugmentService] 무기 데이터를 찾을 수 없습니다. (Id: {augmentDataId})");
+            return false;
+        }
+
         var augmentVm = new AugmentSlotViewModel();
         augmentVm.AugmentUniqueId = GenerateAugmentUniqueId();
         augmentVm.AugmentDataId = augmentDataId;
+        augmentVm.FillFromData(weaponData);
 
         emptySlot.Augment = augmentVm;
+
+        AugmentStatEventHub.Instance.NotifyStatRequested(augmentVm.AugmentUniqueId, augmentDataId);
         return true;
     }
 
@@ -195,9 +219,12 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
         var augmentVm = new AugmentSlotViewModel();
         augmentVm.AugmentUniqueId = GenerateAugmentUniqueId();
         augmentVm.AugmentDataId = pickedData.Id;
+        augmentVm.FillFromData(pickedData);
 
         slotState.Augment = augmentVm;
         WeaponEquipEventHub.Instance.NotifyWeaponEquipped(TrainCarSection.Head, 0, pickedData.Id);
+
+        AugmentStatEventHub.Instance.NotifyStatRequested(augmentVm.AugmentUniqueId, pickedData.Id);
     }
 
     private List<WeaponData> GetStartingWeaponPool()
@@ -218,5 +245,56 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
         }
 
         return commonWeaponList;
+    }
+
+    private void OnStatCalculated(long augmentUniqueId, WeaponCurrentStats stats)
+    {
+        AugmentSlotViewModel augmentVm = FindAugmentByUniqueId(augmentUniqueId);
+        if (augmentVm == null)
+        {
+            return;
+        }
+
+        augmentVm.SetStats(stats);
+    }
+
+    private AugmentSlotViewModel FindAugmentByUniqueId(long augmentUniqueId)
+    {
+        AugmentSlotViewModel found = FindAugmentInContainer(_localInventoryVm, augmentUniqueId);
+        if (found != null)
+        {
+            return found;
+        }
+
+        foreach (var equipVm in _localEquipVmDic.Values)
+        {
+            found = FindAugmentInContainer(equipVm, augmentUniqueId);
+            if (found != null)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
+    private AugmentSlotViewModel FindAugmentInContainer(AugmentSlotContainerViewModel container, long augmentUniqueId)
+    {
+        if (container == null)
+        {
+            return null;
+        }
+
+        int slotCount = container.GetSlotCount();
+        for (int i = 0; i < slotCount; i++)
+        {
+            AugmentSlotState slotState = container.GetSlot(i);
+            if (slotState != null && slotState.Augment != null && slotState.Augment.AugmentUniqueId == augmentUniqueId)
+            {
+                return slotState.Augment;
+            }
+        }
+
+        return null;
     }
 }
