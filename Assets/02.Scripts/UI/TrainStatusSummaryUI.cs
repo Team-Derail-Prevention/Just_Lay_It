@@ -67,7 +67,7 @@ public class TrainStatusSummaryUI : UIBase
     {
         if (Text_Hp != null)
         {
-            Text_Hp.text = $"{Mathf.RoundToInt(curHp)} / {Mathf.RoundToInt(maxHp)}";
+            Text_Hp.text = $"체력 : {Mathf.RoundToInt(curHp)} / {Mathf.RoundToInt(maxHp)}";
         }
     }
 
@@ -92,7 +92,7 @@ public class TrainStatusSummaryUI : UIBase
     {
         if (Text_Defense != null && TrainManager.Instance != null && TrainManager.Instance.ActiveTrain != null)
         {
-            Text_Defense.text = Mathf.RoundToInt(TrainManager.Instance.ActiveTrain.Defense).ToString();
+            Text_Defense.text = $"방어력 : {Mathf.RoundToInt(TrainManager.Instance.ActiveTrain.Defense).ToString()}";
         }
     }
 
@@ -100,17 +100,17 @@ public class TrainStatusSummaryUI : UIBase
     {
         if (Text_Amount != null && NetworkResourceService.Instance != null)
         {
-            Text_Amount.text = NetworkResourceService.Instance.CurrentCargoLoad.ToString();
+            Text_Amount.text = $"현재 적제량 : {NetworkResourceService.Instance.CurrentCargoLoad.ToString()}";
         }
 
         if (Text_Resource != null && NetworkResourceService.Instance != null)
         {
-            Text_Resource.text = NetworkResourceService.Instance.CargoLimit.ToString();
+            Text_Resource.text = $"적제 한계량 : {NetworkResourceService.Instance.CargoLimit.ToString()}";
         }
 
         if (Text_Boarding != null && NetworkTrainCargoService.Instance != null)
         {
-            Text_Boarding.text = $"{NetworkTrainCargoService.Instance.BoardedCitizenCount} / {NetworkTrainCargoService.Instance.BoardingLimit}";
+            Text_Boarding.text = $"탑승 가능 : {NetworkTrainCargoService.Instance.BoardedCitizenCount} / {NetworkTrainCargoService.Instance.BoardingLimit}";
         }
     }
 
@@ -123,17 +123,17 @@ public class TrainStatusSummaryUI : UIBase
 
         if (Text_CollectSpeed != null)
         {
-            Text_CollectSpeed.text = $"x{DroneManager.Instance.GatherSpeedMultiplier:0.00}";
+            Text_CollectSpeed.text = $"체집 속도 : x{DroneManager.Instance.GatherSpeedMultiplier:0.00}";
         }
 
         if (Text_CollectEfficiency != null)
         {
-            Text_CollectEfficiency.text = $"+{DroneManager.Instance.YieldBonus}";
+            Text_CollectEfficiency.text = $"체집 효율 : +{DroneManager.Instance.YieldBonus}";
         }
 
         if (Text_ActionSpeed != null)
         {
-            Text_ActionSpeed.text = $"x{DroneManager.Instance.MoveSpeedMultiplier:0.00}";
+            Text_ActionSpeed.text = $"행동 속도 : x{DroneManager.Instance.MoveSpeedMultiplier:0.00}";
         }
     }
 }
