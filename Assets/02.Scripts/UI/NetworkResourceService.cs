@@ -171,6 +171,38 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         return addable;
     }
 
+    public int AddStoneWithWarehouseOverflow(int amount)
+    {
+        int addable = Mathf.Min(amount, RemainingCargoCapacity);
+        int overflow = amount - addable;
+
+        if (addable > 0)
+        {
+            var vm = GetLocalResourceViewModel();
+            vm.CurrentStone += addable;
+            _sessionTotalStoneCollected += addable;
+
+            if (ResourceStatusEventHub.Instance != null)
+            {
+                ResourceStatusEventHub.Instance.NotifyStoneChanged(vm.CurrentStone);
+            }
+        }
+
+        if (overflow > 0)
+        {
+            if (NetworkWarehouseService.Instance != null)
+            {
+                NetworkWarehouseService.Instance.AddStoneDirect(overflow);
+            }
+            else
+            {
+                Debug.LogWarning($"[NetworkResourceService] 적재 한도 초과분({overflow})을 보관할 창고를 찾지 못했습니다.");
+            }
+        }
+
+        return addable + overflow;
+    }
+
     public bool TrySpendWood(int amount)
     {
         var vm = GetLocalResourceViewModel();

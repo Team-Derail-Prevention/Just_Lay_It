@@ -82,6 +82,11 @@ public static class WeaponStatManager
 
     public static int GetLobbyUpgradeLevel(string slotDataId)
     {
+        if (NetworkUpgradeService.Instance == null)
+        {
+            return 0;
+        }
+
         UpgradeViewModel upgradeValue = NetworkUpgradeService.Instance.GetLocalUpgradeViewModel();
         if (upgradeValue == null)
         {

@@ -7,6 +7,15 @@ public class WeaponStat : SingletonBase<WeaponStat>
         base.Init();
     }
 
+    private void Start()
+    {
+        if (AugmentStatEventHub.Instance != null)
+        {
+            AugmentStatEventHub.Instance.OnStatRequested -= HandleStatRequested;
+            AugmentStatEventHub.Instance.OnStatRequested += HandleStatRequested;
+        }
+    }
+
     private void OnEnable()
     {
         if (AugmentStatEventHub.Instance != null)
