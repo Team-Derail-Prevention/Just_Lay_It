@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class BaseArrivalUI : UIBase
 {
-    private const int REPAIR_HEAL_PERCENT = 10; // 임시 값 추후
-    private const int REPAIR_STONE_COST = 0; // 임시 값 추후
+    private const int REPAIR_HEAL_PERCENT = 20; // 임시 값 추후
+    private const int REPAIR_STONE_COST = 40; // 임시 값 추후
+    private const string InsufficientResourceMessage = "재화가 부족합니다.";
 
     [Header("자원 표시")]
     [SerializeField] private TextMeshProUGUI Text_Wood;
@@ -98,7 +99,7 @@ public class BaseArrivalUI : UIBase
 
     private void BindButtonDescriptionEvents()
     {
-        if (Button_WeaponGacha != null) Button_WeaponGacha.OnPointerEnterButton += OnButtonHoverEnter;
+        if (Button_WeaponGacha != null) Button_WeaponGacha.OnPointerEnterButton += OnWeaponGachaHoverEnter;
         if (Button_TrainStrengthening != null) Button_TrainStrengthening.OnPointerEnterButton += OnButtonHoverEnter;
         if (Button_Inventory != null) Button_Inventory.OnPointerEnterButton += OnButtonHoverEnter;
         if (Button_TrainRepair != null) Button_TrainRepair.OnPointerEnterButton += OnTrainRepairHoverEnter;
@@ -113,7 +114,7 @@ public class BaseArrivalUI : UIBase
 
     private void UnbindButtonDescriptionEvents()
     {
-        if (Button_WeaponGacha != null) Button_WeaponGacha.OnPointerEnterButton -= OnButtonHoverEnter;
+        if (Button_WeaponGacha != null) Button_WeaponGacha.OnPointerEnterButton -= OnWeaponGachaHoverEnter;
         if (Button_TrainStrengthening != null) Button_TrainStrengthening.OnPointerEnterButton -= OnButtonHoverEnter;
         if (Button_Inventory != null) Button_Inventory.OnPointerEnterButton -= OnButtonHoverEnter;
         if (Button_TrainRepair != null) Button_TrainRepair.OnPointerEnterButton -= OnTrainRepairHoverEnter;
@@ -148,6 +149,23 @@ public class BaseArrivalUI : UIBase
         }
 
         Text_BK.text = $"현재 열차의 체력은 {curHpPercent}% 입니다.\n열차 수리 한번당 가격 : 돌 {REPAIR_STONE_COST}개 이고 {REPAIR_HEAL_PERCENT}%의 체력을 회복합니다.";
+    }
+
+    private void OnWeaponGachaHoverEnter(string description)
+    {
+        if (Text_BK == null)
+        {
+            return;
+        }
+
+        if (NetworkGachaService.Instance == null)
+        {
+            Text_BK.text = description;
+            return;
+        }
+
+        int gachaCost = NetworkGachaService.Instance.CurrentGachaCost;
+        Text_BK.text = $"무기 가챠 1회 현재 가격 : 돌 {gachaCost}. \n열차에 장착할 수 있는 무기를 랜덤으로 3개 뽑고, 하나를 정해서 인벤토리로 가져갈 수 있습니다.\n무기 가챠 비용은 구매시마다 5씩 증가합니다.";
     }
 
     private void OnButtonHoverExit()
@@ -205,8 +223,30 @@ public class BaseArrivalUI : UIBase
         if (Text_Cash != null) Text_Cash.text = curCashCount.ToString();
     }
 
+    private bool TryValidateStoneCost(int cost)
+    {
+        if (NetworkResourceService.Instance == null)
+        {
+            return false;
+        }
+
+        if (NetworkResourceService.Instance.HasEnoughStone(cost) == false)
+        {
+            UIManager.Instance.OpenExitConfirmPopup(null, null, InsufficientResourceMessage);
+            return false;
+        }
+
+        return true;
+    }
+
     private void OnClick_WeaponGacha()
     {
+        int cost = NetworkGachaService.Instance.CurrentGachaCost;
+        if (TryValidateStoneCost(cost) == false)
+        {
+            return;
+        }
+
         UIManager.Instance.OpenWeaponGachaUI();
     }
 
@@ -222,8 +262,27 @@ public class BaseArrivalUI : UIBase
 
     private void OnClick_TrainRepair()
     {
-        // TODO : TrainRepair 로직 정해지면 연동
-        Debug.Log($"[BaseArrivalUI] TrainRepair 아직 미구현 (수리 {REPAIR_HEAL_PERCENT}%, 가격 {REPAIR_STONE_COST})");
+        if (TryValidateStoneCost(REPAIR_STONE_COST) == false)
+        {
+            return;
+        }
+
+        if (GameManager.Train != null && GameManager.Train.IsTrainHpFull())
+        {
+            UIManager.Instance.OpenExitConfirmPopup(null, null, "열차 체력이 이미 가득 찼습니다!");
+            return;
+        }
+
+        bool isSpent = NetworkResourceService.Instance.TrySpendStone(REPAIR_STONE_COST);
+        if (isSpent == false)
+        {
+            Debug.LogWarning("[BaseArrivalUI] 재화 검증 이후 소모에 실패했습니다. 상태를 확인해주세요.");
+            return;
+        }
+
+        GameManager.Train.HealActiveTrain(REPAIR_HEAL_PERCENT);
+
+        Debug.Log($"[BaseArrivalUI] 수리 요청 완료 (최대 체력의 {REPAIR_HEAL_PERCENT}% 회복), 돌 {REPAIR_STONE_COST} 소모");
     }
 
     private void OnClick_TrainDeparture()

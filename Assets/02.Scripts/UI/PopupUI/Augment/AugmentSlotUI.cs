@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 
 public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler,IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
@@ -19,14 +20,17 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
 
     private AugmentSlotState _slotState;
     private AugmentSlotContainerViewModel _ownerContainer;
+    private AugmentSlotViewModel _subscribedAugment;
     private RectTransform _rectTransform;
     private Canvas _rootCanvas;
     private Vector2 _originalAnchoredPos;
     private Transform _originalParent;
     private bool _isDragging;
 
+
     private RectTransform _descriptionRectTransform;
     private Transform _descriptionOriginalParent;
+
 
     public int SlotIndex
     {
@@ -63,6 +67,7 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
         _ownerContainer = ownerContainer;
         _slotState.PropertyChanged += OnPropertyChanged_View;
 
+        SubscribeAugment(_slotState.Augment);
         RefreshAll();
     }
 
@@ -73,10 +78,42 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
             _slotState.PropertyChanged -= OnPropertyChanged_View;
         }
 
+        UnsubscribeAugment();
         HideDescription();
     }
 
     private void OnPropertyChanged_View(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(AugmentSlotState.Augment))
+        {
+            UnsubscribeAugment();
+            SubscribeAugment(_slotState.Augment);
+        }
+
+        RefreshAll();
+    }
+
+    private void SubscribeAugment(AugmentSlotViewModel augment)
+    {
+        if (augment == null)
+        {
+            return;
+        }
+
+        augment.PropertyChanged += OnAugmentPropertyChanged_View;
+        _subscribedAugment = augment;
+    }
+
+    private void UnsubscribeAugment()
+    {
+        if (_subscribedAugment != null)
+        {
+            _subscribedAugment.PropertyChanged -= OnAugmentPropertyChanged_View;
+            _subscribedAugment = null;
+        }
+    }
+
+    private void OnAugmentPropertyChanged_View(object sender, PropertyChangedEventArgs e)
     {
         RefreshAll();
     }
@@ -93,7 +130,24 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
         {
             Image_Icon.gameObject.SetActive(isFilled);
 
-            // 무기 증강 정해지면 ResourceManager로 로드 추후 수정
+            if (isFilled == true)
+            {
+                LoadIconAsync(_slotState.Augment.IconPath).Forget();
+            }
+        }
+
+        if (isFilled == true && GameObject_Description != null && GameObject_Description.activeSelf == true)
+        {
+            FillDescription(_slotState.Augment);
+        }
+    }
+
+    private async UniTaskVoid LoadIconAsync(string iconPath)
+    {
+        Sprite sprite = await ResourceManager.Instance.LoadAsset<Sprite>(iconPath);
+        if (Image_Icon != null)
+        {
+            Image_Icon.sprite = sprite;
         }
     }
 
@@ -192,59 +246,46 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
             return;
         }
 
-        FillDescription(_slotState.Augment.AugmentDataId);
+        FillDescription(_slotState.Augment);
         ShowDescription();
     }
 
-    private void FillDescription(string weaponDataId)
+    private void FillDescription(AugmentSlotViewModel augment)
     {
-        /*
-        WeaponStatSnapshot stat = WeaponFire.GetCurrentStats(weaponDataId);
-        if (stat == null)
-        {
-            return;
-        }
-
         if (Text_NameGrade != null)
         {
-            Text_NameGrade.text = $"{stat.WeaponName} ({stat.GradeName})";
+            Text_NameGrade.text = $"{augment.DisplayName} ({augment.GradeName})";
         }
 
         if (Text_Atk != null)
         {
-            Text_Atk.text = $"{stat.Atk}";
+            Text_Atk.text = augment.IsStatReady ? $"{augment.Atk}" : "-";
         }
 
         if (Text_Range != null)
         {
-            Text_Range.text = $"{stat.Range}";
+            Text_Range.text = augment.IsStatReady ? $"{augment.Range}" : "-";
         }
 
         if (Text_FireRate != null)
         {
-            Text_FireRate.text = $"{stat.FireRate}";
+            Text_FireRate.text = augment.IsStatReady ? $"{augment.FireRate}" : "-";
         }
 
         if (Text_ReloadTime != null)
         {
-            Text_ReloadTime.text = $"{stat.ReloadTime}";
+            Text_ReloadTime.text = augment.IsStatReady ? $"{augment.ReloadTime}" : "-";
         }
 
         if (Text_MagazineSize != null)
         {
-            Text_MagazineSize.text = $"{stat.MagazineSize}";
+            Text_MagazineSize.text = augment.IsStatReady ? $"{augment.MagazineSize}" : "-";
         }
 
         if (Text_Price != null)
         {
-            Text_Price.text = $"{weaponData.Price}";
+            Text_Price.text = $"{augment.Price}";
         }
-
-        if (Text_Price != null)
-        {
-            Text_Price.text = $"{stat.Price}";
-        }
-        */
     }
 
     public void OnPointerExit(PointerEventData eventData)

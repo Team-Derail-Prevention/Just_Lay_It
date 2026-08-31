@@ -9006,7 +9006,6 @@ MonoBehaviour:
   Text_Amount: {fileID: 3353385261866593659}
   Text_Resource: {fileID: 1013890392902346390}
   Text_Boarding: {fileID: 2439744699921207671}
-  Text_Installation: {fileID: 7693575050589283394}
   Text_CollectSpeed: {fileID: 9205248805072350054}
   Text_CollectEfficiency: {fileID: 6933883712206187762}
   Text_ActionSpeed: {fileID: 5402692116587191933}
@@ -9677,8 +9676,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
-  m_fontSizeBase: 28
+  m_fontSize: 26
+  m_fontSizeBase: 26
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
