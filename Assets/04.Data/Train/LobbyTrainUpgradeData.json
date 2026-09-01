@@ -1,0 +1,26 @@
+[
+  {
+    "Id": "LOBBY_TRAIN_MAX_HP",
+    "Name": "열차 체력 증가",
+    "Description": "기차의 기본 최대 체력을 영구적으로 증가시킵니다. (+50)",
+    "TargetStatType": "MaxHp",
+    "Operation": "Add",
+    "Value": 50,
+    "MaxLevel": 4,
+    "GoldCost": 100,
+    "GoldCostPerLevel": 50,
+    "IconPath": "null"
+  },
+  {
+    "Id": "LOBBY_TRAIN_DEFENSE",
+    "Name": "열차 방어력 증가",
+    "Description": "기차의 기본 방어력을 영구적으로 증가시킵니다. (+2)",
+    "TargetStatType": "Defense",
+    "Operation": "Add",
+    "Value": 2,
+    "MaxLevel": 4,
+    "GoldCost": 150,
+    "GoldCostPerLevel": 75,
+    "IconPath": "null"
+  }
+]
