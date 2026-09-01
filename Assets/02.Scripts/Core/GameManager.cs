@@ -59,6 +59,7 @@ public class GameManager : SingletonBase<GameManager>
     public static DroneManager Drone => DroneManager.Instance;
     public static UIManager UI => UIManager.Instance;
     public static SaveManager Save => SaveManager.Instance;
+    public static WeaponStatManager Weapon => WeaponStatManager.Instance;
     public static TimeManager Time => Instance != null ? Instance._timeManager : null;
 
     public static MaterialTransferEventHub MaterialTransferEventHub => MaterialTransferEventHub.Instance;
@@ -488,6 +489,7 @@ public class GameManager : SingletonBase<GameManager>
         SetManagerParent(Monster);
         SetManagerParent(Drone);
         SetManagerParent(Save);
+        SetManagerParent(Weapon);
     }
 
     public void RefreshManagerHierarchy()

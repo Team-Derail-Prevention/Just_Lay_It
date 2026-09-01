@@ -1037,6 +1037,8 @@ public class RailManager : SingletonBase<RailManager>
                 _installedRailPath.Add(stationRailsToAppend[i]);
             }
             Debug.Log("[RailManager] 기차역 레일 연결성공");
+            SoundManager.Instance?.PlaySFX(SfxAddress.Train.Arrive);
+            DroneManager.Instance?.RecallAll();
         }
     }
 
