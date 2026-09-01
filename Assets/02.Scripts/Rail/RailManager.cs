@@ -13,7 +13,6 @@ public enum RailType
 public class RailManager : SingletonBase<RailManager>
 {
     [Header("Refs")]
-    [SerializeField] private Camera Camera_Main;
     [SerializeField] private LayerMask _groundLayer;
     [SerializeField] private LayerMask _blockedLayer; // 오브젝트가 올라간 바닥(Default) 레이어
     [SerializeField] private Transform Transform_MapRoot;
@@ -33,6 +32,21 @@ public class RailManager : SingletonBase<RailManager>
     public float GhostAlpha { get { return _ghostAlpha; } }
 
     public bool IsPlaceModeActive { get { return _isPlaceModeActive; } }
+
+
+    //카메라 자동 등록
+    private Camera _mainCamera;
+    public Camera Camera_Main
+    {
+        get
+        {
+            if (_mainCamera == null)
+            {
+                _mainCamera = Camera.main;
+            }
+            return _mainCamera;
+        }
+    }
 
     private RailType _currentRailType = RailType.Straight;
 
@@ -93,6 +107,7 @@ public class RailManager : SingletonBase<RailManager>
             MapManager_Ref.OnMapGenerated += HandleMapGenerated;
         }
     }
+   
 
     private void Start()
     {
@@ -450,6 +465,9 @@ public class RailManager : SingletonBase<RailManager>
 
     private void UpdateHover()
     {
+        //카메라 자동 등록
+        if (Camera_Main == null) return;
+
         Ray ray = Camera_Main.ScreenPointToRay(Input.mousePosition);
         Plane groundPlane = new Plane(Vector3.up, new Vector3(0f, _groundPlaneY, 0f));
 
