@@ -50,12 +50,16 @@ public class GameClearResultUI : UIBase
     [SerializeField] private RectTransform _viewportRect;
     [SerializeField] private RectTransform _scrollContent;
     [SerializeField, Min(0f)] private float _creditsScrollSpeed = 60f;
+    [SerializeField, Min(0f)] private float _scrollStartDelay = 5f;
 
+    private float _enableElapsedTime;
     private readonly GameClearResultViewModel _viewModel = new GameClearResultViewModel();
     private Action _onConfirm;
 
     private void OnEnable()
     {
+        _enableElapsedTime = 0f;
+
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
         RefreshAllTexts();
     }
@@ -71,6 +75,12 @@ public class GameClearResultUI : UIBase
         if (isEnterPressed == true)
         {
             OnConfirm();
+            return;
+        }
+
+        _enableElapsedTime += Time.deltaTime; 
+        if (_enableElapsedTime < _scrollStartDelay) 
+        {
             return;
         }
 

@@ -84,6 +84,24 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
         RefreshDescriptionIfVisible();
     }
 
+    private void OnEnable()
+    {
+        if (_slotState == null)
+        {
+            return;
+        }
+
+        _slotState.PropertyChanged -= OnPropertyChanged_View; 
+        _slotState.PropertyChanged += OnPropertyChanged_View;
+
+        SubscribeAugment(_slotState.Augment);
+
+        RefreshIcon();
+        RefreshLockedOverlay();
+        RefreshDescriptionIfVisible();
+    }
+
+
     private void OnDisable()
     {
         if (_slotState != null)
@@ -123,11 +141,39 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
         if (Image_Icon != null)
         {
             Image_Icon.gameObject.SetActive(isFilled);
+            Debug.Log($"[AugmentSlotUI] SetActive({isFilled}) 호출됨\n{System.Environment.StackTrace}");
 
-            if (isFilled == true)
+            if (isFilled == false)
+            {
+                Image_Icon.sprite = null;
+            }
+            else
             {
                 LoadIconAsync(_slotState.Augment.IconPath).Forget();
             }
+        }
+    }
+
+    private void TryReloadMissingIcon()
+    {
+        if (_slotState == null)
+        {
+            return;
+        }
+
+        if (_slotState.Augment == null)
+        {
+            return;
+        }
+
+        if (Image_Icon == null)
+        {
+            return;
+        }
+
+        if (Image_Icon.sprite == null)
+        {
+            LoadIconAsync(_slotState.Augment.IconPath).Forget();
         }
     }
 
@@ -168,10 +214,11 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
 
     private async UniTaskVoid LoadIconAsync(string iconPath)
     {
-        Sprite sprite = await ResourceManager.Instance.LoadAsset<Sprite>(iconPath);
-        if (Image_Icon != null)
+        Sprite sprite = await ResourceManager.Instance.LoadAssetWithRetry<Sprite>(iconPath);
+        if (Image_Icon != null && sprite != null)
         {
             Image_Icon.sprite = sprite;
+            Image_Icon.gameObject.SetActive(true);
         }
     }
 

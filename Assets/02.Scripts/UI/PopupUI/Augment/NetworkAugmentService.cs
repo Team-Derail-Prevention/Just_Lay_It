@@ -19,13 +19,18 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
+
+        if (AugmentStatEventHub.Instance != null)
+        {
+            AugmentStatEventHub.Instance.OnStatCalculated -= OnStatCalculated;
+            AugmentStatEventHub.Instance.OnStatCalculated += OnStatCalculated;
+        }
     }
 
     private void OnEnable()
     {
         if (AugmentStatEventHub.Instance != null)
         {
-            AugmentStatEventHub.Instance.OnStatCalculated -= OnStatCalculated;
             AugmentStatEventHub.Instance.OnStatCalculated += OnStatCalculated;
         }
     }
