@@ -279,7 +279,7 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!1001 &630776818
+--- !u!1001 &148326830
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -287,25 +287,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2594106013847594870, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
-      propertyPath: Camera_Main
-      value: 
-      objectReference: {fileID: 45642483}
     - target: {fileID: 5135570578148450497, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
       propertyPath: m_Name
       value: NeedGame
       objectReference: {fileID: 0}
     - target: {fileID: 5348495112963776683, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.26621
+      value: 1.08874
       objectReference: {fileID: 0}
     - target: {fileID: 5348495112963776683, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5348495112963776683, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.78534
+      value: 7.05696
       objectReference: {fileID: 0}
     - target: {fileID: 5348495112963776683, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -336,8 +332,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects:
-    - {fileID: 7910819472740257061, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
@@ -501,5 +496,5 @@ SceneRoots:
   m_Roots:
   - {fileID: 45642484}
   - {fileID: 1458767299}
-  - {fileID: 630776818}
   - {fileID: 1925273252}
+  - {fileID: 148326830}
