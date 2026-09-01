@@ -115,7 +115,12 @@ public class GachaCardUI : MonoBehaviour
                 await UniTask.Delay(System.TimeSpan.FromSeconds(startDelay), ignoreTimeScale: true, cancellationToken: cancellationToken);
             }
 
+            SoundManager.Instance?.PlaySFX(SfxAddress.Ui.GachaSpin);
+
             await PlaySlotMachineReelAsync(cancellationToken);
+
+            SoundManager.Instance?.PlaySFX(SfxAddress.Ui.WeaponPick);
+
             ApplyCardData();
             SetRevealVisible(true);
         }

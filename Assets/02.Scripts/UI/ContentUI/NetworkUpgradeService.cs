@@ -6,7 +6,8 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
     private bool _isSlotsCreated;
 
     [Header("보상 설정")]
-    [SerializeField] private int _cashPerRescuedCitizen = 100;
+    private const int RESCUE_REWARD_BASE = 100;
+    private const int RESCUE_REWARD_STEP = 5;
 
     private void Start()
     {
@@ -96,18 +97,11 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
         slotVm.LevelUp();
         ApplyEffect(slotDataId, slotVm.CurrentLevel);
 
-        // 저장 관련 정해지면 추후 수정
-
         return true;
     }
 
     private void ApplyEffect(string slotDataId, int newLevel)
     {
-        if (slotDataId == "LOBBY_RESCUE_REWARD")
-        {
-            _cashPerRescuedCitizen += 5;
-        }
-
         UpgradeEventHub.Instance.NotifyLobbyUpgraded(slotDataId, newLevel);
     }
 
@@ -123,8 +117,6 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
         int refundAmount = CalcRefundAmount(slotVm);
         slotVm.LevelDown();
         vm.GainCash(refundAmount);
-
-        // 저장 관련 정해지면 추후 수정
 
         return true;
     }
@@ -158,8 +150,6 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
                 vm.GainCash(refundAmount);
             }
         }
-
-        // 저장 관련 정해지면 추후 수정
     }
 
     private int CalcRefundAmount(UpgradeSlotViewModel slotVm)
@@ -171,8 +161,6 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
     {
         var vm = GetLocalUpgradeViewModel();
         vm.GainCash(amount);
-
-        // 저장 관련 정해지면 추후 수정
     }
 
     public int GrantRescueReward(int rescuedHumanCount)
@@ -182,7 +170,7 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
             return 0;
         }
 
-        int rewardCash = rescuedHumanCount * _cashPerRescuedCitizen;
+        int rewardCash = rescuedHumanCount * GetCashPerRescuedCitizen();
         GainCash(rewardCash);
 
         Debug.Log($"[NetworkUpgradeService] 구출한 시민 {rescuedHumanCount}명 → 보상 캐쉬 {rewardCash} 지급");
@@ -190,14 +178,9 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
         return rewardCash;
     }
 
-    public object GetSaveData()
+    private int GetCashPerRescuedCitizen()
     {
-        // 저장 관련 정해지면 추후 수정
-        return null;
-    }
-
-    public void LoadSaveData(object saveData)
-    {
-        // 저장 관련 정해지면 추후 수정
+        int level = GetLocalUpgradeViewModel().GetSlot("LOBBY_RESCUE_REWARD")?.CurrentLevel ?? 0;
+        return RESCUE_REWARD_BASE + (level * RESCUE_REWARD_STEP);
     }
 }
