@@ -147,10 +147,10 @@ public class WeaponFire : MonoBehaviour
             return;
         }
 
-        int reloadLevel = WeaponStatManager.GetLobbyUpgradeLevel("LOBBY_WEAPON_RELOAD");
-        int magazineLevel = WeaponStatManager.GetLobbyUpgradeLevel("LOBBY_WEAPON_MAGAZINE");
-        int atkLevel = WeaponStatManager.GetLobbyUpgradeLevel("LOBBY_WEAPON_ATK");
-        int rangeLevel = WeaponStatManager.GetLobbyUpgradeLevel("LOBBY_WEAPON_RANGE");
+        int reloadLevel = WeaponStat.GetLobbyUpgradeLevel("LOBBY_WEAPON_RELOAD");
+        int magazineLevel = WeaponStat.GetLobbyUpgradeLevel("LOBBY_WEAPON_MAGAZINE");
+        int atkLevel = WeaponStat.GetLobbyUpgradeLevel("LOBBY_WEAPON_ATK");
+        int rangeLevel = WeaponStat.GetLobbyUpgradeLevel("LOBBY_WEAPON_RANGE");
 
         _reloadTime = Mathf.Max(0f, _reloadTime - (reloadLevel * _weaponData.LobbyReloadByLevel));
         _magazineSize += magazineLevel * _weaponData.LobbyMagazineByLevel;

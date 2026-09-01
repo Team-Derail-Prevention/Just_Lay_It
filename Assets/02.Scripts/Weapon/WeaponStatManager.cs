@@ -1,107 +1,46 @@
-﻿using Cysharp.Threading.Tasks.Triggers;
-using UnityEngine;
+﻿using UnityEngine;
 
-public struct WeaponLobbyStats
+public class WeaponStatManager : SingletonBase<WeaponStatManager>
 {
-    public int Atk;
-    public float FireRate;
-    public int MagazineSize;
-    public float ReloadTime;
-    public float Range;
-}
-
-public static class WeaponStatManager
-{
-    public static WeaponLobbyStats GetLobbyStats(string weaponId)
+    protected override void Init()
     {
-        WeaponLobbyStats stats = default;
-
-        if (!TryCalculate(weaponId, out int atk, out float fireRate, out int magazine, out float reload, out float range))
-        {
-            return stats;
-        }
-
-        stats.Atk = atk;
-        stats.FireRate = fireRate;
-        stats.MagazineSize = magazine;
-        stats.ReloadTime = reload;
-        stats.Range = range;
-
-        return stats;
+        base.Init();
     }
 
-    // 무기 Id만으로 스탯 계산 (장착 여부 무관, 미리보기/상점 UI용)
-    public static bool TryGetCurrentWeaponStats(string weaponId, out WeaponCurrentStats stats)
+    private void Start()
     {
-        stats = default;
-
-        if (!TryCalculate(weaponId, out int atk, out float fireRate, out int magazine, out float reload, out float range))
+        if (AugmentStatEventHub.Instance != null)
         {
-            return false;
+            AugmentStatEventHub.Instance.OnStatRequested -= HandleStatRequested;
+            AugmentStatEventHub.Instance.OnStatRequested += HandleStatRequested;
         }
-
-        stats.Atk = atk;
-        stats.FireRate = fireRate;
-        stats.MagazineSize = magazine;
-        stats.ReloadTime = reload;
-        stats.Range = range;
-        stats.CurrentAmmo = magazine;
-
-        return true;
     }
 
-    // 공통 계산 로직 (GetLobbyStats / TryGetCalculatedStats가 함께 사용)
-    private static bool TryCalculate(string weaponId, out int atk, out float fireRate, out int magazine, out float reload, out float range)
+    private void OnEnable()
     {
-        atk = 0;
-        fireRate = 0f;
-        magazine = 0;
-        reload = 0f;
-        range = 0f;
-
-        WeaponData weaponData = DataManager.Instance.GetData<WeaponData>(weaponId);
-        if (weaponData == null)
+        if (AugmentStatEventHub.Instance != null)
         {
-            Debug.LogError($"[WeaponStatManager] {weaponId} 무기 데이터를 찾을 수 없습니다");
-            return false;
+            AugmentStatEventHub.Instance.OnStatRequested += HandleStatRequested;
         }
-
-        int atkLevel = GetLobbyUpgradeLevel("LOBBY_WEAPON_ATK");
-        int magazineLevel = GetLobbyUpgradeLevel("LOBBY_WEAPON_MAGAZINE");
-        int reloadLevel = GetLobbyUpgradeLevel("LOBBY_WEAPON_RELOAD");
-        int rangeLevel = GetLobbyUpgradeLevel("LOBBY_WEAPON_RANGE");
-        int battleDamageLevel = GetLobbyUpgradeLevel("BATTLE_DAMAGE");
-
-        atk = weaponData.Atk
-            + (atkLevel * weaponData.LobbyATKByLevel)
-            + (battleDamageLevel * weaponData.InGameATKByLevel);
-        fireRate = weaponData.FireRate;
-        magazine = weaponData.MagazineSize + (magazineLevel * weaponData.LobbyMagazineByLevel);
-        reload = Mathf.Max(0f, weaponData.ReloadTime - (reloadLevel * weaponData.LobbyReloadByLevel));
-        range = weaponData.Range + (rangeLevel * weaponData.LobbyRangeByLevel);
-
-        return true;
     }
 
-    public static int GetLobbyUpgradeLevel(string slotDataId)
+    private void OnDisable()
     {
-        if (NetworkUpgradeService.Instance == null)
+        if (AugmentStatEventHub.Instance != null)
         {
-            return 0;
+            AugmentStatEventHub.Instance.OnStatRequested -= HandleStatRequested;
         }
+    }
 
-        UpgradeViewModel upgradeValue = NetworkUpgradeService.Instance.GetLocalUpgradeViewModel();
-        if (upgradeValue == null)
+    private void HandleStatRequested(long augmentUniqueId, string weaponDataId)
+    {
+        if (WeaponStat.TryGetCurrentWeaponStats(weaponDataId, out WeaponCurrentStats stats))
         {
-            return 0;
+            AugmentStatEventHub.Instance.NotifyStatCalculated(augmentUniqueId, stats);
         }
-
-        UpgradeSlotViewModel slotValue = upgradeValue.GetSlot(slotDataId);
-        if (slotValue == null)
+        else
         {
-            return 0;
+            Debug.LogWarning($"[WeaponStat] {weaponDataId} 스탯 계산 실패");
         }
-
-        return slotValue.CurrentLevel;
     }
 }
