@@ -19,18 +19,13 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
-
-        if (AugmentStatEventHub.Instance != null)
-        {
-            AugmentStatEventHub.Instance.OnStatCalculated -= OnStatCalculated;
-            AugmentStatEventHub.Instance.OnStatCalculated += OnStatCalculated;
-        }
     }
 
     private void OnEnable()
     {
         if (AugmentStatEventHub.Instance != null)
         {
+            AugmentStatEventHub.Instance.OnStatCalculated -= OnStatCalculated;
             AugmentStatEventHub.Instance.OnStatCalculated += OnStatCalculated;
         }
     }
@@ -236,7 +231,6 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
         List<WeaponData> pool = GetStartingWeaponPool();
         if (pool.Count == 0)
         {
-            Debug.LogWarning("[NetworkAugmentService] 기본 지급용 무기 데이터가 없습니다.");
             return;
         }
 

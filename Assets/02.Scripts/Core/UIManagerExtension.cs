@@ -42,6 +42,7 @@ public enum UIType
     NoticePopup,
     GameClearResultUI,
     StageSelectPopup,
+    HudViewControlUI,
 }
 public static class UIManagerExtension
 {
@@ -93,7 +94,6 @@ public static class UIManagerExtension
             return;
         }
 
-        // 실제 로딩 추후 수정
         await GameManager.Instance.StartGame();
 
         if (loadingUI != null)
@@ -111,10 +111,9 @@ public static class UIManagerExtension
             return;
         }
 
-        const string message = "5분 안에 스테이션 4개를 모두 방문해 클리어하면\n다음 게임 시작 시 더 높은 난이도로 시작됩니다.";
         bool isConfirmed = false;
 
-        uiManager.OpenNoticePopup(message, () => isConfirmed = true);
+        uiManager.OpenNoticePopup(() => isConfirmed = true);
         await Cysharp.Threading.Tasks.UniTask.WaitUntil(() => isConfirmed, cancellationToken: uiManager.GetCancellationTokenOnDestroy());
 
         SaveManager.Instance.HasSeenFirstPlayNotice = true;
@@ -144,7 +143,7 @@ public static class UIManagerExtension
                 isDecided = true;
             });
 
-        await Cysharp.Threading.Tasks.UniTask.WaitUntil(() => isDecided);
+        await Cysharp.Threading.Tasks.UniTask.WaitUntil(() => isDecided, cancellationToken: uiManager.GetCancellationTokenOnDestroy());
 
         return selectedStage;
     }
@@ -302,6 +301,23 @@ public static class UIManagerExtension
     public static void CloseHudMinimapUI(this UIManager uiManager)
     {
         uiManager.CloseMainUI(UIType.HudMinimapUI);
+    }
+
+    public static HudViewControlUI OpenHudViewControlUI(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenMainUI(UIType.HudViewControlUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("HudViewControlUI가 생성되지 않았습니다");
+            return null;
+        }
+
+        return uiBase as HudViewControlUI;
+    }
+
+    public static void CloseHudViewControlUI(this UIManager uiManager)
+    {
+        uiManager.CloseMainUI(UIType.HudViewControlUI);
     }
 
     public static void OpenInGameMenuButtonUI(this UIManager uiManager)
@@ -519,7 +535,7 @@ public static class UIManagerExtension
         uiManager.CloseMainUI(UIType.RailPlaceConfirmPopup);
     }
 
-    public static void OpenNoticePopup(this UIManager uiManager, string message, Action onConfirm)
+    public static void OpenNoticePopup(this UIManager uiManager, Action onConfirm)
     {
         var uiBase = uiManager.OpenPopupUI(UIType.NoticePopup);
         if (uiBase == null)
@@ -530,7 +546,7 @@ public static class UIManagerExtension
 
         if (uiBase is NoticePopupUI noticePopup)
         {
-            noticePopup.Init(message, onConfirm);
+            noticePopup.Init(onConfirm);
         }
     }
 

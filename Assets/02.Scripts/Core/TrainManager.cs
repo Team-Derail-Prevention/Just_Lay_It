@@ -43,7 +43,7 @@ public class TrainManager : SingletonBase<TrainManager>
         SpawnTerminalTrainAsync(carriageCount).Forget();
     }
 
-    private async UniTaskVoid SpawnTerminalTrainAsync(int carriageCount)
+    public async UniTask SpawnTerminalTrainAsync(int carriageCount)
     {
         CentralTerminal terminal = GameManager.Map.MapRoot.GetComponentInChildren<CentralTerminal>();
 

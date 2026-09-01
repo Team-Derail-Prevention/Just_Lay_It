@@ -21,7 +21,7 @@ public class AugmentSlotState : ViewModelBase
         }
     }
 
-    private AugmentSlotViewModel _augment; // null이면 빈 칸
+    private AugmentSlotViewModel _augment;
     public AugmentSlotViewModel Augment
     {
         get
@@ -30,6 +30,11 @@ public class AugmentSlotState : ViewModelBase
         }
         set
         {
+            if (ReferenceEquals(_augment, value) == true)
+            {
+                return;
+            }
+
             _augment = value;
             OnPropertyChanged(nameof(Augment));
         }

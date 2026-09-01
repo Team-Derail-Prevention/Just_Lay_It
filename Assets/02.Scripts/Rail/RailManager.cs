@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -41,8 +41,11 @@ public class RailManager : SingletonBase<RailManager>
     private float _gridOriginZ;
     private float _groundPlaneY;
 
+    //출발한 역/터미널의 루트를 기억 (출발지 역 전체의 오감지 방지)
+    private Transform _departureStationRoot;
+    private Transform _currentDepartureGateRoot;
+
     private HashSet<Vector2Int> _installedCubes = new HashSet<Vector2Int>();
-    private HashSet<Transform> _registeredRails = new HashSet<Transform>();
 
     private struct PlacedRailInfo
     {
@@ -958,12 +961,13 @@ public class RailManager : SingletonBase<RailManager>
     private void ConnectStationRails(Transform placedRail)
     {
         if (placedRail == null) return;
-        if (!_installedRailPath.Contains(placedRail)) return;
+        if (_installedRailPath.Count == 0) return;
+        if (_installedRailPath[_installedRailPath.Count - 1] != placedRail) return;
 
         Vector3 placedPos = placedRail.position;
         Vector2Int placedGrid = WorldPointToGridIndex(placedPos);
 
-        Collider[] hits = Physics.OverlapSphere(placedPos, 2.5f);
+        Collider[] hits = Physics.OverlapSphere(placedPos, 1.2f);
         List<Transform> stationRailsToAppend = new List<Transform>();
         HashSet<Transform> processedRoots = new HashSet<Transform>();
 
@@ -978,17 +982,33 @@ public class RailManager : SingletonBase<RailManager>
             if (isAutoSpawned)
             {
                 Transform touchedRail = hitTrans.name.Contains("AutoSpawned") ? hitTrans : hitTrans.parent;
-                Vector2Int touchedGrid = WorldPointToGridIndex(touchedRail.position);
+                Transform dirRoot = touchedRail.parent;
 
-                int diffX = Mathf.Abs(touchedGrid.x - placedGrid.x);
-                int diffY = Mathf.Abs(touchedGrid.y - placedGrid.y);
-
-                if (diffX + diffY != 1)
+                if (_currentDepartureGateRoot != null && dirRoot == _currentDepartureGateRoot)
                 {
                     continue;
                 }
 
-                Transform dirRoot = touchedRail.parent;
+                if (_departureStationRoot != null && dirRoot != null && dirRoot.IsChildOf(_departureStationRoot))
+                {
+                    int playerRailCount = _installedRailPath.Count - (_currentDepartureGateRoot != null ? _currentDepartureGateRoot.childCount : 0);
+                    if (playerRailCount < 3)
+                    {
+                        continue;
+                    }
+
+                }
+
+                Vector2Int touchedGrid = WorldPointToGridIndex(touchedRail.position);
+                int diffX = Mathf.Abs(touchedGrid.x - placedGrid.x);
+                int diffY = Mathf.Abs(touchedGrid.y - placedGrid.y);
+
+                float worldDist = Vector3.Distance(placedPos, touchedRail.position);
+                if (diffX + diffY != 1 && worldDist > 1.2f)
+                {
+                    continue;
+                }
+
 
                 if (dirRoot != null && !processedRoots.Contains(dirRoot))
                 {
@@ -1023,13 +1043,19 @@ public class RailManager : SingletonBase<RailManager>
     public void InitStartingRailPath(Transform dirRoot)
     {
         _installedRailPath.Clear();
+        _currentDepartureGateRoot = dirRoot;
         if (dirRoot == null) return;
+        if (dirRoot != null)
+        {
+            _departureStationRoot = dirRoot.parent != null ? dirRoot.parent : dirRoot;
+        }
 
         for (int i = 0; i < dirRoot.childCount; i++)
         {
             Transform rail = dirRoot.GetChild(i);
             _installedRailPath.Add(rail);
         }
+        Debug.Log($"[RailManager] 시작 출구 레일 {_installedRailPath.Count}개 등록 완료");
     }
 
     private void AddRailToPath(GameObject rail)
@@ -1039,28 +1065,31 @@ public class RailManager : SingletonBase<RailManager>
         if (_installedRailPath.Count == 0)
         {
             _installedRailPath.Add(rail.transform);
-            ConnectStationRails(rail.transform);
-            PropagateConnectedRails();
-            return;
         }
-
-        Transform lastRail = _installedRailPath[_installedRailPath.Count - 1];
-
-        Vector2Int lastGrid = WorldPointToGridIndex(lastRail.position);
-        Vector2Int newGrid = WorldPointToGridIndex(rail.transform.position);
-
-        int diffX = Mathf.Abs(newGrid.x - lastGrid.x);
-        int diffY = Mathf.Abs(newGrid.y - lastGrid.y);
-
-        if (diffX + diffY == 1)
+        else
         {
-            if (!_installedRailPath.Contains(rail.transform))
+            Transform lastRail = _installedRailPath[_installedRailPath.Count - 1];
+            Vector2Int lastGrid = WorldPointToGridIndex(lastRail.position);
+            Vector2Int newGrid = WorldPointToGridIndex(rail.transform.position);
+
+            int diffX = Mathf.Abs(newGrid.x - lastGrid.x);
+            int diffY = Mathf.Abs(newGrid.y - lastGrid.y);
+
+            if (diffX + diffY == 1)
             {
-                _installedRailPath.Add(rail.transform);
-                ConnectStationRails(rail.transform);
+                if (!_installedRailPath.Contains(rail.transform))
+                {
+                    _installedRailPath.Add(rail.transform);
+
+                }
             }
 
             PropagateConnectedRails();
+
+            if (_installedRailPath.Count > 0)
+            {
+                ConnectStationRails(_installedRailPath[_installedRailPath.Count - 1]);
+            }
         }
     }
 
@@ -1085,6 +1114,8 @@ public class RailManager : SingletonBase<RailManager>
                 if (_placedRails.TryGetValue(neighborGrid, out PlacedRailInfo info))
                 {
                     if (info.Obj == null) continue;
+
+                    if (info.IsFixed) continue;
 
                     Transform candidate = info.Obj.transform;
 

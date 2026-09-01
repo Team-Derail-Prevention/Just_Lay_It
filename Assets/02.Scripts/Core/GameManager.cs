@@ -194,7 +194,6 @@ public class GameManager : SingletonBase<GameManager>
             NetworkTrainStrengtheningService.ResetRun();
             NetworkTrainCargeService.ResetRun();
             NetworkAugmentService.ResetRun();
-            NetworkAugmentService.GrantRandomStartingWeapon();
 
             _currentMapSize = GetMapSize(_currentGameStage);
 
@@ -221,7 +220,8 @@ public class GameManager : SingletonBase<GameManager>
                 await Drone.SpawnAllAsync();
             }
 
-            Train.SpawnTerminalTrain(_startingCarriageCount);
+            await Train.SpawnTerminalTrainAsync(_startingCarriageCount);
+            NetworkAugmentService.GrantRandomStartingWeapon();
 
             ChangeGameState(GameState.EventPaused);
             Debug.Log("[GameManager] 맵, 기차, 몬스터 스폰 완료");

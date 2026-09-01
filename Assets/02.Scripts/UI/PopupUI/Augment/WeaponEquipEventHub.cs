@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using Enums;
 using System;
-using Enums;
+using UnityEngine;
+using UnityEngine.InputSystem.LowLevel;
 
 public class WeaponEquipEventHub : SingletonBase<WeaponEquipEventHub>
 {
-    public event Action<TrainCarSection, int, string> OnWeaponEquipped;
-    public event Action<TrainCarSection, int> OnWeaponUnequipped;
+    public static event Action<TrainCarSection, int, string> OnWeaponEquipped;
+    public static event Action<TrainCarSection, int> OnWeaponUnequipped;
 
     private void Start()
     {

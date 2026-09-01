@@ -6,8 +6,8 @@
     "Description": "선두 기관차",
     "MoveSpeed": 2,
     "RotateSpeed": 5,
-    "MaxHp": 100,
-    "Defense": 1,
+    "MaxHp": 300,
+    "Defense": 3,
     "PrefabPath": "Train/train-Front"
   },
   {

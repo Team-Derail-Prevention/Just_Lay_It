@@ -60,6 +60,7 @@ public class WeaponFire : MonoBehaviour
             Debug.LogError("[WeaponFire] 데이터 매니저가 인스탄스 되어있지 않습니다");
             return;
         }
+
         LoadWeaponData();
         await RegisterProjectilePoolAsync();
         InitWeponLevel();
@@ -146,10 +147,10 @@ public class WeaponFire : MonoBehaviour
             return;
         }
 
-        int reloadLevel = WeaponStatManager.GetLobbyUpgradeLevel("LOBBY_WEAPON_RELOAD");
-        int magazineLevel = WeaponStatManager.GetLobbyUpgradeLevel("LOBBY_WEAPON_MAGAZINE");
-        int atkLevel = WeaponStatManager.GetLobbyUpgradeLevel("LOBBY_WEAPON_ATK");
-        int rangeLevel = WeaponStatManager.GetLobbyUpgradeLevel("LOBBY_WEAPON_RANGE");
+        int reloadLevel = WeaponStat.GetLobbyUpgradeLevel("LOBBY_WEAPON_RELOAD");
+        int magazineLevel = WeaponStat.GetLobbyUpgradeLevel("LOBBY_WEAPON_MAGAZINE");
+        int atkLevel = WeaponStat.GetLobbyUpgradeLevel("LOBBY_WEAPON_ATK");
+        int rangeLevel = WeaponStat.GetLobbyUpgradeLevel("LOBBY_WEAPON_RANGE");
 
         _reloadTime = Mathf.Max(0f, _reloadTime - (reloadLevel * _weaponData.LobbyReloadByLevel));
         _magazineSize += magazineLevel * _weaponData.LobbyMagazineByLevel;
@@ -207,6 +208,7 @@ public class WeaponFire : MonoBehaviour
 
         if (_weaponData != null)
         {
+
             _baseAtk = _weaponData.Atk;
             _fireRate = _weaponData.FireRate;
             _magazineSize = _weaponData.MagazineSize;

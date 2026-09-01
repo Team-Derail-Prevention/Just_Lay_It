@@ -165,10 +165,10 @@ public class TrainFollow : MonoBehaviour
         weaponObj.transform.localRotation = Quaternion.identity;
 
         WeaponFire weaponFire = weaponObj.GetComponent<WeaponFire>();
-        //if (weaponFire != null)
-        //{
-        //    weaponFire.SetWeaponId(weaponDataId);
-        //}
+        if (weaponFire != null)
+        {
+            weaponFire.SetWeaponId(weaponDataId);
+        }
 
         _equippedWeaponObjs[slotIndex] = weaponObj;
 
