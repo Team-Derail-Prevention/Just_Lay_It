@@ -22,13 +22,11 @@ public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     [SerializeField][TextArea] private string _description;
 
     private bool _isManualUnbindEvent;
-    private Action _boundCallback;
-    private UnityAction _boundUnityAction;
+
+    private readonly Dictionary<Action, UnityAction> _boundActions = new Dictionary<Action, UnityAction>();
 
     public event Action<string> OnPointerEnterButton;
     public event Action OnPointerExitButton;
-
-    private readonly List<UnityAction> _boundUnityActions = new List<UnityAction>();
 
     private void Awake()
     {
@@ -46,6 +44,7 @@ public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         if (_isManualUnbindEvent == false)
         {
             Button_Base.onClick.RemoveAllListeners();
+            _boundActions.Clear();
         }
     }
 
@@ -80,21 +79,36 @@ public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void BindOnClickButtonEvent(Action onClickCallback, bool isManualUnbindEvent = false)
     {
-        if (Button_Base == null || onClickCallback == null) return;
+        if (Button_Base == null || onClickCallback == null)
+        {
+            return;
+        }
+
+        if (_boundActions.ContainsKey(onClickCallback) == true)
+        {
+            return;
+        }
 
         UnityAction unityAction = onClickCallback.Invoke;
-        _boundUnityActions.Add(unityAction);
+        _boundActions.Add(onClickCallback, unityAction);
         Button_Base.onClick.AddListener(unityAction);
         _isManualUnbindEvent = isManualUnbindEvent;
     }
 
     public void UnBindOnClickButtonEvent(Action onClickCallback)
     {
-        if (Button_Base == null || _boundUnityAction == null) return;
+        if (Button_Base == null || onClickCallback == null)
+        {
+            return;
+        }
 
-        Button_Base.onClick.RemoveListener(_boundUnityAction);
-        _boundUnityAction = null;
-        _boundCallback = null;
+        if (_boundActions.TryGetValue(onClickCallback, out var unityAction) == false)
+        {
+            return;
+        }
+
+        Button_Base.onClick.RemoveListener(unityAction);
+        _boundActions.Remove(onClickCallback);
     }
 
     public void UnBindAllOnClickButtonEvent()
@@ -105,11 +119,15 @@ public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         }
 
         Button_Base.onClick.RemoveAllListeners();
+        _boundActions.Clear();
     }
 
     public void ChangeButtonText(string buttonStr)
     {
-        if (Text_Base == null) return;
+        if (Text_Base == null)
+        {
+            return;
+        }
 
         Text_Base.text = buttonStr;
     }

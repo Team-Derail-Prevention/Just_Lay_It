@@ -11,7 +11,7 @@ public class RailBuildViewModel : ViewModelBase
     {
         int straightCount = INITIAL_STRAIGHT_RAIL_COUNT + bonusStraightRailCount;
 
-        _slotDic.Add(RailType.Straight, new RailSlotViewModel { RailType = RailType.Straight, OwnedCount = INITIAL_STRAIGHT_RAIL_COUNT });
+        _slotDic.Add(RailType.Straight, new RailSlotViewModel { RailType = RailType.Straight, OwnedCount = straightCount });
         _slotDic.Add(RailType.Corner, new RailSlotViewModel { RailType = RailType.Corner });
     }
 
