@@ -176,6 +176,22 @@ public class TrainContainer : MonoBehaviour
         return true;
     }
 
+    public void UseSpecificCargo(string resourceType, float amount)
+    {
+        int stealAmount = Mathf.RoundToInt(amount);
+
+        if (resourceType == "Wood")
+        {
+            NetworkResourceService.Instance.TrySpendWood(stealAmount);
+            Debug.Log($"도둑 로봇이 나무를 {stealAmount}만큼 훔침");
+        }
+        else if (resourceType == "Stone")
+        {
+            NetworkResourceService.Instance.TrySpendStone(stealAmount);
+            Debug.Log($"도둑 로봇이 돌을 {stealAmount}만큼 훔침");
+        }
+    }
+
     //자재수량 특정 값 강제설정때 사용 (정산, 세션초기화, 테스트용)
     public void SetCargoAmount(float amount)
     {
