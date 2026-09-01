@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -20,12 +21,14 @@ public class BuildModeController : MonoBehaviour
     public bool IsBuildMode { get { return _isBuildMode; } }
     public bool HasResourceUnderCursor { get { return _hasResourceUnderCursor; } }
 
+    private RailSlotViewModel _subscribedSlot;
     private bool _isBuildMode;
     private bool _hasResourceUnderCursor;
     private bool _wasPlaceModeActive;
 
     private void Update()
     {
+        SyncRailSlotSubscription();
         SyncRailPlaceMode();
         HandleToggle();
 
@@ -40,12 +43,71 @@ public class BuildModeController : MonoBehaviour
 
     private void OnDisable()
     {
+        UnsubscribeRailSlot();
+
         if (_isBuildMode == false)
         {
             return;
         }
 
         ExitBuildMode();
+    }
+
+    private void SyncRailSlotSubscription()
+    {
+        RailSlotViewModel slot = GetRailSlot();
+
+        if (slot == _subscribedSlot)
+        {
+            return;
+        }
+
+        UnsubscribeRailSlot();
+
+        _subscribedSlot = slot;
+
+        if (_subscribedSlot == null)
+        {
+            return;
+        }
+
+        _subscribedSlot.PropertyChanged += HandleRailSlotChanged;
+    }
+
+    private void UnsubscribeRailSlot()
+    {
+        if (_subscribedSlot == null)
+        {
+            return;
+        }
+
+        _subscribedSlot.PropertyChanged -= HandleRailSlotChanged;
+        _subscribedSlot = null;
+    }
+
+    private RailSlotViewModel GetRailSlot()
+    {
+        if (NetworkRailService.Instance == null)
+        {
+            return null;
+        }
+
+        return NetworkRailService.Instance.GetLocalRailBuildViewModel().GetSlot(_railType);
+    }
+
+    private void HandleRailSlotChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(RailSlotViewModel.OwnedCount))
+        {
+            return;
+        }
+
+        if (_isBuildMode == false)
+        {
+            return;
+        }
+
+        TryResumePlacement();
     }
 
     private void SyncRailPlaceMode()
@@ -118,12 +180,32 @@ public class BuildModeController : MonoBehaviour
 
         if (_isBuildMode == true)
         {
+            if (TryResumePlacement() == true)
+            {
+                return;
+            }
+
             ExitBuildMode();
 
             return;
         }
 
         EnterBuildMode();
+    }
+
+    private bool TryResumePlacement()
+    {
+        if (RailManager.Instance == null || RailManager.Instance.IsPlaceModeActive == true)
+        {
+            return false;
+        }
+
+        if (NetworkRailService.Instance == null)
+        {
+            return false;
+        }
+
+        return NetworkRailService.Instance.RequestStartPlacement(_railType);
     }
 
     private void EnterBuildMode()
