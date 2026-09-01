@@ -183,4 +183,24 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
         int level = GetLocalUpgradeViewModel().GetSlot("LOBBY_RESCUE_REWARD")?.CurrentLevel ?? 0;
         return RESCUE_REWARD_BASE + (level * RESCUE_REWARD_STEP);
     }
+
+#if UNITY_EDITOR
+    public void Debug_ResetUpgradeState()
+    {
+        UpgradeViewModel vm = GetLocalUpgradeViewModel();
+
+        foreach (var slotKv in vm.SlotDic)
+        {
+            UpgradeSlotViewModel slotVm = slotKv.Value;
+            while (slotVm.CurrentLevel > 0)
+            {
+                slotVm.LevelDown();
+            }
+        }
+
+        vm.CurrentCash = 0;
+
+        Debug.Log("[NetworkUpgradeService] 업그레이드 상태(캐시, 슬롯 레벨)를 초기화했습니다.");
+    }
+#endif
 }

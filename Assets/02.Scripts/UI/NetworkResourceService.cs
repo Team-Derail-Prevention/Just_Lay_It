@@ -259,6 +259,11 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
     public void IncreaseCargoLimit(int amount)
     {
         _cargoLimit += amount;
+
+        if (ResourceStatusEventHub.Instance != null)
+        {
+            ResourceStatusEventHub.Instance.NotifyCargoLimitChanged(_cargoLimit);
+        }
     }
 
     private void OnRequestSpendMoney(int amount, System.Action<bool> onResult)
@@ -279,6 +284,7 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
             ResourceStatusEventHub.Instance.NotifyWoodChanged(_localVm.CurrentWood);
             ResourceStatusEventHub.Instance.NotifyStoneChanged(_localVm.CurrentStone);
             ResourceStatusEventHub.Instance.NotifyRescuedHumanChanged(0);
+            ResourceStatusEventHub.Instance.NotifyCargoLimitChanged(_cargoLimit);
         }
     }
 
