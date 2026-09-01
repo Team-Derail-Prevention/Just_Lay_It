@@ -52,7 +52,7 @@ public class WeaponFire : MonoBehaviour
             _weaponTargeting = GetComponent<WeaponTargeting>();
         }
 
-        _parentTrain = GetComponentInParent<Train>();
+        _parentTrain = FindAnyObjectByType<Train>();
     }
 
     private async void Start()
