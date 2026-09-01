@@ -31,6 +31,8 @@ public class Train : MonoBehaviour
     private Coroutine _electricCoroutine;
     private Coroutine _corrosionCoroutine;
 
+    private TrainContainer _targetContainer;
+
     public float TotalDistance { get { return _totalDistance; } }
 
 
@@ -66,18 +68,24 @@ public class Train : MonoBehaviour
 
 
     // TODO : 인게임 기차 업그레이드 요소 추가하면 구독or취소 할거 (체력강화나 이것저것)
-    //private void OnEnable()
-    //{
-    //    UpgradeEventHub.Instance.OnInGameUpgraded += ;
-    //}
+    private void OnEnable()
+    {
+        if (UpgradeEventHub.Instance != null)
+        {
+            UpgradeEventHub.Instance.OnInGameUpgraded += HandleInGameUpgraded;
+        }
+    }
 
 
 
-    //private void OnDisable()
-    //{
-    //    UpgradeEventHub.Instance.OnInGameUpgraded -= ;
+    private void OnDisable()
+    {
+        if (UpgradeEventHub.Instance != null)
+        {
+            UpgradeEventHub.Instance.OnInGameUpgraded -= HandleInGameUpgraded;
+        }
 
-    //}
+    }
 
 
     private void Update()
@@ -132,6 +140,25 @@ public class Train : MonoBehaviour
             TrainStatusEventHub.Instance.NotifyHpChanged(_currentHp, _maxHp);
         }
     }
+
+    private void HandleInGameUpgraded(string upgradeId, int value)
+    {
+        switch (upgradeId)
+        {
+            case "INGAME_TRAIN_MAX_HP":
+                UpgradeMaxHp(value, healAmount: true);
+                break;
+
+            case "INGAME_TRAIN_DEFENSE":
+                UpgradeDefense(value);
+                break;
+
+            default:
+                Debug.LogWarning($"[Train] 처리되지 않은 업그레이드 ID: {upgradeId}");
+                break;
+        }
+    }
+
 
     public void UpgradeMaxHp(int addHp, bool healAmount)
     {
@@ -200,12 +227,9 @@ public class Train : MonoBehaviour
         _currentHp = Mathf.Min(_maxHp, _currentHp + healAmount);
 
         Debug.Log($"[Train] 열차 수리 완료! 회복량: {healAmount} ({healPercent}%), 현재 HP: {_currentHp}/{_maxHp}");
-        
 
-        if (GameManager.TrainStatusEventHub != null)
-        {
-            GameManager.TrainStatusEventHub.NotifyHpChanged(_currentHp, _maxHp);
-        }
+
+        TrainStatusEventHub.Instance?.NotifyHpChanged(_currentHp, _maxHp);
     }
 
     private void BrokenTrain()
@@ -330,11 +354,18 @@ public class Train : MonoBehaviour
 
     private void StealCargo(float stealAmount)
     {
-        TrainContainer container = GetComponent<TrainContainer>();
-        if (container != null)
+        if (_targetContainer == null)
         {
-            container.UseCargo(stealAmount);
-            Debug.Log($"몬스터가 자재를 {stealAmount}만큼 훔침 남은 자재: {container.CurrentAmount}");
+            _targetContainer = FindAnyObjectByType<TrainContainer>();
+        }
+
+        if (_targetContainer != null)
+        {
+            int randomResource = UnityEngine.Random.Range(0, 2);
+            string resourceType = (randomResource == 0) ? "Wood" : "Stone";
+
+            _targetContainer.UseSpecificCargo(resourceType, stealAmount);
+            Debug.Log($"몬스터가 자재를 {stealAmount}만큼 훔침. 남은 자재: {_targetContainer.CurrentAmount}");
         }
     }
 

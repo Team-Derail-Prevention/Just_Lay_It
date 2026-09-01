@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 
 [Serializable]
 public class SerializationWrapper<T>
@@ -50,6 +49,26 @@ public class TrainData : GameDataBase
     public int Defense;
     public string PrefabPath;
 }
+
+[Serializable]
+public class TrainUpgradeData : GameDataBase
+{
+    public string Name;
+    public string Description;
+    public string TargetStatType;
+    public string Operation;
+    public float Value;
+    public int MaxLevel;
+    public int GoldCost;
+    public int GoldCostPerLevel;
+    public string IconPath;
+}
+
+[Serializable]
+public class LobbyTrainUpgradeData : TrainUpgradeData { }
+
+[Serializable]
+public class InGameTrainUpgradeData : TrainUpgradeData { }
 
 [Serializable]
 public class WeaponData : GameDataBase
