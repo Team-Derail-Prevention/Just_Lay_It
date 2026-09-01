@@ -9,8 +9,12 @@ public class LobbyUI : UIBase
     [SerializeField] private UIButton _btnSetting;
     [SerializeField] private UIButton _btnExit;
 
+    private bool _isStartingGame;
+
     private void OnEnable()
     {
+        _isStartingGame = false;
+
         _btnGameStart.BindOnClickButtonEvent(OnClick_GameStart);
         _btnUpgrade.BindOnClickButtonEvent(OnClick_Upgrade);
         _btnDictionary.BindOnClickButtonEvent(OnClick_Dictionary);
@@ -29,6 +33,12 @@ public class LobbyUI : UIBase
 
     private void OnClick_GameStart()
     {
+        if (_isStartingGame == true)
+        {
+            return;
+        }
+
+        _isStartingGame = true;
         UIManager.Instance.StartGameFromLobby().Forget();
     }
 
@@ -49,13 +59,11 @@ public class LobbyUI : UIBase
 
     private void OnClick_Exit()
     {
-        // 게임매니저 작성 후 추가 작성
         UIManager.Instance.OpenExitConfirmPopup(OnConfirmExit);
     }
 
     private void OnConfirmExit()
     {
-        // 게임 매니저 작성 후 추가 작성
         Application.Quit();
     }
 }
