@@ -29,9 +29,25 @@ public class MapTileInfo : MonoBehaviour
 
     public Vector2Int LocalGridCoordinate => _localGridCoordinate;
     public Vector3Int ParentMapGridPos => _parentMapGridPos;
+
+    private static readonly Vector2Int TerminalCenter = Vector2Int.zero;
+
+    public bool IsTerminalReservedArea =>
+    Mathf.Abs(_localGridCoordinate.x - TerminalCenter.x) <= 1 &&
+    Mathf.Abs(_localGridCoordinate.y - TerminalCenter.y) <= 1;
+
+    public bool IsTerminalEntrance =>
+        _localGridCoordinate == new Vector2Int(0, 2) ||
+        _localGridCoordinate == new Vector2Int(0, -2) ||
+        _localGridCoordinate == new Vector2Int(2, 0) ||
+        _localGridCoordinate == new Vector2Int(-2, 0);
+
     public bool CanInstallRail
     {
-        get => _baseCanInstallRail && !_hasRail && !_hasOnGroundOccupant;
+        get => _baseCanInstallRail
+            && !_hasRail
+            && !_hasOnGroundOccupant
+            && !IsTerminalReservedArea;
         set => _baseCanInstallRail = value;
     }
     public bool HasRail
@@ -52,6 +68,16 @@ public class MapTileInfo : MonoBehaviour
         _parentMapGridPos = parentMapGridPos;
         _baseCanInstallRail = canInstallRail;
         _hasRail = false;
+
+        if (IsTerminalReservedArea)
+        {
+            _baseCanInstallRail = false;
+            gameObject.layer = _defaultLayerIndex != -1 ? _defaultLayerIndex : 0;
+        }
+        else
+        {
+            ApplyVisualLayer();
+        }
     }
 
     public void SetParentMapGridPosition(Vector3Int parentMapGridPos)
@@ -112,6 +138,12 @@ public class MapTileInfo : MonoBehaviour
 
     private void ApplyVisualLayer()
     {
+        if (IsTerminalReservedArea)
+        {
+            gameObject.layer = _defaultLayerIndex != -1 ? _defaultLayerIndex : 0;
+            return;
+        }
+
         if (_hasOnGroundOccupant)
         {
             gameObject.layer = _defaultLayerIndex != -1 ? _defaultLayerIndex : 0;
