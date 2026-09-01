@@ -110,7 +110,7 @@
         "DropGold": 10,
         "AttackType": "Steal",
         "DebuffDuration": 0,
-        "DebuffPower": 0,
+        "DebuffPower": 1,
         "UseAttackSound": "DebuffMonster_04_Attack_Sound",
         "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
         "UseDieSound": "Monster_01_Die_Sound",
