@@ -32,6 +32,8 @@ public class SoundManager : SingletonBase<SoundManager>
     private readonly List<AudioSource> _spatialSources = new List<AudioSource>();
 
     private string _currentBgmAddress;
+    private GameState _previousGameState = GameState.Ready;
+    private bool _hasPreviousGameState;
 
     private AudioLowPassFilter _bgmLowPassFilter;
 
@@ -86,6 +88,8 @@ public class SoundManager : SingletonBase<SoundManager>
     {
         SetMuffled(gameState == GameState.EventPaused);
 
+        PlayDepartureOnGameStart(gameState);
+
         string address = ResolveBgmAddress(gameState);
 
         if (string.IsNullOrEmpty(address))
@@ -94,6 +98,21 @@ public class SoundManager : SingletonBase<SoundManager>
         }
 
         PlayBGM(address);
+    }
+
+    private void PlayDepartureOnGameStart(GameState gameState)
+    {
+        bool previousStateWasPlaying = _hasPreviousGameState && _previousGameState == GameState.Playing;
+
+        _previousGameState = gameState;
+        _hasPreviousGameState = true;
+
+        if (gameState != GameState.Playing || previousStateWasPlaying)
+        {
+            return;
+        }
+
+        PlaySFX(SfxAddress.Train.Depart);
     }
 
     private string ResolveBgmAddress(GameState gameState)
