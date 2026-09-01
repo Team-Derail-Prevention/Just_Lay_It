@@ -319,7 +319,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3dd46994b1a6ff4a893eec1078a4664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Train
-  _reachThreshold: 0.2
+  _reachThreshold: 0.35
   _targetIndex: 0
   _isMoving: 1
   _currentSpeed: 0
