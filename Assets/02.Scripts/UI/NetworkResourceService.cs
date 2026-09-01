@@ -60,7 +60,7 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         get
         {
             var vm = GetLocalResourceViewModel();
-            return vm.CurrentWood + vm.CurrentStone;
+            return vm.CurrentStone;
         }
     }
 
@@ -131,23 +131,21 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
 
     public int AddWood(int amount)
     {
-        int addable = Mathf.Min(amount, RemainingCargoCapacity);
-        if (addable <= 0)
+        if (amount <= 0)
         {
-            Debug.LogWarning("[NetworkResourceService] 적재 한도가 가득 찼습니다.");
             return 0;
         }
 
         var vm = GetLocalResourceViewModel();
-        vm.CurrentWood += addable;
-        _sessionTotalWoodCollected += addable;
+        vm.CurrentWood += amount;
+        _sessionTotalWoodCollected += amount;
 
         if (ResourceStatusEventHub.Instance != null)
         {
             ResourceStatusEventHub.Instance.NotifyWoodChanged(vm.CurrentWood);
         }
 
-        return addable;
+        return amount;
     }
 
     public int AddStone(int amount)

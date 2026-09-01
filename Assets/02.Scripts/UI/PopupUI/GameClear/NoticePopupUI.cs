@@ -1,14 +1,18 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
+using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using TMPro;
 
 public class NoticePopupUI : UIBase
 {
     [Header("컴포넌트 연결")]
     [SerializeField] private Image _tipImage;
-    [SerializeField] private Button _leftArrowButton;
-    [SerializeField] private Button _rightArrowButton;
-    [SerializeField] private Button _okButton;
+    [SerializeField] private TextMeshProUGUI _enterGuideText;
+
+    [Header("안내 문구")]
+    [SerializeField] private string _nextPageGuideMessage = "다음 'Enter'";
+    [SerializeField] private string _confirmGuideMessage = "확인 'Enter'";
 
     [Header("TIP 이미지 목록")]
     [SerializeField] private Sprite[] _tipSprites;
@@ -16,19 +20,24 @@ public class NoticePopupUI : UIBase
     private int _currentPageIndex;
     private Action _onConfirm;
 
-    private void OnEnable()
+    private void Update()
     {
-        _leftArrowButton.onClick.AddListener(OnClick_LeftArrow);
-        _rightArrowButton.onClick.AddListener(OnClick_RightArrow);
-        _okButton.onClick.AddListener(OnClick_Ok);
+        if (Keyboard.current == null)
+        {
+            return;
+        }
+
+        bool isEnterPressed = (Keyboard.current.enterKey.wasPressedThisFrame == true || Keyboard.current.numpadEnterKey.wasPressedThisFrame == true);
+        if (isEnterPressed == false)
+        {
+            return;
+        }
+
+        ProceedToNextPageOrConfirm();
     }
 
     private void OnDisable()
     {
-        _leftArrowButton.onClick.RemoveListener(OnClick_LeftArrow);
-        _rightArrowButton.onClick.RemoveListener(OnClick_RightArrow);
-        _okButton.onClick.RemoveListener(OnClick_Ok);
-
         _onConfirm = null;
     }
 
@@ -40,23 +49,18 @@ public class NoticePopupUI : UIBase
         UpdatePage();
     }
 
-    private void OnClick_LeftArrow()
+    private void ProceedToNextPageOrConfirm()
     {
-        bool isFirstPage = (_currentPageIndex <= 0);
-        if (isFirstPage == true)
+        if (_tipSprites == null || _tipSprites.Length == 0)
         {
+            Confirm();
             return;
         }
 
-        _currentPageIndex--;
-        UpdatePage();
-    }
-
-    private void OnClick_RightArrow()
-    {
         bool isLastPage = (_currentPageIndex >= _tipSprites.Length - 1);
         if (isLastPage == true)
         {
+            Confirm();
             return;
         }
 
@@ -64,7 +68,7 @@ public class NoticePopupUI : UIBase
         UpdatePage();
     }
 
-    private void OnClick_Ok()
+    private void Confirm()
     {
         Action onConfirm = _onConfirm;
 
@@ -75,22 +79,30 @@ public class NoticePopupUI : UIBase
 
     private void UpdatePage()
     {
-        if (_tipSprites == null || _tipSprites.Length == 0)
+        try
         {
-            return;
+            if (_tipSprites == null || _tipSprites.Length == 0)
+            {
+                return;
+            }
+
+            bool isLastPage = (_currentPageIndex >= _tipSprites.Length - 1);
+
+            if (_tipImage != null)
+            {
+                _tipImage.sprite = _tipSprites[_currentPageIndex];
+            }
+
+            if (_enterGuideText != null)
+            {
+                _enterGuideText.text = isLastPage ? _confirmGuideMessage : _nextPageGuideMessage;
+            }
+
+            Debug.Log($"[NoticePopupUI] UpdatePage 성공. index={_currentPageIndex}, Application.isFocused={Application.isFocused}");
         }
-
-        bool isFirstPage = (_currentPageIndex <= 0);
-        bool isLastPage = (_currentPageIndex >= _tipSprites.Length - 1);
-
-        if (_tipImage != null)
+        catch (Exception ex)
         {
-            _tipImage.sprite = _tipSprites[_currentPageIndex];
+            Debug.LogError($"[NoticePopupUI] UpdatePage 중 예외 발생! index={_currentPageIndex}, 예외={ex}");
         }
-
-        _leftArrowButton.gameObject.SetActive(!isFirstPage);
-        _rightArrowButton.gameObject.SetActive(!isLastPage);
-        _okButton.gameObject.SetActive(isLastPage);
     }
-
 }

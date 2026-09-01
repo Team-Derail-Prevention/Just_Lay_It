@@ -220,7 +220,7 @@ public class GameManager : SingletonBase<GameManager>
                 await Drone.SpawnAllAsync();
             }
 
-            // await Train.SpawnTerminalTrainAsync(_startingCarriageCount);
+            await Train.SpawnTerminalTrainAsync(_startingCarriageCount);
             NetworkAugmentService.GrantRandomStartingWeapon();
 
             ChangeGameState(GameState.EventPaused);

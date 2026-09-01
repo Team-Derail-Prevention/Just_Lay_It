@@ -94,7 +94,6 @@ public static class UIManagerExtension
             return;
         }
 
-        // 실제 로딩 추후 수정
         await GameManager.Instance.StartGame();
 
         if (loadingUI != null)
@@ -144,7 +143,7 @@ public static class UIManagerExtension
                 isDecided = true;
             });
 
-        await Cysharp.Threading.Tasks.UniTask.WaitUntil(() => isDecided);
+        await Cysharp.Threading.Tasks.UniTask.WaitUntil(() => isDecided, cancellationToken: uiManager.GetCancellationTokenOnDestroy());
 
         return selectedStage;
     }

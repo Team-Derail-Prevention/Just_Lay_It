@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class GameClearResultUI : UIBase
 {
@@ -61,7 +62,12 @@ public class GameClearResultUI : UIBase
 
     private void Update()
     {
-        bool isEnterPressed = Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
+        if (Keyboard.current == null)
+        {
+            return;
+        }
+
+        bool isEnterPressed = (Keyboard.current.enterKey.wasPressedThisFrame == true || Keyboard.current.numpadEnterKey.wasPressedThisFrame == true);
         if (isEnterPressed == true)
         {
             OnConfirm();

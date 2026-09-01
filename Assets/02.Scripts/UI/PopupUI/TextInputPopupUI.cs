@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using TMPro;
 using System;
+using UnityEngine.InputSystem;
 
 public class TextInputPopupUI : UIBase
 {
@@ -23,7 +24,12 @@ public class TextInputPopupUI : UIBase
 
     private void Update()
     {
-        bool isEnterPressed = Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
+        if (Keyboard.current == null)
+        {
+            return;
+        }
+
+        bool isEnterPressed = (Keyboard.current.enterKey.wasPressedThisFrame == true || Keyboard.current.numpadEnterKey.wasPressedThisFrame == true);
         if (isEnterPressed == true && InputField_Amount != null)
         {
             OnSubmitAmount(InputField_Amount.text);
