@@ -26,6 +26,9 @@ public class Train : MonoBehaviour
     private int _defense;
     private float _totalDistance = 0f;
     private bool _isBroken = false;
+    private float _freezeRemainTime = 0f;
+    private float _electricRemainTime = 0f;
+    private float _corrosionRemainTime = 0f;
 
     private Coroutine _freezeCoroutine;
     private Coroutine _electricCoroutine;
@@ -123,6 +126,8 @@ public class Train : MonoBehaviour
         _trainData = data;
         _totalDistance = 0f;
         _isBroken = false;
+        _currentSpeed = 0f;
+
 
         if (data != null)
         {
@@ -133,7 +138,6 @@ public class Train : MonoBehaviour
             _defense = data.Defense;
         }
 
-        _currentSpeed = 0f;
 
         if (TrainStatusEventHub.Instance != null)
         {
@@ -143,49 +147,33 @@ public class Train : MonoBehaviour
 
     private void HandleInGameUpgraded(string upgradeId, int value)
     {
-        switch (upgradeId)
-        {
-            case "INGAME_TRAIN_MAX_HP":
-                UpgradeMaxHp(value, healAmount: true);
-                break;
-
-            case "INGAME_TRAIN_DEFENSE":
-                UpgradeDefense(value);
-                break;
-
-            default:
-                Debug.LogWarning($"[Train] 처리되지 않은 업그레이드 ID: {upgradeId}");
-                break;
-        }
+        RecalculateStats(isInitial: false);
     }
 
-
-    public void UpgradeMaxHp(int addHp, bool healAmount)
+    public void RecalculateStats(bool isInitial = false)
     {
-        if (addHp <= 0)
+        if (_trainData == null) return;
+
+        if (TrainStat.TryGetCurrentTrainStats(_trainData.Id, out TrainCurrentStats stats))
         {
-            return;
+            int prevMaxHp = _maxHp;
+
+            _maxHp = stats.MaxHp;
+            _defense = stats.Defense;
+
+            if (isInitial)
+            {
+                _currentHp = _maxHp;
+            }
+            else if (_maxHp > prevMaxHp)
+            {
+                // 최대 체력이 늘어난 만큼 현재 체력도 증가
+                _currentHp += (_maxHp - prevMaxHp);
+            }
+
+            Debug.Log($"[Train Stat] 갱신 완료 | HP: {_currentHp}/{_maxHp}, 방어력: {_defense}");
+            TrainStatusEventHub.Instance?.NotifyHpChanged(_currentHp, _maxHp);
         }
-
-        _maxHp += addHp;
-        if (healAmount)
-        {
-            _currentHp += addHp;
-        }
-
-        Debug.Log($"[Train Upgrade] 최대 HP 강화! MaxHP: {_maxHp}, CurrentHP: {_currentHp}");
-        TrainStatusEventHub.Instance?.NotifyHpChanged(_currentHp, _maxHp);
-    }
-
-    public void UpgradeDefense(int addDefense)
-    {
-        if (addDefense <= 0)
-        {
-            return;
-        }
-
-        _defense += addDefense;
-        Debug.Log($"[Train Upgrade] 방어력 강화! 현재 방어력: {_defense}");
     }
 
     public void TakeDamage(int damage)
@@ -312,17 +300,37 @@ public class Train : MonoBehaviour
         switch (debuffType)
         {
             case "Freeze":
+                if (_isFrozen)
+                {
+                    _freezeRemainTime = duration;
+                    return;
+                }
+
                 if (_freezeCoroutine != null) StopCoroutine(_freezeCoroutine);
                 _freezeCoroutine = StartCoroutine(FreezeRoutine(duration));
                 break;
+
             case "Electric":
+                if (_isElectrified)
+                {
+                    _electricRemainTime = duration;
+                    return;
+                }
                 if (_electricCoroutine != null) StopCoroutine(_electricCoroutine);
                 _electricCoroutine = StartCoroutine(ElectricRoutine(duration));
                 break;
+
             case "Corrosion":
+                if (_corrosionMultiplier > 1.0f)
+                {
+                    _corrosionRemainTime = duration;
+                    _corrosionMultiplier = power;
+                    return;
+                }
                 if (_corrosionCoroutine != null) StopCoroutine(_corrosionCoroutine);
                 _corrosionCoroutine = StartCoroutine(CorrosionRoutine(duration, power));
                 break;
+
             case "Steal":
                 StealCargo(power);
                 break;
@@ -332,24 +340,46 @@ public class Train : MonoBehaviour
     private System.Collections.IEnumerator FreezeRoutine(float duration)
     {
         _isFrozen = true;
-        yield return new WaitForSeconds(duration);
+        _freezeRemainTime = duration;
+
+        while (_freezeRemainTime > 0f)
+        {
+            _freezeRemainTime -= Time.deltaTime;
+            yield return null;
+        }
+
         _isFrozen = false;
+        _freezeCoroutine = null;
     }
 
     private System.Collections.IEnumerator ElectricRoutine(float duration)
     {
         _isElectrified = true;
-        yield return new WaitForSeconds(duration);
+        _electricRemainTime = duration;
+
+        while (_electricRemainTime > 0f)
+        {
+            _electricRemainTime -= Time.deltaTime;
+            yield return null;
+        }
+
         _isElectrified = false;
+        _electricCoroutine = null;
     }
 
     private System.Collections.IEnumerator CorrosionRoutine(float duration, float damageMultiplier)
     {
         _corrosionMultiplier = damageMultiplier;
+        _corrosionRemainTime = duration;
 
-        yield return new WaitForSeconds(duration);
+        while (_corrosionRemainTime > 0f)
+        {
+            _corrosionRemainTime -= Time.deltaTime;
+            yield return null;
+        }
 
         _corrosionMultiplier = 1.0f;
+        _corrosionCoroutine = null;
     }
 
     private void StealCargo(float stealAmount)
@@ -368,13 +398,5 @@ public class Train : MonoBehaviour
             Debug.Log($"몬스터가 자재를 {stealAmount}만큼 훔침. 남은 자재: {_targetContainer.CurrentAmount}");
         }
     }
-
-
-   // 업그레이드 테스트용 
-    [ContextMenu("Test / Upgrade MaxHp (+50)")]
-    private void TestUpgradeHp() => UpgradeMaxHp(50, true);
-
-    [ContextMenu("Test / Upgrade Defense (+5)")]
-    private void TestUpgradeDef() => UpgradeDefense(5);
 
 }
