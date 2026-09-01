@@ -5,7 +5,7 @@
     "MaxLevel": 4,
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
-    "Description": "장착한 모든 무기의 재장전 속도가 감소 합니다",
+    "Description": "장착한 모든 무기의 재장전 속도가 감소 합니다. (- 0.2)",
     "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_RELOAD_Icon]"
   },
   {
@@ -14,7 +14,7 @@
     "MaxLevel": 4,
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
-    "Description": "장착한 모든 무기의 탄창 수가 증가 합니다",
+    "Description": "장착한 모든 무기의 탄창 수가 증가 합니다. (+ 5)",
     "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_MAGAZINE_Icon]"
   },
   {
@@ -23,7 +23,7 @@
     "MaxLevel": 4,
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
-    "Description": "장착한 모든 무기의 공격력이 증가 합니다",
+    "Description": "장착한 모든 무기의 공격력이 증가 합니다. (+ 2)",
     "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_ATK_Icon]"
   },
   {
@@ -32,7 +32,7 @@
     "MaxLevel": 4,
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
-    "Description": "장착한 모든 무기의 공격 가능 범위가 증가 합니다",
+    "Description": "장착한 모든 무기의 공격 가능 범위가 증가 합니다. (+ 1)",
     "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_RANGE_Icon]"
   },
   {
@@ -41,7 +41,7 @@
     "MaxLevel": 4,
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
-    "Description": "무기 가챠 진행시 뽑힌 무기를 다시 돌릴 수 있는 횟수가 증가 합니다",
+    "Description": "무기 가챠 진행시 뽑힌 무기를 다시 돌릴 수 있는 횟수가 증가 합니다. (+ 1)",
     "IconPath": "LobbyUpgrade_Icon[LOBBY_GACHA_REROLL_Icon]"
   },
   {
@@ -50,7 +50,7 @@
     "MaxLevel": 4,
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
-    "Description": "정거장에서 구출한 시민 숫자에 따른 캐쉬 보상량이 증가 합니다",
+    "Description": "정거장에서 구출한 시민 숫자에 따른 캐쉬 보상량이 증가 합니다. (+ 5)",
     "IconPath": "LobbyUpgrade_Icon[LOBBY_RESCUE_REWARD_Icon]"
   },
   {
@@ -59,7 +59,7 @@
     "MaxLevel": 4,
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
-    "Description": "선로를 제작 하는 속도가 빨라집니다",
+    "Description": "선로를 제작 하는 속도가 빨라집니다. (- 10%)",
     "IconPath": "LobbyUpgrade_Icon[LOBBY_RAIL_CRAFT_SPEED_Icon]"
   },
   {
@@ -68,7 +68,7 @@
     "MaxLevel": 4,
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
-    "Description": "게임 시작시 처음에 가지고 시작하는 선로의 개수가 증가합니다",
+    "Description": "게임 시작시 처음에 가지고 시작하는 선로의 개수가 증가합니다. (+ 2)",
     "IconPath": "LOBBY_BASE_RAIL_COUNT_Icon"
   },
   {
@@ -77,7 +77,25 @@
     "MaxLevel": 4,
     "BaseCost": 50,
     "CostIncreasePerLevel": 30,
-    "Description": "게임 시작시 나무와 돌의 가지고 있을 수 있는 제한량이 증가 합니다",
+    "Description": "게임 시작시 나무와 돌의 가지고 있을 수 있는 제한량이 증가 합니다. (+ 100)",
     "IconPath": "LobbyUpgrade_Icon[LOBBY_BASE_CARGO_LIMIT_Icon]"
+  },
+  {
+    "Id": "LOBBY_TRAIN_MAX_HP",
+    "Name": "열차 체력 증가",
+    "MaxLevel": 4,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "Description": "기차의 기본 최대 체력을 영구적으로 증가시킵니다. (+ 50)",
+    "IconPath": "LobbyUpgrade01_Icon[LOBBY_TRAIN_MAX_HP_Icon]"
+  },
+  {
+    "Id": "LOBBY_TRAIN_DEFENSE",
+    "Name": "열차 방어력 증가",
+    "MaxLevel": 4,
+    "BaseCost": 50,
+    "CostIncreasePerLevel": 30,
+    "Description": "기차의 기본 방어력을 영구적으로 증가시킵니다. (+ 2)",
+    "IconPath": "LobbyUpgrade01_Icon[LOBBY_TRAIN_DEFENSE_Icon]"
   }
 ]
