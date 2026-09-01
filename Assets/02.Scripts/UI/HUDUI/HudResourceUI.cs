@@ -10,6 +10,9 @@ public class HudResourceUI : UIBase
     [Header("나무")]
     [SerializeField] private TextMeshProUGUI Text_Wood;
 
+    [Header("적재 제한량")]
+    [SerializeField] private TextMeshProUGUI Text_StoneLimit;
+
     [Header("돌")]
     [SerializeField] private TextMeshProUGUI Text_Stone;
 
@@ -30,6 +33,7 @@ public class HudResourceUI : UIBase
             ResourceStatusEventHub.Instance.OnWoodChanged += SetWood;
             ResourceStatusEventHub.Instance.OnStoneChanged += SetStone;
             ResourceStatusEventHub.Instance.OnRescuedHumanChanged += SetRescuedHuman;
+            ResourceStatusEventHub.Instance.OnCargoLimitChanged += SetStoneLimit;
         }
 
         if (NetworkResourceService.Instance != null)
@@ -38,6 +42,7 @@ public class HudResourceUI : UIBase
             SetWood(resourceVm.CurrentWood);
             SetStone(resourceVm.CurrentStone);
             SetRescuedHuman(resourceVm.RescuedHumanCount);
+            SetStoneLimit(NetworkResourceService.Instance.CargoLimit);
         }
 
         if (NetworkUpgradeService.Instance != null)
@@ -55,6 +60,7 @@ public class HudResourceUI : UIBase
             ResourceStatusEventHub.Instance.OnWoodChanged -= SetWood;
             ResourceStatusEventHub.Instance.OnStoneChanged -= SetStone;
             ResourceStatusEventHub.Instance.OnRescuedHumanChanged -= SetRescuedHuman;
+            ResourceStatusEventHub.Instance.OnCargoLimitChanged -= SetStoneLimit;
         }
 
         if (_upgradeVm != null)
@@ -100,6 +106,14 @@ public class HudResourceUI : UIBase
         if (Text_RescuedHuman != null)
         {
             Text_RescuedHuman.text = curRescuedCount.ToString();
+        }
+    }
+
+    public void SetStoneLimit(int curCargoLimit)
+    {
+        if (Text_StoneLimit != null)
+        {
+            Text_StoneLimit.text = curCargoLimit.ToString();
         }
     }
 }
