@@ -25,7 +25,7 @@ public class FollowCamera : MonoBehaviour
     private List<CameraData> _cameraPresets = new List<CameraData>();
     private int _currentPresetIndex = 0;
 
-    public event Action<int> OnPresetIndex;
+    public static event Action<int> OnPresetIndex;
 
     private void Start()
     {

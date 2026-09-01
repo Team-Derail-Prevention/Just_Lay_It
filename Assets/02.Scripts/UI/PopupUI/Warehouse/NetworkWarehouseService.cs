@@ -45,6 +45,22 @@ public class NetworkWarehouseService : SingletonBase<NetworkWarehouseService>
         return _localVm;
     }
 
+    public void AddStoneDirect(int amount)
+    {
+        if (amount <= 0) return;
+        var vm = GetLocalWarehouseViewModel();
+        vm.CurrentStone += amount;
+        NotifyWarehouseStone(vm.CurrentStone);
+    }
+
+    public void AddWoodDirect(int amount)
+    {
+        if (amount <= 0) return;
+        var vm = GetLocalWarehouseViewModel();
+        vm.CurrentWood += amount;
+        NotifyWarehouseWood(vm.CurrentWood);
+    }
+
     private void OnRequestPutIntoWarehouse(MaterialObejctType materialType, int amount, Action<bool> onResult)
     {
         if (NetworkResourceService.Instance == null)

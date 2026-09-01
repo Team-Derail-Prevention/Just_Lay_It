@@ -140,6 +140,14 @@ public class RailManager : SingletonBase<RailManager>
             RemoveAllRail();
         }
 
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            if (_isPlaceModeActive && _isHoveredCube)
+            {
+                TryInstallRail(_hoveredGridIndex, _hoveredCubeInfo);
+            }
+        }
+
         if (!_isPlaceModeActive)
         {
             return;

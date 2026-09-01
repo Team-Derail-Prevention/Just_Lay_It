@@ -18,7 +18,12 @@ public class DroneVisualMotion : MonoBehaviour
 
     private void Awake()
     {
-        _mover = GetComponent<IAgentMover>();
+        DroneMoveController moveController = GetComponent<DroneMoveController>();
+
+        if (moveController != null)
+        {
+            _mover = moveController.Mover;
+        }
 
         if (_visual == null)
         {

@@ -23,7 +23,11 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
 
     private void OnEnable()
     {
-        AugmentStatEventHub.Instance.OnStatCalculated += OnStatCalculated;
+        if (AugmentStatEventHub.Instance != null)
+        {
+            AugmentStatEventHub.Instance.OnStatCalculated -= OnStatCalculated;
+            AugmentStatEventHub.Instance.OnStatCalculated += OnStatCalculated;
+        }
     }
 
     private void OnDisable()
@@ -161,8 +165,19 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
             return false;
         }
 
+        int sellPrice = slotState.Augment.Price;
+
         slotState.Augment = null;
         NotifyEquipChanged(container, slotIndex, null);
+
+        if (NetworkResourceService.Instance != null)
+        {
+            NetworkResourceService.Instance.AddStoneWithWarehouseOverflow(sellPrice);
+        }
+        else
+        {
+            Debug.LogWarning("[NetworkAugmentService] NetworkResourceService가 없어 판매 재화를 지급하지 못했습니다.");
+        }
 
         return true;
     }
@@ -172,6 +187,12 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
         AugmentEquipViewModel equipVm = container as AugmentEquipViewModel;
         if (equipVm == null)
         {
+            return;
+        }
+
+        if (WeaponEquipEventHub.Instance == null)
+        {
+            Debug.LogWarning("[NetworkAugmentService] WeaponEquipEventHub가 없어 장착/해제 알림을 보내지 못했습니다.");
             return;
         }
 
@@ -210,7 +231,6 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
         List<WeaponData> pool = GetStartingWeaponPool();
         if (pool.Count == 0)
         {
-            Debug.LogWarning("[NetworkAugmentService] 기본 지급용 무기 데이터가 없습니다.");
             return;
         }
 

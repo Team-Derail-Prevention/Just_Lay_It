@@ -45,6 +45,7 @@ public class GameManager : SingletonBase<GameManager>
 
     public event Action<int> OnCountdownChanged;
     public event Action OnGameCleared;
+    public event Action<GameState> OnGameStateChanged;
 
     public bool IsStageSelectUnlocked => Save != null && Save.HasClearedAllStagesSpecial;
 
@@ -192,6 +193,7 @@ public class GameManager : SingletonBase<GameManager>
             NetworkRailService.ResetRun();
             NetworkTrainStrengtheningService.ResetRun();
             NetworkTrainCargeService.ResetRun();
+            NetworkAugmentService.ResetRun();
 
             _currentMapSize = GetMapSize(_currentGameStage);
 
@@ -218,7 +220,8 @@ public class GameManager : SingletonBase<GameManager>
                 await Drone.SpawnAllAsync();
             }
 
-            Train.SpawnTerminalTrain(_startingCarriageCount);
+            // await Train.SpawnTerminalTrainAsync(_startingCarriageCount);
+            NetworkAugmentService.GrantRandomStartingWeapon();
 
             ChangeGameState(GameState.EventPaused);
             Debug.Log("[GameManager] 맵, 기차, 몬스터 스폰 완료");
@@ -776,6 +779,7 @@ public class GameManager : SingletonBase<GameManager>
         NetworkRailService.ResetRun();
         NetworkTrainStrengtheningService.ResetRun();
         NetworkTrainCargeService.ResetRun();
+        NetworkAugmentService.ResetRun();
 
         UI?.CloseHudTrainStatusUI();
         UI?.CloseHudResourceUI();
@@ -836,6 +840,8 @@ public class GameManager : SingletonBase<GameManager>
     {
         _currentGameState = newState;
         Debug.Log($"[GameManager] 게임 상태 변경: {CurrentGameState}");
+
+        OnGameStateChanged?.Invoke(newState);
     }
 }
 
