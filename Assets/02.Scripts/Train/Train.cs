@@ -3,7 +3,7 @@
 public class Train : MonoBehaviour
 {
     [Header("Detection Setting")]
-    [SerializeField] private float _reachThreshold = 0.2f;
+    [SerializeField] private float _reachThreshold = 0.35f;
     [SerializeField] public int _targetIndex = 0;
     [SerializeField] private bool _isMoving = true;
 
