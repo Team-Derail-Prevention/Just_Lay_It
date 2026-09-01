@@ -760,7 +760,7 @@ public class RailManager : SingletonBase<RailManager>
         if (controller != null) controller.enabled = false;
 
         Collider placedCollider = spawnedRail.GetComponentInChildren<Collider>();
-        if (placedCollider != null) placedCollider.enabled = true;
+        if (placedCollider != null) placedCollider.enabled = false;
 
         _placedRails[gridIndex] = new PlacedRailInfo { Obj = spawnedRail, Type = railType, RotationStep = rotationStep };
 
@@ -1063,6 +1063,12 @@ public class RailManager : SingletonBase<RailManager>
     private void AddRailToPath(GameObject rail)
     {
         if (rail == null) return;
+
+        Collider placedCollider = rail.GetComponentInChildren<Collider>();
+        if (placedCollider != null)
+        {
+            placedCollider.enabled = true;
+        }
 
         if (_installedRailPath.Count == 0)
         {
