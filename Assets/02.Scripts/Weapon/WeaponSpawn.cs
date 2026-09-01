@@ -5,26 +5,55 @@ using UnityEngine;
 
 public class WeaponSpawn : SingletonBase<WeaponSpawn>
 {
+    private class PendingWeaponInstall
+    {
+        public TrainCarSection Section;
+        public int SlotIndex;
+        public string WeaponDataId;
+    }
+
+    private readonly List<PendingWeaponInstall> _pendingInstallList = new List<PendingWeaponInstall>();
+
     protected override void Init()
     {
         base.Init();
     }
 
+    private void Start()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
+
     private void OnEnable()
     {
-        if (WeaponEquipEventHub.Instance != null)
-        {
-            WeaponEquipEventHub.Instance.OnWeaponEquipped += OnWeaponEquipped;
-            WeaponEquipEventHub.Instance.OnWeaponUnequipped += OnWeaponUnequipped;
-        }
+        WeaponEquipEventHub.OnWeaponEquipped += OnWeaponEquipped;
+        WeaponEquipEventHub.OnWeaponUnequipped += OnWeaponUnequipped;
+
+        TrainManager.OnTrainSpawn += OnTrainSpawned;
     }
 
     private void OnDisable()
     {
-        if (WeaponEquipEventHub.Instance != null)
+        WeaponEquipEventHub.OnWeaponEquipped -= OnWeaponEquipped;
+        WeaponEquipEventHub.OnWeaponUnequipped -= OnWeaponUnequipped;
+
+        TrainManager.OnTrainSpawn -= OnTrainSpawned;
+    }
+
+    private async void OnTrainSpawned(Transform headTransform)
+    {
+        if (_pendingInstallList.Count == 0)
         {
-            WeaponEquipEventHub.Instance.OnWeaponEquipped -= OnWeaponEquipped;
-            WeaponEquipEventHub.Instance.OnWeaponUnequipped -= OnWeaponUnequipped;
+            return;
+        }
+
+        List<PendingWeaponInstall> retryList = new List<PendingWeaponInstall>(_pendingInstallList);
+        _pendingInstallList.Clear();
+
+        for (int i = 0; i < retryList.Count; i++)
+        {
+            PendingWeaponInstall pending = retryList[i];
+            await WeaponInstall(pending.Section, pending.SlotIndex, pending.WeaponDataId);
         }
     }
 
@@ -38,9 +67,16 @@ public class WeaponSpawn : SingletonBase<WeaponSpawn>
         WeaponUninstall(section, slotIndex);
     }
 
-    public async UniTaskVoid WeaponInstall(TrainCarSection section, int slotIndex, string weaponDataId)
+    public async UniTask WeaponInstall(TrainCarSection section, int slotIndex, string weaponDataId)
     {
+        if (IsTrainReady() == false)
+        {
+            EnqueuePendingInstall(section, slotIndex, weaponDataId);
+            return;
+        }
+
         TrainFollow targetTrain = GetTrainBySection(section);
+
         if (targetTrain == null)
         {
             return;
@@ -53,6 +89,23 @@ public class WeaponSpawn : SingletonBase<WeaponSpawn>
         }
 
         await InstWeapon(weaponDataId, targetTrain, slotIndex);
+    }
+
+    private bool IsTrainReady()
+    {
+        return TrainManager.Instance != null && TrainManager.Instance.carList.Count > 0;
+    }
+
+    private void EnqueuePendingInstall(TrainCarSection section, int slotIndex, string weaponDataId)
+    {
+        Debug.LogWarning($"[WeaponSpawn] 열차가 아직 준비되지 않아 {section}칸 {slotIndex}번 슬롯 장착을 대기열에 담습니다. (WeaponId: {weaponDataId})");
+
+        PendingWeaponInstall pending = new PendingWeaponInstall();
+        pending.Section = section;
+        pending.SlotIndex = slotIndex;
+        pending.WeaponDataId = weaponDataId;
+
+        _pendingInstallList.Add(pending);
     }
 
     public void WeaponUninstall(TrainCarSection section, int slotIndex)
@@ -69,6 +122,7 @@ public class WeaponSpawn : SingletonBase<WeaponSpawn>
     private async UniTask InstWeapon(string weaponDataId, TrainFollow targetTrain, int slotIndex)
     {
         WeaponData weaponData = DataManager.Instance.GetData<WeaponData>(weaponDataId);
+
         if (weaponData == null || targetTrain == null)
         {
             Debug.LogError($"[WeaponSpawn] {weaponDataId} 데이터 조회 실패 또는 대상 열차 없음");
@@ -82,7 +136,7 @@ public class WeaponSpawn : SingletonBase<WeaponSpawn>
             return;
         }
 
-        targetTrain.MountWeapon(weaponPrefab, weaponDataId, slotIndex);
+        bool isMounted = targetTrain.MountWeapon(weaponPrefab, weaponDataId, slotIndex);
     }
 
     private TrainFollow GetTrainBySection(TrainCarSection section)
