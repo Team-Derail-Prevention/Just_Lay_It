@@ -8,14 +8,15 @@ public class MonsterMove : MonoBehaviour
     [SerializeField] private float _attackRange = 5.0f;
     [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private Transform firePosition;
+    [SerializeField] private bool _isMeleeAttack;
 
     private float _moveSpeed;
     private int _monsterAtk;
     private Transform _target;
     private bool _isAttackRange = false;
 
-    private readonly int _walk = Animator.StringToHash("IsMove");
-    private readonly int _attack = Animator.StringToHash("IsAttack");
+    private readonly int _isWalk = Animator.StringToHash("IsWalk");
+    private readonly int _isAttack = Animator.StringToHash("IsAttack");
 
     private float _attackTimer = 0f;
     private float _attackCooldown = 2f;
@@ -35,7 +36,7 @@ public class MonsterMove : MonoBehaviour
             return;
         }
 
-        
+
 
         Vector3 flatTargetPos = new Vector3(_target.position.x, transform.position.y, _target.position.z);
         float distanceToTarget = Vector3.Distance(transform.position, flatTargetPos);
@@ -56,7 +57,7 @@ public class MonsterMove : MonoBehaviour
         _target = target;
 
         _isAttackRange = false;
-        _attackTimer = 0f;
+        _attackTimer = _attackCooldown;
 
         _rb = GetComponent<Rigidbody>();
 
@@ -77,7 +78,7 @@ public class MonsterMove : MonoBehaviour
         }
     }
 
-    
+
     private void ShootProjectile()
     {
         if (_projectilePrefab == null)
@@ -101,9 +102,19 @@ public class MonsterMove : MonoBehaviour
 
     private void HandleMovement(Vector3 targetPos)
     {
-        _isAttackRange = false;
-        _attackTimer = 0f;
-        
+        if (_isAttackRange)
+        {
+            _isAttackRange = false;
+
+            if (_animator != null)
+            {
+                _animator.ResetTrigger(_isAttack);
+                _animator.SetBool(_isWalk, true);
+            }
+        }
+
+        _attackTimer += Time.deltaTime;
+
         transform.LookAt(targetPos);
 
         if (_rb != null)
@@ -126,7 +137,7 @@ public class MonsterMove : MonoBehaviour
 
             if (_animator != null)
             {
-                _animator.SetBool(_walk, false);
+                _animator.SetBool(_isWalk, false);
             }
 
         }
@@ -144,10 +155,29 @@ public class MonsterMove : MonoBehaviour
 
             if (_animator != null)
             {
-                _animator.SetTrigger(_attack);
+                _animator.SetTrigger(_isAttack);
             }
 
-            ShootProjectile();
+            if (!_isMeleeAttack)
+            {
+                ShootProjectile();
+            }
+        }
+    }
+    public void ExecuteMeleeHit()
+    {
+        if (_target != null)
+        {
+            float distance = Vector3.Distance(transform.position, _target.position);
+
+            if (distance <= _attackRange + 0.5f)
+            {
+                Train train = _target.GetComponentInParent<Train>();
+                if (train != null)
+                {
+                    train.ApplyDebuff("Steal", _debuffDuration, _debuffPower);
+                }
+            }
         }
     }
 }

@@ -48,15 +48,13 @@ public class MonsterProjectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Train") || other.GetComponent<Train>() != null)
-        {
-            Debug.Log("Train 타격");
+        Train train = other.GetComponentInParent<Train>();
 
-            Train train = other.GetComponent<Train>();
+        if (other.CompareTag("Train") || train != null)
+        {
 
             if (train != null)
             {
- 
                 train.TakeDamage(_damage);
                 train.ApplyDebuff(_attackType, _debuffDuration, _debuffPower);
             }
