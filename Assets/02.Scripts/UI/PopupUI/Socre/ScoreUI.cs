@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using TMPro;
+using UnityEngine.InputSystem;
 
 public class ScoreUI : UIBase
 {
@@ -35,6 +36,11 @@ public class ScoreUI : UIBase
 
     private void Update()
     {
+        if (Keyboard.current == null)
+        {
+            return;
+        }
+
         bool isEnterPressed = Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
         if (isEnterPressed == true)
         {

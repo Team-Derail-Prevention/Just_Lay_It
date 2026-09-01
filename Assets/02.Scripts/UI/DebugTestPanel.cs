@@ -1,35 +1,41 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class DebugTestPanel : MonoBehaviour
 {
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Keyboard.current == null)
+        {
+            return;
+        }
+
+        if(Keyboard.current.digit1Key.wasPressedThisFrame == true)
         {
             NetworkResourceService.Instance.AddWood(10);
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha2))
+        if (Keyboard.current.digit2Key.wasPressedThisFrame == true)
         {
             NetworkResourceService.Instance.AddStone(10);
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha3))
+        if (Keyboard.current.digit3Key.wasPressedThisFrame == true)
         {
             NetworkUpgradeService.Instance.GainCash(100);
         }
 
-        if (Input.GetKeyDown(KeyCode.F9))
+        if (Keyboard.current.f9Key.wasPressedThisFrame == true)
         {
             GameManager.Instance.Debug_ForceGameClearInTime();
         }
 
-        if (Input.GetKeyDown(KeyCode.F10))
+        if (Keyboard.current.f10Key.wasPressedThisFrame == true)
         {
             GameManager.Instance.Debug_ForceGameClearOverTime();
         }
 
-        if (Input.GetKeyDown(KeyCode.F11))
+        if (Keyboard.current.f11Key.wasPressedThisFrame == true)
         {
             SaveManager.Instance.Debug_ResetFirstPlayNotice();
         }
