@@ -38,7 +38,7 @@ public class WeaponFire : MonoBehaviour
 
     private int _lobbyAtkBonus;
     private int _battleDamageBonus;
-
+    private Train _parentTrain;
 
     private void Awake()
     {
@@ -51,6 +51,8 @@ public class WeaponFire : MonoBehaviour
         {
             _weaponTargeting = GetComponent<WeaponTargeting>();
         }
+
+        _parentTrain = GetComponentInParent<Train>();
     }
 
     private async void Start()
@@ -80,6 +82,12 @@ public class WeaponFire : MonoBehaviour
         }
 
         _fireTimer += Time.deltaTime;
+
+        if (_fireTimer < GetModifiedFireRate())
+        {
+            return;
+        }
+
         if (_fireTimer < _fireRate)
         {
             return;
@@ -127,6 +135,15 @@ public class WeaponFire : MonoBehaviour
         stats.CurrentAmmo = _currentAmmo;
 
         return stats;
+    }
+
+    private float GetModifiedFireRate()
+    {
+        if (_parentTrain != null && _parentTrain.IsFrozen)
+        {
+            return _fireRate * 2.0f;
+        }
+        return _fireRate;
     }
 
     private void OnInGameUpgraded(string slotDataId, int newLevel)
@@ -243,7 +260,13 @@ public class WeaponFire : MonoBehaviour
             Vector3 targetCenter = new Vector3(target.position.x, _firePosition.position.y, target.position.z);
             Vector3 shootDir = (targetCenter - _firePosition.position).normalized;
 
-            projectile.ProjectileInitialize(shootDir, _weaponAtk);
+            int finalAtk = _weaponAtk;
+            if (_parentTrain != null && _parentTrain.IsElectrified)
+            {
+                finalAtk = Mathf.RoundToInt(finalAtk * 0.5f);
+            }
+
+            projectile.ProjectileInitialize(shootDir, finalAtk);
         }
 
         _currentAmmo--;
