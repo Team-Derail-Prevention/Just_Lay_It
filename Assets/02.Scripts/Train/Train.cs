@@ -133,9 +133,8 @@ public class Train : MonoBehaviour
         {
             _maxMoveSpeed = data.MoveSpeed;
             _rotateSpeed = data.RotateSpeed;
-            _maxHp = data.MaxHp;
-            _currentHp = data.MaxHp;
-            _defense = data.Defense;
+
+            RecalculateStats(isInitial: true);
         }
 
 

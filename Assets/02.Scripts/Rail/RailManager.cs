@@ -13,7 +13,6 @@ public enum RailType
 public class RailManager : SingletonBase<RailManager>
 {
     [Header("Refs")]
-    [SerializeField] private Camera Camera_Main;
     [SerializeField] private LayerMask _groundLayer;
     [SerializeField] private LayerMask _blockedLayer; // 오브젝트가 올라간 바닥(Default) 레이어
     [SerializeField] private Transform Transform_MapRoot;
@@ -33,6 +32,21 @@ public class RailManager : SingletonBase<RailManager>
     public float GhostAlpha { get { return _ghostAlpha; } }
 
     public bool IsPlaceModeActive { get { return _isPlaceModeActive; } }
+
+
+    //카메라 자동 등록
+    private Camera _mainCamera;
+    public Camera Camera_Main
+    {
+        get
+        {
+            if (_mainCamera == null)
+            {
+                _mainCamera = Camera.main;
+            }
+            return _mainCamera;
+        }
+    }
 
     private RailType _currentRailType = RailType.Straight;
 
@@ -93,6 +107,7 @@ public class RailManager : SingletonBase<RailManager>
             MapManager_Ref.OnMapGenerated += HandleMapGenerated;
         }
     }
+   
 
     private void Start()
     {
@@ -450,6 +465,9 @@ public class RailManager : SingletonBase<RailManager>
 
     private void UpdateHover()
     {
+        //카메라 자동 등록
+        if (Camera_Main == null) return;
+
         Ray ray = Camera_Main.ScreenPointToRay(Input.mousePosition);
         Plane groundPlane = new Plane(Vector3.up, new Vector3(0f, _groundPlaneY, 0f));
 
@@ -857,7 +875,7 @@ public class RailManager : SingletonBase<RailManager>
         if (controller != null) controller.enabled = false;
 
         Collider placedCollider = spawnedRail.GetComponentInChildren<Collider>();
-        if (placedCollider != null) placedCollider.enabled = true;
+        if (placedCollider != null) placedCollider.enabled = false;
 
         _placedRails[gridIndex] = new PlacedRailInfo
         {
@@ -967,6 +985,14 @@ public class RailManager : SingletonBase<RailManager>
         Vector3 placedPos = placedRail.position;
         Vector2Int placedGrid = WorldPointToGridIndex(placedPos);
 
+        Vector3 forwardDir = placedRail.forward;
+        if (_installedRailPath.Count >= 2)
+        {
+            Vector3 prevPos = _installedRailPath[_installedRailPath.Count - 2].position;
+            forwardDir = (placedPos - prevPos).normalized;
+        }
+        forwardDir.y = 0f;
+
         Collider[] hits = Physics.OverlapSphere(placedPos, 1.2f);
         List<Transform> stationRailsToAppend = new List<Transform>();
         HashSet<Transform> processedRoots = new HashSet<Transform>();
@@ -984,19 +1010,27 @@ public class RailManager : SingletonBase<RailManager>
                 Transform touchedRail = hitTrans.name.Contains("AutoSpawned") ? hitTrans : hitTrans.parent;
                 Transform dirRoot = touchedRail.parent;
 
-                if (_currentDepartureGateRoot != null && dirRoot == _currentDepartureGateRoot)
+                if (_currentDepartureGateRoot != null && (dirRoot == _currentDepartureGateRoot || touchedRail.IsChildOf(_currentDepartureGateRoot)))
                 {
                     continue;
                 }
 
-                if (_departureStationRoot != null && dirRoot != null && dirRoot.IsChildOf(_departureStationRoot))
+                if (_departureStationRoot != null && (touchedRail.IsChildOf(_departureStationRoot) || (dirRoot != null && dirRoot.IsChildOf(_departureStationRoot))))
                 {
-                    int playerRailCount = _installedRailPath.Count - (_currentDepartureGateRoot != null ? _currentDepartureGateRoot.childCount : 0);
+                    int startRailCount = _currentDepartureGateRoot != null ? _currentDepartureGateRoot.childCount : 0;
+                    int playerRailCount = _installedRailPath.Count - startRailCount;
                     if (playerRailCount < 3)
                     {
                         continue;
                     }
 
+                }
+
+                Vector3 toTargetDir = (touchedRail.position - placedPos).normalized;
+                toTargetDir.y = 0f;
+                if (Vector3.Dot(forwardDir, toTargetDir) < -0.1f)
+                {
+                    continue;
                 }
 
                 Vector2Int touchedGrid = WorldPointToGridIndex(touchedRail.position);
@@ -1047,16 +1081,28 @@ public class RailManager : SingletonBase<RailManager>
         _installedRailPath.Clear();
         _currentDepartureGateRoot = dirRoot;
         if (dirRoot == null) return;
-        if (dirRoot != null)
+        
+        StationObject stationObj = dirRoot.GetComponentInParent<StationObject>();
+        CentralTerminal terminalObj = dirRoot.GetComponentInParent<CentralTerminal>();
+
+        if (stationObj != null)
+        {
+            _departureStationRoot = stationObj.transform;
+        }
+        else if (terminalObj != null)
+        {
+            _departureStationRoot = terminalObj.transform;
+        }
+        else
         {
             _departureStationRoot = dirRoot.parent != null ? dirRoot.parent : dirRoot;
         }
 
-        for (int i = 0; i < dirRoot.childCount; i++)
-        {
-            Transform rail = dirRoot.GetChild(i);
-            _installedRailPath.Add(rail);
-        }
+            for (int i = 0; i < dirRoot.childCount; i++)
+            {
+                Transform rail = dirRoot.GetChild(i);
+                _installedRailPath.Add(rail);
+            }
         Debug.Log($"[RailManager] 시작 출구 레일 {_installedRailPath.Count}개 등록 완료");
     }
 
