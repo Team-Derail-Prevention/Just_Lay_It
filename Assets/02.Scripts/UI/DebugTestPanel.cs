@@ -18,7 +18,7 @@ public class DebugTestPanel : MonoBehaviour
         {
             NetworkUpgradeService.Instance.GainCash(100);
         }
-
+#if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.F9))
         {
             GameManager.Instance.Debug_ForceGameClearInTime();
@@ -33,5 +33,6 @@ public class DebugTestPanel : MonoBehaviour
         {
             SaveManager.Instance.Debug_ResetFirstPlayNotice();
         }
+#endif
     }
 }
