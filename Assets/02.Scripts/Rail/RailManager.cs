@@ -107,7 +107,7 @@ public class RailManager : SingletonBase<RailManager>
             MapManager_Ref.OnMapGenerated += HandleMapGenerated;
         }
     }
-   
+
 
     private void Start()
     {
@@ -157,26 +157,9 @@ public class RailManager : SingletonBase<RailManager>
 
         if (Input.GetKeyDown(KeyCode.D))
         {
-            if (_previewInstance == null)
-            {
-                return;
-            }
-
-            if (_isConfirmPopupOpen || _isHoverSuppressed)
-            {
-                return;
-            }
-
             if (_isPlaceModeActive && _isHoveredCube)
             {
-                if (IsPlacementValid(_hoveredGridIndex, _hoveredCubeInfo))
-                {
-                    TryInstallRail(_hoveredGridIndex, _hoveredCubeInfo);
-                }
-                else
-                {
-                    Debug.Log("[RailManager] 설치 불가 영역입니다.");
-                }
+                TryInstallRail(_hoveredGridIndex, _hoveredCubeInfo);
             }
         }
 
@@ -541,7 +524,7 @@ public class RailManager : SingletonBase<RailManager>
         }
         else if (type == RailType.Corner)
         {
-            // [교정완료] 실제 프리팹의 시각적 회전값에 맞게 포트 매핑 완전 수정
+            // 실제 프리팹의 시각적 회전값에 맞게 포트 매핑 수정
             if (rotStep == 0) { ports.Add(0); ports.Add(3); } // 북, 서 (0도)
             else if (rotStep == 1) { ports.Add(0); ports.Add(1); } // 북, 동 (90도 회전)
             else if (rotStep == 2) { ports.Add(1); ports.Add(2); } // 동, 남 (180도 회전)
@@ -575,7 +558,7 @@ public class RailManager : SingletonBase<RailManager>
         return count;
     }
 
-    // [핵심 수정] 상대방 구멍이 나를 향하고 있거나, 아직 미완성된 레일일 때만 스마트하게 연결을 시도합니다.
+    // [수정] 상대방 구멍이 나를 향하고 있거나, 아직 미완성된 레일일 때만 연결을 시도합니다.
     private List<int> GetConnectedDirections(Vector2Int gridIndex)
     {
         List<int> connected = new List<int>();
@@ -799,7 +782,8 @@ public class RailManager : SingletonBase<RailManager>
 
         _placedRails[gridIndex] = new PlacedRailInfo { Obj = spawnedRail, Type = railType, RotationStep = rotationStep };
 
-        DroneManager.Deliver(spawnedRail, worldPos, rotation, AddRailToPath);
+        // [수정] AddRailToPath 대신, 배달 완료 시 그래프 전체를 재구성하는 OnRailDelivered 콜백으로 교체
+        DroneManager.Deliver(spawnedRail, worldPos, rotation, OnRailDelivered);
 
         UpdateNeighborShapes(gridIndex);
 
@@ -869,11 +853,8 @@ public class RailManager : SingletonBase<RailManager>
         {
             DroneManager.TryReplaceDelivery(oldInfo.Obj, spawnedRail);
 
-            int pathIndex = _installedRailPath.IndexOf(oldInfo.Obj.transform);
-            if (pathIndex != -1)
-            {
-                _installedRailPath[pathIndex] = spawnedRail.transform;
-            }
+            // [수정] _installedRailPath 안의 옛 Transform을 수동으로 찾아 바꾸던 코드 제거
+            // -> RebuildInstalledRailPath()가 _placedRails에서 항상 최신 Transform을 읽어오므로 불필요해짐
 
             if (oldInfo.IsFixed)
             {
@@ -901,6 +882,9 @@ public class RailManager : SingletonBase<RailManager>
             RotationStep = newRotationStep,
             IsFixed = oldInfo.IsFixed
         };
+
+        // [추가] 모양이 바뀐 뒤 경로를 그래프 스냅샷 기준으로 다시 계산
+        RebuildInstalledRailPath();
     }
 
     private void RemoveRail(Vector2Int gridIndex, bool updateNeighbors = true)
@@ -926,7 +910,8 @@ public class RailManager : SingletonBase<RailManager>
 
         if (placedInfo.Obj != null)
         {
-            _installedRailPath.Remove(placedInfo.Obj.transform);
+            // [수정] _installedRailPath.Remove(...) 수동 제거 코드 삭제
+            // -> RebuildInstalledRailPath()가 _placedRails 기준으로 리스트를 통째로 새로 만들므로 불필요해짐
             Addressables.ReleaseInstance(placedInfo.Obj);
         }
 
@@ -939,6 +924,9 @@ public class RailManager : SingletonBase<RailManager>
         {
             UpdateNeighborShapes(gridIndex);
         }
+
+        // [추가] 레일 회수 후 경로 재구성
+        RebuildInstalledRailPath();
 
         Debug.Log($"[RailManager] {placedInfo.Type} 레일 회수됨: " + gridIndex);
     }
@@ -1098,7 +1086,7 @@ public class RailManager : SingletonBase<RailManager>
         _installedRailPath.Clear();
         _currentDepartureGateRoot = dirRoot;
         if (dirRoot == null) return;
-        
+
         StationObject stationObj = dirRoot.GetComponentInParent<StationObject>();
         CentralTerminal terminalObj = dirRoot.GetComponentInParent<CentralTerminal>();
 
@@ -1115,15 +1103,16 @@ public class RailManager : SingletonBase<RailManager>
             _departureStationRoot = dirRoot.parent != null ? dirRoot.parent : dirRoot;
         }
 
-            for (int i = 0; i < dirRoot.childCount; i++)
-            {
-                Transform rail = dirRoot.GetChild(i);
-                _installedRailPath.Add(rail);
-            }
+        for (int i = 0; i < dirRoot.childCount; i++)
+        {
+            Transform rail = dirRoot.GetChild(i);
+            _installedRailPath.Add(rail);
+        }
         Debug.Log($"[RailManager] 시작 출구 레일 {_installedRailPath.Count}개 등록 완료");
     }
 
-    private void AddRailToPath(GameObject rail)
+    // [수정] AddRailToPath를 대체 - 배달 완료 시 콜라이더만 켜주고, 경로 갱신은 RebuildInstalledRailPath에 위임
+    private void OnRailDelivered(GameObject rail)
     {
         if (rail == null) return;
 
@@ -1133,72 +1122,107 @@ public class RailManager : SingletonBase<RailManager>
             placedCollider.enabled = true;
         }
 
-        if (_installedRailPath.Count == 0)
-        {
-            _installedRailPath.Add(rail.transform);
-        }
-        else
-        {
-            Transform lastRail = _installedRailPath[_installedRailPath.Count - 1];
-            Vector2Int lastGrid = WorldPointToGridIndex(lastRail.position);
-            Vector2Int newGrid = WorldPointToGridIndex(rail.transform.position);
-
-            int diffX = Mathf.Abs(newGrid.x - lastGrid.x);
-            int diffY = Mathf.Abs(newGrid.y - lastGrid.y);
-
-            if (diffX + diffY == 1)
-            {
-                if (!_installedRailPath.Contains(rail.transform))
-                {
-                    _installedRailPath.Add(rail.transform);
-
-                }
-            }
-
-            PropagateConnectedRails();
-
-            if (_installedRailPath.Count > 0)
-            {
-                ConnectStationRails(_installedRailPath[_installedRailPath.Count - 1]);
-            }
-        }
+        RebuildInstalledRailPath();
     }
 
-    // 끊긴 곳을 메꿨을 때 뒤에 이미 깔려있던 레일들을 순서대로 리스트에 추가해주는 함수
-    private void PropagateConnectedRails()
+    // [추가] fromGrid에서 포트가 맞물리는 다음 레일을 찾음. visited에 있는 칸은 건너뜀.
+    // 후보가 2개 이상이면(3방향 접합 등 설계상 없어야 할 분기) 경고 로그를 남기고 첫 번째만 사용.
+    private bool FindNextConnectedRail(Vector2Int fromGrid, HashSet<Vector2Int> visited, out Transform nextRail, out Vector2Int nextGrid, out bool nextIsFixed)
     {
-        for (int step = 0; step < 100; step++)
+        nextRail = null;
+        nextGrid = default;
+        nextIsFixed = false;
+
+        if (!_placedRails.TryGetValue(fromGrid, out PlacedRailInfo fromInfo)) return false;
+
+        List<int> ports = GetRailPorts(fromInfo.Type, fromInfo.RotationStep);
+        int matchCount = 0;
+
+        for (int i = 0; i < ports.Count; i++)
         {
-            if (_installedRailPath.Count == 0)
+            int port = ports[i];
+            Vector2Int candidateGrid = fromGrid + _cardinalOffsets[port];
+
+            if (visited.Contains(candidateGrid)) continue;
+            if (!_placedRails.TryGetValue(candidateGrid, out PlacedRailInfo candidateInfo)) continue;
+            if (candidateInfo.Obj == null) continue;
+
+            int dirFromCandidateToMe = OppositeDirection(port);
+            List<int> candidatePorts = GetRailPorts(candidateInfo.Type, candidateInfo.RotationStep);
+            if (!candidatePorts.Contains(dirFromCandidateToMe)) continue; // 서로 포트가 맞물려야 인정
+
+            matchCount++;
+            if (matchCount == 1)
+            {
+                nextRail = candidateInfo.Obj.transform;
+                nextGrid = candidateGrid;
+                nextIsFixed = candidateInfo.IsFixed;
+            }
+        }
+
+        if (matchCount > 1)
+        {
+            Debug.LogWarning($"[RailManager] {fromGrid}에서 분기(3방향 이상 연결) 감지됨 - 첫 번째 후보만 사용합니다.");
+        }
+
+        return matchCount > 0;
+    }
+
+    // [추가] 출발 게이트부터 _placedRails 그래프를 매번 다시 순회해 _installedRailPath를 재구성.
+    // 드론 배달/배치 순서와 무관하게 항상 그 순간의 실제 연결 상태를 정확히 반영함.
+    private void RebuildInstalledRailPath()
+    {
+        List<Transform> newPath = new List<Transform>();
+        HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
+
+        if (_currentDepartureGateRoot == null)
+        {
+            _installedRailPath = newPath;
+            return;
+        }
+
+        // 1. 출발 게이트 고정 레일들을 시작 구간으로 등록
+        for (int i = 0; i < _currentDepartureGateRoot.childCount; i++)
+        {
+            Transform gateRail = _currentDepartureGateRoot.GetChild(i);
+            newPath.Add(gateRail);
+            visited.Add(WorldPointToGridIndex(gateRail.position));
+        }
+
+        if (newPath.Count == 0)
+        {
+            _installedRailPath = newPath;
+            return;
+        }
+
+        Vector2Int currentGrid = WorldPointToGridIndex(newPath[newPath.Count - 1].position);
+
+        // 2. 그래프를 따라 계속 다음(플레이어가 놓은) 레일을 찾아 이어붙임
+        for (int step = 0; step < 500; step++)
+        {
+            if (!FindNextConnectedRail(currentGrid, visited, out Transform nextRail, out Vector2Int nextGrid, out bool nextIsFixed))
             {
                 break;
             }
 
-            Transform currentLast = _installedRailPath[_installedRailPath.Count - 1];
-            Vector2Int currentGrid = WorldPointToGridIndex(currentLast.position);
-            Transform nextFoundRail = null;
-
-            for (int dir = 0; dir < 4; dir++)
+            if (nextIsFixed)
             {
-                Vector2Int neighborGrid = currentGrid + _cardinalOffsets[dir];
-
-                if (_placedRails.TryGetValue(neighborGrid, out PlacedRailInfo info))
-                {
-                    if (info.Obj == null) continue;
-
-                    Transform candidate = info.Obj.transform;
-
-                    if (_installedRailPath.Contains(candidate)) continue;
-
-                    nextFoundRail = candidate;
-                    break;
-                }
+                // [핵심] 다른 역/터미널의 고정 레일 영역에 도달함 - 그래프 인접성만으로
+                // 그냥 들어가지 않고, ConnectStationRails의 물리 기반 검증
+                // (방향 체크, 자기 출발지 재진입 방지, 유예 칸수 등)에 맡기고 순회 종료
+                break;
             }
 
-            if (nextFoundRail == null) break;
+            newPath.Add(nextRail);
+            visited.Add(nextGrid);
+            currentGrid = nextGrid;
+        }
 
-            _installedRailPath.Add(nextFoundRail);
-            ConnectStationRails(nextFoundRail);
+        _installedRailPath = newPath;
+
+        if (_installedRailPath.Count > 0)
+        {
+            ConnectStationRails(_installedRailPath[_installedRailPath.Count - 1]);
         }
     }
 
