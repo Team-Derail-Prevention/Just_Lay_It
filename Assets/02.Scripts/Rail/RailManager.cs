@@ -67,8 +67,10 @@ public class RailManager : SingletonBase<RailManager>
         public RailType Type;
         public int RotationStep;
         public bool IsFixed;
+        public bool IsDelivered;
     }
     private Dictionary<Vector2Int, PlacedRailInfo> _placedRails = new Dictionary<Vector2Int, PlacedRailInfo>();
+    private bool _hasAnnouncedStationArrival;
 
     private Vector2Int _hoveredGridIndex;
     private bool _isHoveredCube;
@@ -288,7 +290,8 @@ public class RailManager : SingletonBase<RailManager>
                 Obj = railTrans.gameObject,
                 Type = RailType.Straight,
                 RotationStep = rotationStep,
-                IsFixed = true
+                IsFixed = true,
+                IsDelivered = true
             };
 
             if (_cubeGrid.TryGetValue(gridIndex, out CubeInfo cubeInfo) && cubeInfo.TileScript != null)
@@ -772,7 +775,7 @@ public class RailManager : SingletonBase<RailManager>
         Collider placedCollider = spawnedRail.GetComponentInChildren<Collider>();
         if (placedCollider != null) placedCollider.enabled = false;
 
-        _placedRails[gridIndex] = new PlacedRailInfo { Obj = spawnedRail, Type = railType, RotationStep = rotationStep };
+        _placedRails[gridIndex] = new PlacedRailInfo { Obj = spawnedRail, Type = railType, RotationStep = rotationStep, IsDelivered = false };
 
         // [수정] AddRailToPath 대신, 배달 완료 시 그래프 전체를 재구성하는 OnRailDelivered 콜백으로 교체
         DroneManager.Deliver(spawnedRail, worldPos, rotation, OnRailDelivered);
@@ -872,7 +875,8 @@ public class RailManager : SingletonBase<RailManager>
             Obj = spawnedRail,
             Type = newType,
             RotationStep = newRotationStep,
-            IsFixed = oldInfo.IsFixed
+            IsFixed = oldInfo.IsFixed,
+            IsDelivered = oldInfo.IsDelivered
         };
 
         // [추가] 모양이 바뀐 뒤 경로를 그래프 스냅샷 기준으로 다시 계산
@@ -1066,9 +1070,14 @@ public class RailManager : SingletonBase<RailManager>
             {
                 _installedRailPath.Add(stationRailsToAppend[i]);
             }
-            Debug.Log("[RailManager] 기차역 레일 연결성공");
-            SoundManager.Instance?.PlaySFX(SfxAddress.Train.Arrive);
-            DroneManager.Instance?.RecallAllAndSuspendMining();
+            if (_hasAnnouncedStationArrival == false)
+            {
+                _hasAnnouncedStationArrival = true;
+
+                Debug.Log("[RailManager] 기차역 레일 연결성공");
+                SoundManager.Instance?.PlaySFX(SfxAddress.Train.Arrive);
+                DroneManager.Instance?.RecallAllAndSuspendMining();
+            }
 
             //레일 전체 연결 완료 -> 기차 속도 부스트 적용
             TrainManager.Instance?.SetTrainSpeedBoost(true);
@@ -1078,6 +1087,7 @@ public class RailManager : SingletonBase<RailManager>
     public void InitStartingRailPath(Transform dirRoot)
     {
         _currentDepartureGateRoot = dirRoot;
+        _hasAnnouncedStationArrival = false;
         if (dirRoot == null)
         {
             _installedRailPath.Clear();
@@ -1116,7 +1126,39 @@ public class RailManager : SingletonBase<RailManager>
             placedCollider.enabled = true;
         }
 
+        MarkRailDelivered(rail);
+
         RebuildInstalledRailPath();
+    }
+
+    private void MarkRailDelivered(GameObject rail)
+    {
+        Vector2Int foundGrid = default;
+        bool isFound = false;
+
+        foreach (KeyValuePair<Vector2Int, PlacedRailInfo> kvp in _placedRails)
+        {
+            if (kvp.Value.Obj != rail)
+            {
+                continue;
+            }
+
+            foundGrid = kvp.Key;
+            isFound = true;
+
+            break;
+        }
+
+        if (isFound == false)
+        {
+            return;
+        }
+
+        PlacedRailInfo info = _placedRails[foundGrid];
+
+        info.IsDelivered = true;
+
+        _placedRails[foundGrid] = info;
     }
 
     // [추가] fromGrid에서 포트가 맞물리는 다음 레일을 찾음. visited에 있는 칸은 건너뜀.
@@ -1140,6 +1182,7 @@ public class RailManager : SingletonBase<RailManager>
             if (visited.Contains(candidateGrid)) continue;
             if (!_placedRails.TryGetValue(candidateGrid, out PlacedRailInfo candidateInfo)) continue;
             if (candidateInfo.Obj == null) continue;
+            if (candidateInfo.IsDelivered == false) continue;
 
             int dirFromCandidateToMe = OppositeDirection(port);
             List<int> candidatePorts = GetRailPorts(candidateInfo.Type, candidateInfo.RotationStep);
