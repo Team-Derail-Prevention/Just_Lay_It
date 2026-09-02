@@ -365,6 +365,26 @@ public class SaveManager : SingletonBase<SaveManager>
 
         return saveData;
     }
+
+#if UNITY_EDITOR
+    public void Debug_ResetAllProgressData()
+    {
+        HasSeenFirstPlayNotice = false;
+        HasClearedAllStagesSpecial = false;
+
+        PlayerPrefs.SetInt(TotalPlayCountKey, 0);
+        PlayerPrefs.Save();
+
+        SaveLifetimeStatsData(new LifetimeStatsData());
+
+        if (GameManager.NetworkUpgradeService != null)
+        {
+            GameManager.NetworkUpgradeService.Debug_ResetUpgradeState();
+        }
+
+        Debug.Log("[SaveManager] 전체 진행 데이터를 초기화했습니다.");
+    }
+#endif
 }
 
 [Serializable]
