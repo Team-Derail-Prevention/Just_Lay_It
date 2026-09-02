@@ -34,6 +34,21 @@ public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         SetDefaultUI();
     }
 
+    private void OnEnable()
+    {
+        if (Button_Base == null)
+        {
+            return;
+        }
+
+        Button_Base.onClick.AddListener(PlayClickSfx);
+    }
+
+    private void PlayClickSfx()
+    {
+        SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Click);
+    }
+
     private void OnDisable()
     {
         if (Button_Base == null)

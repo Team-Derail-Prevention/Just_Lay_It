@@ -57,6 +57,8 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
     {
         TickCraftProgress(RailType.Straight);
         TickCraftProgress(RailType.Corner);
+
+        TryAutoCraftStraight();
     }
 
     public RailBuildViewModel GetLocalRailBuildViewModel()
@@ -139,5 +141,27 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
         _localRailBuildViewModel = new RailBuildViewModel(_bonusBaseRailCount);
         _sessionCraftedCount = 0;
         _sessionInstalledCount = 0;
+    }
+
+    private void TryAutoCraftStraight()
+    {
+        var slot = GetLocalRailBuildViewModel().GetSlot(RailType.Straight);
+        if (slot.CraftQueueCount > 0)
+        {
+            return;
+        }
+
+        if (NetworkResourceService.Instance == null)
+        {
+            return;
+        }
+
+        int currentWood = NetworkResourceService.Instance.GetLocalResourceViewModel().CurrentWood;
+        if (currentWood < CRAFT_WOOD_COST)
+        {
+            return;
+        }
+
+        RequestCraft(RailType.Straight);
     }
 }

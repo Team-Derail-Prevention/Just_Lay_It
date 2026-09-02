@@ -39,5 +39,10 @@ public class DebugTestPanel : MonoBehaviour
         {
             SaveManager.Instance.Debug_ResetFirstPlayNotice();
         }
+
+        if (Keyboard.current.f12Key.wasPressedThisFrame == true)
+        {
+            SaveManager.Instance.Debug_ResetAllProgressData();
+        }
     }
 }

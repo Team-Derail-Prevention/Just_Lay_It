@@ -31,7 +31,7 @@ public class LobbyUI : UIBase
         _btnExit.UnBindOnClickButtonEvent(OnClick_Exit);
     }
 
-    private void OnClick_GameStart()
+    private async void OnClick_GameStart()
     {
         if (_isStartingGame == true)
         {
@@ -39,7 +39,15 @@ public class LobbyUI : UIBase
         }
 
         _isStartingGame = true;
-        UIManager.Instance.StartGameFromLobby().Forget();
+
+        try
+        {
+            await UIManager.Instance.StartGameFromLobby();
+        }
+        finally
+        {
+            _isStartingGame = false;
+        }
     }
 
     private void OnClick_Upgrade()
