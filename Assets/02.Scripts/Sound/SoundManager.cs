@@ -9,8 +9,8 @@ public class SoundManager : SingletonBase<SoundManager>
     [SerializeField] private AudioSource _bgmSource;
 
     [Header("상태별 BGM")]
-    [SerializeField] private string _lobbyBgmAddress = "Bgm/OutGame";
-    [SerializeField] private string _inGameBgmAddress = "Bgm/InGame";
+    [SerializeField] private string _lobbyBgmAddress = BgmAddress.Lobby;
+    [SerializeField] private string _inGameBgmAddress = BgmAddress.InGame;
 
     [Header("일시정지 먹먹함")]
     [SerializeField, Min(0f)] private float _muffleCutoff = 1000f;

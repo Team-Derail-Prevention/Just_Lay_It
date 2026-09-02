@@ -12,6 +12,8 @@
         public const string WeaponEquip = "Sfx/Ui/WeaponEquip";
         public const string WeaponUnEquip = "Sfx/Ui/WeaponUnEquip";
         public const string Denied = "Sfx/Ui/Denied";
+        public const string Purchase = "Sfx/Ui/Purchase";
+        public const string Sell = "Sfx/Ui/Sell";
     }
 
     public static class Train
@@ -61,6 +63,6 @@
 
 public static class BgmAddress
 {
-    public const string Lobby = "Bgm/Lobby";
+    public const string Lobby = "Bgm/OutGame";
     public const string InGame = "Bgm/InGame";
 }
