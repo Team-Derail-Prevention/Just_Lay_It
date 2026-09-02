@@ -2,6 +2,7 @@
 {
     public static class Ui
     {
+        public const string Hover = "Sfx/Ui/Hover";
         public const string Click = "Sfx/Ui/Click";
         public const string GachaSpin = "Sfx/Ui/GachaSpin";
         public const string WeaponPick = "Sfx/Ui/WeaponPick";
@@ -39,6 +40,8 @@
     {
         Drone.Propeller,
         Drone.RailDrop,
+        Ui.Hover,
+        Ui.Click,
         Train.Depart,
         Train.Arrive,
     };
