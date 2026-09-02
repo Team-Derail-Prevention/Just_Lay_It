@@ -25,6 +25,13 @@
         public const string Repair = "Sfx/Train/Repair";
     }
 
+    public static class Weapon
+    {
+        public const string Prefix = "Sfx/Weapon/";
+        public const string Fire = "Sfx/Weapon/Fire";
+        public const string Reload = "Sfx/Weapon/Reload";
+    }
+
     public static class Monster
     {
         public const string LaserFire = "Sfx/Monster/LaserFire";
