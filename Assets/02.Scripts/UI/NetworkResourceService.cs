@@ -9,6 +9,24 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
     private int _cargoLimit = BASE_CARGO_LIMIT;
     private int _sessionTotalWoodCollected;
     private int _sessionTotalStoneCollected;
+    private bool _isBaseRepairFreeUsed;
+    private bool _isStationRepairFreeUsed;
+
+    public bool IsBaseRepairFreeAvailable
+    {
+        get
+        {
+            return _isBaseRepairFreeUsed == false;
+        }
+    }
+
+    public bool IsStationRepairFreeAvailable
+    {
+        get
+        {
+            return _isStationRepairFreeUsed == false;
+        }
+    }
 
     public int SessionTotalWoodCollected => _sessionTotalWoodCollected;
     public int SessionTotalStoneCollected => _sessionTotalStoneCollected;
@@ -226,6 +244,28 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         return vm.CurrentStone >= amount;
     }
 
+    public bool TrySpendStoneForBaseRepair(int cost)
+    {
+        if (_isBaseRepairFreeUsed == false)
+        {
+            _isBaseRepairFreeUsed = true;
+            return true;
+        }
+
+        return TrySpendStone(cost);
+    }
+
+    public bool TrySpendStoneForStationRepair(int cost)
+    {
+        if (_isStationRepairFreeUsed == false)
+        {
+            _isStationRepairFreeUsed = true;
+            return true;
+        }
+
+        return TrySpendStone(cost);
+    }
+
     public bool TrySpendStone(int amount)
     {
         var vm = GetLocalResourceViewModel();
@@ -278,13 +318,14 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         _cargoLimit = BASE_CARGO_LIMIT;
         _sessionTotalWoodCollected = 0;
         _sessionTotalStoneCollected = 0;
+        _isBaseRepairFreeUsed = false;
+        _isStationRepairFreeUsed = false;
 
         if (ResourceStatusEventHub.Instance != null)
         {
             ResourceStatusEventHub.Instance.NotifyWoodChanged(_localVm.CurrentWood);
             ResourceStatusEventHub.Instance.NotifyStoneChanged(_localVm.CurrentStone);
             ResourceStatusEventHub.Instance.NotifyRescuedHumanChanged(0);
-            ResourceStatusEventHub.Instance.NotifyCargoLimitChanged(_cargoLimit);
         }
     }
 

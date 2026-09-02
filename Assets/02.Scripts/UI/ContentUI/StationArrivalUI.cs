@@ -66,12 +66,8 @@ public class StationArrivalUI : UIBase
         _takeStoneAmount = 0;
         _boardCitizenAmount = 0;
 
-        if (Text_RepairCost != null)
-        {
-            Text_RepairCost.text = REPAIR_STONE_COST.ToString();
-        }
+        RefreshRepairCostText();
         SyncHpFromActiveTrain();
-
         RefreshTopIndicators();
         RefreshTakeAmountTexts();
     }
@@ -151,6 +147,17 @@ public class StationArrivalUI : UIBase
         {
             Text_TrainHpPercent.text = $"{Mathf.RoundToInt(_currentHpPercent)}%";
         }
+    }
+
+    private void RefreshRepairCostText()
+    {
+        if (Text_RepairCost == null)
+        {
+            return;
+        }
+
+        bool isFreeAvailable = NetworkResourceService.Instance != null && NetworkResourceService.Instance.IsStationRepairFreeAvailable;
+        Text_RepairCost.text = isFreeAvailable ? "무료" : REPAIR_STONE_COST.ToString();
     }
 
     private void RefreshTopIndicators()
@@ -245,7 +252,9 @@ public class StationArrivalUI : UIBase
             return;
         }
 
-        bool isSpent = NetworkResourceService.Instance.TrySpendStone(REPAIR_STONE_COST);
+        bool isFreeAvailable = NetworkResourceService.Instance != null && NetworkResourceService.Instance.IsStationRepairFreeAvailable;
+
+        bool isSpent = NetworkResourceService.Instance.TrySpendStoneForStationRepair(REPAIR_STONE_COST);
         if (isSpent == false)
         {
             UIManager.Instance.OpenExitConfirmPopup(null, null, "돌이 부족합니다.");
@@ -253,6 +262,7 @@ public class StationArrivalUI : UIBase
         }
 
         RefreshTopIndicators();
+        RefreshRepairCostText();
 
         GameManager.Train.HealActiveTrain(REPAIR_HEAL_PERCENT);
 

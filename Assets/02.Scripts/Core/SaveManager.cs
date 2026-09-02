@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
@@ -380,6 +381,11 @@ public class SaveManager : SingletonBase<SaveManager>
         if (GameManager.NetworkUpgradeService != null)
         {
             GameManager.NetworkUpgradeService.Debug_ResetUpgradeState();
+        }
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SetGameStage(GameStage.Stage1);
         }
 
         Debug.Log("[SaveManager] 전체 진행 데이터를 초기화했습니다.");
