@@ -6,7 +6,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [SerializeField] private Button Button_Base;
     [SerializeField] private TextMeshProUGUI Text_Base;
@@ -173,6 +173,11 @@ public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
             Image_BKFrame.color = _hoverFrameColor;
         }
 
+        if (Button_Base != null && Button_Base.interactable)
+        {
+            SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Hover);
+        }
+
         OnPointerEnterButton?.Invoke(_description);
     }
 
@@ -184,5 +189,15 @@ public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         }
 
         OnPointerExitButton?.Invoke();
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left || Button_Base == null || Button_Base.interactable == false)
+        {
+            return;
+        }
+
+        SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Click);
     }
 }
