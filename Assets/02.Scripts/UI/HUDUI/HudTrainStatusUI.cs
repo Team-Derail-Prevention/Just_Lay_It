@@ -55,6 +55,12 @@ public class HudTrainStatusUI : UIBase
         TrainStatusEventHub.Instance.OnSpeedChanged += SetSpeed;
         TrainStatusEventHub.Instance.OnDistanceChanged += SetDistance;
         TrainStatusEventHub.Instance.OnPlayTimeChanged += SetPlayTime;
+
+        if (TrainManager.Instance != null && TrainManager.Instance.ActiveTrain != null)
+        {
+            Train activeTrain = TrainManager.Instance.ActiveTrain;
+            SetHp(activeTrain.CurrentHp, activeTrain.MaxHp);
+        }
     }
 
     private void OnDisable()
