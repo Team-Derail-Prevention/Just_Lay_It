@@ -1069,6 +1069,9 @@ public class RailManager : SingletonBase<RailManager>
             Debug.Log("[RailManager] 기차역 레일 연결성공");
             SoundManager.Instance?.PlaySFX(SfxAddress.Train.Arrive);
             DroneManager.Instance?.RecallAllAndSuspendMining();
+
+            //레일 전체 연결 완료 -> 기차 속도 부스트 적용
+            TrainManager.Instance?.SetTrainSpeedBoost(true);
         }
     }
 
@@ -1163,6 +1166,9 @@ public class RailManager : SingletonBase<RailManager>
     // 드론 배달/배치 순서와 무관하게 항상 그 순간의 실제 연결 상태를 정확히 반영함.
     private void RebuildInstalledRailPath()
     {
+        // 경로 재계산 전 일단 부스트 해제
+        TrainManager.Instance?.SetTrainSpeedBoost(false);
+
         List<Transform> newPath = new List<Transform>();
         HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
 
