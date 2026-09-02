@@ -5,6 +5,12 @@ public class MapTileInfo : MonoBehaviour
 {
     private const string DefaultLayerName = "Default";
 
+    [Header("Runtime Debug")]
+    [SerializeField] private bool _hasOnGroundOccupant;
+
+    [SerializeField] private GameObject _detectedOccupant;
+    [SerializeField] private string _detectedOccupantName;
+
     [Header("Grid Information")]
     [SerializeField] private Vector2Int _localGridCoordinate;
     [SerializeField] private Vector3Int _parentMapGridPos;
@@ -25,7 +31,6 @@ public class MapTileInfo : MonoBehaviour
     private int _groundLayerIndex;
     private int _defaultLayerIndex;
     private LayerMask _objectLayerMask;
-    private bool _hasOnGroundOccupant;
 
     public Vector2Int LocalGridCoordinate => _localGridCoordinate;
     public Vector3Int ParentMapGridPos => _parentMapGridPos;
@@ -95,6 +100,9 @@ public class MapTileInfo : MonoBehaviour
             QueryTriggerInteraction.Collide);
 
         _hasOnGroundOccupant = false;
+        _detectedOccupant = null;
+        _detectedOccupantName = string.Empty;
+
         foreach (Collider hitCollider in hitColliders)
         {
             if (hitCollider.transform.IsChildOf(transform))
@@ -103,6 +111,10 @@ public class MapTileInfo : MonoBehaviour
             }
 
             _hasOnGroundOccupant = true;
+
+            _detectedOccupant = hitCollider.gameObject;
+            _detectedOccupantName = hitCollider.gameObject.name;
+
             break;
         }
 
