@@ -121,6 +121,15 @@ public class RailManager : SingletonBase<RailManager>
         {
             Debug.LogWarning("[RailManager] NetworkRailService.Instance가 Start() 시점에도 null입니다. 씬에 NetworkRailService가 있는지 확인하세요.");
         }
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnGameStateChanged += StopPlaceMode;
+        }
+    }
+
+    private void OnDisable()
+    {
+        GameManager.Instance.OnGameStateChanged += StopPlaceMode;
     }
 
     private void OnDestroy()
@@ -201,6 +210,14 @@ public class RailManager : SingletonBase<RailManager>
         }
     }
 
+    private void StopPlaceMode(GameState gameState)
+    {
+        if (gameState != GameState.Playing)
+        {
+            ExitPlaceMode();
+        }
+    }
+
     private void EnterPlaceMode(RailType railType)
     {
         if (_isPlaceModeActive)
@@ -211,7 +228,8 @@ public class RailManager : SingletonBase<RailManager>
 
         if (GameManager.Instance.CurrentGameState != GameState.Playing)
         {
-            ExitPlaceMode();
+            Debug.LogWarning("[RailManager] 게임 플레이 중에만 레일을 설치할 수 있습니다.");
+            return;
         }
 
         _currentRailType = railType;
