@@ -73,6 +73,8 @@ public class NetworkTrainStrengtheningService : SingletonBase<NetworkTrainStreng
 
         slotVm.LevelUp();
         ApplyEffect(slotVm.SlotDataId, slotVm.CurrentLevel);
+
+        SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Purchase);
     }
 
     private void ApplyEffect(string slotDataId, int newLevel)

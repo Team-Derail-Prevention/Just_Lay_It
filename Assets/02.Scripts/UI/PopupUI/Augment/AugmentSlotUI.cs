@@ -339,7 +339,12 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
 
     private void ConfirmSell()
     {
-        NetworkAugmentService.Instance.RequestSell(_ownerContainer, SlotIndex);
+        if (NetworkAugmentService.Instance.RequestSell(_ownerContainer, SlotIndex) == false)
+        {
+            return;
+        }
+
+        SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Sell);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
