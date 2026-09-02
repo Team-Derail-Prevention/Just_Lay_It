@@ -21,8 +21,8 @@ public class GameManager : SingletonBase<GameManager>
     [SerializeField] private GameStage _currentGameStage = GameStage.Stage1;
 
     [SerializeField, Min(0f)] private float _stage1ClearTimeLimit = 300f;
-    [SerializeField, Min(0f)] private float _stage2ClearTimeLimit = 300f;
-    [SerializeField, Min(0f)] private float _stage3ClearTimeLimit = 300f;
+    [SerializeField, Min(0f)] private float _stage2ClearTimeLimit = 480f;
+    [SerializeField, Min(0f)] private float _stage3ClearTimeLimit = 720f;
 
     private readonly TimeManager _timeManager = new TimeManager();
 
@@ -615,6 +615,7 @@ public class GameManager : SingletonBase<GameManager>
 
         Physics.SyncTransforms();
         Map?.RefreshAllTileOccupancies();
+        Rail?.SyncGhostRailData();
 
         Debug.Log($"[GameManager] 스테이션 순회: {CompletedStationCount}/{RequiredStationCount}");
 

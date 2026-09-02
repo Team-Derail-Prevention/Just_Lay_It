@@ -1230,4 +1230,42 @@ public class RailManager : SingletonBase<RailManager>
     {
         return _installedRailPath.Count;
     }
+
+    public void SyncGhostRailData()
+    {
+        // 1. 파괴된 레일(고스트) 캐시 정리
+        List<Vector2Int> keysToRemove = new List<Vector2Int>();
+        foreach (KeyValuePair<Vector2Int, PlacedRailInfo> kvp in _placedRails)
+        {
+            if (kvp.Value.Obj == null) // 실제 게임오브젝트가 이미 파괴되었다면
+            {
+                keysToRemove.Add(kvp.Key);
+            }
+        }
+
+        for (int i = 0; i < keysToRemove.Count; i++)
+        {
+            _placedRails.Remove(keysToRemove[i]);
+            _installedCubes.Remove(keysToRemove[i]);
+        }
+
+        // 2. 타일 스크립트(HasRail) 강제 동기화
+        foreach (KeyValuePair<Vector2Int, CubeInfo> kvp in _cubeGrid)
+        {
+            if (kvp.Value.TileScript != null)
+            {
+                // 매니저가 기억하는 레일이 없는데 HasRail이 true로 남아있다면 찌꺼기로 간주하고 강제 해제
+                if (kvp.Value.TileScript.HasRail && !_installedCubes.Contains(kvp.Key))
+                {
+                    kvp.Value.TileScript.HasRail = false;
+                }
+            }
+        }
+
+        // 3. 바닥 레이어(IsGroundLayer) 즉시 갱신 및 경로 재구성
+        RecheckBlockedTiles();
+        RebuildInstalledRailPath();
+
+        Debug.Log($"[RailManager] 고스트 레일 데이터 동기화 완료 (제거된 찌꺼기: {keysToRemove.Count}개)");
+    }
 }
