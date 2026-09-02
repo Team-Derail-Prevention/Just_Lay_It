@@ -199,20 +199,22 @@ public class HudMinimapUI : UIBase
 
     private void UpdateStationVisitState()
     {
-        if (GameManager.Train == null)
-        {
-            return;
-        }
-
         for (int i = 0; i < _stationMarkerEntries.Count; i++)
         {
             StationMarkerEntry entry = _stationMarkerEntries[i];
-            if (entry.IsVisited || entry.Station == null || entry.MarkerImage == null)
+            if (entry.IsVisited || entry.MarkerImage == null)
             {
                 continue;
             }
 
-            bool isVisited = GameManager.Train.IsVisitedStation(entry.Station.transform);
+            bool isStationDestroyed = entry.Station == null;
+            bool isVisited = isStationDestroyed;
+
+            if (isVisited == false && GameManager.Train != null)
+            {
+                isVisited = GameManager.Train.IsVisitedStation(entry.Station.transform);
+            }
+
             if (isVisited == false)
             {
                 continue;
