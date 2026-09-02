@@ -155,14 +155,6 @@ public class RailManager : SingletonBase<RailManager>
             RemoveAllRail();
         }
 
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            if (_isPlaceModeActive && _isHoveredCube)
-            {
-                TryInstallRail(_hoveredGridIndex, _hoveredCubeInfo);
-            }
-        }
-
         if (!_isPlaceModeActive)
         {
             return;
@@ -1020,7 +1012,7 @@ public class RailManager : SingletonBase<RailManager>
                     continue;
                 }
 
-                if (_departureStationRoot != null && (touchedRail.IsChildOf(_departureStationRoot) || (dirRoot != null && dirRoot.IsChildOf(_departureStationRoot))))
+                if (dirRoot == null && _departureStationRoot != null && touchedRail.IsChildOf(_departureStationRoot))
                 {
                     int startRailCount = _currentDepartureGateRoot != null ? _currentDepartureGateRoot.childCount : 0;
                     int playerRailCount = _installedRailPath.Count - startRailCount;
@@ -1028,7 +1020,6 @@ public class RailManager : SingletonBase<RailManager>
                     {
                         continue;
                     }
-
                 }
 
                 Vector3 toTargetDir = (touchedRail.position - placedPos).normalized;
@@ -1083,9 +1074,13 @@ public class RailManager : SingletonBase<RailManager>
 
     public void InitStartingRailPath(Transform dirRoot)
     {
-        _installedRailPath.Clear();
         _currentDepartureGateRoot = dirRoot;
-        if (dirRoot == null) return;
+        if (dirRoot == null)
+        {
+            _installedRailPath.Clear();
+            return;
+
+        }
 
         StationObject stationObj = dirRoot.GetComponentInParent<StationObject>();
         CentralTerminal terminalObj = dirRoot.GetComponentInParent<CentralTerminal>();
@@ -1103,11 +1098,7 @@ public class RailManager : SingletonBase<RailManager>
             _departureStationRoot = dirRoot.parent != null ? dirRoot.parent : dirRoot;
         }
 
-        for (int i = 0; i < dirRoot.childCount; i++)
-        {
-            Transform rail = dirRoot.GetChild(i);
-            _installedRailPath.Add(rail);
-        }
+        RebuildInstalledRailPath();
         Debug.Log($"[RailManager] 시작 출구 레일 {_installedRailPath.Count}개 등록 완료");
     }
 
