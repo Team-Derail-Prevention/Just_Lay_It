@@ -52,7 +52,7 @@ public class MonsterMove : MonoBehaviour
         }
     }
 
-    public void Initialize(MonsterData data, Transform target)
+    public void Initialize(MonsterData data, Transform target, float atkMultiplier)
     {
         _target = target;
 
@@ -69,7 +69,7 @@ public class MonsterMove : MonoBehaviour
         if (data != null)
         {
             _moveSpeed = data.Speed;
-            _monsterAtk = data.Atk;
+            _monsterAtk = Mathf.RoundToInt(data.Atk * atkMultiplier);
 
             _attackType = data.AttackType;
             _debuffDuration = data.DebuffDuration;
