@@ -47,6 +47,11 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
 
     private void Update()
     {
+        if (GameManager.Instance == null || GameManager.Instance.CurrentGameState != GameState.Playing)
+        {
+            return;
+        }
+
         TickCraftProgress(RailType.Straight);
         TickCraftProgress(RailType.Corner);
 
@@ -86,6 +91,12 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
 
     public bool RequestCraft(RailType railType)
     {
+        if (GameManager.Instance == null || GameManager.Instance.CurrentGameState != GameState.Playing)
+        {
+            Debug.LogWarning("[NetworkRailService] 게임 진행 중이 아니라 제작할 수 없습니다.");
+            return false;
+        }
+
         if (NetworkResourceService.Instance == null || NetworkResourceService.Instance.TrySpendWood(CRAFT_WOOD_COST) == false)
         {
             Debug.LogWarning("[NetworkRailService] 나무가 부족합니다.");

@@ -591,6 +591,7 @@ public class GameManager : SingletonBase<GameManager>
         RemovePlayerPlacedRails();
 
         RemoveCompletedStations();
+        NetworkTrainCargeService?.UnloadAllCitizens();
 
         await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, this.GetCancellationTokenOnDestroy());
 

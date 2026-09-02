@@ -77,6 +77,11 @@ public class NetworkTrainCargoService : SingletonBase<NetworkTrainCargoService>
         _boardingLimit += amount;
     }
 
+    public void UnloadAllCitizens()
+    {
+        _boardedCitizenCount = 0;
+    }
+
     public void ResetRun()
     {
         _boardedCitizenCount = 0;
