@@ -157,9 +157,26 @@ public class RailManager : SingletonBase<RailManager>
 
         if (Input.GetKeyDown(KeyCode.D))
         {
+            if (_previewInstance == null)
+            {
+                return;
+            }
+
+            if (_isConfirmPopupOpen || _isHoverSuppressed)
+            {
+                return;
+            }
+
             if (_isPlaceModeActive && _isHoveredCube)
             {
-                TryInstallRail(_hoveredGridIndex, _hoveredCubeInfo);
+                if (IsPlacementValid(_hoveredGridIndex, _hoveredCubeInfo))
+                {
+                    TryInstallRail(_hoveredGridIndex, _hoveredCubeInfo);
+                }
+                else
+                {
+                    Debug.Log("[RailManager] 설치 불가 영역입니다.");
+                }
             }
         }
 
@@ -875,7 +892,7 @@ public class RailManager : SingletonBase<RailManager>
         if (controller != null) controller.enabled = false;
 
         Collider placedCollider = spawnedRail.GetComponentInChildren<Collider>();
-        if (placedCollider != null) placedCollider.enabled = false;
+        if (placedCollider != null) placedCollider.enabled = true;
 
         _placedRails[gridIndex] = new PlacedRailInfo
         {
@@ -1072,7 +1089,7 @@ public class RailManager : SingletonBase<RailManager>
             }
             Debug.Log("[RailManager] 기차역 레일 연결성공");
             SoundManager.Instance?.PlaySFX(SfxAddress.Train.Arrive);
-            DroneManager.Instance?.RecallAll();
+            DroneManager.Instance?.RecallAllAndSuspendMining();
         }
     }
 
@@ -1168,8 +1185,6 @@ public class RailManager : SingletonBase<RailManager>
                 if (_placedRails.TryGetValue(neighborGrid, out PlacedRailInfo info))
                 {
                     if (info.Obj == null) continue;
-
-                    if (info.IsFixed) continue;
 
                     Transform candidate = info.Obj.transform;
 

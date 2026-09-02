@@ -148,6 +148,9 @@ public class BaseArrivalUI : UIBase
             curHpPercent = Mathf.RoundToInt(_currentTrainHp / _currentTrainMaxHp * 100f);
         }
 
+        bool isFreeAvailable = NetworkResourceService.Instance != null && NetworkResourceService.Instance.IsBaseRepairFreeAvailable;
+        string costText = isFreeAvailable ? "무료 (첫 1회)" : $"돌 {REPAIR_STONE_COST}개";
+
         Text_BK.text = $"현재 열차의 체력은 {curHpPercent}% 입니다.\n열차 수리 한번당 가격 : 돌 {REPAIR_STONE_COST}개 이고 {REPAIR_HEAL_PERCENT}%의 체력을 회복합니다.";
     }
 
@@ -262,7 +265,9 @@ public class BaseArrivalUI : UIBase
 
     private void OnClick_TrainRepair()
     {
-        if (TryValidateStoneCost(REPAIR_STONE_COST) == false)
+        bool isFreeAvailable = NetworkResourceService.Instance != null && NetworkResourceService.Instance.IsBaseRepairFreeAvailable;
+
+        if (isFreeAvailable == false && TryValidateStoneCost(REPAIR_STONE_COST) == false)
         {
             return;
         }
@@ -273,7 +278,7 @@ public class BaseArrivalUI : UIBase
             return;
         }
 
-        bool isSpent = NetworkResourceService.Instance.TrySpendStone(REPAIR_STONE_COST);
+        bool isSpent = NetworkResourceService.Instance.TrySpendStoneForBaseRepair(REPAIR_STONE_COST);
         if (isSpent == false)
         {
             Debug.LogWarning("[BaseArrivalUI] 재화 검증 이후 소모에 실패했습니다. 상태를 확인해주세요.");

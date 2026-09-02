@@ -788,6 +788,8 @@ public class GameManager : SingletonBase<GameManager>
         UI?.CloseHudMinimapUI();
         UI?.CloseInGameMenuButtonUI();
         UI?.CloseRailBuildUI();
+        UI?.CloseStationArrivalUI();
+        UI?.CloseBaseArrivalUI();
         UI?.OpenContentUI(UIType.LobbyUI);
     }
 
