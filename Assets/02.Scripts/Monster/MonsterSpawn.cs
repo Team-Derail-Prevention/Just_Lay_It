@@ -303,4 +303,11 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
 
         return stageMultiplier * timeMultiplier;
     }
+
+    public void ResetGamePhase()
+    {
+        _elapsedTime = 0f;
+        _currentMonsterCount = 0;
+        _isSpawning = false;
+    }
 }
