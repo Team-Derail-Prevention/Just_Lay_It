@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -20,6 +20,8 @@ public class BuildModeController : MonoBehaviour
 
     public bool IsBuildMode { get { return _isBuildMode; } }
     public bool HasResourceUnderCursor { get { return _hasResourceUnderCursor; } }
+
+    private const float DENIED_SFX_INTERVAL = 1f;
 
     private RailSlotViewModel _subscribedSlot;
     private bool _isBuildMode;
@@ -151,12 +153,29 @@ public class BuildModeController : MonoBehaviour
 
     private void ReloadRail()
     {
-        if (NetworkRailService.Instance == null)
+        if (TryStartPlacement() == true)
         {
             return;
         }
 
+        ExitBuildMode();
+    }
+
+    private bool TryStartPlacement()
+    {
+        if (NetworkRailService.Instance == null)
+        {
+            return false;
+        }
+
         NetworkRailService.Instance.RequestStartPlacement(_railType);
+
+        if (RailManager.Instance == null)
+        {
+            return false;
+        }
+
+        return RailManager.Instance.IsPlaceModeActive;
     }
 
     private void HandleToggle()
@@ -200,12 +219,7 @@ public class BuildModeController : MonoBehaviour
             return false;
         }
 
-        if (NetworkRailService.Instance == null)
-        {
-            return false;
-        }
-
-        return NetworkRailService.Instance.RequestStartPlacement(_railType);
+        return TryStartPlacement();
     }
 
     private void EnterBuildMode()
@@ -213,10 +227,14 @@ public class BuildModeController : MonoBehaviour
         _isBuildMode = true;
         _hasResourceUnderCursor = false;
 
-        if (NetworkRailService.Instance != null)
+        if (TryStartPlacement() == true)
         {
-            NetworkRailService.Instance.RequestStartPlacement(_railType);
+            return;
         }
+
+        SoundManager.Instance?.PlaySFXThrottled(SfxAddress.Ui.Denied, DENIED_SFX_INTERVAL);
+
+        ExitBuildMode();
     }
 
     private void ExitBuildMode()
