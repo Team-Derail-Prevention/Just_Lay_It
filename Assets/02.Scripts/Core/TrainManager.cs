@@ -398,5 +398,12 @@ public class TrainManager : SingletonBase<TrainManager>
         return false;
     }
 
+    public void SetTrainSpeedBoost(bool active)
+    {
+        if (_activeTrain != null)
+        {
+            _activeTrain.SetSpeedBoost(active);
+        }
+    }
 
 }

@@ -9,10 +9,16 @@ public class Train : MonoBehaviour
 
     [Header("Acceleration Setting")]
     [SerializeField] private float _currentSpeed = 0f; // 현재 속도
+
     [Header("Debuff State")]
     private bool _isFrozen = false;
     private bool _isElectrified = false;
     private float _corrosionMultiplier = 1.0f;
+
+    [Header("Speed Boost Setting")]
+    [SerializeField] private float _connectedSpeedMultiplier = 2.0f; // 레일 완공 시 속도 배율
+    private float _speedBoostMultiplier = 1.0f;
+    private bool _isBoosted = false;
 
     public bool IsFrozen => _isFrozen;
     public bool IsElectrified => _isElectrified;
@@ -254,7 +260,14 @@ public class Train : MonoBehaviour
             return;
         }
 
-        _currentSpeed = Mathf.MoveTowards(_currentSpeed, _maxMoveSpeed, _acceleration * Time.deltaTime);
+        if (_isBoosted)
+        {
+            _currentSpeed = _maxMoveSpeed * _speedBoostMultiplier;
+        }
+        else
+        {
+            _currentSpeed = Mathf.MoveTowards(_currentSpeed, _maxMoveSpeed, _acceleration * Time.deltaTime);
+        }
 
         Vector3 direction = (targetNode.position - transform.position).normalized;
         direction.y = 0f;
@@ -396,6 +409,28 @@ public class Train : MonoBehaviour
             _targetContainer.UseSpecificCargo(resourceType, stealAmount);
             Debug.Log($"몬스터가 자재를 {stealAmount}만큼 훔침. 남은 자재: {_targetContainer.CurrentAmount}");
         }
+    }
+
+    public void SetSpeedBoost(bool active)
+    {
+        _isBoosted = active;
+        _speedBoostMultiplier = active ? _connectedSpeedMultiplier : 1.0f;
+
+        if (active)
+        {
+            _currentSpeed = _maxMoveSpeed * _speedBoostMultiplier;
+            TrainStatusEventHub.Instance?.NotifySpeedChanged(_currentSpeed * 10f);
+        }
+        else
+        {
+            // 부스트 해제 시 기본 최고 속도보다 높다면 즉시 기본 최고 속도로 보정
+            if (_currentSpeed > _maxMoveSpeed)
+            {
+                _currentSpeed = _maxMoveSpeed;
+                TrainStatusEventHub.Instance?.NotifySpeedChanged(_currentSpeed * 10f);
+            }
+        }
+        Debug.Log($"[Train] 속도 부스트 {(active ? "활성화" : "비활성화")} (배율: {_speedBoostMultiplier})");
     }
 
 }
