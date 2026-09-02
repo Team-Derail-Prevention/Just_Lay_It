@@ -99,19 +99,10 @@ public class Train : MonoBehaviour
 
     private void Update()
     {
+#if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.Alpha6))
         {
             _isMoving = !_isMoving;
-        }
-
-        if (GameManager.Instance.CurrentGameState == GameState.Playing && _isMoving && !_isBroken)
-        {
-            MoveTrain();
-        }
-        else
-        {
-            _currentSpeed = 0f;
-            TrainStatusEventHub.Instance?.NotifySpeedChanged(0f);
         }
 
         if (Input.GetKeyDown(KeyCode.I))
@@ -125,6 +116,9 @@ public class Train : MonoBehaviour
             Debug.Log("[Cheat] O키 입력: 20 회복 적용");
             Heal(20);
         }
+#endif
+
+        TrainMovement();
     }
 
     public void TrainInit(TrainData data)
@@ -147,6 +141,19 @@ public class Train : MonoBehaviour
         if (TrainStatusEventHub.Instance != null)
         {
             TrainStatusEventHub.Instance.NotifyHpChanged(_currentHp, _maxHp);
+        }
+    }
+
+    private void TrainMovement()
+    {
+        if (GameManager.Instance.CurrentGameState == GameState.Playing && _isMoving && !_isBroken)
+        {
+            MoveTrain();
+        }
+        else
+        {
+            _currentSpeed = 0f;
+            TrainStatusEventHub.Instance?.NotifySpeedChanged(0f);
         }
     }
 
