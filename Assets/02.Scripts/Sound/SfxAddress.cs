@@ -11,6 +11,7 @@
         public const string WeaponPickLegendary = "Sfx/Ui/WeaponPickLegendary";
         public const string WeaponEquip = "Sfx/Ui/WeaponEquip";
         public const string WeaponUnEquip = "Sfx/Ui/WeaponUnEquip";
+        public const string Denied = "Sfx/Ui/Denied";
     }
 
     public static class Train
