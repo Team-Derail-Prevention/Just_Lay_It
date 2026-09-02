@@ -21,6 +21,7 @@ public class MonsterMove : MonoBehaviour
     private float _attackTimer = 0f;
     private float _attackCooldown = 2f;
 
+    private string _attackSound;
     private string _attackType;
     private float _debuffDuration;
     private float _debuffPower;
@@ -75,6 +76,7 @@ public class MonsterMove : MonoBehaviour
             _debuffDuration = data.DebuffDuration;
             _debuffPower = data.DebuffPower;
             _projectileColor = data.ProjectileColor;
+            _attackSound = data.UseAttackSound;
         }
     }
 
@@ -157,6 +159,8 @@ public class MonsterMove : MonoBehaviour
             {
                 _animator.SetTrigger(_isAttack);
             }
+
+            SoundManager.Instance?.PlaySFXAt(SfxAddress.Resolve(SfxAddress.Monster.Prefix, _attackSound, SfxAddress.Monster.Attack), transform.position);
 
             if (!_isMeleeAttack)
             {
