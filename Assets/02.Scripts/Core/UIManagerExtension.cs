@@ -344,14 +344,20 @@ public static class UIManagerExtension
             return;
         }
 
-        GameManager.Instance?.PauseGameplayTime();
+        if (GameManager.Instance != null && GameManager.Instance.CurrentGameState == GameState.Playing)
+        {
+            GameManager.Instance.PauseGameplayTime();
+        }
     }
 
     public static void CloseInGameMenuPopup(this UIManager uiManager)
     {
         uiManager.ClosePopupUI(UIType.InGameMenuPopup);
 
-        GameManager.Instance?.ResumeGameplayTime();
+        if (GameManager.Instance != null && GameManager.Instance.CurrentGameState == GameState.Playing)
+        {
+            GameManager.Instance.ResumeGameplayTime();
+        }
     }
 
     public static void OpenAugmentInventoryUI(this UIManager uiManager)
