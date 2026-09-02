@@ -6,7 +6,7 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
     private bool _isSlotsCreated;
 
     [Header("보상 설정")]
-    private const int RESCUE_REWARD_BASE = 100;
+    private const int RESCUE_REWARD_BASE = 50;
     private const int RESCUE_REWARD_STEP = 5;
 
     private void Start()

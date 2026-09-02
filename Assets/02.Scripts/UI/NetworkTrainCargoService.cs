@@ -2,7 +2,7 @@
 
 public class NetworkTrainCargoService : SingletonBase<NetworkTrainCargoService>
 {
-    private const int BASE_BOARDING_LIMIT = 20;
+    private const int BASE_BOARDING_LIMIT = 5;
     private int _boardedCitizenCount;
     private int _boardingLimit = BASE_BOARDING_LIMIT;
 
@@ -50,7 +50,7 @@ public class NetworkTrainCargoService : SingletonBase<NetworkTrainCargoService>
     {
         if (slotDataId == "CARGO_CREW_LIMIT")
         {
-            IncreaseBoardingLimit(5); // 임시 값
+            IncreaseBoardingLimit(2);
         }
     }
 
