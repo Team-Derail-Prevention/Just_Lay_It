@@ -157,9 +157,26 @@ public class RailManager : SingletonBase<RailManager>
 
         if (Input.GetKeyDown(KeyCode.D))
         {
+            if (_previewInstance == null)
+            {
+                return;
+            }
+
+            if (_isConfirmPopupOpen || _isHoverSuppressed)
+            {
+                return;
+            }
+
             if (_isPlaceModeActive && _isHoveredCube)
             {
-                TryInstallRail(_hoveredGridIndex, _hoveredCubeInfo);
+                if (IsPlacementValid(_hoveredGridIndex, _hoveredCubeInfo))
+                {
+                    TryInstallRail(_hoveredGridIndex, _hoveredCubeInfo);
+                }
+                else
+                {
+                    Debug.Log("[RailManager] 설치 불가 영역입니다.");
+                }
             }
         }
 
