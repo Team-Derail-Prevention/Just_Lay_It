@@ -282,6 +282,7 @@ GameObject:
   - component: {fileID: 8619676847978769459}
   - component: {fileID: 28566633754140623}
   - component: {fileID: -1488224410472738027}
+  - component: {fileID: 5295898831354830622}
   m_Layer: 0
   m_Name: train-Front
   m_TagString: Train
@@ -372,3 +373,29 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.0010092, z: 2.2891283}
   m_Center: {x: 0, y: 1.1203362, z: -0.04347229}
+--- !u!114 &5295898831354830622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3943277691693670508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8bfc9b820db1994e93f946cb5676fbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LoopSoundSource
+  _address: Sfx/Train/Drive
+  _playOnEnable: 1
+  _baseVolume: 0.9
+  _minDistance: 3
+  _maxDistance: 60
+  _usePitchBySpeed: 1
+  _speedForMaxPitch: 4
+  _minPitch: 0.9
+  _maxPitch: 1.25
+  _pitchSmoothTime: 0.25
+  _stopWhenIdle: 1
+  _idleSpeedThreshold: 0.1
+  _randomizeStartTime: 0
+  _pitchOffsetRange: 0
