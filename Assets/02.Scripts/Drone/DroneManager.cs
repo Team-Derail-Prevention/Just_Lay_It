@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Enums;
 using UnityEngine;
 
 public class DroneManager : SingletonBase<DroneManager>
@@ -61,6 +62,7 @@ public class DroneManager : SingletonBase<DroneManager>
     private float _moveSpeedMultiplier = 1f;
     private int _yieldBonus;
     private bool _isUpgradeSubscribed;
+    private bool _isMiningSuspendedUntilDeparture;
 
     private DroneRailPreloader _preloader;
     private DroneOrderMarkerView _markerView;
@@ -88,6 +90,22 @@ public class DroneManager : SingletonBase<DroneManager>
             }
 
             return _markerView;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+        }
+    }
+
+    private void HandleGameStateChanged(GameState gameState)
+    {
+        if (gameState == GameState.Playing)
+        {
+            _isMiningSuspendedUntilDeparture = false;
         }
     }
 
@@ -236,6 +254,11 @@ public class DroneManager : SingletonBase<DroneManager>
     private void Start()
     {
         TrySubscribeUpgrade();
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
+        }
     }
 
     private void OnDisable()
@@ -371,6 +394,11 @@ public class DroneManager : SingletonBase<DroneManager>
 
     public bool TryAssignMining(MaterialObject target)
     {
+        if (_isMiningSuspendedUntilDeparture)
+        {
+            return false;
+        }
+
         if (target == null || target.IsBroken || target.IsMining)
         {
             return false;
@@ -435,6 +463,11 @@ public class DroneManager : SingletonBase<DroneManager>
 
     public bool CanAssignMining(MaterialObject target)
     {
+        if (_isMiningSuspendedUntilDeparture)
+        {
+            return false;
+        }
+
         if (target == null || target.IsBroken || target.IsMining)
         {
             return false;
@@ -783,6 +816,12 @@ public class DroneManager : SingletonBase<DroneManager>
     public bool HasIdleCarrier()
     {
         return FindNearestIdleCarrier(Vector3.zero) != null;
+    }
+
+    public void RecallAllAndSuspendMining()
+    {
+        _isMiningSuspendedUntilDeparture = true;
+        RecallAll();
     }
 
     public void RecallAll()

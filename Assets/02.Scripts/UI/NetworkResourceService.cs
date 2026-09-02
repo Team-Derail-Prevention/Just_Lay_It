@@ -3,7 +3,7 @@ using Enums;
 
 public class NetworkResourceService : SingletonBase<NetworkResourceService>
 {
-    private const int BASE_CARGO_LIMIT = 300;
+    private const int BASE_CARGO_LIMIT = 400;
 
     private ResourceViewModel _localVm;
     private int _cargoLimit = BASE_CARGO_LIMIT;
