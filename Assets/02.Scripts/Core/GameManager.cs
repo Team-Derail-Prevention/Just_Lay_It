@@ -74,6 +74,7 @@ public class GameManager : SingletonBase<GameManager>
     public static NetworkUpgradeService NetworkUpgradeService => NetworkUpgradeService.Instance;
     public static NetworkResourceService NetworkResourceService => NetworkResourceService.Instance;
     public static NetworkWarehouseService NetworkWarehouseService => NetworkWarehouseService.Instance;
+    public static NetworkGachaService NetworkGachaService => NetworkGachaService.Instance;
 
     public GameState CurrentGameState => _currentGameState;
     public GameStage CurrentGameStage => _currentGameStage;
@@ -107,8 +108,6 @@ public class GameManager : SingletonBase<GameManager>
 
     private void Update()
     {
-        HandleStageCheatKeys();
-
         if (CurrentGameState != GameState.Playing)
         {
             return;
@@ -134,32 +133,13 @@ public class GameManager : SingletonBase<GameManager>
         MonsterHealth.OnMonsterDiedWithStone -= HandleMonsterDied;
     }
 
-    private void HandleStageCheatKeys()
-    {
-        if (CurrentGameState != GameState.Ready)
-        {
-            return;
-        }
-
-        if (Input.GetKeyDown(KeyCode.F1))
-        {
-            SetGameStageForCheat(GameStage.Stage1);
-        }
-        else if (Input.GetKeyDown(KeyCode.F2))
-        {
-            SetGameStageForCheat(GameStage.Stage2);
-        }
-        else if (Input.GetKeyDown(KeyCode.F3))
-        {
-            SetGameStageForCheat(GameStage.Stage3);
-        }
-    }
-
-    private void SetGameStageForCheat(GameStage stage)
+#if UNITY_EDITOR
+    public void SetGameStageForCheat(GameStage stage)
     {
         SetGameStage(stage);
         Debug.Log($"[GameManager] 치트 적용: Stage {(int)_currentGameStage} 선택. 다음 게임은 {GetMapSize(_currentGameStage)}x{GetMapSize(_currentGameStage)} 맵으로 시작합니다.");
     }
+#endif
 
     public void SetGameStage(GameStage stage)
     {
@@ -195,6 +175,7 @@ public class GameManager : SingletonBase<GameManager>
             NetworkTrainStrengtheningService.ResetRun();
             NetworkTrainCargeService.ResetRun();
             NetworkAugmentService.ResetRun();
+            NetworkGachaService.ResetRun();
 
             _currentMapSize = GetMapSize(_currentGameStage);
 
