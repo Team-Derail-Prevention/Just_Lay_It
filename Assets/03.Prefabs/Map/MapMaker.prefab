@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 450b23e9b3405ca4798f584a5a2be2cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapMaker
-  _materialJsonData: {fileID: 4900000, guid: 510f35ef434d8464ca320dd64c0f52a6, type: 3}
+  _materialJsonData: {fileID: 4900000, guid: 5bf184604a657064698729f41f7e14aa, type: 3}
   _mapCategory: 0
   _cubePrefabs:
   - {fileID: 5287405914116040443, guid: 797c3a5290aa5b64d9a8ba14fcf6fa54, type: 3}
@@ -58,10 +58,16 @@ MonoBehaviour:
   _obstaclePrefabs:
   - {fileID: 8967484211123364771, guid: b14e81ff37fb82f4399920a9a7b2eb55, type: 3}
   _materialSpawnDatas:
-  - _prefab: {fileID: 6179755561338510967, guid: 90bfcda798250494690a658a59cc0341, type: 3}
-    _minCount: 6
+  - _prefab: {fileID: 5070134356130765180, guid: 43a6d4c8227859540b4ceb2ad2036758, type: 3}
+    _minCount: 20
   - _prefab: {fileID: 9063175124058616429, guid: e800eb9fe429e68418aaa2e50836063a, type: 3}
-    _minCount: 6
+    _minCount: 10
+  - _prefab: {fileID: 5382888589710558236, guid: d818e8db0d4114041923feb36d8b479a, type: 3}
+    _minCount: 15
+  - _prefab: {fileID: 6179755561338510967, guid: 90bfcda798250494690a658a59cc0341, type: 3}
+    _minCount: 8
+  - _prefab: {fileID: 6825517055451600367, guid: f76851bc128e234479fc727ccd52c75b, type: 3}
+    _minCount: 5
   _targetObstacleCount: 4
   _stationHeight: 1
   _obstacleHeight: 1
