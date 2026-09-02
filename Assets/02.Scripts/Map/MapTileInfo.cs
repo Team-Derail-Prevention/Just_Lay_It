@@ -5,6 +5,12 @@ public class MapTileInfo : MonoBehaviour
 {
     private const string DefaultLayerName = "Default";
 
+    [Header("Runtime Debug")]
+    [SerializeField] private bool _hasOnGroundOccupant;
+
+    [SerializeField] private GameObject _detectedOccupant;
+    [SerializeField] private string _detectedOccupantName;
+
     [Header("Grid Information")]
     [SerializeField] private Vector2Int _localGridCoordinate;
     [SerializeField] private Vector3Int _parentMapGridPos;
@@ -22,19 +28,22 @@ public class MapTileInfo : MonoBehaviour
     [Tooltip("타일 위 오브젝트 감지를 위한 높이 범위")]
     [SerializeField] private float _checkHeight = 3.0f;
 
+    [SerializeField] private bool _useTerminalReservedArea;
+
     private int _groundLayerIndex;
     private int _defaultLayerIndex;
     private LayerMask _objectLayerMask;
-    private bool _hasOnGroundOccupant;
 
     public Vector2Int LocalGridCoordinate => _localGridCoordinate;
     public Vector3Int ParentMapGridPos => _parentMapGridPos;
 
     private static readonly Vector2Int TerminalCenter = Vector2Int.zero;
 
+
     public bool IsTerminalReservedArea =>
-    Mathf.Abs(_localGridCoordinate.x - TerminalCenter.x) <= 1 &&
-    Mathf.Abs(_localGridCoordinate.y - TerminalCenter.y) <= 1;
+        _useTerminalReservedArea &&
+        Mathf.Abs(_localGridCoordinate.x - TerminalCenter.x) <= 1 &&
+        Mathf.Abs(_localGridCoordinate.y - TerminalCenter.y) <= 1;
 
     public bool IsTerminalEntrance =>
         _localGridCoordinate == new Vector2Int(0, 2) ||
@@ -85,6 +94,13 @@ public class MapTileInfo : MonoBehaviour
         _parentMapGridPos = parentMapGridPos;
     }
 
+    public void SetTerminalReservedAreaEnabled(bool enabled)
+    {
+        _useTerminalReservedArea = enabled;
+
+        ApplyVisualLayer();
+    }
+
     public void RefreshOccupancy()
     {
         Collider[] hitColliders = Physics.OverlapBox(
@@ -95,6 +111,9 @@ public class MapTileInfo : MonoBehaviour
             QueryTriggerInteraction.Collide);
 
         _hasOnGroundOccupant = false;
+        _detectedOccupant = null;
+        _detectedOccupantName = string.Empty;
+
         foreach (Collider hitCollider in hitColliders)
         {
             if (hitCollider.transform.IsChildOf(transform))
@@ -103,6 +122,10 @@ public class MapTileInfo : MonoBehaviour
             }
 
             _hasOnGroundOccupant = true;
+
+            _detectedOccupant = hitCollider.gameObject;
+            _detectedOccupantName = hitCollider.gameObject.name;
+
             break;
         }
 
