@@ -70,7 +70,7 @@ public static class WeaponStat
         int magazineLevel = GetLobbyUpgradeLevel("LOBBY_WEAPON_MAGAZINE");
         int reloadLevel = GetLobbyUpgradeLevel("LOBBY_WEAPON_RELOAD");
         int rangeLevel = GetLobbyUpgradeLevel("LOBBY_WEAPON_RANGE");
-        int battleDamageLevel = GetLobbyUpgradeLevel("BATTLE_DAMAGE");
+        int battleDamageLevel = GetInGameUpgradeLevel("BATTLE_DAMAGE");
 
         atk = weaponData.Atk
             + (atkLevel * weaponData.LobbyATKByLevel)
@@ -97,6 +97,28 @@ public static class WeaponStat
         }
 
         UpgradeSlotViewModel slotValue = upgradeValue.GetSlot(slotDataId);
+        if (slotValue == null)
+        {
+            return 0;
+        }
+
+        return slotValue.CurrentLevel;
+    }
+
+    public static int GetInGameUpgradeLevel(string slotDataId)
+    {
+        if (NetworkTrainStrengtheningService.Instance == null)
+        {
+            return 0;
+        }
+
+        TrainStrengtheningViewModel upgradeValue = NetworkTrainStrengtheningService.Instance.GetLocalTrainStrengtheningViewModel();
+        if (upgradeValue == null)
+        {
+            return 0;
+        }
+
+        TrainStatSlotViewModel slotValue = upgradeValue.GetSlot(slotDataId);
         if (slotValue == null)
         {
             return 0;

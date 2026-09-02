@@ -562,7 +562,7 @@ public class MapManager : SingletonBase<MapManager>
         }
     }
 
-    private void RefreshAllTileOccupancies()
+    public void RefreshAllTileOccupancies()
     {
         foreach (MapTileInfo tile in _spawnedTiles)
         {

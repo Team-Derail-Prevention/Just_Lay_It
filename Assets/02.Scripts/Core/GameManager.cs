@@ -21,8 +21,8 @@ public class GameManager : SingletonBase<GameManager>
     [SerializeField] private GameStage _currentGameStage = GameStage.Stage1;
 
     [SerializeField, Min(0f)] private float _stage1ClearTimeLimit = 300f;
-    [SerializeField, Min(0f)] private float _stage2ClearTimeLimit = 300f;
-    [SerializeField, Min(0f)] private float _stage3ClearTimeLimit = 300f;
+    [SerializeField, Min(0f)] private float _stage2ClearTimeLimit = 480f;
+    [SerializeField, Min(0f)] private float _stage3ClearTimeLimit = 720f;
 
     private readonly TimeManager _timeManager = new TimeManager();
 
@@ -74,6 +74,7 @@ public class GameManager : SingletonBase<GameManager>
     public static NetworkUpgradeService NetworkUpgradeService => NetworkUpgradeService.Instance;
     public static NetworkResourceService NetworkResourceService => NetworkResourceService.Instance;
     public static NetworkWarehouseService NetworkWarehouseService => NetworkWarehouseService.Instance;
+    public static NetworkGachaService NetworkGachaService => NetworkGachaService.Instance;
 
     public GameState CurrentGameState => _currentGameState;
     public GameStage CurrentGameStage => _currentGameStage;
@@ -107,8 +108,6 @@ public class GameManager : SingletonBase<GameManager>
 
     private void Update()
     {
-        HandleStageCheatKeys();
-
         if (CurrentGameState != GameState.Playing)
         {
             return;
@@ -134,32 +133,13 @@ public class GameManager : SingletonBase<GameManager>
         MonsterHealth.OnMonsterDiedWithStone -= HandleMonsterDied;
     }
 
-    private void HandleStageCheatKeys()
-    {
-        if (CurrentGameState != GameState.Ready)
-        {
-            return;
-        }
-
-        if (Input.GetKeyDown(KeyCode.F1))
-        {
-            SetGameStageForCheat(GameStage.Stage1);
-        }
-        else if (Input.GetKeyDown(KeyCode.F2))
-        {
-            SetGameStageForCheat(GameStage.Stage2);
-        }
-        else if (Input.GetKeyDown(KeyCode.F3))
-        {
-            SetGameStageForCheat(GameStage.Stage3);
-        }
-    }
-
-    private void SetGameStageForCheat(GameStage stage)
+#if UNITY_EDITOR
+    public void SetGameStageForCheat(GameStage stage)
     {
         SetGameStage(stage);
         Debug.Log($"[GameManager] 치트 적용: Stage {(int)_currentGameStage} 선택. 다음 게임은 {GetMapSize(_currentGameStage)}x{GetMapSize(_currentGameStage)} 맵으로 시작합니다.");
     }
+#endif
 
     public void SetGameStage(GameStage stage)
     {
@@ -195,6 +175,7 @@ public class GameManager : SingletonBase<GameManager>
             NetworkTrainStrengtheningService.ResetRun();
             NetworkTrainCargeService.ResetRun();
             NetworkAugmentService.ResetRun();
+            NetworkGachaService.ResetRun();
 
             _currentMapSize = GetMapSize(_currentGameStage);
 
@@ -265,7 +246,7 @@ public class GameManager : SingletonBase<GameManager>
 
     public void HandleTerminalArrival()
     {
-        HandleTerminalArrival(null);
+        HandleTerminalArrivalAsync(null).Forget();
     }
 
     public void SelectExitDirection(int directionIndex)
@@ -570,7 +551,7 @@ public class GameManager : SingletonBase<GameManager>
 
     private void HandleCentralTerminalEntered(CentralTerminal terminal)
     {
-        HandleTerminalArrival(terminal);
+        HandleTerminalArrivalAsync(terminal).Forget();
     }
 
     private void HandleStationArrival(StationObject station, string stationId)
@@ -592,7 +573,7 @@ public class GameManager : SingletonBase<GameManager>
         // TODO: Station UI를 열고 CompleteStation(bool)을 호출하도록 연결필요
     }
 
-    private void HandleTerminalArrival(CentralTerminal terminal)
+    private async UniTaskVoid HandleTerminalArrivalAsync(CentralTerminal terminal)
     {
         if (CurrentGameState != GameState.Playing)
         {
@@ -608,9 +589,17 @@ public class GameManager : SingletonBase<GameManager>
         PauseGameplayTime();
         StopAndDespawnMonsters();
         RemovePlayerPlacedRails();
+
         RemoveCompletedStations();
 
+        await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, this.GetCancellationTokenOnDestroy());
+
+        Physics.SyncTransforms();
+        Map?.RefreshAllTileOccupancies();
+        Rail?.SyncGhostRailData();
+
         Debug.Log($"[GameManager] 스테이션 순회: {CompletedStationCount}/{RequiredStationCount}");
+
         if (CompletedStationCount >= RequiredStationCount)
         {
             GameClear();
@@ -622,7 +611,6 @@ public class GameManager : SingletonBase<GameManager>
         UI?.OpenBaseArrivalUI();
         OpenScoreReport(ScoreResultType.BaseArrival, null);
         Debug.Log("[GameManager] 터미널 도착: 출구 방향 선택을 기다립니다.");
-        // TODO: Terminal UI를 열고 CentralTerminal.SelectExitGate(int)와 연결필요(?)
     }
 
     private void RemoveCompletedStations()
