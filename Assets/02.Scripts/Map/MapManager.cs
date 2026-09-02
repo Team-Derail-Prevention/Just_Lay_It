@@ -348,8 +348,7 @@ public class MapManager : SingletonBase<MapManager>
         _spawnedMaps[gridPos] = mapObject;
         _mapTypeData[gridPos] = typeId;
 
-        RegisterMapTiles(mapObject, gridPos);
-
+        RegisterMapTiles(mapObject, gridPos, typeId == 2);
         Transform railParent = mapObject.transform.Find("offsetRailRoot");
 
         if (railParent == null)
@@ -550,13 +549,15 @@ public class MapManager : SingletonBase<MapManager>
         _isExpanding = false;
     }
 
-    private void RegisterMapTiles(GameObject mapObject, Vector3Int mapGridPos)
+    private void RegisterMapTiles(GameObject mapObject, Vector3Int mapGridPos, bool isCentralTerminal)
     {
         MapTileInfo[] tiles = mapObject.GetComponentsInChildren<MapTileInfo>(true);
 
         foreach (MapTileInfo tile in tiles)
         {
             tile.SetParentMapGridPosition(mapGridPos);
+            tile.SetTerminalReservedAreaEnabled(isCentralTerminal);
+
             _spawnedTiles.Add(tile);
         }
     }

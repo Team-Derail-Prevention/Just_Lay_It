@@ -28,6 +28,8 @@ public class MapTileInfo : MonoBehaviour
     [Tooltip("타일 위 오브젝트 감지를 위한 높이 범위")]
     [SerializeField] private float _checkHeight = 3.0f;
 
+    [SerializeField] private bool _useTerminalReservedArea;
+
     private int _groundLayerIndex;
     private int _defaultLayerIndex;
     private LayerMask _objectLayerMask;
@@ -37,9 +39,11 @@ public class MapTileInfo : MonoBehaviour
 
     private static readonly Vector2Int TerminalCenter = Vector2Int.zero;
 
+
     public bool IsTerminalReservedArea =>
-    Mathf.Abs(_localGridCoordinate.x - TerminalCenter.x) <= 1 &&
-    Mathf.Abs(_localGridCoordinate.y - TerminalCenter.y) <= 1;
+        _useTerminalReservedArea &&
+        Mathf.Abs(_localGridCoordinate.x - TerminalCenter.x) <= 1 &&
+        Mathf.Abs(_localGridCoordinate.y - TerminalCenter.y) <= 1;
 
     public bool IsTerminalEntrance =>
         _localGridCoordinate == new Vector2Int(0, 2) ||
@@ -88,6 +92,13 @@ public class MapTileInfo : MonoBehaviour
     public void SetParentMapGridPosition(Vector3Int parentMapGridPos)
     {
         _parentMapGridPos = parentMapGridPos;
+    }
+
+    public void SetTerminalReservedAreaEnabled(bool enabled)
+    {
+        _useTerminalReservedArea = enabled;
+
+        ApplyVisualLayer();
     }
 
     public void RefreshOccupancy()
