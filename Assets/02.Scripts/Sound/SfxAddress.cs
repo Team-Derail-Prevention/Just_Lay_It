@@ -5,8 +5,12 @@
         public const string Hover = "Sfx/Ui/Hover";
         public const string Click = "Sfx/Ui/Click";
         public const string GachaSpin = "Sfx/Ui/GachaSpin";
-        public const string WeaponPick = "Sfx/Ui/WeaponPick";
+        public const string WeaponPickCommon = "Sfx/Ui/WeaponPickCommon";
+        public const string WeaponPickRare = "Sfx/Ui/WeaponPickRare";
+        public const string WeaponPickEpic = "Sfx/Ui/WeaponPickEpic";
+        public const string WeaponPickLegendary = "Sfx/Ui/WeaponPickLegendary";
         public const string WeaponEquip = "Sfx/Ui/WeaponEquip";
+        public const string WeaponUnEquip = "Sfx/Ui/WeaponUnEquip";
     }
 
     public static class Train

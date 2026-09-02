@@ -119,7 +119,7 @@ public class GachaCardUI : MonoBehaviour
 
             await PlaySlotMachineReelAsync(cancellationToken);
 
-            SoundManager.Instance?.PlaySFX(SfxAddress.Ui.WeaponPick);
+            SoundManager.Instance?.PlaySFX(GetWeaponPickAddress());
 
             ApplyCardData();
             SetRevealVisible(true);
@@ -236,6 +236,26 @@ public class GachaCardUI : MonoBehaviour
     {
         int r = value % mod;
         return r < 0 ? r + mod : r;
+    }
+
+    private string GetWeaponPickAddress()
+    {
+        if (_cardState == null)
+        {
+            return SfxAddress.Ui.WeaponPickCommon;
+        }
+
+        switch (_cardState.GradeName)
+        {
+            case "Rare":
+                return SfxAddress.Ui.WeaponPickRare;
+            case "Epic":
+                return SfxAddress.Ui.WeaponPickEpic;
+            case "Legendary":
+                return SfxAddress.Ui.WeaponPickLegendary;
+            default:
+                return SfxAddress.Ui.WeaponPickCommon;
+        }
     }
 
     private void RebindCardButtonEvents()

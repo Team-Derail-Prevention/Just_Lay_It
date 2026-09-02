@@ -238,6 +238,8 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
         _isDragging = true;
         _canvasGroup.alpha = 0.4f;
 
+        SoundManager.Instance?.PlaySFX(SfxAddress.Ui.WeaponUnEquip);
+
         CreateDragGhost();
     }
 
@@ -308,7 +310,11 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
         }
 
         bool isMoved = NetworkAugmentService.Instance.RequestMove(draggedSlot.OwnerContainer, draggedSlot.SlotIndex, _ownerContainer, SlotIndex);
-        if (isMoved == false && _slotState.Augment != null)
+        if (isMoved == true)
+        {
+            SoundManager.Instance?.PlaySFX(SfxAddress.Ui.WeaponEquip);
+        }
+        else if (_slotState.Augment != null)
         {
             UIManager.Instance.OpenExitConfirmPopup(null, null, "이미 다른 무기가 장착된 칸입니다.");
         }
