@@ -4,8 +4,8 @@
     "Category": "Battle",
     "Name": "열차 체력 증가 (+ 50)",
     "MaxLevel": 5,
-    "BaseCost": 50,
-    "CostIncreasePerLevel": 30,
+    "BaseCost": 100,
+    "CostIncreasePerLevel": 50,
     "IconPath": "InGameUpgrade_Icon[BATTLE_HP_Icon]"
   },
   {
@@ -13,8 +13,8 @@
     "Category": "Battle",
     "Name": "열차 피해량 증가 (+ 2)",
     "MaxLevel": 5,
-    "BaseCost": 50,
-    "CostIncreasePerLevel": 30,
+    "BaseCost": 100,
+    "CostIncreasePerLevel": 50,
     "IconPath": "InGameUpgrade_Icon[BATTLE_DAMAGE_Icon]"
   },
   {
@@ -22,8 +22,8 @@
     "Category": "Battle",
     "Name": "열차 방어력 증가 (+ 2)",
     "MaxLevel": 5,
-    "BaseCost": 50,
-    "CostIncreasePerLevel": 30,
+    "BaseCost": 100,
+    "CostIncreasePerLevel": 50,
     "IconPath": "InGameUpgrade_Icon[BATTLE_DEFENSE_Icon]"
   },
   {
@@ -31,8 +31,8 @@
     "Category": "Cargo",
     "Name": "자원 적제 제한량 증가 (+ 100)",
     "MaxLevel": 5,
-    "BaseCost": 50,
-    "CostIncreasePerLevel": 30,
+    "BaseCost": 100,
+    "CostIncreasePerLevel": 50,
     "IconPath": "InGameUpgrade_Icon[CARGO_RESOURCE_LIMIT_Icon]"
   },
   {
@@ -40,8 +40,8 @@
     "Category": "Cargo",
     "Name": "인원 탑승 제한량 증가 (+ 5)",
     "MaxLevel": 5,
-    "BaseCost": 50,
-    "CostIncreasePerLevel": 30,
+    "BaseCost": 100,
+    "CostIncreasePerLevel": 50,
     "IconPath": "InGameUpgrade_Icon[CARGO_CREW_LIMIT_Icon]"
   },
   {
@@ -49,8 +49,8 @@
     "Category": "Cargo",
     "Name": "무기 장착 칸 제한 해제",
     "MaxLevel": 5,
-    "BaseCost": 50,
-    "CostIncreasePerLevel": 30,
+    "BaseCost": 100,
+    "CostIncreasePerLevel": 50,
     "IconPath": "InGameUpgrade_Icon[CARGO_WEAPON_LIMIT_Icon]"
   },
   {
@@ -58,8 +58,8 @@
     "Category": "Drone",
     "Name": "자원 채집 속도 증가 (- 0.15)",
     "MaxLevel": 5,
-    "BaseCost": 50,
-    "CostIncreasePerLevel": 30,
+    "BaseCost": 100,
+    "CostIncreasePerLevel": 50,
     "IconPath": "InGameUpgrade_Icon[DRONE_GATHER_SPEED_Icon]"
   },
   {
@@ -67,8 +67,8 @@
     "Category": "Drone",
     "Name": "자원 채집 효율 증가 (+ 1)",
     "MaxLevel": 5,
-    "BaseCost": 50,
-    "CostIncreasePerLevel": 30,
+    "BaseCost": 100,
+    "CostIncreasePerLevel": 50,
     "IconPath": "InGameUpgrade_Icon[DRONE_GATHER_EFFICIENCY_Icon]"
   },
   {
@@ -76,8 +76,8 @@
     "Category": "Drone",
     "Name": "드론 행동 속도 증가 (+ 0.15))",
     "MaxLevel": 5,
-    "BaseCost": 50,
-    "CostIncreasePerLevel": 30,
+    "BaseCost": 100,
+    "CostIncreasePerLevel": 50,
     "IconPath": "InGameUpgrade_Icon[DRONE_MOVE_SPEED_Icon]"
   }
 ]
