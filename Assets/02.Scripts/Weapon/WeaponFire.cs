@@ -284,12 +284,7 @@ public class WeaponFire : MonoBehaviour
 
     private void PlayWeaponSfx(string dataSoundName, string fallbackAddress)
     {
-        string address = fallbackAddress;
-
-        if (string.IsNullOrEmpty(dataSoundName) == false)
-        {
-            address = SfxAddress.Weapon.Prefix + dataSoundName;
-        }
+        string address = SfxAddress.Resolve(SfxAddress.Weapon.Prefix, dataSoundName, fallbackAddress);
 
         SoundManager.Instance?.PlaySFXAt(address, _firePosition.position);
     }

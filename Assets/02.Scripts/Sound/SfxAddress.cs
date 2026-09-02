@@ -34,9 +34,10 @@
 
     public static class Monster
     {
-        public const string LaserFire = "Sfx/Monster/LaserFire";
-        public const string MetalHit = "Sfx/Monster/MetalHit";
-        public const string MachineBreak = "Sfx/Monster/MachineBreak";
+        public const string Prefix = "Sfx/Monster/";
+        public const string Attack = "Sfx/Monster/Attack";
+        public const string Hit = "Sfx/Monster/Hit";
+        public const string Die = "Sfx/Monster/Die";
     }
 
     public static class Drone
@@ -55,6 +56,17 @@
     public static class Game
     {
         public const string Clear = "Sfx/Game/Clear";
+        public const string Over = "Sfx/Game/Over";
+    }
+
+    public static string Resolve(string prefix, string dataSoundName, string fallbackAddress)
+    {
+        if (string.IsNullOrEmpty(dataSoundName))
+        {
+            return fallbackAddress;
+        }
+
+        return prefix + dataSoundName;
     }
 
     public static readonly string[] All =
