@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using UnityEngine.InputSystem;
 
 public class RailPlaceConfirmPopup : UIBase
 {
@@ -19,6 +20,25 @@ public class RailPlaceConfirmPopup : UIBase
         if (Button_Cancel != null)
         {
             Button_Cancel.BindOnClickButtonEvent(OnClick_Cancel);
+        }
+    }
+
+    private void Update()
+    {
+        if (Keyboard.current == null)
+        {
+            return;
+        }
+
+        if (Keyboard.current.fKey.wasPressedThisFrame == true)
+        {
+            OnClick_Confirm();
+            return;
+        }
+
+        if (Keyboard.current.aKey.wasPressedThisFrame == true)
+        {
+            OnClick_Cancel();
         }
     }
 
