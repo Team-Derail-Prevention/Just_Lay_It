@@ -16,13 +16,6 @@ public class MapManager : SingletonBase<MapManager>
     [SerializeField] private string _straightRailAddress = "Prefab/Rail_Straight";
     [SerializeField] private float _railSpawnOffset = 2f;
 
-    [Header("Game Stage")]
-    [SerializeField] private GameStage _currentGameStage = GameStage.Stage1;
-
-    [SerializeField, Min(0f)] private float _stage1ClearTimeLimit = 300f;
-    [SerializeField, Min(0f)] private float _stage2ClearTimeLimit = 300f;
-    [SerializeField, Min(0f)] private float _stage3ClearTimeLimit = 300f;
-
     private readonly Vector3Int[] _initialMapOffsets =
     {
         new Vector3Int(-1, 0, 1),  new Vector3Int(0, 0, 1),  new Vector3Int(1, 0, 1),

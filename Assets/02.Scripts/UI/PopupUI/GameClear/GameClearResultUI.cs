@@ -78,7 +78,7 @@ public class GameClearResultUI : UIBase
             return;
         }
 
-        _enableElapsedTime += Time.deltaTime; 
+        _enableElapsedTime += Time.unscaledDeltaTime;
         if (_enableElapsedTime < _scrollStartDelay) 
         {
             return;

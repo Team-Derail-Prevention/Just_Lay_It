@@ -401,7 +401,13 @@ public class GameManager : SingletonBase<GameManager>
         resultData.EarnedCashCount = Save != null ? Save.LifetimeTotalEarnedCash : 0;
         resultData.TotalPlayCount = Save != null ? Save.TotalPlayCount : 0;
         resultData.TitleMessage = BuildGameClearTitleMessage(clearedStage, isFinalStage);
-        resultData.NextStageNoticeMessage = isFinalStage ? string.Empty : "다음 난이도의 특수 클리어 성공을 기원합니다.";
+
+        GameStage nextStage = _currentGameStage;
+        int nextStageTimeLimitMinutes = Mathf.RoundToInt(GetClearTimeLimit(nextStage) / 60f);
+        resultData.NextStageNoticeMessage = isFinalStage
+            ? string.Empty
+            : $"다음 난이도는 {nextStageTimeLimitMinutes}분 안에 클리어를 노려 특수 클리어를 성공 하시기를 기원합니다.";
+
         resultData.IsFinalStage = isFinalStage;
 
         return resultData;
