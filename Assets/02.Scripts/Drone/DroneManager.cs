@@ -392,6 +392,8 @@ public class DroneManager : SingletonBase<DroneManager>
 
     public int PendingMiningCount { get { return _pendingMining.Count; } }
 
+    public bool IsSuspendedUntilDeparture { get { return _isMiningSuspendedUntilDeparture; } }
+
     public bool TryAssignMining(MaterialObject target)
     {
         if (_isMiningSuspendedUntilDeparture)

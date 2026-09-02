@@ -308,11 +308,6 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
             return;
         }
 
-        if (_cargo.Count > 0)
-        {
-            return;
-        }
-
         BeginReturn();
     }
 
