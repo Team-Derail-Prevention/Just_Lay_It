@@ -9,7 +9,7 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
     [Header("Spawn Settings")]
     [SerializeField] private Transform _mainTrain;
     [SerializeField] private float _spawnRadius = 15;
-    [SerializeField] private float _spawnInterval = 2f;
+    [SerializeField] private float _spawnInterval = 3.5f;
     [SerializeField] private int _maxMonsterLimit = 50;
     [SerializeField] private float _initialSpawnDelay = 30f;
     [SerializeField] private float _spawnYOffset = 2.0f;
@@ -25,6 +25,7 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
 
     [Header("Difficulty Scaling")]
     [SerializeField] private float _hpIncreasePerMinute = 0.25f;
+    [SerializeField] private float _atkIncreasePerMinute = 0.25f;
 
     [SerializeField] private LayerMask _obstacleLayer;
     [SerializeField] private float _checkRadius = 1f;
@@ -123,7 +124,8 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
                 MonsterMove moveScript = newMonster.GetComponent<MonsterMove>();
                 if (moveScript != null)
                 {
-                    moveScript.Initialize(monsterData, _mainTrain);
+                    float currentAtkMultiplier = GetMonsterAtkMultiplier();
+                    moveScript.Initialize(monsterData, _mainTrain, currentAtkMultiplier);
                 }
             }
 
@@ -299,7 +301,36 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
         }
 
         float minutesPlayed = _elapsedTime / 60f;
-        float timeMultiplier = 1.0f + (minutesPlayed * _hpIncreasePerMinute);
+        float timeMultiplier = Mathf.Min(2.0f, 1.0f + (minutesPlayed * _hpIncreasePerMinute));
+
+        return stageMultiplier * timeMultiplier;
+    }
+
+    private float GetMonsterAtkMultiplier()
+    {
+        float stageMultiplier = 1.0f;
+
+        if (GameManager.Instance != null)
+        {
+            switch (GameManager.Instance.CurrentGameStage)
+            {
+                case GameStage.Stage1:
+                    stageMultiplier = 1.0f;
+                    break;
+                case GameStage.Stage2:
+                    stageMultiplier = 1.5f;
+                    break;
+                case GameStage.Stage3:
+                    stageMultiplier = 2.0f;
+                    break;
+                default:
+                    stageMultiplier = 1.0f;
+                    break;
+            }
+        }
+
+        float minutesPlayed = _elapsedTime / 60f;
+        float timeMultiplier = Mathf.Min(2.0f, 1.0f + (minutesPlayed * _atkIncreasePerMinute));
 
         return stageMultiplier * timeMultiplier;
     }
