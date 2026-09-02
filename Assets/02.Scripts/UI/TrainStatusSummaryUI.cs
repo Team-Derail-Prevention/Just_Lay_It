@@ -90,9 +90,21 @@ public class TrainStatusSummaryUI : UIBase
 
     private void RefreshBattle()
     {
-        if (Text_Defense != null && TrainManager.Instance != null && TrainManager.Instance.ActiveTrain != null)
+        if (TrainManager.Instance == null || TrainManager.Instance.ActiveTrain == null)
         {
-            Text_Defense.text = $"방어력 : {Mathf.RoundToInt(TrainManager.Instance.ActiveTrain.Defense).ToString()}";
+            return;
+        }
+
+        Train activeTrain = TrainManager.Instance.ActiveTrain;
+
+        if (Text_Hp != null)
+        {
+            Text_Hp.text = $"체력 : {Mathf.RoundToInt(activeTrain.CurrentHp)} / {Mathf.RoundToInt(activeTrain.MaxHp)}";
+        }
+
+        if (Text_Defense != null)
+        {
+            Text_Defense.text = $"방어력 : {Mathf.RoundToInt(activeTrain.Defense)}";
         }
     }
 

@@ -13,15 +13,9 @@ public class AugmentEquipUI : MonoBehaviour
     [SerializeField] private GameObject Prefab_Slot;
     [SerializeField] private SectionRow[] _sectionRowList;
 
-    private bool _isSlotsCreated;
-
     private void OnEnable()
     {
-        if (_isSlotsCreated == false)
-        {
-            CreateAllRows();
-            _isSlotsCreated = true;
-        }
+        CreateAllRows();
     }
 
     private void CreateAllRows()
