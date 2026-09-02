@@ -265,7 +265,7 @@ public class GameManager : SingletonBase<GameManager>
 
     public void HandleTerminalArrival()
     {
-        HandleTerminalArrival(null);
+        HandleTerminalArrivalAsync(null).Forget();
     }
 
     public void SelectExitDirection(int directionIndex)
@@ -570,7 +570,7 @@ public class GameManager : SingletonBase<GameManager>
 
     private void HandleCentralTerminalEntered(CentralTerminal terminal)
     {
-        HandleTerminalArrival(terminal);
+        HandleTerminalArrivalAsync(terminal).Forget();
     }
 
     private void HandleStationArrival(StationObject station, string stationId)
@@ -592,7 +592,7 @@ public class GameManager : SingletonBase<GameManager>
         // TODO: Station UI를 열고 CompleteStation(bool)을 호출하도록 연결필요
     }
 
-    private void HandleTerminalArrival(CentralTerminal terminal)
+    private async UniTaskVoid HandleTerminalArrivalAsync(CentralTerminal terminal)
     {
         if (CurrentGameState != GameState.Playing)
         {
@@ -608,9 +608,16 @@ public class GameManager : SingletonBase<GameManager>
         PauseGameplayTime();
         StopAndDespawnMonsters();
         RemovePlayerPlacedRails();
+
         RemoveCompletedStations();
 
+        await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, this.GetCancellationTokenOnDestroy());
+
+        Physics.SyncTransforms();
+        Map?.RefreshAllTileOccupancies();
+
         Debug.Log($"[GameManager] 스테이션 순회: {CompletedStationCount}/{RequiredStationCount}");
+
         if (CompletedStationCount >= RequiredStationCount)
         {
             GameClear();
@@ -622,7 +629,6 @@ public class GameManager : SingletonBase<GameManager>
         UI?.OpenBaseArrivalUI();
         OpenScoreReport(ScoreResultType.BaseArrival, null);
         Debug.Log("[GameManager] 터미널 도착: 출구 방향 선택을 기다립니다.");
-        // TODO: Terminal UI를 열고 CentralTerminal.SelectExitGate(int)와 연결필요(?)
     }
 
     private void RemoveCompletedStations()
