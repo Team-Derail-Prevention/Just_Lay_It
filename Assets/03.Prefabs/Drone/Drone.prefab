@@ -848,6 +848,7 @@ GameObject:
   - component: {fileID: 911853885252729923}
   - component: {fileID: 1109667046322424571}
   - component: {fileID: 9084793432629457986}
+  - component: {fileID: 4342230036082813173}
   m_Layer: 0
   m_Name: Drone
   m_TagString: Drone
@@ -923,6 +924,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DroneStateMachine
   _dock: {fileID: 8386779686349033688}
   _workTrigger: {fileID: 1109667046322424571}
+  _miningSound: {fileID: 4342230036082813173}
   _workSpeedMultiplier: 3
 --- !u!114 &4523906457424135640
 MonoBehaviour:
@@ -1011,6 +1013,30 @@ MonoBehaviour:
   _maxPitch: 1.15
   _pitchSmoothTime: 0.25
   _randomizeStartTime: 1
+  _pitchOffsetRange: 0.06
+--- !u!114 &4342230036082813173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5543407445265190575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8bfc9b820db1994e93f946cb5676fbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LoopSoundSource
+  _address: 
+  _playOnEnable: 0
+  _baseVolume: 0.5
+  _minDistance: 3
+  _maxDistance: 60
+  _usePitchBySpeed: 0
+  _speedForMaxPitch: 12
+  _minPitch: 0.85
+  _maxPitch: 1.15
+  _pitchSmoothTime: 0.25
+  _randomizeStartTime: 0
   _pitchOffsetRange: 0.06
 --- !u!1 &6690797270028158932
 GameObject:

@@ -49,10 +49,12 @@ public class MaterialObject : BaseColliderTrigger
 
     private void Update()
     {
+#if UNITY_EDITOR
         if (!_isMining && !_isBroken && !_isCollected && Input.GetKeyDown(KeyCode.Minus))
         {
             ReceiveDroneSignalAndStart();
         }
+#endif
     }
 
     public void InitializeData(MaterialObjectData data)

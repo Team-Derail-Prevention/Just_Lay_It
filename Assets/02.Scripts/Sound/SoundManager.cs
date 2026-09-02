@@ -62,6 +62,9 @@ public class SoundManager : SingletonBase<SoundManager>
 
         LoadSavedVolume();
 
+        MaterialObject.OnMaterialObjectCollected -= HandleMaterialCollected;
+        MaterialObject.OnMaterialObjectCollected += HandleMaterialCollected;
+
         if (GameManager.Instance == null)
         {
             HandleGameStateChanged(GameState.Ready);
@@ -76,12 +79,24 @@ public class SoundManager : SingletonBase<SoundManager>
 
     private void OnDestroy()
     {
+        MaterialObject.OnMaterialObjectCollected -= HandleMaterialCollected;
+
         if (GameManager.Instance == null)
         {
             return;
         }
 
         GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+    }
+
+    private void HandleMaterialCollected(MaterialObjectData data)
+    {
+        if (data == null)
+        {
+            return;
+        }
+
+        PlaySFX(SfxAddress.Resource.Collected);
     }
 
     private void HandleGameStateChanged(GameState gameState)

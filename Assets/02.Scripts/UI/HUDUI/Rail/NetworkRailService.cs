@@ -3,13 +3,11 @@ using System;
 
 public class NetworkRailService : SingletonBase<NetworkRailService>
 {
-    // 임시 선로 제작 소요 시간 3초
     private const float CRAFT_DURATION = 1.5f;
-    private float _craftSpeedPercent = 0f;
+    private const float CRAFT_SPEED_PERCENT_PER_LEVEL = 0.1f;
     private const int CRAFT_WOOD_COST = 2;
 
     private const int BONUS_RAIL_COUNT_PER_LEVEL = 2;
-    private int _bonusBaseRailCount = 0;
 
     private RailBuildViewModel _localRailBuildViewModel;
     private int _sessionCraftedCount;
@@ -19,33 +17,27 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
     public int SessionInstalledCount => _sessionInstalledCount;
 
     public event Action<RailType> OnRequestPlaceMode;
-
-    private void OnEnable()
+    private int GetLobbyUpgradeLevel(string slotDataId)
     {
-        if (UpgradeEventHub.Instance != null)
+        if (NetworkUpgradeService.Instance == null)
         {
-            UpgradeEventHub.Instance.OnLobbyUpgraded += OnLobbyUpgraded;
+            return 0;
         }
+
+        UpgradeViewModel upgradeVm = NetworkUpgradeService.Instance.GetLocalUpgradeViewModel();
+        UpgradeSlotViewModel slotVm = upgradeVm?.GetSlot(slotDataId);
+
+        return slotVm != null ? slotVm.CurrentLevel : 0;
     }
 
-    private void OnDisable()
+    private int GetBonusBaseRailCount()
     {
-        if (UpgradeEventHub.Instance != null)
-        {
-            UpgradeEventHub.Instance.OnLobbyUpgraded -= OnLobbyUpgraded;
-        }
+        return GetLobbyUpgradeLevel("LOBBY_BASE_RAIL_COUNT") * BONUS_RAIL_COUNT_PER_LEVEL;
     }
 
-    private void OnLobbyUpgraded(string slotDataId, int newLevel)
+    private float GetCraftSpeedPercent()
     {
-        if (slotDataId == "LOBBY_RAIL_CRAFT_SPEED")
-        {
-            _craftSpeedPercent += 0.1f;
-        }
-        else if (slotDataId == "LOBBY_BASE_RAIL_COUNT")
-        {
-            _bonusBaseRailCount += BONUS_RAIL_COUNT_PER_LEVEL;
-        }
+        return GetLobbyUpgradeLevel("LOBBY_RAIL_CRAFT_SPEED") * CRAFT_SPEED_PERCENT_PER_LEVEL;
     }
 
     private void Start()
@@ -65,7 +57,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
     {
         if (_localRailBuildViewModel == null)
         {
-            _localRailBuildViewModel = new RailBuildViewModel(_bonusBaseRailCount);
+            _localRailBuildViewModel = new RailBuildViewModel(GetBonusBaseRailCount());
         }
 
         return _localRailBuildViewModel;
@@ -79,7 +71,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
             return;
         }
 
-        float actualDuration = CRAFT_DURATION * (1f - _craftSpeedPercent);
+        float actualDuration = CRAFT_DURATION * (1f - GetCraftSpeedPercent());
         slot.CraftProgress01 += Time.deltaTime / actualDuration;
         if (slot.CraftProgress01 < 1f)
         {
@@ -138,7 +130,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
 
     public void ResetRun()
     {
-        _localRailBuildViewModel = new RailBuildViewModel(_bonusBaseRailCount);
+        _localRailBuildViewModel = new RailBuildViewModel(GetBonusBaseRailCount());
         _sessionCraftedCount = 0;
         _sessionInstalledCount = 0;
     }

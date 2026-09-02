@@ -312,10 +312,24 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         onResult?.Invoke(isSpent);
     }
 
+    private int GetLobbyCargoLimitBonus()
+    {
+        if (NetworkUpgradeService.Instance == null)
+        {
+            return 0;
+        }
+
+        UpgradeViewModel upgradeVm = NetworkUpgradeService.Instance.GetLocalUpgradeViewModel();
+        UpgradeSlotViewModel slotVm = upgradeVm?.GetSlot("LOBBY_BASE_CARGO_LIMIT");
+        int level = slotVm != null ? slotVm.CurrentLevel : 0;
+
+        return level * 100;
+    }
+
     public void ResetRun()
     {
         _localVm = new ResourceViewModel();
-        _cargoLimit = BASE_CARGO_LIMIT;
+        _cargoLimit = BASE_CARGO_LIMIT + GetLobbyCargoLimitBonus();
         _sessionTotalWoodCollected = 0;
         _sessionTotalStoneCollected = 0;
         _isBaseRepairFreeUsed = false;

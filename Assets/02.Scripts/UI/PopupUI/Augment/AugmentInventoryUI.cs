@@ -7,7 +7,6 @@ public class AugmentInventoryUI : UIBase
     [SerializeField] private UIButton Button_Close;
 
     private AugmentInventoryViewModel _vm;
-    private bool _isSlotsCreated;
 
     private void OnEnable()
     {
@@ -18,11 +17,8 @@ public class AugmentInventoryUI : UIBase
 
         _vm = NetworkAugmentService.Instance.GetLocalAugmentInventoryViewModel();
 
-        if (_isSlotsCreated == false)
-        {
-            CreateAllSlots();
-            _isSlotsCreated = true;
-        }
+        ClearExistingSlots();
+        CreateAllSlots();
     }
 
     private void OnDisable()
@@ -30,6 +26,19 @@ public class AugmentInventoryUI : UIBase
         if (Button_Close != null)
         {
             Button_Close.UnBindOnClickButtonEvent(OnClick_Close);
+        }
+    }
+
+    private void ClearExistingSlots()
+    {
+        if (Transform_SlotRoot == null)
+        {
+            return;
+        }
+
+        for (int i = Transform_SlotRoot.childCount - 1; i >= 0; i--)
+        {
+            Destroy(Transform_SlotRoot.GetChild(i).gameObject);
         }
     }
 

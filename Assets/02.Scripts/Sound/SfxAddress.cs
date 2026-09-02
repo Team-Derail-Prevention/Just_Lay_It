@@ -31,8 +31,14 @@
     public static class Drone
     {
         public const string Propeller = "Sfx/Drone/Propeller";
-        public const string Mining = "Sfx/Drone/Mining";
+        public const string MineRock = "Sfx/Drone/MineRock";
+        public const string ChopTree = "Sfx/Drone/ChopTree";
         public const string RailDrop = "Sfx/Drone/RailDrop";
+    }
+
+    public static class Resource
+    {
+        public const string Collected = "Sfx/Resource/Collected";
     }
 
     public static class Game
