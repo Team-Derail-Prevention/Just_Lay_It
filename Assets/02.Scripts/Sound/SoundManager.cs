@@ -16,6 +16,9 @@ public class SoundManager : SingletonBase<SoundManager>
     [SerializeField, Min(0f)] private float _muffleCutoff = 1000f;
     [SerializeField, Min(0f)] private float _normalCutoff = 22000f;
 
+    [Header("자원 획득음 연사 제한")]
+    [SerializeField, Min(0f)] private float _resourceSfxCooldown = 0.08f;
+
     [Header("3D 효과음")]
     [SerializeField, Min(1)] private int _sfxVoiceLimit = 8;
     [SerializeField, Min(0f)] private float _sfxMinDistance = 3f;
@@ -30,6 +33,8 @@ public class SoundManager : SingletonBase<SoundManager>
     [SerializeField, Range(0f, 1f)] private float _bgmVolume = 0.5f;
 
     private readonly List<AudioSource> _spatialSources = new List<AudioSource>();
+
+    private readonly Dictionary<string, float> _lastSfxTimes = new Dictionary<string, float>();
 
     private string _currentBgmAddress;
     private GameState _previousGameState = GameState.Ready;
@@ -96,7 +101,7 @@ public class SoundManager : SingletonBase<SoundManager>
             return;
         }
 
-        PlaySFX(SfxAddress.Resource.Collected);
+        PlaySFXThrottled(SfxAddress.Resource.Collected, _resourceSfxCooldown);
     }
 
     private void HandleGameStateChanged(GameState gameState)
@@ -181,6 +186,25 @@ public class SoundManager : SingletonBase<SoundManager>
         LoadAndPlayOneShot(_sfxSource, assetPath).Forget();
     }
 
+    public void PlaySFXThrottled(string assetPath, float minInterval)
+    {
+        if (string.IsNullOrEmpty(assetPath))
+        {
+            return;
+        }
+
+        float now = Time.unscaledTime;
+
+        if (_lastSfxTimes.TryGetValue(assetPath, out float lastTime) && now - lastTime < minInterval)
+        {
+            return;
+        }
+
+        _lastSfxTimes[assetPath] = now;
+
+        PlaySFX(assetPath);
+    }
+
     public void PlaySFXAt(string assetPath, Vector3 position)
     {
         LoadAndPlaySpatial(assetPath, position).Forget();
@@ -188,9 +212,14 @@ public class SoundManager : SingletonBase<SoundManager>
 
     public void PlayBGM(string assetPath)
     {
-        if (_currentBgmAddress == assetPath)
+        if (_currentBgmAddress == assetPath && IsBgmPlaying())
         {
             return;
+        }
+
+        if (_currentBgmAddress == assetPath)
+        {
+            _currentBgmAddress = null;
         }
 
         ReleaseCurrentBgm();
@@ -198,6 +227,16 @@ public class SoundManager : SingletonBase<SoundManager>
         _currentBgmAddress = assetPath;
 
         LoadAndPlayBgm(assetPath).Forget();
+    }
+
+    private bool IsBgmPlaying()
+    {
+        if (_bgmSource == null)
+        {
+            return false;
+        }
+
+        return _bgmSource.isPlaying;
     }
 
     public void StopSFX()
@@ -366,6 +405,8 @@ public class SoundManager : SingletonBase<SoundManager>
         {
             _bgmSource = CreateSource("BgmSource", isSpatial: false);
         }
+
+        _bgmSource.priority = 0;
 
         EnsureLowPassFilter();
 

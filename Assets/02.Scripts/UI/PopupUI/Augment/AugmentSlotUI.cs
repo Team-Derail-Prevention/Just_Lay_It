@@ -305,6 +305,7 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
         HideDescription();
         if (_slotState.IsLocked == true)
         {
+            SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Denied);
             UIManager.Instance.OpenExitConfirmPopup(null, null, "아직 열리지 않은 칸입니다.");
             return;
         }
@@ -316,6 +317,7 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
         }
         else if (_slotState.Augment != null)
         {
+            SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Denied);
             UIManager.Instance.OpenExitConfirmPopup(null, null, "이미 다른 무기가 장착된 칸입니다.");
         }
     }

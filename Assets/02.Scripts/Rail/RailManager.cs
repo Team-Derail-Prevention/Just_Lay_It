@@ -70,7 +70,7 @@ public class RailManager : SingletonBase<RailManager>
         public bool IsDelivered;
     }
     private Dictionary<Vector2Int, PlacedRailInfo> _placedRails = new Dictionary<Vector2Int, PlacedRailInfo>();
-    private bool _hasAnnouncedStationArrival;
+    private bool _isStationRouteConnected;
 
     private Vector2Int _hoveredGridIndex;
     private bool _isHoveredCube;
@@ -229,6 +229,14 @@ public class RailManager : SingletonBase<RailManager>
         if (GameManager.Instance.CurrentGameState != GameState.Playing)
         {
             Debug.LogWarning("[RailManager] 게임 플레이 중에만 레일을 설치할 수 있습니다.");
+            return;
+        }
+
+        if (_isStationRouteConnected)
+        {
+            Debug.Log("[RailManager] 역 진입 경로가 이미 연결되어 배치할 수 없습니다.");
+            ExitPlaceMode();
+
             return;
         }
 
@@ -757,6 +765,16 @@ public class RailManager : SingletonBase<RailManager>
 
     private void TryInstallRail(Vector2Int gridIndex, CubeInfo cubeInfo)
     {
+        if (_isStationRouteConnected)
+        {
+            return;
+        }
+
+        if (GameManager.Instance != null && GameManager.Instance.CurrentGameState != GameState.Playing)
+        {
+            return;
+        }
+
         if (!IsPlacementValid(gridIndex, cubeInfo)) return;
 
         _installedCubes.Add(gridIndex);
@@ -1088,13 +1106,15 @@ public class RailManager : SingletonBase<RailManager>
             {
                 _installedRailPath.Add(stationRailsToAppend[i]);
             }
-            if (_hasAnnouncedStationArrival == false)
+            if (_isStationRouteConnected == false)
             {
-                _hasAnnouncedStationArrival = true;
+                _isStationRouteConnected = true;
 
                 Debug.Log("[RailManager] 기차역 레일 연결성공");
                 SoundManager.Instance?.PlaySFX(SfxAddress.Train.Arrive);
                 DroneManager.Instance?.RecallAllAndSuspendMining();
+
+                ExitPlaceMode();
             }
 
             //레일 전체 연결 완료 -> 기차 속도 부스트 적용
@@ -1105,7 +1125,7 @@ public class RailManager : SingletonBase<RailManager>
     public void InitStartingRailPath(Transform dirRoot)
     {
         _currentDepartureGateRoot = dirRoot;
-        _hasAnnouncedStationArrival = false;
+        _isStationRouteConnected = false;
         if (dirRoot == null)
         {
             _installedRailPath.Clear();
