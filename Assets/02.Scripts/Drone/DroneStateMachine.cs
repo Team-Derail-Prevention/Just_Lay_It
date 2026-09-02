@@ -1,3 +1,4 @@
+using Enums;
 using UnityEngine;
 
 [RequireComponent(typeof(DroneMoveController))]
@@ -8,6 +9,8 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
 
     // 이동 중에는 꺼둡니다. 켜져 있으면 지나치는 자원까지 채굴이 시작됩니다.
     [SerializeField] private Collider _workTrigger;
+
+    [SerializeField] private LoopSoundSource _miningSound;
 
     [Header("작업")]
     [SerializeField, Min(0.01f)] private float _workSpeedMultiplier = 1f;
@@ -247,8 +250,53 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
         _workTarget.OnMiningFinished -= HandleMiningFinished;
     }
 
+    private void StartMiningSound()
+    {
+        if (_miningSound == null || _workTarget == null)
+        {
+            return;
+        }
+
+        string address = ResolveMiningSoundAddress(_workTarget.MaterialType);
+
+        if (string.IsNullOrEmpty(address))
+        {
+            return;
+        }
+
+        _miningSound.SetAddress(address);
+        _miningSound.Play();
+    }
+
+    private void StopMiningSound()
+    {
+        if (_miningSound == null)
+        {
+            return;
+        }
+
+        _miningSound.Stop();
+    }
+
+    private string ResolveMiningSoundAddress(string materialType)
+    {
+        if (materialType == nameof(MaterialObejctType.Rock))
+        {
+            return SfxAddress.Drone.MineRock;
+        }
+
+        if (materialType == nameof(MaterialObejctType.DeadTree))
+        {
+            return SfxAddress.Drone.ChopTree;
+        }
+
+        return null;
+    }
+
     private void BeginReturn()
     {
+        StopMiningSound();
+
         UnbindWorkTarget();
 
         _isReturning = true;
@@ -296,6 +344,8 @@ public class DroneStateMachine : MonoBehaviour, IDroneWorker
         }
 
         BindWorkTarget();
+
+        StartMiningSound();
     }
 
     private float GetUpgradedWorkSpeed()
