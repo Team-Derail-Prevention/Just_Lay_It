@@ -108,7 +108,7 @@ public class SoundManager : SingletonBase<SoundManager>
     {
         SetMuffled(gameState == GameState.EventPaused);
 
-        PlayTrainMoveSfx(gameState);
+        PlayGameStateSfx(gameState);
 
         string address = ResolveBgmAddress(gameState);
 
@@ -120,24 +120,41 @@ public class SoundManager : SingletonBase<SoundManager>
         PlayBGM(address);
     }
 
-    private void PlayTrainMoveSfx(GameState gameState)
+    private void PlayGameStateSfx(GameState gameState)
     {
-        bool previousStateWasPlaying = _hasPreviousGameState && _previousGameState == GameState.Playing;
+        GameState previousState = _previousGameState;
+        bool hasPreviousState = _hasPreviousGameState;
 
         _previousGameState = gameState;
         _hasPreviousGameState = true;
 
+        if (hasPreviousState && previousState == gameState)
+        {
+            return;
+        }
+
+        if (gameState == GameState.GameClear)
+        {
+            PlaySFX(SfxAddress.Game.Clear);
+
+            return;
+        }
+
+        if (gameState == GameState.GameOver)
+        {
+            PlaySFX(SfxAddress.Game.Over);
+
+            return;
+        }
+
         if (gameState == GameState.Playing)
         {
-            if (previousStateWasPlaying)
-            {
-                return;
-            }
-
             PlaySFX(SfxAddress.Train.Depart);
 
             return;
         }
+
+        bool previousStateWasPlaying = hasPreviousState && previousState == GameState.Playing;
 
         if (previousStateWasPlaying == false)
         {
