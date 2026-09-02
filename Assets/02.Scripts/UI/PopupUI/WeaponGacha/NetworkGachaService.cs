@@ -6,7 +6,7 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
     private const int REROLL_COUNT_DEFAULT = 3; 
     public const int REROLL_COST_SINGLE = 1;
     public const int REROLL_COST_ALL = 3;
-    private const int GACHA_BASE_COST = 30;
+    private const int GACHA_BASE_COST = 50;
     private const int GACHA_COST_INCREASE_PER_PULL = 5;
     private int _gachaPullCount = 0;
 
