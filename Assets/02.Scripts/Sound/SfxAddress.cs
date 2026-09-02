@@ -12,21 +12,33 @@
         public const string WeaponEquip = "Sfx/Ui/WeaponEquip";
         public const string WeaponUnEquip = "Sfx/Ui/WeaponUnEquip";
         public const string Denied = "Sfx/Ui/Denied";
+        public const string Purchase = "Sfx/Ui/Purchase";
+        public const string Sell = "Sfx/Ui/Sell";
     }
 
     public static class Train
     {
         public const string Depart = "Sfx/Train/Depart";
+        public const string Stop = "Sfx/Train/Stop";
         public const string Arrive = "Sfx/Train/Arrive";
+        public const string Hit = "Sfx/Train/Hit";
         public const string Drive = "Sfx/Train/Drive";
         public const string Repair = "Sfx/Train/Repair";
     }
 
+    public static class Weapon
+    {
+        public const string Prefix = "Sfx/Weapon/";
+        public const string Fire = "Sfx/Weapon/Fire";
+        public const string Reload = "Sfx/Weapon/Reload";
+    }
+
     public static class Monster
     {
-        public const string LaserFire = "Sfx/Monster/LaserFire";
-        public const string MetalHit = "Sfx/Monster/MetalHit";
-        public const string MachineBreak = "Sfx/Monster/MachineBreak";
+        public const string Prefix = "Sfx/Monster/";
+        public const string Attack = "Sfx/Monster/Attack";
+        public const string Hit = "Sfx/Monster/Hit";
+        public const string Die = "Sfx/Monster/Die";
     }
 
     public static class Drone
@@ -45,6 +57,17 @@
     public static class Game
     {
         public const string Clear = "Sfx/Game/Clear";
+        public const string Over = "Sfx/Game/Over";
+    }
+
+    public static string Resolve(string prefix, string dataSoundName, string fallbackAddress)
+    {
+        if (string.IsNullOrEmpty(dataSoundName))
+        {
+            return fallbackAddress;
+        }
+
+        return prefix + dataSoundName;
     }
 
     public static readonly string[] All =
@@ -60,6 +83,6 @@
 
 public static class BgmAddress
 {
-    public const string Lobby = "Bgm/Lobby";
+    public const string Lobby = "Bgm/OutGame";
     public const string InGame = "Bgm/InGame";
 }

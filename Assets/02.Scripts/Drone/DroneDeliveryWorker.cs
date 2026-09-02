@@ -9,7 +9,6 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
     {
         Idle,
         ToTarget,
-        Waiting,
         Returning,
     }
 
@@ -20,7 +19,6 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         public GameObject Ghost;
         public Vector3 Target;
         public Quaternion Rotation;
-        public int Sequence;
         public Action<GameObject> OnPlaced;
     }
 
@@ -189,7 +187,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         return true;
     }
 
-    public bool Assign(GameObject payload, GameObject ghost, Vector3 target, Quaternion rotation, int sequence, Action<GameObject> onPlaced = null)
+    public bool Assign(GameObject payload, GameObject ghost, Vector3 target, Quaternion rotation, Action<GameObject> onPlaced = null)
     {
         if (payload == null || CanAcceptWork == false)
         {
@@ -210,7 +208,6 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
             Ghost = ghost,
             Target = target,
             Rotation = rotation,
-            Sequence = sequence,
             OnPlaced = onPlaced,
         };
 
@@ -315,7 +312,7 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
     {
         topY = 0f;
 
-        if (_phase == Phase.ToTarget || _phase == Phase.Waiting)
+        if (_phase == Phase.ToTarget)
         {
             if (_cargo.Count == 0)
             {
@@ -370,16 +367,6 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
     private void Update()
     {
-        if (_phase == Phase.Waiting)
-        {
-            if (IsPlacementTurn())
-            {
-                PlaceOrWait();
-            }
-
-            return;
-        }
-
         if (_phase != Phase.Returning)
         {
             return;
@@ -494,13 +481,6 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
 
     private void PlaceOrWait()
     {
-        if (IsPlacementTurn() == false)
-        {
-            _phase = Phase.Waiting;
-
-            return;
-        }
-
         _phase = Phase.ToTarget;
 
         DropFront();
@@ -513,21 +493,6 @@ public class DroneDeliveryWorker : MonoBehaviour, IDroneWorker
         }
 
         BeginReturn();
-    }
-
-    private bool IsPlacementTurn()
-    {
-        if (_cargo.Count == 0)
-        {
-            return true;
-        }
-
-        if (DroneManager.Instance == null)
-        {
-            return true;
-        }
-
-        return DroneManager.Instance.IsPlacementTurn(_cargo[0].Sequence);
     }
 
     private void DropFront()

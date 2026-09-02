@@ -235,6 +235,7 @@ public class BaseArrivalUI : UIBase
 
         if (NetworkResourceService.Instance.HasEnoughStone(cost) == false)
         {
+            SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Denied);
             UIManager.Instance.OpenExitConfirmPopup(null, null, InsufficientResourceMessage);
             return false;
         }
@@ -274,6 +275,7 @@ public class BaseArrivalUI : UIBase
 
         if (GameManager.Train != null && GameManager.Train.IsTrainHpFull())
         {
+            SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Denied);
             UIManager.Instance.OpenExitConfirmPopup(null, null, "열차 체력이 이미 가득 찼습니다!");
             return;
         }
@@ -286,6 +288,8 @@ public class BaseArrivalUI : UIBase
         }
 
         GameManager.Train.HealActiveTrain(REPAIR_HEAL_PERCENT);
+
+        SoundManager.Instance?.PlaySFX(SfxAddress.Train.Repair);
 
         Debug.Log($"[BaseArrivalUI] 수리 요청 완료 (최대 체력의 {REPAIR_HEAL_PERCENT}% 회복), 돌 {REPAIR_STONE_COST} 소모");
     }

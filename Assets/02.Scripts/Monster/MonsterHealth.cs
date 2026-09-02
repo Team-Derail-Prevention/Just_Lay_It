@@ -12,6 +12,9 @@ public class MonsterHealth : MonoBehaviour
     private bool _isDead = false;
 
     public int _dropStone;
+
+    private string _takeDamageSound;
+    private string _dieSound;
     public void Initialize(MonsterData data,float hpMultiplier = 1.0f)
     {
         if(data != null)
@@ -19,6 +22,8 @@ public class MonsterHealth : MonoBehaviour
             _maxHp = Mathf.RoundToInt(data.Hp * hpMultiplier);
             _currentHp = _maxHp;
             _dropStone = data.DropGold;
+            _takeDamageSound = data.UseTakeDamageSound;
+            _dieSound = data.UseDieSound;
         }
 
         _isDead = false;
@@ -37,12 +42,25 @@ public class MonsterHealth : MonoBehaviour
         if (_currentHp <= 0)
         {
             Die();
+
+            return;
         }
+
+        PlayMonsterSfx(_takeDamageSound, SfxAddress.Monster.Hit);
+    }
+
+    private void PlayMonsterSfx(string dataSoundName, string fallbackAddress)
+    {
+        string address = SfxAddress.Resolve(SfxAddress.Monster.Prefix, dataSoundName, fallbackAddress);
+
+        SoundManager.Instance?.PlaySFXAt(address, transform.position);
     }
 
     private void Die()
     {
         _isDead = true;
+
+        PlayMonsterSfx(_dieSound, SfxAddress.Monster.Die);
 
         OnMonsterDiedWithStone?.Invoke(_dropStone);
         OnMonsterDied?.Invoke(transform);

@@ -9,8 +9,8 @@ public class SoundManager : SingletonBase<SoundManager>
     [SerializeField] private AudioSource _bgmSource;
 
     [Header("상태별 BGM")]
-    [SerializeField] private string _lobbyBgmAddress = "Bgm/OutGame";
-    [SerializeField] private string _inGameBgmAddress = "Bgm/InGame";
+    [SerializeField] private string _lobbyBgmAddress = BgmAddress.Lobby;
+    [SerializeField] private string _inGameBgmAddress = BgmAddress.InGame;
 
     [Header("일시정지 먹먹함")]
     [SerializeField, Min(0f)] private float _muffleCutoff = 1000f;
@@ -108,7 +108,7 @@ public class SoundManager : SingletonBase<SoundManager>
     {
         SetMuffled(gameState == GameState.EventPaused);
 
-        PlayDepartureOnGameStart(gameState);
+        PlayGameStateSfx(gameState);
 
         string address = ResolveBgmAddress(gameState);
 
@@ -120,19 +120,53 @@ public class SoundManager : SingletonBase<SoundManager>
         PlayBGM(address);
     }
 
-    private void PlayDepartureOnGameStart(GameState gameState)
+    private void PlayGameStateSfx(GameState gameState)
     {
-        bool previousStateWasPlaying = _hasPreviousGameState && _previousGameState == GameState.Playing;
+        GameState previousState = _previousGameState;
+        bool hasPreviousState = _hasPreviousGameState;
 
         _previousGameState = gameState;
         _hasPreviousGameState = true;
 
-        if (gameState != GameState.Playing || previousStateWasPlaying)
+        if (hasPreviousState && previousState == gameState)
         {
             return;
         }
 
-        PlaySFX(SfxAddress.Train.Depart);
+        if (gameState == GameState.GameClear)
+        {
+            PlaySFX(SfxAddress.Game.Clear);
+
+            return;
+        }
+
+        if (gameState == GameState.GameOver)
+        {
+            PlaySFX(SfxAddress.Game.Over);
+
+            return;
+        }
+
+        if (gameState == GameState.Playing)
+        {
+            PlaySFX(SfxAddress.Train.Depart);
+
+            return;
+        }
+
+        bool previousStateWasPlaying = hasPreviousState && previousState == GameState.Playing;
+
+        if (previousStateWasPlaying == false)
+        {
+            return;
+        }
+
+        if (gameState != GameState.EventPaused)
+        {
+            return;
+        }
+
+        PlaySFX(SfxAddress.Train.Stop);
     }
 
     private string ResolveBgmAddress(GameState gameState)

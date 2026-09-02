@@ -7,6 +7,8 @@ public class Train : MonoBehaviour
     [SerializeField] public int _targetIndex = 0;
     [SerializeField] private bool _isMoving = true;
 
+    private const float HIT_SFX_INTERVAL = 0.15f;
+
     [Header("Acceleration Setting")]
     [SerializeField] private float _currentSpeed = 0f; // 현재 속도
 
@@ -206,6 +208,10 @@ public class Train : MonoBehaviour
         {
             _currentHp = 0;
             BrokenTrain();
+        }
+        else
+        {
+            SoundManager.Instance?.PlaySFXThrottled(SfxAddress.Train.Hit, HIT_SFX_INTERVAL);
         }
 
         if (TrainStatusEventHub.Instance != null)

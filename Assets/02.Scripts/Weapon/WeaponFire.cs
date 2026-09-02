@@ -254,6 +254,8 @@ public class WeaponFire : MonoBehaviour
 
         GameObject projObj = PoolManager.Instance.SpawnFromPool(_projectileId, _firePosition.position, Quaternion.identity);
 
+        PlayWeaponSfx(_weaponData?.UseFireSound, SfxAddress.Weapon.Fire);
+
         WeaponProjectile projectile = projObj.GetComponent<WeaponProjectile>();
         if (projectile != null)
         {
@@ -276,6 +278,15 @@ public class WeaponFire : MonoBehaviour
     {
         _isReloading = true;
         _reloadTimer = 0f;
+
+        PlayWeaponSfx(_weaponData?.UseReloadSound, SfxAddress.Weapon.Reload);
+    }
+
+    private void PlayWeaponSfx(string dataSoundName, string fallbackAddress)
+    {
+        string address = SfxAddress.Resolve(SfxAddress.Weapon.Prefix, dataSoundName, fallbackAddress);
+
+        SoundManager.Instance?.PlaySFXAt(address, _firePosition.position);
     }
 
     private void HandleReload()

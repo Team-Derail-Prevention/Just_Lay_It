@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class LoopSoundSource : MonoBehaviour
@@ -18,6 +18,10 @@ public class LoopSoundSource : MonoBehaviour
     [SerializeField, Min(0.01f)] private float _maxPitch = 1.15f;
     [SerializeField, Min(0f)] private float _pitchSmoothTime = 0.25f;
 
+    [Header("멈추면 무음")]
+    [SerializeField] private bool _stopWhenIdle;
+    [SerializeField, Min(0f)] private float _idleSpeedThreshold = 0.1f;
+
     [Header("개체 편차")]
     [SerializeField] private bool _randomizeStartTime = true;
     [SerializeField, Range(0f, 0.3f)] private float _pitchOffsetRange = 0.06f;
@@ -26,6 +30,7 @@ public class LoopSoundSource : MonoBehaviour
     private bool _isLoading;
     private Vector3 _lastPosition;
     private float _currentPitch = 1f;
+    private float _currentSpeed;
     private float _pitchVelocity;
     private float _pitchOffset = 1f;
 
@@ -179,9 +184,42 @@ public class LoopSoundSource : MonoBehaviour
             return;
         }
 
+        UpdateSpeed();
+
         _source.volume = ResolveVolume();
 
         ApplyPitch();
+
+        ApplyIdleStop();
+    }
+
+    private void UpdateSpeed()
+    {
+        _currentSpeed = 0f;
+
+        if (Time.deltaTime > 0f)
+        {
+            _currentSpeed = (transform.position - _lastPosition).magnitude / Time.deltaTime;
+        }
+
+        _lastPosition = transform.position;
+    }
+
+    private void ApplyIdleStop()
+    {
+        if (_stopWhenIdle == false)
+        {
+            return;
+        }
+
+        if (_currentSpeed > _idleSpeedThreshold)
+        {
+            _source.UnPause();
+
+            return;
+        }
+
+        _source.Pause();
     }
 
     private void ApplyPitch()
@@ -193,16 +231,7 @@ public class LoopSoundSource : MonoBehaviour
             return;
         }
 
-        float speed = 0f;
-
-        if (Time.deltaTime > 0f)
-        {
-            speed = (transform.position - _lastPosition).magnitude / Time.deltaTime;
-        }
-
-        _lastPosition = transform.position;
-
-        float ratio = Mathf.Clamp01(speed / _speedForMaxPitch);
+        float ratio = Mathf.Clamp01(_currentSpeed / _speedForMaxPitch);
         float targetPitch = Mathf.Lerp(_minPitch, _maxPitch, ratio);
 
         _currentPitch = Mathf.SmoothDamp(_currentPitch, targetPitch, ref _pitchVelocity, _pitchSmoothTime);

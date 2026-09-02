@@ -97,6 +97,8 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
         slotVm.LevelUp();
         ApplyEffect(slotDataId, slotVm.CurrentLevel);
 
+        SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Purchase);
+
         return true;
     }
 
