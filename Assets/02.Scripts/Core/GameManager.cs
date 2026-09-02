@@ -768,6 +768,7 @@ public class GameManager : SingletonBase<GameManager>
         Train?.ClearExistingTrain();
         Map?.ClearMap();
         ResetSessionState();
+        Monster?.ResetGamePhase();
     }
 
     public void ReturnToLobby()
