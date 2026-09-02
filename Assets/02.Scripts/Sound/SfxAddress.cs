@@ -21,6 +21,7 @@
         public const string Depart = "Sfx/Train/Depart";
         public const string Stop = "Sfx/Train/Stop";
         public const string Arrive = "Sfx/Train/Arrive";
+        public const string Hit = "Sfx/Train/Hit";
         public const string Drive = "Sfx/Train/Drive";
         public const string Repair = "Sfx/Train/Repair";
     }
