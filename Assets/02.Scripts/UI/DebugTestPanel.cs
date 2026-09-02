@@ -1,10 +1,16 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using Enums;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class DebugTestPanel : MonoBehaviour
 {
     private void Update()
     {
+#if UNITY_EDITOR
         if (Keyboard.current == null)
         {
             return;
@@ -44,5 +50,29 @@ public class DebugTestPanel : MonoBehaviour
         {
             SaveManager.Instance.Debug_ResetAllProgressData();
         }
+
+        HandleStageCheatKeys();
     }
+
+    private void HandleStageCheatKeys()
+    {
+        if (GameManager.Instance.CurrentGameState != GameState.Ready)
+        {
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            GameManager.Instance.SetGameStageForCheat(GameStage.Stage1);
+        }
+        else if (Input.GetKeyDown(KeyCode.F2))
+        {
+            GameManager.Instance.SetGameStageForCheat(GameStage.Stage2);
+        }
+        else if (Input.GetKeyDown(KeyCode.F3))
+        {
+            GameManager.Instance.SetGameStageForCheat(GameStage.Stage3);
+        }
+    }
+#endif
 }
