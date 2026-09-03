@@ -365,34 +365,36 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
             Text_NameGrade.text = $"{augment.DisplayName} ({augment.GradeName})";
         }
 
+        if (Text_Price != null)
+        {
+            Text_Price.text = $"{augment.Price}";
+        }
+
+        bool hasStats = WeaponStat.TryGetCurrentWeaponStats(augment.AugmentDataId, out WeaponCurrentStats stats);
+
         if (Text_Atk != null)
         {
-            Text_Atk.text = augment.IsStatReady ? $"{augment.Atk}" : "-";
+            Text_Atk.text = hasStats ? $"{stats.Atk}" : "-";
         }
 
         if (Text_Range != null)
         {
-            Text_Range.text = augment.IsStatReady ? $"{augment.Range}" : "-";
+            Text_Range.text = hasStats ? $"{stats.Range}" : "-";
         }
 
         if (Text_FireRate != null)
         {
-            Text_FireRate.text = augment.IsStatReady ? $"{augment.FireRate}" : "-";
+            Text_FireRate.text = hasStats ? $"{stats.FireRate}" : "-";
         }
 
         if (Text_ReloadTime != null)
         {
-            Text_ReloadTime.text = augment.IsStatReady ? $"{augment.ReloadTime}" : "-";
+            Text_ReloadTime.text = hasStats ? $"{stats.ReloadTime}" : "-";
         }
 
         if (Text_MagazineSize != null)
         {
-            Text_MagazineSize.text = augment.IsStatReady ? $"{augment.MagazineSize}" : "-";
-        }
-
-        if (Text_Price != null)
-        {
-            Text_Price.text = $"{augment.Price}";
+            Text_MagazineSize.text = hasStats ? $"{stats.MagazineSize}" : "-";
         }
     }
 
