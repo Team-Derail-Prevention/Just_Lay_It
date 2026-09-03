@@ -248,6 +248,7 @@ public class StationArrivalUI : UIBase
     {
         if (GameManager.Train != null && GameManager.Train.IsTrainHpFull())
         {
+            SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Denied);
             UIManager.Instance.OpenExitConfirmPopup(null, null, "열차 체력이 이미 가득 찼습니다!");
             return;
         }
@@ -257,6 +258,7 @@ public class StationArrivalUI : UIBase
         bool isSpent = NetworkResourceService.Instance.TrySpendStoneForStationRepair(REPAIR_STONE_COST);
         if (isSpent == false)
         {
+            SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Denied);
             UIManager.Instance.OpenExitConfirmPopup(null, null, "돌이 부족합니다.");
             return;
         }
@@ -265,6 +267,8 @@ public class StationArrivalUI : UIBase
         RefreshRepairCostText();
 
         GameManager.Train.HealActiveTrain(REPAIR_HEAL_PERCENT);
+
+        SoundManager.Instance?.PlaySFX(SfxAddress.Train.Repair);
 
         Debug.Log($"[StationArrivalUI] 수리 요청 완료 (최대 체력의 {REPAIR_HEAL_PERCENT}% 회복), 돌 {REPAIR_STONE_COST} 소모");
     }
