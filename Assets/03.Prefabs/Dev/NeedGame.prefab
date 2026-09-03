@@ -992,7 +992,7 @@ PrefabInstance:
     - target: {fileID: 2641926352046683756, guid: 702cd132c9e575444a890b38ea726bfb, type: 3}
       propertyPath: _skirtMaker
       value: 
-      objectReference: {fileID: 8387712481165040801}
+      objectReference: {fileID: 5615144558223062781}
     - target: {fileID: 6112901163721120068, guid: 702cd132c9e575444a890b38ea726bfb, type: 3}
       propertyPath: m_LocalPosition.x
       value: -10.527349
@@ -1039,7 +1039,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 667919717652835046, guid: 702cd132c9e575444a890b38ea726bfb, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8387712481165040801}
+      addedObject: {fileID: 5615144558223062781}
   m_SourcePrefab: {fileID: 100100000, guid: 702cd132c9e575444a890b38ea726bfb, type: 3}
 --- !u!4 &3004224421331819613 stripped
 Transform:
@@ -1062,7 +1062,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 667919717652835046, guid: 702cd132c9e575444a890b38ea726bfb, type: 3}
   m_PrefabInstance: {fileID: 9035422658335999257}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8387712481165040801
+--- !u!114 &5615144558223062781
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1076,7 +1076,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MapSkirtMaker
   _skirtMaterial: {fileID: 2100000, guid: e5c9043e471904e488975daaf69ed464, type: 2}
   _ringCount: 3
-  _ringWidth: 30
+  _ringWidth: 15
   _heightDropPerRing: 1.5
   _uvScale: 30
   _segmentsPerSide: 8
@@ -1086,9 +1086,10 @@ MonoBehaviour:
   _duneNoiseHeight: 0.6
   _obstaclePrefabs:
   - {fileID: 6825517055451600367, guid: f76851bc128e234479fc727ccd52c75b, type: 3}
-  _obstacleCountPerRing: 50
+  - {fileID: 9063175124058616429, guid: e800eb9fe429e68418aaa2e50836063a, type: 3}
+  _obstacleCountPerRing: 80
   _decorationLayerName: Default
-  _innerRingBias: 3
+  _innerRingBias: 0.8
 --- !u!1001 &9131221453433227894
 PrefabInstance:
   m_ObjectHideFlags: 0
