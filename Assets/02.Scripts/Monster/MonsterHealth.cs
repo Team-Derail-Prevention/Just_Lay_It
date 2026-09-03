@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel;
 
-public class MonsterHealth : MonoBehaviour
+public class MonsterHealth : MonoBehaviour, IForceDespawnable
 {
     public static event Action<int> OnMonsterDiedWithStone;
     public event Action<Transform>OnMonsterDied;
@@ -80,4 +80,20 @@ public class MonsterHealth : MonoBehaviour
         }
     }
 
+    public void OnForcedDespawn()
+    {
+        if (_isDead)
+        {
+            return;
+        }
+
+        _isDead = true;
+
+        OnMonsterDied?.Invoke(transform);
+
+        if (MonsterSpawn.Instance != null)
+        {
+            MonsterSpawn.Instance.DecreaseMonsterCount();
+        }
+    }
 }

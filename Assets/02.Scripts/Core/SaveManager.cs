@@ -12,6 +12,7 @@ public class SaveManager : SingletonBase<SaveManager>
     private const string LifetimeStatsKey = "LifetimeStatsData";
     private const string AllStagesClearedKey = "HasClearedAllStagesSpecial";
     private const string SettingsSaveKey = "SettingsSaveData";
+    private const string CurrentGameStageKey = "CurrentGameStage";
 
     private readonly HashSet<UpgradeSlotViewModel> _subscribedSlotSet = new HashSet<UpgradeSlotViewModel>();
 
@@ -56,6 +57,16 @@ public class SaveManager : SingletonBase<SaveManager>
         set
         {
             PlayerPrefs.SetInt(AllStagesClearedKey, value ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+    }
+
+    public GameStage CurrentGameStage
+    {
+        get => (GameStage)PlayerPrefs.GetInt(CurrentGameStageKey, (int)GameStage.Stage1);
+        set
+        {
+            PlayerPrefs.SetInt(CurrentGameStageKey, (int)value);
             PlayerPrefs.Save();
         }
     }
@@ -372,6 +383,7 @@ public class SaveManager : SingletonBase<SaveManager>
     {
         HasSeenFirstPlayNotice = false;
         HasClearedAllStagesSpecial = false;
+        CurrentGameStage = GameStage.Stage1;
 
         PlayerPrefs.SetInt(TotalPlayCountKey, 0);
         PlayerPrefs.Save();

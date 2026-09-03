@@ -141,6 +141,17 @@ public class GameManager : SingletonBase<GameManager>
     }
 #endif
 
+    private void RestoreSavedGameStage()
+    {
+        if (Save == null)
+        {
+            return;
+        }
+
+        _currentGameStage = Save.CurrentGameStage;
+        Debug.Log($"[GameManager] 저장된 게임 스테이지를 복원했습니다: {_currentGameStage}");
+    }
+
     public void SetGameStage(GameStage stage)
     {
         _currentGameStage = stage;
@@ -312,6 +323,11 @@ public class GameManager : SingletonBase<GameManager>
         if (isClearedInTime && !isFinalStage)
         {
             _currentGameStage = (GameStage)((int)clearedStage + 1);
+
+            if (Save != null)
+            {
+                Save.CurrentGameStage = _currentGameStage;
+            }
 
             Debug.Log($"[GameManager] Stage {(int)clearedStage} 클리어 성공. 기록: {_playTime:F1}초 / 제한: {timeLimit:F1}초. 다음 스테이지: {(int)_currentGameStage}");
         }
@@ -512,6 +528,8 @@ public class GameManager : SingletonBase<GameManager>
             return;
         }
 
+        RestoreSavedGameStage();
+
         await EnsureGameDataLoadedAsync();
         ChangeGameState(GameState.Ready);
         Debug.Log("[GameManager] 초기화 및 데이터 로드가 완료되었습니다.");
@@ -536,7 +554,7 @@ public class GameManager : SingletonBase<GameManager>
 
     private async UniTask<bool> WaitForRequiredManagersAsync()
     {
-        await UniTask.WaitUntil(() => UI != null && Data != null && Resource != null && Map != null && Train != null, cancellationToken: this.GetCancellationTokenOnDestroy());
+        await UniTask.WaitUntil(() => UI != null && Data != null && Resource != null && Map != null && Train != null && Save != null, cancellationToken: this.GetCancellationTokenOnDestroy());
 
         return ValidateStartDependencies();
     }
@@ -549,6 +567,7 @@ public class GameManager : SingletonBase<GameManager>
         isValid &= ValidateManager(Resource, nameof(ResourceManager));
         isValid &= ValidateManager(Map, nameof(MapManager));
         isValid &= ValidateManager(Train, nameof(TrainManager));
+        isValid &= ValidateManager(Save, nameof(SaveManager));
         return isValid;
     }
 

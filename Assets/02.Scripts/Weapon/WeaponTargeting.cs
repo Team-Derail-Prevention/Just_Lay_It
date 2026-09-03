@@ -136,11 +136,26 @@ public class WeaponTargeting : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        PoolManager.OnAllDespawnedToPool += ClearAllTargets;
+    }
+
     private void OnDisable()
+    {
+        PoolManager.OnAllDespawnedToPool -= ClearAllTargets;
+
+        ClearAllTargets();
+    }
+
+    public void ClearAllTargets()
     {
         for (int i = 0; i < _targetMonster.Count; i++)
         {
-            if (_targetMonster[i] == null) continue;
+            if (_targetMonster[i] == null)
+            {
+                continue;
+            }
 
             MonsterHealth monsterHp = _targetMonster[i].GetComponent<MonsterHealth>();
             if (monsterHp != null)
@@ -148,6 +163,7 @@ public class WeaponTargeting : MonoBehaviour
                 monsterHp.OnMonsterDied -= MonsterDaath;
             }
         }
+
         _targetMonster.Clear();
         _LockTarget = null;
     }

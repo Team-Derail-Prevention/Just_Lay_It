@@ -176,6 +176,10 @@ MonoBehaviour:
   Text_Base: {fileID: 8963922698534442900}
   Image_Base: {fileID: 422151556557319845}
   Image_Select: {fileID: 0}
+  Image_BKFrame: {fileID: 0}
+  _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
+  _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
+  _description: 
 --- !u!114 &6094560534329877722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -467,6 +471,10 @@ MonoBehaviour:
   Text_Base: {fileID: 5251103235091271717}
   Image_Base: {fileID: 2517461230959025344}
   Image_Select: {fileID: 0}
+  Image_BKFrame: {fileID: 0}
+  _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
+  _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
+  _description: 
 --- !u!114 &4865156942461480560
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -719,6 +727,10 @@ MonoBehaviour:
   Text_Base: {fileID: 5211697333773790171}
   Image_Base: {fileID: 8206437950342262440}
   Image_Select: {fileID: 0}
+  Image_BKFrame: {fileID: 0}
+  _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
+  _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
+  _description: 
 --- !u!114 &9144626280690770162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1448,7 +1460,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uBD81\uCABD \uBC29\uD5A5"
+  m_text: "\uC11C\uCABD \uBC29\uD5A5"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
   m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
@@ -1622,7 +1634,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uBD81\uCABD \uBC29\uD5A5"
+  m_text: "\uC11C\uCABD \uBC29\uD5A5"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
   m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
@@ -1833,6 +1845,10 @@ MonoBehaviour:
   Text_Base: {fileID: 4188004104206932641}
   Image_Base: {fileID: 656692129941309519}
   Image_Select: {fileID: 0}
+  Image_BKFrame: {fileID: 0}
+  _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
+  _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
+  _description: 
 --- !u!114 &8981108186105621512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1989,7 +2005,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uBD81\uCABD \uBC29\uD5A5"
+  m_text: "\uB0A8\uCABD \uBC29\uD5A5"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
   m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
@@ -2564,7 +2580,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uBD81\uCABD \uBC29\uD5A5"
+  m_text: "\uB0A8\uCABD \uBC29\uD5A5"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
   m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}

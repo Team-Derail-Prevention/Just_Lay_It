@@ -11,6 +11,8 @@ public class PoolManager : MonoBehaviour
     private Dictionary<string, GameObject> _prefabMap = new(); // poolId -> prefab, 여러 시스템이 각자 등록해도 서로 안 지워짐
     private Transform _poolRoot;
 
+    public static event Action OnAllDespawnedToPool;
+
     private void Awake()
     {
         if (Instance == null)
@@ -132,9 +134,18 @@ public class PoolManager : MonoBehaviour
         {
             for (int i = activeList.Count - 1; i >= 0; i--)
             {
-                DespawnToPool(activeList[i]);
+                GameObject obj = activeList[i];
+
+                if (obj.TryGetComponent<IForceDespawnable>(out IForceDespawnable despawnable))
+                {
+                    despawnable.OnForcedDespawn();
+                }
+
+                DespawnToPool(obj);
             }
         }
+
+        OnAllDespawnedToPool?.Invoke();
     }
 
     private GameObject GetFromPool(string poolId, Vector3 position, Quaternion rotation, Transform parent = null)
