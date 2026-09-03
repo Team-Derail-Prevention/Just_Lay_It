@@ -41,6 +41,13 @@ public class DroneCellIndicator : MonoBehaviour
             return;
         }
 
+        if (DroneManager.Instance != null && DroneManager.Instance.IsMiningSuspended == true)
+        {
+            SetVisible(false);
+
+            return;
+        }
+
         if (_cursor.TryGetCell(out Vector3 cellCenter, out MaterialObject target) == false)
         {
             SetVisible(false);
