@@ -156,8 +156,8 @@ Camera:
   m_GameObject: {fileID: 235417669}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.8901961, g: 0.78039217, b: 0.6313726, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -428,10 +428,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5615144558223062781, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
+      propertyPath: _innerRingBias
+      value: 0.8
+      objectReference: {fileID: 0}
     - target: {fileID: 6471187832279823221, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
       propertyPath: _skirtMaker
       value: 
-      objectReference: {fileID: 1592993456}
+      objectReference: {fileID: 1592993460}
     - target: {fileID: 7487658417806437672, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
       propertyPath: m_UiScaleMode
       value: 1
@@ -474,47 +478,19 @@ PrefabInstance:
     - {fileID: 316817159183985181, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
     - {fileID: 5389074596678508509, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8367873345241165823, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1592993456}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
---- !u!1 &1592993453 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8367873345241165823, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
+--- !u!114 &1592993460 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5615144558223062781, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
   m_PrefabInstance: {fileID: 1479903587}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1592993456
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1592993453}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd7f3d7634f63114b9311a5cc2dfc657, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapSkirtMaker
-  _skirtMaterial: {fileID: 2100000, guid: e5c9043e471904e488975daaf69ed464, type: 2}
-  _ringCount: 3
-  _ringWidth: 15
-  _heightDropPerRing: 1.5
-  _uvScale: 30
-  _segmentsPerSide: 8
-  _innerHeight: 1
-  _boundaryOffset: {x: -1, y: -1}
-  _duneNoiseScale: 0.5
-  _duneNoiseHeight: 1.5
-  _obstaclePrefabs:
-  - {fileID: 5382888589710558236, guid: d818e8db0d4114041923feb36d8b479a, type: 3}
-  - {fileID: 6179755561338510967, guid: 90bfcda798250494690a658a59cc0341, type: 3}
-  - {fileID: 6825517055451600367, guid: f76851bc128e234479fc727ccd52c75b, type: 3}
-  - {fileID: 5070134356130765180, guid: 43a6d4c8227859540b4ceb2ad2036758, type: 3}
-  - {fileID: 9063175124058616429, guid: e800eb9fe429e68418aaa2e50836063a, type: 3}
-  _obstacleCountPerRing: 50
-  _decorationLayerName: Default
-  _innerRingBias: 1
 --- !u!1 &1925162032
 GameObject:
   m_ObjectHideFlags: 0

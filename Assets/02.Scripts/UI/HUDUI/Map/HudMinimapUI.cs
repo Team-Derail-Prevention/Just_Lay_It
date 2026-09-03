@@ -105,28 +105,24 @@ public class HudMinimapUI : UIBase
 
     private Rect CalculateWorldBounds(CentralTerminal terminal, StationObject[] stations)
     {
-        float minX = terminal.transform.position.x;
-        float maxX = terminal.transform.position.x;
-        float minZ = terminal.transform.position.z;
-        float maxZ = terminal.transform.position.z;
+        Vector3 basePosition = terminal.transform.position;
+        float maxRadius = 0.01f;
 
         for (int i = 0; i < stations.Length; i++)
         {
             Vector3 position = stations[i].transform.position;
 
-            minX = Mathf.Min(minX, position.x);
-            maxX = Mathf.Max(maxX, position.x);
-            minZ = Mathf.Min(minZ, position.z);
-            maxZ = Mathf.Max(maxZ, position.z);
+            float distanceX = Mathf.Abs(position.x - basePosition.x);
+            float distanceZ = Mathf.Abs(position.z - basePosition.z);
+            float chebyshevDistance = Mathf.Max(distanceX, distanceZ);
+
+            maxRadius = Mathf.Max(maxRadius, chebyshevDistance);
         }
 
-        float width = Mathf.Max(maxX - minX, 0.01f);
-        float height = Mathf.Max(maxZ - minZ, 0.01f);
+        float paddedRadius = maxRadius * (1f + _worldPaddingRatio);
+        float size = paddedRadius * 2f;
 
-        float paddingX = width * _worldPaddingRatio;
-        float paddingZ = height * _worldPaddingRatio;
-
-        return new Rect(minX - paddingX, minZ - paddingZ, width + (paddingX * 2f), height + (paddingZ * 2f));
+        return new Rect(basePosition.x - paddedRadius, basePosition.z - paddedRadius, size, size);
     }
 
     private void OnViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
