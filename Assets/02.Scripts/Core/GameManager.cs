@@ -197,6 +197,8 @@ public class GameManager : SingletonBase<GameManager>
                 }
             }
 
+            Map.SpawnSkirt(_currentMapSize);
+
             if (Drone != null)
             {
                 await Drone.SpawnAllAsync();
