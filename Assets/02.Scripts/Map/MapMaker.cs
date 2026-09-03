@@ -51,6 +51,8 @@ public class MapMaker : MonoBehaviour
     [SerializeField] private float _obstacleHeight = 2f;
     [SerializeField] private float _materialHeight = 2f;
 
+
+
     private Transform _mapRoot;
 
     private Dictionary<string, MaterialObjectData> _materialDataDict = new Dictionary<string, MaterialObjectData>();

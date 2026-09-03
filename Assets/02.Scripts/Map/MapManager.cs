@@ -11,6 +11,7 @@ public class MapManager : SingletonBase<MapManager>
     [Header("Map Settings")]
     [SerializeField] private Transform _mapRoot;
     [SerializeField] private float _mapSpacing = 30f;
+    [SerializeField] private MapSkirtMaker _skirtMaker;
 
     [Header("Auto Spawn Rail Settings")]
     [SerializeField] private string _straightRailAddress = "Prefab/Rail_Straight";
@@ -285,6 +286,17 @@ public class MapManager : SingletonBase<MapManager>
         }
     }
 
+    public void SpawnSkirt(int mapSize)
+    {
+        if (_skirtMaker == null)
+        {
+            Debug.LogWarning("[MapManager] MapSkirtMaker가 연결되어 있지 않습니다.");
+            return;
+        }
+
+        _skirtMaker.GenerateSkirt(mapSize, _mapSpacing, _mapRoot);
+    }
+
     private IEnumerable<Vector3Int> GetRingPositions(int radius)
     {
         for (int x = -radius; x <= radius; x++)
@@ -537,6 +549,8 @@ public class MapManager : SingletonBase<MapManager>
         _spawnedMaps.Clear();
         _mapTypeData.Clear();
         _spawnedTiles.Clear();
+
+        _skirtMaker?.RemoveSkirt();
 
         _currentRadius = 1;
         _isExpanding = false;
