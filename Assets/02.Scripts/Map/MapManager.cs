@@ -32,6 +32,8 @@ public class MapManager : SingletonBase<MapManager>
     private bool _isExpanding;
 
     public event Action<Dictionary<Vector3Int, int>> OnMapGenerated;
+    private readonly List<Vector3> _railEndPositions = new List<Vector3>();
+
     public Transform MapRoot => _mapRoot;
 
     protected override void Init()
@@ -137,6 +139,7 @@ public class MapManager : SingletonBase<MapManager>
         }
 
         _currentRadius = 1;
+        _railEndPositions.Clear();
 
         await SpawnMapFromDataAsync(centralData, Vector3Int.zero, 2, "CentralTerminal", cancellationToken);
 
@@ -294,7 +297,7 @@ public class MapManager : SingletonBase<MapManager>
             return;
         }
 
-        _skirtMaker.GenerateSkirt(mapSize, _mapSpacing, _mapRoot);
+        _skirtMaker.GenerateSkirt(mapSize, _mapSpacing, _mapRoot, _railEndPositions);
     }
 
     private IEnumerable<Vector3Int> GetRingPositions(int radius)
@@ -420,6 +423,11 @@ public class MapManager : SingletonBase<MapManager>
 
                     GameObject railObj = await PlaceSingleRailAsync(centerPos + offset, paths[d].railRot, railHeight, dirRoot.transform);
 
+                    if (railObj != null)
+                    {
+                        _railEndPositions.Add(railObj.transform.position);
+                    }
+
                     if (i == 0 && railObj != null && terminal != null)
                     {
                         terminal.RegisterStartPoint(d, railObj.transform.position, paths[d].trainRot);
@@ -451,6 +459,11 @@ public class MapManager : SingletonBase<MapManager>
                     Vector3 offset = paths[d].dir * (_railSpawnOffset + i * railLength);
 
                     GameObject railObj = await PlaceSingleRailAsync(centerPos + offset, paths[d].railRot, railHeight, dirRoot.transform);
+
+                    if (railObj != null)
+                    {
+                        _railEndPositions.Add(railObj.transform.position);
+                    }
 
                     if (i == 0 && railObj != null && station != null)
                     {
@@ -551,6 +564,7 @@ public class MapManager : SingletonBase<MapManager>
         _spawnedTiles.Clear();
 
         _skirtMaker?.RemoveSkirt();
+        _railEndPositions.Clear();
 
         _currentRadius = 1;
         _isExpanding = false;
