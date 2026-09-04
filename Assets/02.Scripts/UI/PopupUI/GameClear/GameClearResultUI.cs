@@ -50,7 +50,7 @@ public class GameClearResultUI : UIBase
     [SerializeField] private RectTransform _viewportRect;
     [SerializeField] private RectTransform _scrollContent;
     [SerializeField, Min(0f)] private float _creditsScrollSpeed = 60f;
-    [SerializeField, Min(0f)] private float _scrollStartDelay = 5f;
+    [SerializeField, Min(0f)] private float _scrollStartDelay = 2.5f;
 
     private float _enableElapsedTime;
     private readonly GameClearResultViewModel _viewModel = new GameClearResultViewModel();
@@ -103,7 +103,7 @@ public class GameClearResultUI : UIBase
         float targetY = maxScrollY;
 
         Vector2 anchoredPosition = _scrollContent.anchoredPosition;
-        anchoredPosition.y = Mathf.MoveTowards(anchoredPosition.y, targetY, _creditsScrollSpeed * Time.deltaTime);
+        anchoredPosition.y = Mathf.MoveTowards(anchoredPosition.y, targetY, _creditsScrollSpeed * Time.unscaledDeltaTime);
         _scrollContent.anchoredPosition = anchoredPosition;
     }
 

@@ -237,7 +237,7 @@ public class GameManager : SingletonBase<GameManager>
         }
 
         Train?.SpawnStationTrain(_activeStation, _startingCarriageCount);
-        // Train?.AddVisitedStation(_activeStation.transform);
+        Train?.MarkStationVisited(_activeStation.transform);
 
         _activeStation.ExitStation(stoneTaken, citizenBoarded);
 
