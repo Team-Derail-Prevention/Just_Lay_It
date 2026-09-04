@@ -4,7 +4,6 @@ public class NetworkTrainCargoService : SingletonBase<NetworkTrainCargoService>
 {
     private const int BASE_BOARDING_LIMIT = 5;
     private int _boardedCitizenCount;
-    private int _boardingLimit = BASE_BOARDING_LIMIT;
 
     public int BoardedCitizenCount
     {
@@ -18,7 +17,7 @@ public class NetworkTrainCargoService : SingletonBase<NetworkTrainCargoService>
     {
         get
         {
-            return _boardingLimit;
+            return BASE_BOARDING_LIMIT + GetInGameBoardingLimitBonus();
         }
     }
 
@@ -26,34 +25,11 @@ public class NetworkTrainCargoService : SingletonBase<NetworkTrainCargoService>
     {
         get
         {
-            int remaining = _boardingLimit - _boardedCitizenCount;
+            int remaining = BoardingLimit - _boardedCitizenCount;
             return Mathf.Max(0, remaining);
         }
     }
-    private void OnEnable()
-    {
-        if (UpgradeEventHub.Instance != null)
-        {
-            UpgradeEventHub.Instance.OnInGameUpgraded += OnInGameUpgraded;
-        }
-    }
-
-    private void OnDisable()
-    {
-        if (UpgradeEventHub.Instance != null)
-        {
-            UpgradeEventHub.Instance.OnInGameUpgraded -= OnInGameUpgraded;
-        }
-    }
-
-    private void OnInGameUpgraded(string slotDataId, int newLevel)
-    {
-        if (slotDataId == "CARGO_CREW_LIMIT")
-        {
-            IncreaseBoardingLimit(2);
-        }
-    }
-
+    
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
@@ -72,19 +48,27 @@ public class NetworkTrainCargoService : SingletonBase<NetworkTrainCargoService>
         return boardable;
     }
 
-    public void IncreaseBoardingLimit(int amount)
-    {
-        _boardingLimit += amount;
-    }
-
     public void UnloadAllCitizens()
     {
         _boardedCitizenCount = 0;
     }
 
+    private int GetInGameBoardingLimitBonus()
+    {
+        if (NetworkTrainStrengtheningService.Instance == null)
+        {
+            return 0;
+        }
+
+        TrainStrengtheningViewModel strengtheningVm = NetworkTrainStrengtheningService.Instance.GetLocalTrainStrengtheningViewModel();
+        TrainStatSlotViewModel slotVm = strengtheningVm?.GetSlot("CARGO_CREW_LIMIT");
+        int level = slotVm != null ? slotVm.CurrentLevel : 0;
+
+        return level * 2;
+    }
+
     public void ResetRun()
     {
         _boardedCitizenCount = 0;
-        _boardingLimit = BASE_BOARDING_LIMIT;
     }
 }

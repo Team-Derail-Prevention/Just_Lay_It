@@ -97,5 +97,14 @@
     "CostIncreasePerLevel": 50,
     "Description": "기차의 기본 방어력을 영구적으로 증가시킵니다. (+ 2)",
     "IconPath": "LobbyUpgrade01_Icon[LOBBY_TRAIN_DEFENSE_Icon]"
+  },
+  {
+    "Id": "LOBBY_BASE_WEAPON_UPGrade",
+    "Name": "기본 지급 무기 강화",
+    "MaxLevel": 4,
+    "BaseCost": 100,
+    "CostIncreasePerLevel": 50,
+    "Description": "기본으로 지급되는 무기의 등급이 한 단계 상승합니다.",
+    "IconPath": "LobbyUpgrade01_Icon[LOBBY_BASE_WEAPON_UPGrade_Icon]"
   }
 ]

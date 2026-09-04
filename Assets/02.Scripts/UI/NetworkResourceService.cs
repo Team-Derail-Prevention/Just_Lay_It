@@ -6,7 +6,6 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
     private const int BASE_CARGO_LIMIT = 400;
 
     private ResourceViewModel _localVm;
-    private int _cargoLimit = BASE_CARGO_LIMIT;
     private int _sessionTotalWoodCollected;
     private int _sessionTotalStoneCollected;
     private bool _isBaseRepairFreeUsed;
@@ -51,17 +50,17 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
 
     private void OnLobbyUpgraded(string slotDataId, int newLevel)
     {
-        if (slotDataId == "LOBBY_BASE_CARGO_LIMIT")
+        if (slotDataId == "LOBBY_BASE_CARGO_LIMIT" && ResourceStatusEventHub.Instance != null)
         {
-            IncreaseCargoLimit(100);
+            ResourceStatusEventHub.Instance.NotifyCargoLimitChanged(CargoLimit);
         }
     }
 
     private void OnInGameUpgraded(string slotDataId, int newLevel)
     {
-        if (slotDataId == "CARGO_RESOURCE_LIMIT")
+        if (slotDataId == "CARGO_RESOURCE_LIMIT" && ResourceStatusEventHub.Instance != null)
         {
-            IncreaseCargoLimit(100);
+            ResourceStatusEventHub.Instance.NotifyCargoLimitChanged(CargoLimit);
         }
     }
 
@@ -69,7 +68,7 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
     {
         get
         {
-            return _cargoLimit;
+            return BASE_CARGO_LIMIT + GetLobbyCargoLimitBonus() + GetInGameCargoLimitBonus();
         }
     }
 
@@ -86,7 +85,7 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
     {
         get
         {
-            int remaining = _cargoLimit - CurrentCargoLoad;
+            int remaining = CargoLimit - CurrentCargoLoad;
             return Mathf.Max(0, remaining);
         }
     }
@@ -296,22 +295,6 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         }
     }
 
-    public void IncreaseCargoLimit(int amount)
-    {
-        _cargoLimit += amount;
-
-        if (ResourceStatusEventHub.Instance != null)
-        {
-            ResourceStatusEventHub.Instance.NotifyCargoLimitChanged(_cargoLimit);
-        }
-    }
-
-    private void OnRequestSpendMoney(int amount, System.Action<bool> onResult)
-    {
-        bool isSpent = TrySpendStone(amount);
-        onResult?.Invoke(isSpent);
-    }
-
     private int GetLobbyCargoLimitBonus()
     {
         if (NetworkUpgradeService.Instance == null)
@@ -326,10 +309,29 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         return level * 100;
     }
 
+    private int GetInGameCargoLimitBonus()
+    {
+        if (NetworkTrainStrengtheningService.Instance == null)
+        {
+            return 0;
+        }
+
+        TrainStrengtheningViewModel strengtheningVm = NetworkTrainStrengtheningService.Instance.GetLocalTrainStrengtheningViewModel();
+        TrainStatSlotViewModel slotVm = strengtheningVm?.GetSlot("CARGO_RESOURCE_LIMIT");
+        int level = slotVm != null ? slotVm.CurrentLevel : 0;
+
+        return level * 100;
+    }
+
+    private void OnRequestSpendMoney(int amount, System.Action<bool> onResult)
+    {
+        bool isSpent = TrySpendStone(amount);
+        onResult?.Invoke(isSpent);
+    }
+
     public void ResetRun()
     {
         _localVm = new ResourceViewModel();
-        _cargoLimit = BASE_CARGO_LIMIT + GetLobbyCargoLimitBonus();
         _sessionTotalWoodCollected = 0;
         _sessionTotalStoneCollected = 0;
         _isBaseRepairFreeUsed = false;

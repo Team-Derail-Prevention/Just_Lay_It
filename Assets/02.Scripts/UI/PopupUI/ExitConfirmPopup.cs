@@ -15,6 +15,8 @@ public class ExitConfirmPopup : UIBase
 
     private float _defaultFontSize;
     private bool _isDefaultFontSizeCaptured;
+    private string _defaultMessage;
+    private bool _isDefaultMessageCaptured;
     private Action _onConfirmExit;
     private Action _onCancel;
 
@@ -38,6 +40,7 @@ public class ExitConfirmPopup : UIBase
         Debug.Log($"[ExitConfirmPopup] Init 호출됨, onConfirmExit target={onConfirmExit?.Target}, method={onConfirmExit?.Method}");
 
         CaptureDefaultFontSizeIfNeeded();
+        CaptureDefaultMessageIfNeeded();
 
         if (_messageText != null)
         {
@@ -48,6 +51,7 @@ public class ExitConfirmPopup : UIBase
             }
             else
             {
+                _messageText.text = _defaultMessage;
                 _messageText.fontSize = _defaultFontSize;
             }
         }
@@ -65,6 +69,17 @@ public class ExitConfirmPopup : UIBase
 
         _defaultFontSize = _messageText.fontSize;
         _isDefaultFontSizeCaptured = true;
+    }
+
+    private void CaptureDefaultMessageIfNeeded()
+    {
+        if (_isDefaultMessageCaptured == true || _messageText == null)
+        {
+            return;
+        }
+
+        _defaultMessage = _messageText.text;
+        _isDefaultMessageCaptured = true;
     }
 
     private void OnClick_Yes()

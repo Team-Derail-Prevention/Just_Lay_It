@@ -37,7 +37,7 @@ public class WeaponFire : MonoBehaviour
     private float _baseRange;
 
     private int _lobbyAtkBonus;
-    private int _battleDamageBonus;
+
     private Train _parentTrain;
 
     private void Awake()
@@ -153,7 +153,6 @@ public class WeaponFire : MonoBehaviour
             return;
         }
 
-        _battleDamageBonus = newLevel * _weaponData.InGameATKByLevel;
         RecalculateAtk();
     }
 
@@ -185,7 +184,10 @@ public class WeaponFire : MonoBehaviour
 
     private void RecalculateAtk()
     {
-        _weaponAtk = _baseAtk + _lobbyAtkBonus + _battleDamageBonus;
+        int battleDamageLevel = WeaponStat.GetInGameUpgradeLevel("BATTLE_DAMAGE");
+        int battleDamageBonus = battleDamageLevel * _weaponData.InGameATKByLevel;
+
+        _weaponAtk = _baseAtk + _lobbyAtkBonus + battleDamageBonus;
     }
 
     private async UniTask RegisterProjectilePoolAsync()

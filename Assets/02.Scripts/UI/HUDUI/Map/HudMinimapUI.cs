@@ -22,6 +22,7 @@ public class HudMinimapUI : UIBase
 
     [Header("스테이션 마커 색상")]
     [SerializeField] private Color _stationMarkerColor = new Color(1f, 0.6f, 0f);
+    [SerializeField] private Color _visitedStationMarkerColor = new Color(0.5f, 0.5f, 0.5f);
 
     private readonly MinimapViewModel _vm = new MinimapViewModel();
     private readonly List<StationMarkerEntry> _stationMarkerEntries = new List<StationMarkerEntry>();
@@ -32,12 +33,15 @@ public class HudMinimapUI : UIBase
         public StationObject Station;
         public Image MarkerImage;
         public bool IsVisited;
+        public bool IsHiddenAtBase;
     }
 
     private void OnEnable()
     {
         _vm.PropertyChanged += OnViewModelPropertyChanged;
         _vm.OnStationPositionsChanged += RefreshStationMarkers;
+
+        CentralTerminal.OnCentralTerminalEntered += HandleCentralTerminalEntered;
 
         if (MapManager.Instance == null)
         {
@@ -58,6 +62,8 @@ public class HudMinimapUI : UIBase
     {
         _vm.PropertyChanged -= OnViewModelPropertyChanged;
         _vm.OnStationPositionsChanged -= RefreshStationMarkers;
+
+        CentralTerminal.OnCentralTerminalEntered -= HandleCentralTerminalEntered;
 
         if (MapManager.Instance != null)
         {
@@ -174,7 +180,8 @@ public class HudMinimapUI : UIBase
         {
             Station = station,
             MarkerImage = markerImage,
-            IsVisited = false
+            IsVisited = false,
+            IsHiddenAtBase = false
         };
 
         _stationMarkerEntries.Add(entry);
@@ -203,20 +210,40 @@ public class HudMinimapUI : UIBase
                 continue;
             }
 
-            bool isStationDestroyed = entry.Station == null;
-            bool isVisited = isStationDestroyed;
-
-            if (isVisited == false && GameManager.Train != null)
+            if (entry.Station == null)
             {
-                isVisited = GameManager.Train.IsVisitedStation(entry.Station.transform);
+                entry.IsVisited = true;
+                entry.IsHiddenAtBase = true;
+                entry.MarkerImage.gameObject.SetActive(false);
+                continue;
             }
 
-            if (isVisited == false)
+            if (GameManager.Train == null || GameManager.Train.IsVisitedStation(entry.Station.transform) == false)
             {
                 continue;
             }
 
             entry.IsVisited = true;
+            entry.MarkerImage.color = _visitedStationMarkerColor;
+        }
+    }
+
+    private void HandleCentralTerminalEntered(CentralTerminal terminal)
+    {
+        HideVisitedStationMarkers();
+    }
+
+    private void HideVisitedStationMarkers()
+    {
+        for (int i = 0; i < _stationMarkerEntries.Count; i++)
+        {
+            StationMarkerEntry entry = _stationMarkerEntries[i];
+            if (entry.IsVisited == false || entry.IsHiddenAtBase || entry.MarkerImage == null)
+            {
+                continue;
+            }
+
+            entry.IsHiddenAtBase = true;
             entry.MarkerImage.gameObject.SetActive(false);
         }
     }

@@ -295,6 +295,16 @@ public class TrainManager : SingletonBase<TrainManager>
         return stationTransform != null && visitedStation.Contains(stationTransform);
     }
 
+    public void MarkStationVisited(Transform stationTransform)
+    {
+        if (stationTransform == null)
+        {
+            return;
+        }
+
+        visitedStation.Add(stationTransform);
+    }
+
     public void ArriveStation(GameObject stationObj)
     {
         if (IsStation)

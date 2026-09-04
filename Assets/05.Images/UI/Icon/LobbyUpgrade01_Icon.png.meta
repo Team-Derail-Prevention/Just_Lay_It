@@ -145,7 +145,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: LobbyUpgrade_Icon01_1
+      name: LOBBY_BASE_WEAPON_UPGrade_Icon
       rect:
         serializedVersion: 2
         x: 362
@@ -334,9 +334,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
+      LOBBY_BASE_WEAPON_UPGrade_Icon: -2124044907
       LOBBY_TRAIN_DEFENSE_Icon: 927610852
       LOBBY_TRAIN_MAX_HP_Icon: -758469215
-      LobbyUpgrade_Icon01_1: -2124044907
       LobbyUpgrade_Icon01_3: 1090022148
       LobbyUpgrade_Icon01_4: 1557497233
       LobbyUpgrade_Icon01_5: 754843675

@@ -6,7 +6,10 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
 {
     private const int TOTAL_INVENTORY_SLOT_COUNT = 49;
     private const int SLOT_COUNT_PER_CAR = 5;
-    private const string STARTING_WEAPON_GRADE = "Common";
+    private const string WEAPON_UPGRADE_ID = "LOBBY_BASE_WEAPON_UPGrade";
+    private const int BONUS_WEAPON_UNLOCK_LEVEL = 4;
+    private const string BONUS_WEAPON_GRADE = "Rare";
+    private static readonly string[] STARTING_WEAPON_GRADE_BY_LEVEL = { "Common", "Rare", "Epic", "Legendary", "Legendary" };
 
     private static readonly int[] HEAD_UNLOCK_BY_LEVEL = { 2, 2, 2, 3, 4, 5 };
     private static readonly int[] STANDARD1_UNLOCK_BY_LEVEL = { 0, 2, 2, 3, 4, 5 };
@@ -226,16 +229,36 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
 
     public void GrantRandomStartingWeapon()
     {
-        var equipVm = GetLocalWeaponEquipViewModel(TrainCarSection.Head);
-        var slotState = equipVm.GetSlot(0);
-        if (slotState == null || slotState.Augment != null)
+        int upgradeLevel = GetLobbyWeaponUpgradeLevel();
+        string mainGradeName = GetGradeNameByLevel(upgradeLevel);
+
+        GrantWeaponToSlot(TrainCarSection.Head, 0, mainGradeName);
+
+        if (upgradeLevel >= BONUS_WEAPON_UNLOCK_LEVEL)
+        {
+            GrantWeaponToSlot(TrainCarSection.Head, 1, BONUS_WEAPON_GRADE);
+        }
+    }
+
+    private void GrantWeaponToSlot(TrainCarSection section, int slotIndex, string gradeName)
+    {
+        var equipVm = GetLocalWeaponEquipViewModel(section);
+        var slotState = equipVm.GetSlot(slotIndex);
+        if (slotState == null)
         {
             return;
         }
 
-        List<WeaponData> pool = GetStartingWeaponPool();
+        if (slotState.Augment != null)
+        {
+            Debug.LogWarning($"[NetworkAugmentService] 시작 무기 지급 슬롯에 잔여 무기가 있어 덮어씁니다. (Section: {section}, Slot: {slotIndex}, 기존 Id: {slotState.Augment.AugmentDataId})");
+            slotState.Augment = null;
+        }
+
+        List<WeaponData> pool = GetStartingWeaponPool(gradeName);
         if (pool.Count == 0)
         {
+            Debug.LogWarning($"[NetworkAugmentService] '{gradeName}' 등급의 시작 무기 풀이 비어있습니다. (Section: {section}, Slot: {slotIndex})");
             return;
         }
 
@@ -247,12 +270,35 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
         augmentVm.FillFromData(pickedData);
 
         slotState.Augment = augmentVm;
-        WeaponEquipEventHub.Instance.NotifyWeaponEquipped(TrainCarSection.Head, 0, pickedData.Id);
+        WeaponEquipEventHub.Instance.NotifyWeaponEquipped(section, slotIndex, pickedData.Id);
 
         AugmentStatEventHub.Instance.NotifyStatRequested(augmentVm.AugmentUniqueId, pickedData.Id);
     }
 
-    private List<WeaponData> GetStartingWeaponPool()
+    private string GetGradeNameByLevel(int upgradeLevel)
+    {
+        int clampedLevel = Mathf.Clamp(upgradeLevel, 0, STARTING_WEAPON_GRADE_BY_LEVEL.Length - 1);
+        return STARTING_WEAPON_GRADE_BY_LEVEL[clampedLevel];
+    }
+
+    private int GetLobbyWeaponUpgradeLevel()
+    {
+        if (NetworkUpgradeService.Instance == null)
+        {
+            return 0;
+        }
+
+        var upgradeVm = NetworkUpgradeService.Instance.GetLocalUpgradeViewModel();
+        if (upgradeVm == null)
+        {
+            return 0;
+        }
+
+        var slotVm = upgradeVm.GetSlot(WEAPON_UPGRADE_ID);
+        return slotVm != null ? slotVm.CurrentLevel : 0;
+    }
+
+    private List<WeaponData> GetStartingWeaponPool(string gradeName)
     {
         if (DataManager.Instance == null || DataManager.Instance.IsLoaded == false)
         {
@@ -260,16 +306,16 @@ public class NetworkAugmentService : SingletonBase<NetworkAugmentService>
             return new List<WeaponData>();
         }
 
-        List<WeaponData> commonWeaponList = new List<WeaponData>();
+        List<WeaponData> weaponList = new List<WeaponData>();
         foreach (WeaponData weaponData in DataManager.Instance.GetAllData<WeaponData>())
         {
-            if (weaponData.GradeName == STARTING_WEAPON_GRADE)
+            if (weaponData.GradeName == gradeName)
             {
-                commonWeaponList.Add(weaponData);
+                weaponList.Add(weaponData);
             }
         }
 
-        return commonWeaponList;
+        return weaponList;
     }
 
     private void OnStatCalculated(long augmentUniqueId, WeaponCurrentStats stats)
