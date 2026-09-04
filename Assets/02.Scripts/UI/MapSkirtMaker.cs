@@ -25,12 +25,18 @@ public class MapSkirtMaker : MonoBehaviour
     [SerializeField] private string _decorationLayerName = "Default";
     [SerializeField] private float _innerRingBias = 2.5f;
 
+    [Header("레일 회피 설정")]
+    [SerializeField] private float _railExclusionRadius = 2.1f;
+    [SerializeField] private int _maxSampleAttempts = 10;
+
+    private List<Vector3> _railExclusionPositions;
     private GameObject _skirtObject;
 
-    public void GenerateSkirt(int mapSize, float tileSpacing, Transform parent)
+    public void GenerateSkirt(int mapSize, float tileSpacing, Transform parent, List<Vector3> railExclusionPositions = null)
     {
         RemoveSkirt();
 
+        _railExclusionPositions = railExclusionPositions;
         float innerHalfSize = (mapSize * tileSpacing) / 2f;
         Mesh skirtMesh = BuildSkirtMesh(innerHalfSize);
 
@@ -170,7 +176,7 @@ public class MapSkirtMaker : MonoBehaviour
 
         for (int obstacleIndex = 0; obstacleIndex < totalObstacleCount; obstacleIndex++)
         {
-            Vector2 randomPoint = FindRandomPointInSkirtArea(innerHalfSize, outerHalfSize);
+            Vector2 randomPoint = FindValidRandomPoint(innerHalfSize, outerHalfSize);
 
             float worldX = randomPoint.x;
             float worldZ = randomPoint.y;
@@ -200,6 +206,45 @@ public class MapSkirtMaker : MonoBehaviour
         Vector2 localPoint = SampleSquarePerimeterPoint(targetHalfSize);
 
         return new Vector2(localPoint.x + _boundaryOffset.x, localPoint.y + _boundaryOffset.y);
+    }
+
+    private Vector2 FindValidRandomPoint(float innerHalfSize, float outerHalfSize)
+    {
+        Vector2 candidatePoint = FindRandomPointInSkirtArea(innerHalfSize, outerHalfSize);
+
+        for (int attemptIndex = 0; attemptIndex < _maxSampleAttempts; attemptIndex++)
+        {
+            if (!IsNearRailPosition(candidatePoint))
+            {
+                return candidatePoint;
+            }
+
+            candidatePoint = FindRandomPointInSkirtArea(innerHalfSize, outerHalfSize);
+        }
+
+        return candidatePoint;
+    }
+
+    private bool IsNearRailPosition(Vector2 point)
+    {
+        if (_railExclusionPositions == null || _railExclusionPositions.Count == 0)
+        {
+            return false;
+        }
+
+        for (int railIndex = 0; railIndex < _railExclusionPositions.Count; railIndex++)
+        {
+            Vector3 railPosition = _railExclusionPositions[railIndex];
+            float distanceX = Mathf.Abs(point.x - railPosition.x);
+            float distanceZ = Mathf.Abs(point.y - railPosition.z);
+
+            if (distanceX <= _railExclusionRadius && distanceZ <= _railExclusionRadius)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Vector2 SampleSquarePerimeterPoint(float halfSize)
