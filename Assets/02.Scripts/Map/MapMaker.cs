@@ -125,8 +125,8 @@ public class MapMaker : MonoBehaviour
                     continue;
                 }
 
-                float posX = (x - _gridSizeX / 2f) * _spacing;
-                float posZ = (z - _gridSizeZ / 2f) * _spacing;
+                float posX = (x - (_gridSizeX - 1) / 2f) * _spacing;
+                float posZ = (z - (_gridSizeZ - 1) / 2f) * _spacing;
                 Vector3 spawnPos = new Vector3(posX, 0f, posZ);
 
                 GameObject cubeObj = InstantiatePrefabSafe(selectedCubePrefab, spawnPos, selectedCubePrefab.transform.rotation, groundRoot);
@@ -143,7 +143,9 @@ public class MapMaker : MonoBehaviour
                     tileInfo = cubeObj.AddComponent<MapTileInfo>();
                 }
 
-                tileInfo.InitTile(new Vector2Int(x, z), _mapGridPos, canInstallRail: true);
+                Vector2Int localCoordinate = new Vector2Int(x - (_gridSizeX - 1) / 2, z - (_gridSizeZ - 1) / 2);
+
+                tileInfo.InitTile(localCoordinate, _mapGridPos, canInstallRail: true);
 
                 availablePositions.Add(spawnPos);
                 posToGridMap[spawnPos] = new Vector2Int(x, z);
@@ -153,8 +155,8 @@ public class MapMaker : MonoBehaviour
 
         SetupGroundBoxCollider(groundRoot);
 
-        int centerGridX = _gridSizeX / 2;
-        int centerGridZ = _gridSizeZ / 2;
+        int centerGridX = (_gridSizeX - 1) / 2;
+        int centerGridZ = (_gridSizeZ - 1) / 2;
 
         bool hasStation = (_mapCategory != MapCategory.Normal && _stationPrefab != null);
 
@@ -215,6 +217,7 @@ public class MapMaker : MonoBehaviour
 
             float railSpawnOffset = 2f;
             float railLength = 2f;
+            int railCount = _mapCategory == MapCategory.CentralTerminal ? 6 : 3;
             List<Vector3> railDirections = new List<Vector3>();
 
             if (_mapCategory == MapCategory.CentralTerminal)
@@ -230,19 +233,18 @@ public class MapMaker : MonoBehaviour
                 railDirections.Add(new Vector3(1, 0, 0));
             }
 
-            availablePositions.RemoveAll(pos =>
-            {
+            availablePositions.RemoveAll(pos => {
                 for (int d = 0; d < railDirections.Count; d++)
                 {
                     Vector3 direction = railDirections[d];
 
-                    for (int i = 0; i < 6; i++)
+                    for (int i = 0; i < railCount; i++)
                     {
                         Vector3 expectedRailPos = direction * (railSpawnOffset + (i * railLength));
                         float distX = Mathf.Abs(pos.x - expectedRailPos.x);
                         float distZ = Mathf.Abs(pos.z - expectedRailPos.z);
 
-                        if (distX <= 2.1f && distZ <= 2.1f)
+                        if (distX < 0.01f && distZ < 0.01f)
                         {
                             return true;
                         }
@@ -252,17 +254,45 @@ public class MapMaker : MonoBehaviour
                 return false;
             });
 
-            Debug.Log($"[MapMaker] [{_mapCategory}] 스테이션 및 레일 예상 경로 주변 1칸에 부쉬/오브젝트 스폰 제외 완료.");
+            foreach (KeyValuePair<Vector3, GameObject> kvp in posToTileObj)
+            {
+                bool isRailProtectionArea = false;
+
+                for (int d = 0; d < railDirections.Count && !isRailProtectionArea; d++)
+                {
+                    Vector3 direction = railDirections[d];
+
+                    for (int i = 0; i < railCount; i++)
+                    {
+                        Vector3 expectedRailPos = direction * (railSpawnOffset + (i * railLength));
+                        float distX = Mathf.Abs(kvp.Key.x - expectedRailPos.x);
+                        float distZ = Mathf.Abs(kvp.Key.z - expectedRailPos.z);
+
+                        if (distX < 0.01f && distZ < 0.01f)
+                        {
+                            isRailProtectionArea = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (isRailProtectionArea && kvp.Value != null)
+                {
+                    SetTileRailAvailability(kvp.Value, false);
+                }
+            }
+
+            Debug.Log($"[MapMaker] [{_mapCategory}] 스테이션 3x3 보호 구역과 실제 레일 설치 위치의 오브젝트 스폰 및 레일 설치를 제한했습니다.");
         }
         else
         {
-            Debug.Log($"[MapMaker] [Normal] Normal 카테고리이므로 스테이션이 생성되지 않으며, 전체 15x15 영역(정중앙 포함)에 오브젝트가 무작위 배치됩니다.");
+            Debug.Log($"[MapMaker] {_gridSizeX}x{_gridSizeZ} 맵 생성 완료! (카테고리: {_mapCategory}, MapGridPos: {_mapGridPos})");
         }
 
         SpawnObstacles(ref availablePositions, obstaclesRoot, rand, posToTileObj);
         SpawnMaterials(ref availablePositions, materialsRoot, rand, posToTileObj);
 
-        Debug.Log($"[MapMaker] 15x15 맵 생성 완료! (카테고리: {_mapCategory}, MapGridPos: {_mapGridPos})");
+        Debug.Log($"[MapMaker] {_gridSizeX}x{_gridSizeZ} (카테고리: {_mapCategory}, MapGridPos: {_mapGridPos})");
     }
 
     private void SetupGroundBoxCollider(Transform groundRoot)
@@ -273,7 +303,7 @@ public class MapMaker : MonoBehaviour
         float totalSizeZ = _gridSizeZ * _spacing;
 
         boxCollider.size = new Vector3(totalSizeX, 1f, totalSizeZ);
-        boxCollider.center = new Vector3(-1f, 0.5f, -1f);
+        boxCollider.center = new Vector3(0f, 0.5f, 0f);
     }
 
     private GameObject InstantiatePrefabSafe(GameObject prefab, Vector3 position, Quaternion rotation, Transform parent)
@@ -416,7 +446,7 @@ public class MapMaker : MonoBehaviour
         {
             return;
         }
-        if (!tileObj.TryGetComponent(out MapTileInfo tileInfo)) 
+        if (!tileObj.TryGetComponent(out MapTileInfo tileInfo))
         {
             return;
         }
