@@ -110,6 +110,11 @@ public class BuildModeController : MonoBehaviour
         }
 
         TryResumePlacement();
+
+        if (RailManager.Instance != null)
+        {
+            RailManager.Instance.RefreshHoverOutline();
+        }
     }
 
     private void SyncRailPlaceMode()
@@ -153,27 +158,17 @@ public class BuildModeController : MonoBehaviour
 
     private void ReloadRail()
     {
-        if (TryStartPlacement() == true)
-        {
-            return;
-        }
-
-        ExitBuildMode();
+        TryStartPlacement();
     }
 
     private bool TryStartPlacement()
     {
-        if (NetworkRailService.Instance == null)
-        {
-            return false;
-        }
-
-        NetworkRailService.Instance.RequestStartPlacement(_railType);
-
         if (RailManager.Instance == null)
         {
             return false;
         }
+
+        RailManager.Instance.EnterPlaceModeExternal(_railType);
 
         return RailManager.Instance.IsPlaceModeActive;
     }
@@ -233,8 +228,6 @@ public class BuildModeController : MonoBehaviour
         }
 
         SoundManager.Instance?.PlaySFXThrottled(SfxAddress.Ui.Denied, DENIED_SFX_INTERVAL);
-
-        ExitBuildMode();
     }
 
     private void ExitBuildMode()

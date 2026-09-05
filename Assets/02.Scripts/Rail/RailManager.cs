@@ -190,6 +190,11 @@ public class RailManager : SingletonBase<RailManager>
         UpdateClickInput();
     }
 
+    public void EnterPlaceModeExternal(RailType railType)
+    {
+        EnterPlaceMode(railType);
+    }
+
     public void ExitPlaceModeExternal()
     {
         ExitPlaceMode(clearPlacedRails: false);
@@ -700,10 +705,28 @@ public class RailManager : SingletonBase<RailManager>
 
     private bool IsPlacementValid(Vector2Int gridIndex, CubeInfo cubeInfo)
     {
+        if (_isStationRouteConnected) return false;
+        if (!HasOwnedRail()) return false;
         if (!cubeInfo.IsGroundLayer) return false;
         if (_installedCubes.Contains(gridIndex)) return false;
         if (cubeInfo.TileScript != null && cubeInfo.TileScript.HasRail) return false;
         return true;
+    }
+
+    private bool HasOwnedRail()
+    {
+        if (NetworkRailService.Instance == null) return false;
+
+        return NetworkRailService.Instance.GetLocalRailBuildViewModel().GetSlot(_currentRailType).OwnedCount > 0;
+    }
+
+    public void RefreshHoverOutline()
+    {
+        if (!_isPlaceModeActive) return;
+        if (!_isHoveredCube) return;
+        if (_previewOutline == null) return;
+
+        _previewOutline.Show(_hoveredCubeInfo, IsPlacementValid(_hoveredGridIndex, _hoveredCubeInfo));
     }
 
     private void ClearHover()
@@ -721,7 +744,12 @@ public class RailManager : SingletonBase<RailManager>
         if (!Input.GetMouseButtonDown(0)) return;
 
         if (!_isHoveredCube) return;
-        if (!IsPlacementValid(_hoveredGridIndex, _hoveredCubeInfo)) return;
+
+        if (!IsPlacementValid(_hoveredGridIndex, _hoveredCubeInfo))
+        {
+            SoundManager.Instance?.PlaySFXThrottled(SfxAddress.Ui.Denied, 0.2f);
+            return;
+        }
 
         OpenConfirmPopup(_hoveredGridIndex, _hoveredCubeInfo);
     }

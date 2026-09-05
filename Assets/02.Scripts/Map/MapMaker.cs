@@ -51,8 +51,6 @@ public class MapMaker : MonoBehaviour
     [SerializeField] private float _obstacleHeight = 2f;
     [SerializeField] private float _materialHeight = 2f;
 
-
-
     private Transform _mapRoot;
 
     private Dictionary<string, MaterialObjectData> _materialDataDict = new Dictionary<string, MaterialObjectData>();
@@ -64,7 +62,10 @@ public class MapMaker : MonoBehaviour
 
     private void LoadJsonData()
     {
-        if (_materialJsonData == null) return;
+        if (_materialJsonData == null)
+        {
+            return;
+        }
 
         string json = "{\"items\":" + _materialJsonData.text + "}";
         SerializationWrapper<MaterialObjectData> wrapper = JsonUtility.FromJson<SerializationWrapper<MaterialObjectData>>(json);
@@ -119,7 +120,10 @@ public class MapMaker : MonoBehaviour
             {
                 int prefabIndex = rand.Next(0, _cubePrefabs.Count);
                 GameObject selectedCubePrefab = _cubePrefabs[prefabIndex];
-                if (selectedCubePrefab == null) continue;
+                if (selectedCubePrefab == null)
+                {
+                    continue;
+                }
 
                 float posX = (x - _gridSizeX / 2f) * _spacing;
                 float posZ = (z - _gridSizeZ / 2f) * _spacing;
@@ -209,10 +213,6 @@ public class MapMaker : MonoBehaviour
                 return false;
             });
 
-            // ==========================================
-            // ✅ [추가] 런타임 MapManager의 레일 생성 규칙과 연동하여
-            // 레일 예상 경로 및 주변 1칸 범위에 부쉬/오브젝트 스폰 원천 차단
-            // ==========================================
             float railSpawnOffset = 2f;
             float railLength = 2f;
             List<Vector3> railDirections = new List<Vector3>();
@@ -230,21 +230,27 @@ public class MapMaker : MonoBehaviour
                 railDirections.Add(new Vector3(1, 0, 0));
             }
 
-            foreach (var dir in railDirections)
+            availablePositions.RemoveAll(pos =>
             {
-                // MapManager에서 생성하는 레일 개수(최대 약 6개)만큼 미리 반복하여 경로 확보
-                for (int i = 0; i < 6; i++)
+                for (int d = 0; d < railDirections.Count; d++)
                 {
-                    Vector3 expectedRailPos = Vector3.zero + dir * (railSpawnOffset + (i * railLength));
+                    Vector3 direction = railDirections[d];
 
-                    availablePositions.RemoveAll(pos => {
+                    for (int i = 0; i < 6; i++)
+                    {
+                        Vector3 expectedRailPos = direction * (railSpawnOffset + (i * railLength));
                         float distX = Mathf.Abs(pos.x - expectedRailPos.x);
                         float distZ = Mathf.Abs(pos.z - expectedRailPos.z);
-                        // 레일 위치 및 주변 1칸(_spacing인 2 기준이므로 2.1f 이내) 차단
-                        return distX <= 2.1f && distZ <= 2.1f;
-                    });
+
+                        if (distX <= 2.1f && distZ <= 2.1f)
+                        {
+                            return true;
+                        }
+                    }
                 }
-            }
+
+                return false;
+            });
 
             Debug.Log($"[MapMaker] [{_mapCategory}] 스테이션 및 레일 예상 경로 주변 1칸에 부쉬/오브젝트 스폰 제외 완료.");
         }
@@ -306,22 +312,29 @@ public class MapMaker : MonoBehaviour
 
     private void SpawnObstacles(ref List<Vector3> availablePositions, Transform obstaclesRoot, System.Random rand, Dictionary<Vector3, GameObject> posToTileObj)
     {
-        if (_obstaclePrefabs == null || _obstaclePrefabs.Count == 0) return;
+        if (_obstaclePrefabs == null || _obstaclePrefabs.Count == 0)
+        {
+            return;
+        }
 
         int countToSpawn = Mathf.Min(_targetObstacleCount, availablePositions.Count);
         for (int i = 0; i < countToSpawn; i++)
         {
-            if (availablePositions.Count == 0) break;
+            if (availablePositions.Count == 0)
+            {
+                break;
+            }
 
-            int index = rand.Next(0, availablePositions.Count);
-            Vector3 basePos = availablePositions[index];
-            availablePositions.RemoveAt(index);
+            Vector3 basePos = TakeRandomPosition(availablePositions, rand);
 
             SetTileBakedOccupancy(basePos, posToTileObj, true);
 
             int prefabIndex = rand.Next(0, _obstaclePrefabs.Count);
             GameObject selectedPrefab = _obstaclePrefabs[prefabIndex];
-            if (selectedPrefab == null) continue;
+            if (selectedPrefab == null)
+            {
+                continue;
+            }
 
             Vector3 targetPos = new Vector3(basePos.x, _obstacleHeight, basePos.z);
             string groupName = selectedPrefab.name;
@@ -341,11 +354,17 @@ public class MapMaker : MonoBehaviour
 
     private void SpawnMaterials(ref List<Vector3> availablePositions, Transform materialsRoot, System.Random rand, Dictionary<Vector3, GameObject> posToTileObj)
     {
-        if (_materialSpawnDatas == null || _materialSpawnDatas.Count == 0) return;
+        if (_materialSpawnDatas == null || _materialSpawnDatas.Count == 0)
+        {
+            return;
+        }
 
         foreach (MaterialSpawnData data in _materialSpawnDatas)
         {
-            if (data.Prefab == null || data.MinCount <= 0) continue;
+            if (data.Prefab == null || data.MinCount <= 0)
+            {
+                continue;
+            }
 
             string targetId = data.Prefab.name;
 
@@ -360,9 +379,7 @@ public class MapMaker : MonoBehaviour
             {
                 if (availablePositions.Count == 0) break;
 
-                int index = rand.Next(0, availablePositions.Count);
-                Vector3 basePos = availablePositions.Count > 0 ? availablePositions[index] : Vector3.zero;
-                availablePositions.RemoveAt(index);
+                Vector3 basePos = TakeRandomPosition(availablePositions, rand);
 
                 SetTileBakedOccupancy(basePos, posToTileObj, true);
 
@@ -395,8 +412,14 @@ public class MapMaker : MonoBehaviour
 
     private static void SetTileBakedOccupancy(Vector3 basePosition, Dictionary<Vector3, GameObject> posToTileObj, bool isOccupied)
     {
-        if (!posToTileObj.TryGetValue(new Vector3(basePosition.x, 0f, basePosition.z), out GameObject tileObj)) return;
-        if (!tileObj.TryGetComponent(out MapTileInfo tileInfo)) return;
+        if (!posToTileObj.TryGetValue(new Vector3(basePosition.x, 0f, basePosition.z), out GameObject tileObj))
+        {
+            return;
+        }
+        if (!tileObj.TryGetComponent(out MapTileInfo tileInfo)) 
+        {
+            return;
+        }
 
         tileInfo.SetBakedOccupancy(isOccupied);
     }
@@ -407,5 +430,17 @@ public class MapMaker : MonoBehaviour
         {
             tileInfo.CanInstallRail = canInstallRail;
         }
+    }
+
+    private static Vector3 TakeRandomPosition(List<Vector3> availablePositions, System.Random rand)
+    {
+        int lastIndex = availablePositions.Count - 1;
+        int randomIndex = rand.Next(0, availablePositions.Count);
+        Vector3 selectedPosition = availablePositions[randomIndex];
+
+        availablePositions[randomIndex] = availablePositions[lastIndex];
+        availablePositions.RemoveAt(lastIndex);
+
+        return selectedPosition;
     }
 }

@@ -73,6 +73,6 @@ public class DebugTestPanel : MonoBehaviour
         {
             GameManager.Instance.SetGameStageForCheat(GameStage.Stage3);
         }
-    }
 #endif
+    }
 }
