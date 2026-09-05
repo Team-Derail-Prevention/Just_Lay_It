@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 
 public class NetworkGachaService : SingletonBase<NetworkGachaService>
 {
@@ -201,4 +202,25 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
         UIManager.Instance.OpenExitConfirmPopup(null, null, "무기가 인벤토리로 들어갔습니다.");
     }
 
+    public void PreloadGachaIcons()
+    {
+        PreloadGachaIconsAsync().Forget();
+    }
+
+    private async UniTaskVoid PreloadGachaIconsAsync()
+    {
+        var pool = GetDataPool();
+        if (pool.Count == 0)
+        {
+            return;
+        }
+
+        var loadTaskList = new List<UniTask<Sprite>>(pool.Count);
+        for (int i = 0; i < pool.Count; i++)
+        {
+            loadTaskList.Add(ResourceManager.Instance.LoadAssetWithRetry<Sprite>(pool[i].IconPath));
+        }
+
+        await UniTask.WhenAll(loadTaskList);
+    }
 }

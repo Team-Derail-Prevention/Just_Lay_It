@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
 using System;
-using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class GachaCardUI : MonoBehaviour
@@ -47,6 +48,14 @@ public class GachaCardUI : MonoBehaviour
     private Action<int> _onClickSelect;
     private Action<int> _onClickReroll;
     private bool _isSpinning;
+
+    public bool IsSpinning
+    {
+        get
+        {
+            return _isSpinning;
+        }
+    }
 
     private void OnEnable()
     {
@@ -163,11 +172,13 @@ public class GachaCardUI : MonoBehaviour
             winningIndex = 0;
         }
 
-        var sprites = new Sprite[orderedPool.Count];
+        var loadTaskList = new List<UniTask<Sprite>>(orderedPool.Count);
         for (int i = 0; i < orderedPool.Count; i++)
         {
-            sprites[i] = await ResourceManager.Instance.LoadAsset<Sprite>(orderedPool[i].IconPath);
+            loadTaskList.Add(ResourceManager.Instance.LoadAssetWithRetry<Sprite>(orderedPool[i].IconPath));
         }
+
+        Sprite[] sprites = await UniTask.WhenAll(loadTaskList);
 
         int totalTicks = UnityEngine.Random.Range(MinSpinTicks, MaxSpinTicks + 1);
 
