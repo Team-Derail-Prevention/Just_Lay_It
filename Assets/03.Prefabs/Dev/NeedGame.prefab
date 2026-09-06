@@ -1089,7 +1089,9 @@ MonoBehaviour:
   - {fileID: 9063175124058616429, guid: e800eb9fe429e68418aaa2e50836063a, type: 3}
   _obstacleCountPerRing: 80
   _decorationLayerName: Default
-  _innerRingBias: 0.8
+  _innerRingBias: 0.5
+  _railExclusionRadius: 2.1
+  _maxSampleAttempts: 10
 --- !u!1001 &9131221453433227894
 PrefabInstance:
   m_ObjectHideFlags: 0
