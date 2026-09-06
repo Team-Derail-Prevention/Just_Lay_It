@@ -17,10 +17,11 @@ public class GachaUI : UIBase
 
     private GachaViewModel _vm;
     private readonly List<GachaCardUI> _createdCardList = new List<GachaCardUI>();
-    private bool _isSlotsCreated;
 
     private void OnEnable()
     {
+        NetworkGachaService.Instance.PreloadGachaIcons();
+
         if (Button_RerollAll != null)
         {
             Button_RerollAll.BindOnClickButtonEvent(OnClick_RerollAll);
@@ -28,11 +29,8 @@ public class GachaUI : UIBase
 
         _vm = NetworkGachaService.Instance.GetLocalGachaViewModel();
 
-        if (_isSlotsCreated == false)
-        {
-            CreateAllCardSlots();
-            _isSlotsCreated = true;
-        }
+        ClearExistingCardSlots();
+        CreateAllCardSlots();
 
         bool isOpened = NetworkGachaService.Instance.OpenGachaBox();
         if (isOpened == false)
@@ -52,6 +50,21 @@ public class GachaUI : UIBase
         {
             Button_RerollAll.UnBindOnClickButtonEvent(OnClick_RerollAll);
         }
+    }
+
+    private void ClearExistingCardSlots()
+    {
+        if (Transform_CardGroup == null)
+        {
+            return;
+        }
+
+        for (int i = Transform_CardGroup.childCount - 1; i >= 0; i--)
+        {
+            Destroy(Transform_CardGroup.GetChild(i).gameObject);
+        }
+
+        _createdCardList.Clear();
     }
 
     private void CreateAllCardSlots()
@@ -113,8 +126,26 @@ public class GachaUI : UIBase
         NetworkGachaService.Instance.RequestSelectCard(slotIndex);
     }
 
+    private bool IsAnyCardSpinning()
+    {
+        for (int i = 0; i < _createdCardList.Count; i++)
+        {
+            if (_createdCardList[i].IsSpinning == true)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void OnClickRerollSingle(int slotIndex)
     {
+        if (IsAnyCardSpinning() == true)
+        {
+            return;
+        }
+
         bool isRerolled = NetworkGachaService.Instance.RequestRerollSingle(slotIndex);
         if (isRerolled == false)
         {
@@ -127,6 +158,11 @@ public class GachaUI : UIBase
 
     private void OnClick_RerollAll()
     {
+        if (IsAnyCardSpinning() == true)
+        {
+            return;
+        }
+
         bool isRerolled = NetworkGachaService.Instance.RequestRerollAll();
         if (isRerolled == false)
         {

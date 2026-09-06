@@ -799,6 +799,7 @@ public class GameManager : SingletonBase<GameManager>
         NetworkTrainStrengtheningService.ResetRun();
         NetworkTrainCargeService.ResetRun();
         NetworkAugmentService.ResetRun();
+        NetworkGachaService.ResetRun();
 
         UI?.CloseHudTrainStatusUI();
         UI?.CloseHudResourceUI();
