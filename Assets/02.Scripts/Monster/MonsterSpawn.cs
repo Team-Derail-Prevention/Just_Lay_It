@@ -3,6 +3,7 @@ using Enums;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using static SfxAddress;
 
 public class MonsterSpawn : SingletonBase<MonsterSpawn>
 {
@@ -35,6 +36,7 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
     private int _currentMonsterCount = 0;
     private bool _isSpawning = false;
     private CancellationTokenSource _cts;
+    private readonly Dictionary<string, float> _firstSpawnTimeByMonster = new Dictionary<string, float>();
 
     private async void Start()
     {
@@ -117,6 +119,11 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
 
             newMonster.transform.position = spawnPos;
 
+            if (!_firstSpawnTimeByMonster.ContainsKey(monsterId))
+            {
+                _firstSpawnTimeByMonster[monsterId] = _elapsedTime;
+            }
+
             MonsterData monsterData = DataManager.Instance.GetData<MonsterData>(monsterId);
 
             if (monsterData != null)
@@ -124,7 +131,7 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
                 MonsterMove moveScript = newMonster.GetComponent<MonsterMove>();
                 if (moveScript != null)
                 {
-                    float currentAtkMultiplier = GetMonsterAtkMultiplier();
+                    float currentAtkMultiplier = GetMonsterAtkMultiplier(monsterId);
                     moveScript.Initialize(monsterData, _mainTrain, currentAtkMultiplier);
                 }
             }
@@ -133,7 +140,7 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
 
             if (healthScript != null)
             {
-                float currentHpMultiplier = GetMonsterHpMultiplier();
+                float currentHpMultiplier = GetMonsterHpMultiplier(monsterId);
                 healthScript.Initialize(monsterData, currentHpMultiplier);
             }
 
@@ -277,7 +284,7 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
         }
     }
 
-    private float GetMonsterHpMultiplier()
+    private float GetMonsterHpMultiplier(string monsterId)
     {
         float stageMultiplier = 1.0f;
 
@@ -300,13 +307,14 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
             }
         }
 
-        float minutesPlayed = _elapsedTime / 60f;
+        float individualElapsedTime = GetIndividualElapsedTime(monsterId);
+        float minutesPlayed = individualElapsedTime / 60f;
         float timeMultiplier = Mathf.Min(2.0f, 1.0f + (minutesPlayed * _hpIncreasePerMinute));
 
         return stageMultiplier * timeMultiplier;
     }
 
-    private float GetMonsterAtkMultiplier()
+    private float GetMonsterAtkMultiplier(string monsterId)
     {
         float stageMultiplier = 1.0f;
 
@@ -329,10 +337,21 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
             }
         }
 
-        float minutesPlayed = _elapsedTime / 60f;
+        float individualElapsedTime = GetIndividualElapsedTime(monsterId);
+        float minutesPlayed = individualElapsedTime / 60f;
         float timeMultiplier = Mathf.Min(2.0f, 1.0f + (minutesPlayed * _atkIncreasePerMinute));
 
         return stageMultiplier * timeMultiplier;
+    }
+
+    private float GetIndividualElapsedTime(string monsterId)
+    {
+        if (_firstSpawnTimeByMonster.TryGetValue(monsterId, out float firstSpawnTime))
+        {
+            return _elapsedTime - firstSpawnTime;
+        }
+
+        return 0f;
     }
 
     public void ResetGamePhase()
@@ -340,5 +359,6 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
         _elapsedTime = 0f;
         _currentMonsterCount = 0;
         _isSpawning = false;
+        _firstSpawnTimeByMonster.Clear();
     }
 }
