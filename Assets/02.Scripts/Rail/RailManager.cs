@@ -717,7 +717,7 @@ public class RailManager : SingletonBase<RailManager>
     {
         if (NetworkRailService.Instance == null) return false;
 
-        return NetworkRailService.Instance.GetLocalRailBuildViewModel().GetSlot(_currentRailType).OwnedCount > 0;
+        return NetworkRailService.Instance.GetLocalRailBuildViewModel().GetSlot(RailType.Straight).OwnedCount > 0;
     }
 
     public void RefreshHoverOutline()
@@ -815,7 +815,7 @@ public class RailManager : SingletonBase<RailManager>
         RailType railTypeAtInstall = _currentRailType;
         int rotationStepAtInstall = _previewController != null ? _previewController.CurrentRotationStep : _lastRotationStep;
 
-        NetworkRailService.Instance?.ConsumeRailOnPlaced(railTypeAtInstall);
+        NetworkRailService.Instance?.ConsumeRailOnPlaced(RailType.Straight);
 
         SpawnPlacedRailAsync(gridIndex, cubeInfo.Center, _previewInstance.transform.rotation, railTypeAtInstall, rotationStepAtInstall).Forget();
     }
@@ -978,7 +978,7 @@ public class RailManager : SingletonBase<RailManager>
         _placedRails.Remove(gridIndex);
         _installedCubes.Remove(gridIndex);
 
-        NetworkRailService.Instance?.ReturnRailToInventory(placedInfo.Type);
+        NetworkRailService.Instance?.ReturnRailToInventory(RailType.Straight);
 
         if (updateNeighbors)
         {
