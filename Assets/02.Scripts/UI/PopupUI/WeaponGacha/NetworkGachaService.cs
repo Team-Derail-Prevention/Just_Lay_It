@@ -11,6 +11,14 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
     private const int GACHA_COST_INCREASE_PER_PULL = 5;
     private int _gachaPullCount = 0;
 
+    private static readonly Dictionary<string, int> GRADE_WEIGHT_TABLE = new Dictionary<string, int>
+    {
+        { "Common", 4 },
+        { "Rare", 3 },
+        { "Epic", 2 },
+        { "Legendary", 1 }
+    };
+
     private GachaViewModel _localVm;
     private List<WeaponData> _dataPool;
 
@@ -178,8 +186,58 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
             return;
         }
 
-        var pickedData = pool[Random.Range(0, pool.Count)];
+        string pickedGrade = PickWeightedGrade(pool);
+        List<WeaponData> gradePool = new List<WeaponData>();
+
+        foreach (WeaponData data in pool)
+        {
+            if (data.GradeName == pickedGrade)
+            {
+                gradePool.Add(data);
+            }
+        }
+
+        var pickedData = gradePool[Random.Range(0, gradePool.Count)];
         cardState.FillFromData(pickedData);
+    }
+
+    private string PickWeightedGrade(List<WeaponData> pool)
+    {
+        List<string> gradeNameList = new List<string>();
+        List<int> weightList = new List<int>();
+        int totalWeight = 0;
+
+        foreach (WeaponData data in pool)
+        {
+            if (gradeNameList.Contains(data.GradeName))
+            {
+                continue;
+            }
+
+            int weight = 1;
+            if (GRADE_WEIGHT_TABLE.ContainsKey(data.GradeName))
+            {
+                weight = GRADE_WEIGHT_TABLE[data.GradeName];
+            }
+
+            gradeNameList.Add(data.GradeName);
+            weightList.Add(weight);
+            totalWeight += weight;
+        }
+
+        int randomValue = Random.Range(0, totalWeight);
+        int cumulativeWeight = 0;
+
+        for (int i = 0; i < gradeNameList.Count; i++)
+        {
+            cumulativeWeight += weightList[i];
+            if (randomValue < cumulativeWeight)
+            {
+                return gradeNameList[i];
+            }
+        }
+
+        return gradeNameList[gradeNameList.Count - 1];
     }
 
     public void RequestSelectCard(int slotIndex)
@@ -222,5 +280,52 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
         }
 
         await UniTask.WhenAll(loadTaskList);
+    }
+
+    public void Debug_SimulateGachaProbability(int sampleCount)
+    {
+        var pool = GetDataPool();
+        if (pool.Count == 0)
+        {
+            Debug.LogWarning("[NetworkGachaService] 데이터 풀이 비어있어 시뮬레이션할 수 없습니다.");
+            return;
+        }
+
+        Dictionary<string, int> resultCountByGrade = new Dictionary<string, int>();
+
+        for (int i = 0; i < sampleCount; i++)
+        {
+            string pickedGrade = PickWeightedGrade(pool);
+
+            if (resultCountByGrade.ContainsKey(pickedGrade) == false)
+            {
+                resultCountByGrade[pickedGrade] = 0;
+            }
+
+            resultCountByGrade[pickedGrade]++;
+        }
+
+        int totalWeight = 0;
+        foreach (KeyValuePair<string, int> weightPair in GRADE_WEIGHT_TABLE)
+        {
+            totalWeight += weightPair.Value;
+        }
+
+        Debug.Log($"[GachaProbability] 샘플 {sampleCount}회 시뮬레이션 결과");
+
+        foreach (KeyValuePair<string, int> resultPair in resultCountByGrade)
+        {
+            string gradeName = resultPair.Key;
+            int actualCount = resultPair.Value;
+            float actualPercent = (float)actualCount / sampleCount * 100f;
+
+            float expectedPercent = 0f;
+            if (GRADE_WEIGHT_TABLE.ContainsKey(gradeName))
+            {
+                expectedPercent = (float)GRADE_WEIGHT_TABLE[gradeName] / totalWeight * 100f;
+            }
+
+            Debug.Log($"  {gradeName} : {actualCount}회 ({actualPercent:F2}% / 기대치 {expectedPercent:F2}%)");
+        }
     }
 }

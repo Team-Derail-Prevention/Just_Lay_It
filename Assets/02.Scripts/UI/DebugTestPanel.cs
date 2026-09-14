@@ -31,6 +31,11 @@ public class DebugTestPanel : MonoBehaviour
             NetworkUpgradeService.Instance.GainCash(100);
         }
 
+        if (Keyboard.current.f7Key.wasPressedThisFrame == true)
+        {
+            NetworkGachaService.Instance.Debug_SimulateGachaProbability(10000);
+        }
+
         if (Keyboard.current.f9Key.wasPressedThisFrame == true)
         {
             GameManager.Instance.Debug_ForceGameClearInTime();
