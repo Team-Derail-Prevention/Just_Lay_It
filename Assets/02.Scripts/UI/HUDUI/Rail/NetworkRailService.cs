@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using Enums;
 
 public class NetworkRailService : SingletonBase<NetworkRailService>
 {
