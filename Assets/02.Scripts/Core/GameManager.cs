@@ -72,6 +72,8 @@ public class GameManager : SingletonBase<GameManager>
     public static NetworkWarehouseService NetworkWarehouseService => NetworkWarehouseService.Instance;
     public static NetworkGachaService NetworkGachaService => NetworkGachaService.Instance;
 
+    public static FollowCamera Camera => FollowCamera.Instance;
+
     public GameState CurrentGameState => _currentGameState;
     public GameStage CurrentGameStage => _currentGameStage;
 
@@ -759,6 +761,7 @@ public class GameManager : SingletonBase<GameManager>
         Map?.ClearMap();
         ResetSessionState();
         Monster?.ResetGamePhase();
+        Camera?.ChangePreset(0);
     }
 
     public void ReturnToLobby()
