@@ -38,12 +38,7 @@ public class DebugTestPanel : MonoBehaviour
 
         if (Keyboard.current.f9Key.wasPressedThisFrame == true)
         {
-            GameManager.Instance.Debug_ForceGameClearInTime();
-        }
-
-        if (Keyboard.current.f10Key.wasPressedThisFrame == true)
-        {
-            GameManager.Instance.Debug_ForceGameClearOverTime();
+            GameManager.Instance.Debug_GameClear();
         }
 
         if (Keyboard.current.f11Key.wasPressedThisFrame == true)
