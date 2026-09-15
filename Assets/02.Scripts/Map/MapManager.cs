@@ -364,6 +364,7 @@ public class MapManager : SingletonBase<MapManager>
         GameObject mapObject = Instantiate(prefab, worldPosition, Quaternion.identity, _mapRoot);
 
         mapObject.name = $"{mapNameTag} ({gridPos.x}, {gridPos.z})";
+        SetMaterialObjectRotation(mapObject);
 
         _spawnedMaps[gridPos] = mapObject;
         _mapTypeData[gridPos] = typeId;
@@ -399,6 +400,18 @@ public class MapManager : SingletonBase<MapManager>
             Vector3 centerPosition = stationObj != null? stationObj.transform.position : worldPosition;
 
             await SpawnRailsAroundAsync(centerPosition, false, railParent, null, stationObj);
+        }
+    }
+
+    private void SetMaterialObjectRotation(GameObject mapObject)
+    {
+        MaterialObject[] materialObjects = mapObject.GetComponentsInChildren<MaterialObject>(true);
+
+        foreach (MaterialObject materialObject in materialObjects)
+        {
+            int rotationStep = Random.Range(-4, 5);
+            float randomYRotation = rotationStep * 15f;
+            materialObject.transform.localRotation = Quaternion.Euler(0f, randomYRotation, 0f);
         }
     }
 
