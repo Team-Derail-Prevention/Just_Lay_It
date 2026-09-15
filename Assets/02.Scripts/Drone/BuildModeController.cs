@@ -20,6 +20,7 @@ public class BuildModeController : MonoBehaviour
 
     public bool IsBuildMode { get { return _isBuildMode; } }
     public bool HasResourceUnderCursor { get { return _hasResourceUnderCursor; } }
+    public bool IsBuildModeInteractable { get { return _isBuildMode == true && IsGameplayPaused() == false; } }
 
     private const float DENIED_SFX_INTERVAL = 1f;
 
@@ -30,6 +31,13 @@ public class BuildModeController : MonoBehaviour
 
     private void Update()
     {
+        if (IsGameplayPaused() == true)
+        {
+            SuspendInteraction();
+
+            return;
+        }
+
         SyncRailSlotSubscription();
         SyncRailPlaceMode();
         HandleToggle();
@@ -171,6 +179,26 @@ public class BuildModeController : MonoBehaviour
         RailManager.Instance.EnterPlaceModeExternal(_railType);
 
         return RailManager.Instance.IsPlaceModeActive;
+    }
+
+    private static bool IsGameplayPaused()
+    {
+        if (GameManager.Time != null)
+        {
+            return GameManager.Time.IsPaused;
+        }
+
+        return Mathf.Approximately(Time.timeScale, 0f);
+    }
+
+    private void SuspendInteraction()
+    {
+        _hasResourceUnderCursor = false;
+
+        if (RailManager.Instance != null)
+        {
+            RailManager.Instance.SetHoverSuppressed(true);
+        }
     }
 
     private void HandleToggle()

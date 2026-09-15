@@ -34,7 +34,7 @@ public class DroneCellIndicator : MonoBehaviour
             return;
         }
 
-        if (_buildMode.IsBuildMode == false)
+        if (_buildMode.IsBuildModeInteractable == false)
         {
             SetVisible(false);
 
