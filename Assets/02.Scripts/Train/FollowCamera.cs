@@ -51,10 +51,7 @@ public class FollowCamera : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
-        {
-            CycleNextPreset();
-        }
+        HandlePresetInput();
     }
 
     private void LateUpdate()
@@ -111,18 +108,39 @@ public class FollowCamera : MonoBehaviour
         OnPresetIndex?.Invoke(_currentPresetIndex);
     }
 
-    private void CycleNextPreset()
+    private void HandlePresetInput()
     {
         if (_cameraPresets.Count == 0)
         {
             return;
         }
 
-            _currentPresetIndex = (_currentPresetIndex + 1) % _cameraPresets.Count;
-
-        OnPresetIndex?.Invoke(_currentPresetIndex);
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            ChangePreset(0);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            ChangePreset(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            ChangePreset(2);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            ChangePreset(3);
+        }
     }
 
+    private void ChangePreset(int index)
+    {
+        if (index >= 0 && index < _cameraPresets.Count)
+        {
+            _currentPresetIndex = index;
+            OnPresetIndex?.Invoke(_currentPresetIndex);
+        }
+    }
     private Vector3 ParseVector3(string s)
     {
         if (string.IsNullOrEmpty(s)) return Vector3.zero;
