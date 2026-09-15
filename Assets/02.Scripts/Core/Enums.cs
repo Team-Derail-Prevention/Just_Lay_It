@@ -66,5 +66,6 @@
         ExitSelected = 3,     // 출구 방향 선택 완료 후 재개 준비
         GameOver = 4,         // 게임 오버
         GameClear = 5,        // 게임 클리어  
+        GamePaused = 6,       // 게임 일시정지
     }
 }

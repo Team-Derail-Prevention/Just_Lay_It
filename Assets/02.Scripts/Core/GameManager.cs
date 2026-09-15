@@ -214,7 +214,7 @@ public class GameManager : SingletonBase<GameManager>
             await Train.SpawnTerminalTrainAsync(_startingCarriageCount);
             NetworkAugmentService.GrantRandomStartingWeapon();
 
-            ChangeGameState(GameState.EventPaused);
+            ChangeGameState(GameState.GamePaused);
             Debug.Log("[GameManager] 맵, 기차, 몬스터 스폰 완료");
 
         }
