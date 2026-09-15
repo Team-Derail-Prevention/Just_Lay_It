@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Enums;
 
 public class Train : MonoBehaviour
 {
