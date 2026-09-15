@@ -222,12 +222,17 @@ public class TrainManager : SingletonBase<TrainManager>
                     follow.SetFrontTrain(front);
                     follow.SetTargetIndex(0);
                 }
+                RailActivator activator = carList[i].GetComponent<RailActivator>();
+                if (activator != null && _headTrain != null)
+                {
+                    int targetIndex = (i + 1) * 2; // 각 객차별 간격 설정
+                    activator.InitActivator(head, targetIndex);
+                }
 
                 front = carList[i].transform;
             }
         }
 
-        SetCarriagesActive(true);
         IsStation = false;
 
         OnTrainRelocated?.Invoke();
@@ -269,6 +274,15 @@ public class TrainManager : SingletonBase<TrainManager>
         if (followTrain != null)
         {
             followTrain.FollowInit(data, frontCar);
+        }
+
+        RailActivator activator = newCar.GetComponent<RailActivator>();
+        if (activator != null && _headTrain != null)
+        {
+            Train head = _headTrain.GetComponent<Train>();
+            int targetIndex = (carList.Count + 1) * 2;
+
+            activator.InitActivator(head, targetIndex);
         }
 
         TrainContainer trainContainer = newCar.GetComponent<TrainContainer>();

@@ -206,6 +206,7 @@ GameObject:
   m_Component:
   - component: {fileID: 522151680287233867}
   - component: {fileID: 2819733320591373764}
+  - component: {fileID: 8628620927700557994}
   m_Layer: 0
   m_Name: train-Follow-2
   m_TagString: Train
@@ -250,6 +251,19 @@ MonoBehaviour:
   _maxSpeedMultiplier: 2.5
   _targetIndex: 0
   _weaponSlotsRoot: {fileID: 2294976270616654775}
+--- !u!114 &8628620927700557994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2242447720609399337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 732a5f73868c9634f85718ec11cac64d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RailActivator
+  _activationRailIndex: 3
 --- !u!1 &2671916874873111920
 GameObject:
   m_ObjectHideFlags: 0
