@@ -20,10 +20,6 @@ public class GameManager : SingletonBase<GameManager>
     [Header("Game Stage")]
     [SerializeField] private GameStage _currentGameStage = GameStage.Stage1;
 
-    [SerializeField, Min(0f)] private float _stage1ClearTimeLimit = 300f;
-    [SerializeField, Min(0f)] private float _stage2ClearTimeLimit = 480f;
-    [SerializeField, Min(0f)] private float _stage3ClearTimeLimit = 720f;
-
     private readonly TimeManager _timeManager = new TimeManager();
 
     private Transform _managerRoot;
@@ -316,11 +312,9 @@ public class GameManager : SingletonBase<GameManager>
         ChangeGameState(GameState.GameClear);
 
         GameStage clearedStage = _currentGameStage;
-        float timeLimit = GetClearTimeLimit(clearedStage);
-        bool isClearedInTime = _playTime <= timeLimit;
         bool isFinalStage = clearedStage >= GameStage.Stage3;
 
-        if (isClearedInTime && !isFinalStage)
+        if (!isFinalStage)
         {
             _currentGameStage = (GameStage)((int)clearedStage + 1);
 
@@ -329,11 +323,7 @@ public class GameManager : SingletonBase<GameManager>
                 Save.CurrentGameStage = _currentGameStage;
             }
 
-            Debug.Log($"[GameManager] Stage {(int)clearedStage} 클리어 성공. 기록: {_playTime:F1}초 / 제한: {timeLimit:F1}초. 다음 스테이지: {(int)_currentGameStage}");
-        }
-        else if (!isClearedInTime)
-        {
-            Debug.Log($"[GameManager] Stage {(int)clearedStage}는 클리어했지만 제한 시간 초과: {_playTime:F1}초 / {timeLimit:F1}초. 다음 게임도 현재 스테이지입니다.");
+            Debug.Log($"[GameManager] Stage {(int)clearedStage} 클리어 성공. 다음 스테이지: {(int)_currentGameStage}");
         }
         else
         {
@@ -343,33 +333,26 @@ public class GameManager : SingletonBase<GameManager>
         OnGameCleared?.Invoke();
         FinalizeRunStatsAndGrantReward();
 
-        if (isClearedInTime)
+        if (isFinalStage && Save != null)
         {
-            if (isFinalStage && Save != null)
-            {
-                Save.HasClearedAllStagesSpecial = true;
-            }
+            Save.HasClearedAllStagesSpecial = true;
+        }
 
-            OpenGameClearResultUI(clearedStage, isFinalStage, ReturnToLobby);
-        }
-        else
-        {
-            OpenScoreReport(ScoreResultType.GameClear, ReturnToLobby);
-        }
+        OpenGameClearResultUI(clearedStage, isFinalStage, ReturnToLobby);
     }
 
 #if UNITY_EDITOR
     public void Debug_ForceGameClearInTime()
     {
         _playTime = 0f;
-        Debug.Log("[GameManager] (디버그) 제한시간 내 클리어를 강제로 트리거합니다.");
+        Debug.Log("[GameManager] (디버그) 클리어를 강제로 트리거합니다.");
         GameClear();
     }
 
     public void Debug_ForceGameClearOverTime()
     {
-        _playTime = GetClearTimeLimit(_currentGameStage) + 1f;
-        Debug.Log("[GameManager] (디버그) 제한시간 초과 클리어를 강제로 트리거합니다.");
+        _playTime += 1f;
+        Debug.Log("[GameManager] (디버그) 시간과 관계없이 클리어를 강제로 트리거합니다.");
         GameClear();
     }
 #endif
@@ -420,11 +403,9 @@ public class GameManager : SingletonBase<GameManager>
         resultData.TotalPlayCount = Save != null ? Save.TotalPlayCount : 0;
         resultData.TitleMessage = BuildGameClearTitleMessage(clearedStage, isFinalStage);
 
-        GameStage nextStage = _currentGameStage;
-        int nextStageTimeLimitMinutes = Mathf.RoundToInt(GetClearTimeLimit(nextStage) / 60f);
         resultData.NextStageNoticeMessage = isFinalStage
             ? string.Empty
-            : $"다음 난이도는 {nextStageTimeLimitMinutes}분 안에 클리어를 노려 특수 클리어를 성공 하시기를 기원합니다.";
+            : "다음 난이도에 도전해 보세요.";
 
         resultData.IsFinalStage = isFinalStage;
 
@@ -435,11 +416,11 @@ public class GameManager : SingletonBase<GameManager>
     {
         if (isFinalStage)
         {
-            return "축하드립니다. 모든 매우 어려움 난이도 특수 클리어를 성공하셨습니다.\n이로써 모든 난이도 특수 클리어를 달성하셨습니다. 다시 한번 축하드립니다.";
+            return "축하드립니다. 모든 난이도를 클리어하셨습니다.\n이로써 모든 난이도를 정복하셨습니다. 다시 한번 축하드립니다.";
         }
 
         GameStage nextStage = _currentGameStage;
-        return $"{GetStageDisplayName(clearedStage)} 난이도 특수 클리어에 성공하셨습니다.\n자동으로 게임 시작 시 {GetStageDisplayName(nextStage)} 난이도가 시작됩니다.";
+        return $"{GetStageDisplayName(clearedStage)} 난이도를 클리어하셨습니다.\n자동으로 게임 시작 시 {GetStageDisplayName(nextStage)} 난이도가 시작됩니다.";
     }
 
     private string GetStageDisplayName(GameStage stage)
@@ -819,17 +800,6 @@ public class GameManager : SingletonBase<GameManager>
             GameStage.Stage2 => 5,
             GameStage.Stage3 => 7,
             _ => 3
-        };
-    }
-
-    private float GetClearTimeLimit(GameStage stage)
-    {
-        return stage switch
-        {
-            GameStage.Stage1 => _stage1ClearTimeLimit,
-            GameStage.Stage2 => _stage2ClearTimeLimit,
-            GameStage.Stage3 => _stage3ClearTimeLimit,
-            _ => 0f
         };
     }
 
