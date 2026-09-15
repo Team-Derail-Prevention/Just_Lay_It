@@ -17,6 +17,10 @@ public class MapManager : SingletonBase<MapManager>
     [SerializeField] private string _straightRailAddress = "Prefab/Rail_Straight";
     [SerializeField] private float _railSpawnOffset = 2f;
 
+    [Header("Central Terminal Settings")]
+    [SerializeField] private string _stage1CentralTerminalId = "CentralTerminal_001";
+    [SerializeField] private string _otherStageCentralTerminalId = "CentralTerminal_002";
+
     private readonly Vector3Int[] _initialMapOffsets =
     {
         new Vector3Int(-1, 0, 1),  new Vector3Int(0, 0, 1),  new Vector3Int(1, 0, 1),
@@ -104,6 +108,7 @@ public class MapManager : SingletonBase<MapManager>
         MapData centralData = null;
         List<MapData> stationDatas = new();
         List<MapData> normalDatas = new();
+        string centralTerminalId = GetCentralTerminalIdForCurrentStage();
 
         foreach (MapData data in allMapDatas)
         {
@@ -112,7 +117,7 @@ public class MapManager : SingletonBase<MapManager>
                 continue;
             }
 
-            if (data.Type == MapTypeConst.CentralTerminal)
+            if (data.Type == MapTypeConst.CentralTerminal && data.Id == centralTerminalId)
             {
                 centralData = data;
             }
@@ -128,7 +133,7 @@ public class MapManager : SingletonBase<MapManager>
 
         if (centralData == null)
         {
-            Debug.LogError("[MapManager] CentralTerminal 타입의 MapData를 찾을 수 없습니다.");
+            Debug.LogError($"[MapManager] 현재 스테이지에 사용할 CentralTerminal MapData를 찾을 수 없습니다. ID: {centralTerminalId}");
             return false;
         }
 
@@ -164,6 +169,13 @@ public class MapManager : SingletonBase<MapManager>
 
         Debug.Log("[MapManager] 초기 맵 생성 완료. 스테이션 배치 완료.확장 대기 중");
         return true;
+    }
+
+    private string GetCentralTerminalIdForCurrentStage()
+    {
+        return GameManager.Instance != null && GameManager.Instance.CurrentGameStage == GameStage.Stage1
+            ? _stage1CentralTerminalId
+            : _otherStageCentralTerminalId;
     }
 
     public async UniTask<bool> ExpandMapAsync(int targetSize, CancellationToken cancellationToken = default)
@@ -352,6 +364,7 @@ public class MapManager : SingletonBase<MapManager>
         GameObject mapObject = Instantiate(prefab, worldPosition, Quaternion.identity, _mapRoot);
 
         mapObject.name = $"{mapNameTag} ({gridPos.x}, {gridPos.z})";
+        SetMaterialObjectRotation(mapObject);
 
         _spawnedMaps[gridPos] = mapObject;
         _mapTypeData[gridPos] = typeId;
@@ -387,6 +400,18 @@ public class MapManager : SingletonBase<MapManager>
             Vector3 centerPosition = stationObj != null? stationObj.transform.position : worldPosition;
 
             await SpawnRailsAroundAsync(centerPosition, false, railParent, null, stationObj);
+        }
+    }
+
+    private void SetMaterialObjectRotation(GameObject mapObject)
+    {
+        MaterialObject[] materialObjects = mapObject.GetComponentsInChildren<MaterialObject>(true);
+
+        foreach (MaterialObject materialObject in materialObjects)
+        {
+            int rotationStep = Random.Range(-4, 5);
+            float randomYRotation = rotationStep * 15f;
+            materialObject.transform.localRotation = Quaternion.Euler(0f, randomYRotation, 0f);
         }
     }
 

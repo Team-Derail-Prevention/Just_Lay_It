@@ -72,6 +72,8 @@ public class GameManager : SingletonBase<GameManager>
     public static NetworkWarehouseService NetworkWarehouseService => NetworkWarehouseService.Instance;
     public static NetworkGachaService NetworkGachaService => NetworkGachaService.Instance;
 
+    public static FollowCamera Camera => FollowCamera.Instance;
+
     public GameState CurrentGameState => _currentGameState;
     public GameStage CurrentGameStage => _currentGameStage;
 
@@ -99,7 +101,7 @@ public class GameManager : SingletonBase<GameManager>
     private void Start()
     {
         RefreshManagerHierarchyAsync().Forget();
-        Debug.Log($"[GamaManager] 스테이지 체크 {CurrentGameStage}");
+        Debug.Log($"[GameManager] 스테이지 체크 {_currentGameStage}");
     }
 
     private void Update()
@@ -214,7 +216,7 @@ public class GameManager : SingletonBase<GameManager>
             await Train.SpawnTerminalTrainAsync(_startingCarriageCount);
             NetworkAugmentService.GrantRandomStartingWeapon();
 
-            ChangeGameState(GameState.EventPaused);
+            ChangeGameState(GameState.GamePaused);
             Debug.Log("[GameManager] 맵, 기차, 몬스터 스폰 완료");
 
         }
@@ -342,17 +344,10 @@ public class GameManager : SingletonBase<GameManager>
     }
 
 #if UNITY_EDITOR
-    public void Debug_ForceGameClearInTime()
+    public void Debug_GameClear()
     {
         _playTime = 0f;
         Debug.Log("[GameManager] (디버그) 클리어를 강제로 트리거합니다.");
-        GameClear();
-    }
-
-    public void Debug_ForceGameClearOverTime()
-    {
-        _playTime += 1f;
-        Debug.Log("[GameManager] (디버그) 시간과 관계없이 클리어를 강제로 트리거합니다.");
         GameClear();
     }
 #endif
@@ -766,6 +761,7 @@ public class GameManager : SingletonBase<GameManager>
         Map?.ClearMap();
         ResetSessionState();
         Monster?.ResetGamePhase();
+        Camera?.ChangePreset(0);
     }
 
     public void ReturnToLobby()
