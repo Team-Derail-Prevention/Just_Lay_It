@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
-public class FollowCamera : MonoBehaviour
+public class FollowCamera : SingletonBase<FollowCamera>
 {
     [Header("Runtime Debug / Editable")]
     [SerializeField] private Transform _debugTarget;
@@ -27,15 +27,23 @@ public class FollowCamera : MonoBehaviour
 
     public static event Action<int> OnPresetIndex;
 
+    protected override void Init()
+    {
+        base.Init();
+    }
+
     private void Start()
     {
         InitializeCameraPresetsAsync(this.GetCancellationTokenOnDestroy()).Forget();
 
-        if (_target == null && TrainManager.Instance != null)
+        if (_target == null && GameManager.Train != null)
         {
-            SetTarget(TrainManager.Instance.HeadTransform);
+            SetTarget(GameManager.Train.HeadTransform);
         }
     }
+
+
+
 
     private void OnEnable()
     {
@@ -133,7 +141,7 @@ public class FollowCamera : MonoBehaviour
         }
     }
 
-    private void ChangePreset(int index)
+    public void ChangePreset(int index)
     {
         if (index >= 0 && index < _cameraPresets.Count)
         {
@@ -141,6 +149,7 @@ public class FollowCamera : MonoBehaviour
             OnPresetIndex?.Invoke(_currentPresetIndex);
         }
     }
+
     private Vector3 ParseVector3(string s)
     {
         if (string.IsNullOrEmpty(s)) return Vector3.zero;
@@ -179,9 +188,9 @@ public class FollowCamera : MonoBehaviour
 
     private void HandleTrainRelocated()
     {
-        if (TrainManager.Instance != null)
+        if (GameManager.Train != null)
         {
-            SetTarget(TrainManager.Instance.HeadTransform);
+            SetTarget(GameManager.Train.HeadTransform);
         }
     }
 }
