@@ -64,6 +64,7 @@ GameObject:
   - component: {fileID: 1684910812018614335}
   - component: {fileID: 6446244244896828611}
   - component: {fileID: 4345425380480425041}
+  - component: {fileID: 5732879419995468296}
   m_Layer: 0
   m_Name: train-Follow-1
   m_TagString: Train
@@ -130,6 +131,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.2, y: 2.0275822, z: 2.3}
   m_Center: {x: 0, y: 1.5137908, z: 0.14999998}
+--- !u!114 &5732879419995468296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2815961600046383129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 732a5f73868c9634f85718ec11cac64d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RailActivator
+  _activationRailIndex: 3
 --- !u!1 &3969239286006433948
 GameObject:
   m_ObjectHideFlags: 0

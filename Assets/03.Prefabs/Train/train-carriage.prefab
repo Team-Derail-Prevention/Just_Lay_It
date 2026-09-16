@@ -799,6 +799,7 @@ GameObject:
   - component: {fileID: 4119779054705174305}
   - component: {fileID: 1748783018269494275}
   - component: {fileID: 8088652464291806410}
+  - component: {fileID: 7400597521784276816}
   m_Layer: 0
   m_Name: train-carriage
   m_TagString: Train
@@ -863,6 +864,19 @@ MonoBehaviour:
   _maxSpeedMultiplier: 2.5
   _targetIndex: 0
   _weaponSlotsRoot: {fileID: 1556050174047909412}
+--- !u!114 &7400597521784276816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7710635448997255348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 732a5f73868c9634f85718ec11cac64d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RailActivator
+  _activationRailIndex: 3
 --- !u!1 &8575369421686350974
 GameObject:
   m_ObjectHideFlags: 0

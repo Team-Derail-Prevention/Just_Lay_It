@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using Enums;
+using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class TrainManager : SingletonBase<TrainManager>
@@ -32,9 +33,74 @@ public class TrainManager : SingletonBase<TrainManager>
     private Train _activeTrain;
     private Vector3 _lastEnterDirection = Vector3.forward;
 
+
+    public static event Action<int> OnTrainStopWarning;
+    // 게임오버 시간 초
+    private float _maxStopAllowedTime = 3.0f;
+    private float _stopTimer = 0f;
+    private int _lastWarningSecond = 0; // 마지막으로 이벤트를 발생시킨 '초' 기록용
+
     protected override void Init()
     {
         base.Init();
+    }
+
+    private void Update()
+    {
+        CheckStopHurdle();
+    }
+
+
+    //TODO 이벤트 둬야한다. 멈춰있는 시간동안 사운드 발생 + 색 변화 << 
+    private void CheckStopHurdle()
+    {
+        if (GameManager.Instance == null || GameManager.Instance.CurrentGameState != GameState.Playing || _headTrain == null || IsStation)
+        {
+            _stopTimer = 0f;
+            _lastWarningSecond = 0;
+            return;
+        }
+
+        Train headTrainScript = _headTrain.GetComponent<Train>();
+        if (headTrainScript == null)
+        {
+            return;
+        }
+        // 기차는 가야 하는데(이동 상태인데) 실제 속도가 0이거나 레일이 막혀서 나아가지 못할 때
+        if (headTrainScript.IsMoving && headTrainScript.CurrentSpeed <= 0.01f)
+        {
+            _stopTimer += Time.deltaTime;
+
+            int currentSecond = Mathf.FloorToInt(_stopTimer);
+            if (currentSecond > _lastWarningSecond)
+            {
+                _lastWarningSecond = currentSecond;
+                OnTrainStopWarning?.Invoke(currentSecond); // 구독한 객체들에게 1초마다 알림 발송
+            }
+
+            if (_stopTimer >= _maxStopAllowedTime)
+            {
+                TriggerStopGameOver();
+            }
+        }
+        else
+        {
+            // 정상 주행 중이면 타이머 리셋
+            _stopTimer = 0f;
+            _lastWarningSecond = 0;
+        }
+    }
+
+    private void TriggerStopGameOver()
+    {
+        _stopTimer = 0f;
+        _lastWarningSecond = 0;
+        Debug.LogError($"[TrainManager] 기차가 {_maxStopAllowedTime}초 이상 정지 상태여서 게임오버 처리됩니다.");
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.GameOver();
+        }
     }
 
     // 터미널 스폰 + 동,서,남,북 선택 시 이동
@@ -222,12 +288,17 @@ public class TrainManager : SingletonBase<TrainManager>
                     follow.SetFrontTrain(front);
                     follow.SetTargetIndex(0);
                 }
+                RailActivator activator = carList[i].GetComponent<RailActivator>();
+                if (activator != null && _headTrain != null)
+                {
+                    int targetIndex = (i + 1) * 2; // 각 객차별 간격 설정
+                    activator.InitActivator(head, targetIndex);
+                }
 
                 front = carList[i].transform;
             }
         }
 
-        SetCarriagesActive(true);
         IsStation = false;
 
         OnTrainRelocated?.Invoke();
@@ -269,6 +340,15 @@ public class TrainManager : SingletonBase<TrainManager>
         if (followTrain != null)
         {
             followTrain.FollowInit(data, frontCar);
+        }
+
+        RailActivator activator = newCar.GetComponent<RailActivator>();
+        if (activator != null && _headTrain != null)
+        {
+            Train head = _headTrain.GetComponent<Train>();
+            int targetIndex = (carList.Count + 1) * 2;
+
+            activator.InitActivator(head, targetIndex);
         }
 
         TrainContainer trainContainer = newCar.GetComponent<TrainContainer>();
