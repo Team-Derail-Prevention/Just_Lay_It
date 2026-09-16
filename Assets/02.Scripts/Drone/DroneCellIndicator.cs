@@ -55,6 +55,13 @@ public class DroneCellIndicator : MonoBehaviour
             return;
         }
 
+        if (target != null && target.IsMining == true)
+        {
+            SetVisible(false);
+
+            return;
+        }
+
         SetVisible(true);
         PlaceAt(cellCenter);
         Colorize(target);

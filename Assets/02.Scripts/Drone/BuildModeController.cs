@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Enums;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -183,6 +184,11 @@ public class BuildModeController : MonoBehaviour
 
     private static bool IsGameplayPaused()
     {
+        if (GameManager.Instance != null && GameManager.Instance.CurrentGameState != GameState.Playing)
+        {
+            return true;
+        }
+
         if (GameManager.Time != null)
         {
             return GameManager.Time.IsPaused;
