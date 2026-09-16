@@ -9,6 +9,7 @@ public class ResourceStatusEventHub : SingletonBase<ResourceStatusEventHub>
     public event Action<int> OnMoneyChanged;
     public event Action<int, int> OnStationProgressChanged;
     public event Action<int> OnCargoLimitChanged;
+    public event Action<int, int> OnBoardingChanged;
 
     private void Start()
     {
@@ -43,5 +44,10 @@ public class ResourceStatusEventHub : SingletonBase<ResourceStatusEventHub>
     public void NotifyCargoLimitChanged(int curCargoLimit)
     {
         OnCargoLimitChanged?.Invoke(curCargoLimit);
+    }
+
+    public void NotifyBoardingChanged(int curBoardedCount, int boardingLimit)
+    {
+        OnBoardingChanged?.Invoke(curBoardedCount, boardingLimit);
     }
 }

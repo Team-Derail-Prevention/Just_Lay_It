@@ -79,6 +79,7 @@ public class DataManager : SingletonBase<DataManager>
         await LoadDataAsync<InGameUpgradeData>("InGameUpgradeData", cancellationToken);
         await LoadDataAsync<LobbyUpgradeData>("LobbyUpgradeData", cancellationToken);
         await LoadDataAsync<CameraData>("CameraData", cancellationToken);
+        await LoadDataAsync<UITextData>("UITextData", cancellationToken);
 
         IsLoaded = true;
         OnDataLoadCompleted?.Invoke();

@@ -352,8 +352,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
-  m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+  m_sharedMaterial: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -383,7 +383,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -526,8 +526,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: BLACKSMIH
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
-  m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+  m_sharedMaterial: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -551,13 +551,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32
-  m_fontSizeBase: 32
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -888,8 +888,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 0
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
-  m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+  m_sharedMaterial: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -913,13 +913,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -2058,8 +2058,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
-  m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+  m_sharedMaterial: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2089,7 +2089,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -2227,7 +2227,11 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+    - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor.b
       value: 1
@@ -2247,7 +2251,7 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294967295
@@ -2303,13 +2307,35 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6494975331650331341}
   m_SourcePrefab: {fileID: 100100000, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
 --- !u!224 &2476304993302908474 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3393532458673574038, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
   m_PrefabInstance: {fileID: 956352533337972396}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2995295384978750744 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 956352533337972396}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6494975331650331341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2995295384978750744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: LobbyUpgrade_UI_01
+  _targetText: {fileID: 7729440072746112356}
 --- !u!114 &4309952062004176565 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3933229204511864857, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
@@ -2321,6 +2347,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15fbc403b31e5a24eafadfcef0d724e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIButton
+--- !u!114 &7729440072746112356 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 956352533337972396}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2995295384978750744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &1159146960005738580
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2420,7 +2457,11 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+    - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor.b
       value: 1
@@ -2440,7 +2481,7 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294967295
@@ -2496,7 +2537,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8781682893837122796}
   m_SourcePrefab: {fileID: 100100000, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
 --- !u!114 &2775269721644369997 stripped
 MonoBehaviour:
@@ -2509,11 +2553,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15fbc403b31e5a24eafadfcef0d724e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIButton
+--- !u!1 &3801837169656222688 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 1159146960005738580}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8781682893837122796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3801837169656222688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: LobbyUpgrade_UI_03
+  _targetText: {fileID: 8509489098976246684}
 --- !u!224 &4543606244142915778 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3393532458673574038, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
   m_PrefabInstance: {fileID: 1159146960005738580}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8509489098976246684 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 1159146960005738580}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3801837169656222688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &2973256075864955924
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2613,7 +2687,11 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+    - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor.b
       value: 1
@@ -2633,7 +2711,7 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294967295
@@ -2689,13 +2767,35 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3730715816838297730}
   m_SourcePrefab: {fileID: 100100000, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
 --- !u!224 &457994350736755842 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3393532458673574038, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
   m_PrefabInstance: {fileID: 2973256075864955924}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &979506953368780704 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 2973256075864955924}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3730715816838297730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 979506953368780704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: LobbyUpgrade_UI_04
+  _targetText: {fileID: 5711402023181080540}
 --- !u!114 &2294165898152174605 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3933229204511864857, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
@@ -2707,6 +2807,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15fbc403b31e5a24eafadfcef0d724e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIButton
+--- !u!114 &5711402023181080540 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 2973256075864955924}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 979506953368780704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &7800691907165666381
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2806,7 +2917,11 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+    - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor.b
       value: 1
@@ -2826,7 +2941,7 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294967295
@@ -2882,13 +2997,46 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4566837708826959584}
   m_SourcePrefab: {fileID: 100100000, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+--- !u!114 &738668066753984389 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 7800691907165666381}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5230182415569149945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!224 &4853086266652142811 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3393532458673574038, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
   m_PrefabInstance: {fileID: 7800691907165666381}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5230182415569149945 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 7800691907165666381}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4566837708826959584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5230182415569149945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: LobbyUpgrade_UI_02
+  _targetText: {fileID: 738668066753984389}
 --- !u!114 &6544923138017231956 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3933229204511864857, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}

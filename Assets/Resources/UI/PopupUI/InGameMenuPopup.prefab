@@ -831,7 +831,11 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+    - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor.b
       value: 0
@@ -851,7 +855,7 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4278190080
@@ -899,13 +903,35 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -4929128335434432210}
   m_SourcePrefab: {fileID: 100100000, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
 --- !u!224 &353530602272508314 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3393532458673574038, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
   m_PrefabInstance: {fileID: 3170465964480387340}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1092977473910487736 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 3170465964480387340}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-4929128335434432210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1092977473910487736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: InGameMenu_PopUp_UI_03
+  _targetText: {fileID: 5619956580406907588}
 --- !u!114 &2119615290492772629 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3933229204511864857, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
@@ -917,6 +943,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15fbc403b31e5a24eafadfcef0d724e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIButton
+--- !u!114 &5619956580406907588 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 3170465964480387340}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1092977473910487736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &3637126385295266229
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1016,7 +1053,11 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+    - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor.b
       value: 0
@@ -1036,7 +1077,7 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4278190080
@@ -1084,7 +1125,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -8034247807095717763}
   m_SourcePrefab: {fileID: 100100000, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
 --- !u!114 &354667481591622060 stripped
 MonoBehaviour:
@@ -1097,11 +1141,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15fbc403b31e5a24eafadfcef0d724e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIButton
+--- !u!1 &1634072100104335873 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 3637126385295266229}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-8034247807095717763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1634072100104335873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: InGameMenu_PopUp_UI_01
+  _targetText: {fileID: 6086740694031768189}
 --- !u!224 &2117137023092818211 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3393532458673574038, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
   m_PrefabInstance: {fileID: 3637126385295266229}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6086740694031768189 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 3637126385295266229}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1634072100104335873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &5477475343522609285
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1201,7 +1275,11 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+    - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor.b
       value: 0
@@ -1221,7 +1299,7 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4278190080
@@ -1269,13 +1347,46 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -5825378225624561498}
   m_SourcePrefab: {fileID: 100100000, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+--- !u!114 &3027051757352268621 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 5477475343522609285}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7554557521931918129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!224 &7141540259428247571 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3393532458673574038, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
   m_PrefabInstance: {fileID: 5477475343522609285}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7554557521931918129 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 5477475343522609285}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-5825378225624561498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7554557521931918129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: InGameMenu_PopUp_UI_02
+  _targetText: {fileID: 3027051757352268621}
 --- !u!114 &8833324489656696988 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3933229204511864857, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
@@ -1386,7 +1497,11 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+    - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor.b
       value: 0
@@ -1406,7 +1521,7 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4278190080
@@ -1454,8 +1569,41 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6431903681416805174}
   m_SourcePrefab: {fileID: 100100000, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+--- !u!114 &303637976113616766 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 7077235727469518006}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5108116215111876354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!1 &5108116215111876354 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 7077235727469518006}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6431903681416805174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5108116215111876354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: InGameMenu_PopUp_UI_04
+  _targetText: {fileID: 303637976113616766}
 --- !u!224 &5561764872732609568 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3393532458673574038, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}

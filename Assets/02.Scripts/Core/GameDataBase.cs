@@ -53,8 +53,10 @@ public class TrainData : GameDataBase
 [Serializable]
 public class TrainUpgradeData : GameDataBase
 {
-    public string Name;
-    public string Description;
+    public string Name_Ko;
+    public string Name_En;
+    public string Description_Ko;
+    public string Description_En;
     public string TargetStatType;
     public string Operation;
     public float Value;
@@ -81,7 +83,8 @@ public class WeaponData : GameDataBase
     public float Range;
     public int Price;
 
-    public string Description;
+    public string Description_Ko;
+    public string Description_En;
     public string GradeName;
     public string IconPath;
     public string UseFireSound;
@@ -140,19 +143,24 @@ public static class DroneStatTypeConst
 [Serializable]
 public class LobbyUpgradeData : GameDataBase
 {
-    public string Name;
-    public string Description;
+    public string Name_Ko;
+    public string Name_En;
+    public string Description_Ko;
+    public string Description_En;
     public int MaxLevel;
     public int BaseCost;
     public int CostIncreasePerLevel;
     public string IconPath;
+    public int NameFontSize_Ko;
+    public int NameFontSize_En;
 }
 
 [Serializable]
 public class InGameUpgradeData : GameDataBase
 {
     public string Category;
-    public string Name;
+    public string Name_Ko;
+    public string Name_En;
     public string IconPath;
     public int MaxLevel;
     public int BaseCost;
@@ -166,4 +174,14 @@ public class CameraData : GameDataBase
     public string fixedRotation;
     public bool lookAtTarget;
     public string AddressablePath;
+}
+
+[Serializable]
+public class UITextData : GameDataBase
+{
+    public string Place;
+    public string Text_Ko;
+    public string Text_En;
+    public int FontSiz_Ko;
+    public int FontSiz_En;
 }

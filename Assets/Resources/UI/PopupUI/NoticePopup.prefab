@@ -65,10 +65,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uD655\uC778  'Enter'"
+  m_text: Next  'Enter'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
-  m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+  m_sharedMaterial: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -265,12 +265,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NoticePopupUI
   _tipImage: {fileID: 6772651737357800445}
   _enterGuideText: {fileID: 3387989607014400251}
-  _nextPageGuideMessage: "\uB2E4\uC74C 'Enter'"
-  _confirmGuideMessage: "\uD655\uC778 'Enter'"
-  _tipSprites:
+  _nextPageGuideMessage: ' Next ''Enter'''
+  _confirmGuideMessage: ' ''Enter'''
+  _tipSpritesKo:
   - {fileID: 21300000, guid: 23ab5bdeadc14db438905e8025ea9ff7, type: 3}
   - {fileID: 21300000, guid: 6b50f3d1f6ee76647bf0160ae0ec1947, type: 3}
-  - {fileID: 21300000, guid: 15d6df8c32075a549b1d938d6651f805, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  _tipSpritesEn:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!1 &4764710488238852972
 GameObject:
   m_ObjectHideFlags: 0

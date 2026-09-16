@@ -67,5 +67,12 @@
         GameOver = 4,         // 게임 오버
         GameClear = 5,        // 게임 클리어  
         GamePaused = 6,       // 게임 일시정지
+        GaveUp = 7,
+    }
+
+    public enum LanguageType
+    {
+        Korean = 0,
+        English = 1
     }
 }

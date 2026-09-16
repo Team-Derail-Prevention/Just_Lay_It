@@ -36,16 +36,6 @@ public class GameClearResultUI : UIBase
     [Header("누적 게임 플레이 횟수")]
     [SerializeField] private TextMeshProUGUI Text_GameNumberScore;
 
-    [Header("다음 난이도 응원 문구 (최종 난이도가 아닐 때)")]
-    [SerializeField] private GameObject _nextStageNoticeRoot;
-    [SerializeField] private TextMeshProUGUI Text_NextStageNotice;
-
-    [Header("제작진 크레딧 (모든 난이도 특수 클리어 시)")]
-    [SerializeField] private GameObject _creditsRoot;
-
-    [Header("엔딩 문구 (모든 난이도 특수 클리어 시)")]
-    [SerializeField] private GameObject _endingRoot;
-
     [Header("스크롤 콘텐츠 (제목 ~ 엔딩 전체)")]
     [SerializeField] private RectTransform _viewportRect;
     [SerializeField] private RectTransform _scrollContent;
@@ -79,7 +69,7 @@ public class GameClearResultUI : UIBase
         }
 
         _enableElapsedTime += Time.unscaledDeltaTime;
-        if (_enableElapsedTime < _scrollStartDelay) 
+        if (_enableElapsedTime < _scrollStartDelay)
         {
             return;
         }
@@ -146,8 +136,6 @@ public class GameClearResultUI : UIBase
         _viewModel.EarnedCashCount = resultData.EarnedCashCount;
         _viewModel.TotalPlayCount = resultData.TotalPlayCount;
         _viewModel.TitleMessage = resultData.TitleMessage;
-        _viewModel.NextStageNoticeMessage = resultData.NextStageNoticeMessage;
-        _viewModel.IsFinalStage = resultData.IsFinalStage;
 
         _onConfirm = onConfirm;
 
@@ -191,12 +179,6 @@ public class GameClearResultUI : UIBase
             case nameof(GameClearResultViewModel.TotalPlayCount):
                 SetGameNumberText();
                 break;
-            case nameof(GameClearResultViewModel.NextStageNoticeMessage):
-                SetNextStageNoticeText();
-                break;
-            case nameof(GameClearResultViewModel.IsFinalStage):
-                SetFooterVisibility();
-                break;
         }
     }
 
@@ -213,8 +195,7 @@ public class GameClearResultUI : UIBase
         SetRailInstallText();
         SetCashText();
         SetGameNumberText();
-        SetNextStageNoticeText();
-        SetFooterVisibility();
+        ResetScrollContentPosition();
     }
 
     private void SetTitleText()
@@ -308,34 +289,6 @@ public class GameClearResultUI : UIBase
         {
             Text_GameNumberScore.text = _viewModel.TotalPlayCount.ToString("D4");
         }
-    }
-
-    private void SetNextStageNoticeText()
-    {
-        if (Text_NextStageNotice != null)
-        {
-            Text_NextStageNotice.text = _viewModel.NextStageNoticeMessage;
-        }
-    }
-
-    private void SetFooterVisibility()
-    {
-        if (_nextStageNoticeRoot != null)
-        {
-            _nextStageNoticeRoot.SetActive(!_viewModel.IsFinalStage);
-        }
-
-        if (_creditsRoot != null)
-        {
-            _creditsRoot.SetActive(_viewModel.IsFinalStage);
-        }
-
-        if (_endingRoot != null)
-        {
-            _endingRoot.SetActive(_viewModel.IsFinalStage);
-        }
-
-        ResetScrollContentPosition();
     }
 
     private void OnConfirm()

@@ -180,6 +180,7 @@ MonoBehaviour:
   _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
   _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
   _description: 
+  _descriptionLocalizationId: 
 --- !u!114 &6094560534329877722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -206,6 +207,7 @@ GameObject:
   - component: {fileID: 7980970773576428897}
   - component: {fileID: 5290375096243763495}
   - component: {fileID: 3082641422167324950}
+  - component: {fileID: 1011930367274580297}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -262,7 +264,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uB3D9\uCABD \uBC29\uD5A5"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -293,7 +295,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -329,9 +331,23 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &1011930367274580297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 215983678665140444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: TrainDeparture_PopUp_UI_02
+  _targetText: {fileID: 3082641422167324950}
 --- !u!1 &413918667268323763
 GameObject:
   m_ObjectHideFlags: 0
@@ -475,6 +491,7 @@ MonoBehaviour:
   _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
   _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
   _description: 
+  _descriptionLocalizationId: 
 --- !u!114 &4865156942461480560
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -731,6 +748,7 @@ MonoBehaviour:
   _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
   _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
   _description: 
+  _descriptionLocalizationId: 
 --- !u!114 &9144626280690770162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -832,6 +850,7 @@ GameObject:
   - component: {fileID: 3920446931585406266}
   - component: {fileID: 4943305317592291847}
   - component: {fileID: 2896216792900235053}
+  - component: {fileID: 5519159724559013304}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -888,7 +907,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uBD81\uCABD \uBC29\uD5A5"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -919,7 +938,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -955,9 +974,23 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &5519159724559013304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2158499167319490031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: TrainDeparture_PopUp_UI_08
+  _targetText: {fileID: 2896216792900235053}
 --- !u!1 &2601220746550887172
 GameObject:
   m_ObjectHideFlags: 0
@@ -1119,6 +1152,7 @@ GameObject:
   - component: {fileID: 508225688802320029}
   - component: {fileID: 2515920238846213969}
   - component: {fileID: 8963922698534442900}
+  - component: {fileID: 1997392563598377010}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -1175,8 +1209,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uB3D9\uCABD \uBC29\uD5A5"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
-  m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+  m_sharedMaterial: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1206,7 +1240,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -1245,6 +1279,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &1997392563598377010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3140967554654730356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: TrainDeparture_PopUp_UI_01
+  _targetText: {fileID: 8963922698534442900}
 --- !u!1 &3373898165027333341
 GameObject:
   m_ObjectHideFlags: 0
@@ -1406,6 +1454,7 @@ GameObject:
   - component: {fileID: 1784515870603177376}
   - component: {fileID: 568687556450550628}
   - component: {fileID: 5211697333773790171}
+  - component: {fileID: 3363981623798465130}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -1462,8 +1511,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC11C\uCABD \uBC29\uD5A5"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
-  m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+  m_sharedMaterial: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1493,7 +1542,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -1532,6 +1581,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &3363981623798465130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3607047899608635246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: TrainDeparture_PopUp_UI_03
+  _targetText: {fileID: 5211697333773790171}
 --- !u!1 &4704757690750338170
 GameObject:
   m_ObjectHideFlags: 0
@@ -1580,6 +1643,7 @@ GameObject:
   - component: {fileID: 1867336187645379326}
   - component: {fileID: 3371814025607005215}
   - component: {fileID: 1530585275140229465}
+  - component: {fileID: 7447684617628984470}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -1636,7 +1700,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC11C\uCABD \uBC29\uD5A5"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -1667,7 +1731,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -1703,9 +1767,23 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &7447684617628984470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5904332974623869497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: TrainDeparture_PopUp_UI_04
+  _targetText: {fileID: 1530585275140229465}
 --- !u!1 &6171788755618794053
 GameObject:
   m_ObjectHideFlags: 0
@@ -1849,6 +1927,7 @@ MonoBehaviour:
   _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
   _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
   _description: 
+  _descriptionLocalizationId: 
 --- !u!114 &8981108186105621512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1951,6 +2030,7 @@ GameObject:
   - component: {fileID: 4571101190014946911}
   - component: {fileID: 9066971089745459932}
   - component: {fileID: 1202212595596558208}
+  - component: {fileID: 2220522824870415599}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -2007,7 +2087,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uB0A8\uCABD \uBC29\uD5A5"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -2038,7 +2118,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -2074,9 +2154,23 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &2220522824870415599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6750032541305885912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: TrainDeparture_PopUp_UI_06
+  _targetText: {fileID: 1202212595596558208}
 --- !u!1 &6948973867545232321
 GameObject:
   m_ObjectHideFlags: 0
@@ -2352,6 +2446,7 @@ GameObject:
   - component: {fileID: 2115575163284367123}
   - component: {fileID: 3034770589555202923}
   - component: {fileID: 5251103235091271717}
+  - component: {fileID: 8368907062523278710}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -2408,8 +2503,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uBD81\uCABD \uBC29\uD5A5"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
-  m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+  m_sharedMaterial: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2439,7 +2534,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -2478,6 +2573,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &8368907062523278710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7730101479480799847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: TrainDeparture_PopUp_UI_07
+  _targetText: {fileID: 5251103235091271717}
 --- !u!1 &8675747040851240676
 GameObject:
   m_ObjectHideFlags: 0
@@ -2526,6 +2635,7 @@ GameObject:
   - component: {fileID: 4697407798028415555}
   - component: {fileID: 7164317378157160303}
   - component: {fileID: 4188004104206932641}
+  - component: {fileID: 5987386517485906461}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -2582,8 +2692,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uB0A8\uCABD \uBC29\uD5A5"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
-  m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+  m_sharedMaterial: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2613,7 +2723,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -2652,6 +2762,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &5987386517485906461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9169432621275899928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: TrainDeparture_PopUp_UI_05
+  _targetText: {fileID: 4188004104206932641}
 --- !u!1001 &3335773316390926089
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2751,7 +2875,11 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+    - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontSizeBase
       value: 48
@@ -2759,7 +2887,7 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 0
@@ -2787,13 +2915,35 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -8319587466747323847}
   m_SourcePrefab: {fileID: 100100000, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
 --- !u!224 &95477066254395295 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3393532458673574038, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
   m_PrefabInstance: {fileID: 3335773316390926089}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &765546996077745341 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 3335773316390926089}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-8319587466747323847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 765546996077745341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: TrainDeparture_PopUp_UI_10
+  _targetText: {fileID: 5209210581183184065}
 --- !u!114 &1792062352593129232 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3933229204511864857, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
@@ -2805,6 +2955,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15fbc403b31e5a24eafadfcef0d724e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIButton
+--- !u!114 &5209210581183184065 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 3335773316390926089}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 765546996077745341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &9020115257431768997
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2904,7 +3065,11 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+    - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontSizeBase
       value: 48
@@ -2912,7 +3077,7 @@ PrefabInstance:
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+      objectReference: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 0
@@ -2940,8 +3105,22 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 640820117826966137}
   m_SourcePrefab: {fileID: 100100000, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+--- !u!114 &1958004044234044525 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 9020115257431768997}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6483261305408773137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!114 &5456181413593352124 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3933229204511864857, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
@@ -2958,3 +3137,22 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3393532458673574038, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
   m_PrefabInstance: {fileID: 9020115257431768997}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6483261305408773137 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2653966839845086132, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 9020115257431768997}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &640820117826966137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6483261305408773137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: TrainDeparture_PopUp_UI_09
+  _targetText: {fileID: 1958004044234044525}

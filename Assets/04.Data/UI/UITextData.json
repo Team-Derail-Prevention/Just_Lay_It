@@ -1,0 +1,1226 @@
+[
+  {
+    "Id": "Base_UI_LM_01",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "무기 뽑기",
+    "Text_En": "Weapon Gacha",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 48
+  },
+  {
+    "Id": "Base_UI_LM_02",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "열차 업글",
+    "Text_En": "Train Upgrade",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "Base_UI_LM_03",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "인벤토리",
+    "Text_En": "Inventory",
+    "FontSiz_Ko": 38,
+    "FontSiz_En": 38
+  },
+  {
+    "Id": "Base_UI_LM_04",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "열차 수리",
+    "Text_En": "Train Repair",
+    "FontSiz_Ko": 38,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "Base_UI_LM_05",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "열차 출발",
+    "Text_En": "Departure",
+    "FontSiz_Ko": 38,
+    "FontSiz_En": 38
+  },
+  {
+    "Id": "Base_UI_LM_Button_hover_01",
+    "Place": "BaseArrivalUI_Button_hover",
+    "Text_Ko": "무기 가챠 1회 현재 가격 : 돌 {0}.\n열차에 장착할 수 있는 무기를 랜덤으로 3개 뽑고, 하나를 정해서 인벤토리로 가져갈 수 있습니다.\n무기 가챠 비용은 구매시마다 5씩 증가합니다.",
+    "Text_En": "Current weapon gacha price: {0} Stone.\nRandomly draw three weapons that can be mounted on your train, then choose one to take to your inventory.\nThe gacha cost increases by 5 with each purchase.",
+    "FontSiz_Ko": 26,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "Base_UI_LM_Button_hover_02",
+    "Place": "BaseArrivalUI_Button_hover",
+    "Text_Ko": "전투, 적재, 드론에 관련된 업그레이드를 할 수 있습니다.\n이 업그레이드는 새 게임에는 적용되지 않습니다.",
+    "Text_En": "You can make upgrades related to combat, equipment, and drones.\nThis upgrade does not apply to the new game.",
+    "FontSiz_Ko": 26,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "Base_UI_LM_Button_hover_03",
+    "Place": "BaseArrivalUI_Button_hover",
+    "Text_Ko": "뽑기를 통해 얻은 무기를 보관합니다.\n무기를 좌클릭 드래그를 이용해, 열차에 장착하거나, 열차에 장착된 무기를 인벤토리로 집어넣을 수 있습니다.\n무기를 우클릭하면 해당 무기를 판매할 수 있습니다.",
+    "Text_En": "Store the weapon you obtained through the draw.\nWeapons can be mounted on the train by left-clicking and dragging them out, or you can add weapons already mounted on the train to the inventory.\nTo sell a weapon, right-click the weapon.",
+    "FontSiz_Ko": 26,
+    "FontSiz_En": 22
+  },
+  {
+    "Id": "Base_UI_LM_Button_hover_04",
+    "Place": "BaseArrivalUI_Button_hover",
+    "Text_Ko": "베이스에서 밖으로 출발할 방향을 선택해서 출발합니다. (동, 서, 남, 북)",
+    "Text_En": "Exit the base and choose the direction to depart. (East, west, south, north)",
+    "FontSiz_Ko": 26,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "Base_UI_LM_Button_hover_05",
+    "Place": "BaseArrivalUI_Button_hover",
+    "Text_Ko": "현재 열차의 체력은 {0}% 입니다.\n열차 수리 한번당 가격 : 돌 {1}개 이고 {2}%의 체력을 회복합니다.",
+    "Text_En": "The train's current durability is {0}%.\nEach repair costs {1} Stone and restores {2}% of durability.",
+    "FontSiz_Ko": 38,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "Base_UI_LT_01",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "운행 종료",
+    "Text_En": "Operation End",
+    "FontSiz_Ko": 38,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "Base_UI_RM_01",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "전 투",
+    "Text_En": "Battle",
+    "FontSiz_Ko": 26,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "Base_UI_RM_02",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "적 제",
+    "Text_En": "Cargo",
+    "FontSiz_Ko": 26,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "Base_UI_RM_03",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "드 론",
+    "Text_En": "Drone",
+    "FontSiz_Ko": 26,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "Base_UI_RB_01",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "1번칸",
+    "Text_En": "Car 1",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "Base_UI_RB_02",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "2번칸",
+    "Text_En": "Car 2",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "Base_UI_RB_03",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "3번칸",
+    "Text_En": "Car 3",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "Base_UI_RML_01",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "체력",
+    "Text_En": "HP",
+    "FontSiz_Ko": 24,
+    "FontSiz_En": 24
+  },
+  {
+    "Id": "Base_UI_RML_02",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "방어력",
+    "Text_En": "Defense",
+    "FontSiz_Ko": 24,
+    "FontSiz_En": 24
+  },
+  {
+    "Id": "Base_UI_RMM_01",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "현재 적제량",
+    "Text_En": "Current Cargo",
+    "FontSiz_Ko": 24,
+    "FontSiz_En": 20
+  },
+  {
+    "Id": "Base_UI_RMM_02",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "적제 한계량",
+    "Text_En": "Cargo Limit",
+    "FontSiz_Ko": 24,
+    "FontSiz_En": 24
+  },
+  {
+    "Id": "Base_UI_RMM_03",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "탑승 가능",
+    "Text_En": "Passenger",
+    "FontSiz_Ko": 24,
+    "FontSiz_En": 22
+  },
+  {
+    "Id": "Base_UI_RMR_01",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "체집 속도",
+    "Text_En": "Gather Speed",
+    "FontSiz_Ko": 24,
+    "FontSiz_En": 22
+  },
+  {
+    "Id": "Base_UI_RMR_02",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "체집 효율",
+    "Text_En": "Efficiency",
+    "FontSiz_Ko": 24,
+    "FontSiz_En": 24
+  },
+  {
+    "Id": "Base_UI_RMR_03",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "행동 속도",
+    "Text_En": "Move Speed",
+    "FontSiz_Ko": 24,
+    "FontSiz_En": 22
+  },
+  {
+    "Id": "Lobby_UI_01",
+    "Place": "LobbyUI",
+    "Text_Ko": "게임 시작",
+    "Text_En": "Game Start",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "Lobby_UI_02",
+    "Place": "LobbyUI",
+    "Text_Ko": "업그레이드",
+    "Text_En": "Upgrade",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "Lobby_UI_03",
+    "Place": "LobbyUI",
+    "Text_Ko": "도 감",
+    "Text_En": "Dictionary",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "Lobby_UI_04",
+    "Place": "LobbyUI",
+    "Text_Ko": "설 정",
+    "Text_En": "Setting",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "Lobby_UI_05",
+    "Place": "LobbyUI",
+    "Text_Ko": "게임 종료",
+    "Text_En": "Exit",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "LobbyUpgrade_UI_01",
+    "Place": "LobbyUpgradeUI",
+    "Text_Ko": "나가기",
+    "Text_En": "Exit",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "LobbyUpgrade_UI_02",
+    "Place": "LobbyUpgradeUI",
+    "Text_Ko": "구 매",
+    "Text_En": "Buy",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "LobbyUpgrade_UI_03",
+    "Place": "LobbyUpgradeUI",
+    "Text_Ko": "판 매",
+    "Text_En": "Sale",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "LobbyUpgrade_UI_04",
+    "Place": "LobbyUpgradeUI",
+    "Text_Ko": "전부판매",
+    "Text_En": "All Sale",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "StationArrival_UI_ML_01",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "돌",
+    "Text_En": "    Stone",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "StationArrival_UI_ML_02",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "정거장 보유 돌",
+    "Text_En": "Storage Stone",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "StationArrival_UI_ML_03",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "가져갈 양",
+    "Text_En": "Take Amount",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "StationArrival_UI_ML_04",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "기 입 하 기",
+    "Text_En": "Fill in",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "StationArrival_UI_MM_01",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "시 민",
+    "Text_En": "  Citizen",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "StationArrival_UI_MM_02",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "정거장 보유 시민",
+    "Text_En": "Station citizen",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "StationArrival_UI_MM_03",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "탑승 시킬 인원",
+    "Text_En": "Passenger",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "StationArrival_UI_MM_04",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "기 입 하 기",
+    "Text_En": "Fill in",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "StationArrival_UI_MR_01",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "열 차 수 리",
+    "Text_En": "Train Repair",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "StationArrival_UI_MR_02",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "열 차 내 구 도",
+    "Text_En": "Train HP",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "StationArrival_UI_MR_03",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "수 리 비 용",
+    "Text_En": "Repair cost",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "StationArrival_UI_MR_04",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "수 리 하 기",
+    "Text_En": "Repair",
+    "FontSiz_Ko": 32,
+    "FontSiz_En": 32
+  },
+  {
+    "Id": "HudMinimap_UI_01",
+    "Place": "HudMinimapUI",
+    "Text_Ko": "기지",
+    "Text_En": "Base",
+    "FontSiz_Ko": 20,
+    "FontSiz_En": 20
+  },
+  {
+    "Id": "HudMinimap_UI_02",
+    "Place": "HudMinimapUI",
+    "Text_Ko": "기차",
+    "Text_En": "Train",
+    "FontSiz_Ko": 20,
+    "FontSiz_En": 17
+  },
+  {
+    "Id": "HudMinimap_UI_03",
+    "Place": "HudMinimapUI",
+    "Text_Ko": "정거장",
+    "Text_En": "Station",
+    "FontSiz_Ko": 16,
+    "FontSiz_En": 16
+  },
+  {
+    "Id": "RailBuild_UI_01",
+    "Place": "RailBuildUI",
+    "Text_Ko": "자 동 제 작",
+    "Text_En": "Auto Make",
+    "FontSiz_Ko": 18,
+    "FontSiz_En": 17
+  },
+  {
+    "Id": "RailBuild_UI_02",
+    "Place": "RailBuildUI",
+    "Text_Ko": "설 치",
+    "Text_En": "Install",
+    "FontSiz_Ko": 24,
+    "FontSiz_En": 24
+  },
+  {
+    "Id": "RailBuild_UI_03",
+    "Place": "RailBuildUI",
+    "Text_Ko": "Key 'W' - 설치 / 채취 On or Off ",
+    "Text_En": "Key 'W' - Set / Take On or Off",
+    "FontSiz_Ko": 15,
+    "FontSiz_En": 15
+  },
+  {
+    "Id": "RailBuild_UI_04",
+    "Place": "RailBuildUI",
+    "Text_Ko": "Key 'V' - 드론 행동 취소",
+    "Text_En": "Key 'V\" - Drone abort action",
+    "FontSiz_Ko": 15,
+    "FontSiz_En": 15
+  },
+  {
+    "Id": "RailPlaceConfirm_PopUp_UI_01",
+    "Place": "RailPlaceConfirmPopup",
+    "Text_Ko": "취소",
+    "Text_En": "Back",
+    "FontSiz_Ko": 30,
+    "FontSiz_En": 30
+  },
+  {
+    "Id": "RailPlaceConfirm_PopUp_UI_02",
+    "Place": "RailPlaceConfirmPopup",
+    "Text_Ko": "설치",
+    "Text_En": "Install",
+    "FontSiz_Ko": 30,
+    "FontSiz_En": 30
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_01",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "게임을 종료하겠습니까?",
+    "Text_En": "Exit the Game?",
+    "FontSiz_Ko": 60,
+    "FontSiz_En": 60
+  },
+  {
+    "Id": "GameBook_PopUp_UI_01",
+    "Place": "GameBookUI",
+    "Text_Ko": "데미지",
+    "Text_En": "Damage",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "GameBook_PopUp_UI_02",
+    "Place": "GameBookUI",
+    "Text_Ko": "연사력",
+    "Text_En": "RPM",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "GameBook_PopUp_UI_03",
+    "Place": "GameBookUI",
+    "Text_Ko": "사거리",
+    "Text_En": "Range",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "GameBook_PopUp_UI_04",
+    "Place": "GameBookUI",
+    "Text_Ko": "탄창",
+    "Text_En": "Magazine",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "GameBook_PopUp_UI_05",
+    "Place": "GameBookUI",
+    "Text_Ko": "재장전",
+    "Text_En": "Reload",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "GameBook_PopUp_UI_06",
+    "Place": "GameBookUI",
+    "Text_Ko": "무\n기",
+    "Text_En": "G\nU\nN",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 30
+  },
+  {
+    "Id": "GameBook_PopUp_UI_07",
+    "Place": "GameBookUI",
+    "Text_Ko": "몬\n스\n터",
+    "Text_En": "B\no\nT",
+    "FontSiz_Ko": 30,
+    "FontSiz_En": 30
+  },
+  {
+    "Id": "GameClearResult_PopUp_UI_01",
+    "Place": "GameClearResultUI",
+    "Text_Ko": "총 플레이 운행 거리 ",
+    "Text_En": "Total play operating distance",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "GameClearResult_PopUp_UI_02",
+    "Place": "GameClearResultUI",
+    "Text_Ko": "총 플레이 시간",
+    "Text_En": "Total playtime",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "GameClearResult_PopUp_UI_03",
+    "Place": "GameClearResultUI",
+    "Text_Ko": "총 플레이 시민 구출 수",
+    "Text_En": "Total number of citizen rescues ",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "GameClearResult_PopUp_UI_04",
+    "Place": "GameClearResultUI",
+    "Text_Ko": "총 플레이 획득 나무",
+    "Text_En": "Total play acquisition tree",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "GameClearResult_PopUp_UI_05",
+    "Place": "GameClearResultUI",
+    "Text_Ko": "총 플레이 획득 돌",
+    "Text_En": "Total play acquisition stones",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "GameClearResult_PopUp_UI_06",
+    "Place": "GameClearResultUI",
+    "Text_Ko": "총 플레이 몬스터 킬 수",
+    "Text_En": "Total play monster kills",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "GameClearResult_PopUp_UI_07",
+    "Place": "GameClearResultUI",
+    "Text_Ko": "총 플레이 선로 제작 수",
+    "Text_En": "Total number of Make Rail",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "GameClearResult_PopUp_UI_8",
+    "Place": "GameClearResultUI",
+    "Text_Ko": "총 플레이 선로 설치 수",
+    "Text_En": "Total number of Install Rail",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "GameClearResult_PopUp_UI_9",
+    "Place": "GameClearResultUI",
+    "Text_Ko": "총 플레이 획득 캐쉬 수",
+    "Text_En": "Total play acquisition cash count",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "GameClearResult_PopUp_UI_10",
+    "Place": "GameClearResultUI",
+    "Text_Ko": "게임 플레이 횟수",
+    "Text_En": "Number of game plays",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "GameClearResult_PopUp_UI_11",
+    "Place": "GameClearResultUI",
+    "Text_Ko": "수고하신 분들\n팀 : 탈선방지위원회\n맵 & QA : 팀장 : 이0헌\nUI : 신0준\n몬스터 : 나0준\n기차 : 정0진\n드론 & 사운드 : 이0영\n선로 & 무기 : 강0창",
+    "Text_En": "Those who worked hard\nTeam: Committee for Preventing Derailment\nMap & QA: Team Leader: Lee 0-heon\nUI: Shin 0-jun\nMonster: Na0jun\nTrain: Jeong 0-jin\nDrone & Sound: Lee 0-Young\nTracks & Weapons: Kang 0 Chang",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "GameClearResult_PopUp_UI_12",
+    "Place": "GameClearResultUI",
+    "Text_Ko": "이로써 모든 난이도 클리어를 달성 하셨습니다.\n다시한번 축하드립니다.\n저희 게임을 플레이해주셔 감사드립니다.",
+    "Text_En": "With this, you have achieved a clear at all difficulties.\nCongratulations once again.\nThank you for playing our game.",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
+  },
+  {
+    "Id": "GameStartCountdown_PopUp_UI_01",
+    "Place": "GameStartCountdownPopup",
+    "Text_Ko": "{0}' 초 후 열차가 출발 합니다.",
+    "Text_En": "The train will depart in {0} seconds.",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "InGameMenu_PopUp_UI_01",
+    "Place": "InGameMenuPopup",
+    "Text_Ko": "설 정",
+    "Text_En": "Setting",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "InGameMenu_PopUp_UI_02",
+    "Place": "InGameMenuPopup",
+    "Text_Ko": "로비로 나가기",
+    "Text_En": "Out Lobby",
+    "FontSiz_Ko": 32,
+    "FontSiz_En": 32
+  },
+  {
+    "Id": "InGameMenu_PopUp_UI_03",
+    "Place": "InGameMenuPopup",
+    "Text_Ko": "게임 종료",
+    "Text_En": "Game End",
+    "FontSiz_Ko": 32,
+    "FontSiz_En": 32
+  },
+  {
+    "Id": "InGameMenu_PopUp_UI_04",
+    "Place": "InGameMenuPopup",
+    "Text_Ko": "취 소",
+    "Text_En": "Exit",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "Score_PopUp_UI_01",
+    "Place": "ScoreUI",
+    "Text_Ko": "운행 결과 : ",
+    "Text_En": "Result",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "Score_PopUp_UI_02",
+    "Place": "ScoreUI",
+    "Text_Ko": "운행 거리 ",
+    "Text_En": "operating distance",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "Score_PopUp_UI_03",
+    "Place": "ScoreUI",
+    "Text_Ko": "구출한 시민 수",
+    "Text_En": "number of citizen rescues",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "Score_PopUp_UI_04",
+    "Place": "ScoreUI",
+    "Text_Ko": "총 획득 자원",
+    "Text_En": "Total Resources Obtained",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "Score_PopUp_UI_05",
+    "Place": "ScoreUI",
+    "Text_Ko": "죽인 몬스터 수",
+    "Text_En": "monster kills",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "Setting_PopUp_UI_TL_01",
+    "Place": "SettingUI",
+    "Text_Ko": "배경음",
+    "Text_En": "BGM",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "Setting_PopUp_UI_TL_02",
+    "Place": "SettingUI",
+    "Text_Ko": "효과음",
+    "Text_En": "SFX",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "Setting_PopUp_UI_BL_01",
+    "Place": "SettingUI",
+    "Text_Ko": "언 어",
+    "Text_En": "Language",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "Setting_PopUp_UI_BL_02",
+    "Place": "SettingUI",
+    "Text_Ko": "언어 선택",
+    "Text_En": "Choice",
+    "FontSiz_Ko": 30,
+    "FontSiz_En": 30
+  },
+  {
+    "Id": "Setting_PopUp_UI_TR_01",
+    "Place": "SettingUI",
+    "Text_Ko": "디스플레이",
+    "Text_En": "Display",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "Setting_PopUp_UI_TR_02",
+    "Place": "SettingUI",
+    "Text_Ko": "디스플레이 모드",
+    "Text_En": "Choice",
+    "FontSiz_Ko": 30,
+    "FontSiz_En": 30
+  },
+  {
+    "Id": "Setting_PopUp_UI_TR_03",
+    "Place": "SettingUI",
+    "Text_Ko": "창 모드",
+    "Text_En": "Window mode",
+    "FontSiz_Ko": 30,
+    "FontSiz_En": 30
+  },
+  {
+    "Id": "Setting_PopUp_UI_TR_04",
+    "Place": "SettingUI",
+    "Text_Ko": "전체 화면",
+    "Text_En": "Full screen",
+    "FontSiz_Ko": 30,
+    "FontSiz_En": 30
+  },
+  {
+    "Id": "Setting_PopUp_UI_TR_05",
+    "Place": "SettingUI",
+    "Text_Ko": "테두리 없음",
+    "Text_En": "No border",
+    "FontSiz_Ko": 30,
+    "FontSiz_En": 30
+  },
+  {
+    "Id": "Setting_PopUp_UI_BR_01",
+    "Place": "SettingUI",
+    "Text_Ko": "기본값으로 재설정",
+    "Text_En": "Reset to default",
+    "FontSiz_Ko": 35,
+    "FontSiz_En": 35
+  },
+  {
+    "Id": "Setting_PopUp_UI_BR_02",
+    "Place": "SettingUI",
+    "Text_Ko": "변경 사항 저장",
+    "Text_En": "Save changes",
+    "FontSiz_Ko": 35,
+    "FontSiz_En": 35
+  },
+  {
+    "Id": "Setting_PopUp_UI_BR_03",
+    "Place": "SettingUI",
+    "Text_Ko": "뒤로가기",
+    "Text_En": "Back",
+    "FontSiz_Ko": 35,
+    "FontSiz_En": 35
+  },
+  {
+    "Id": "StageSelect_PopUp_UI_01",
+    "Place": "StageSelectPopup",
+    "Text_Ko": "보 통",
+    "Text_En": "Normal",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "StageSelect_PopUp_UI_02",
+    "Place": "StageSelectPopup",
+    "Text_Ko": "어 려 움",
+    "Text_En": "Hard",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "StageSelect_PopUp_UI_03",
+    "Place": "StageSelectPopup",
+    "Text_Ko": "매 우 어 려 움",
+    "Text_En": "Very Hard",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "StageSelect_PopUp_UI_04",
+    "Place": "StageSelectPopup",
+    "Text_Ko": "취 소",
+    "Text_En": "Exit",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "TextInput_PopUp_UI_01",
+    "Place": "TextInputPopup",
+    "Text_Ko": "원하는 숫자를 기입 하세요.",
+    "Text_En": "Enter the desired number.",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "TextInput_PopUp_UI_02",
+    "Place": "TextInputPopup",
+    "Text_Ko": "(기입 후 'Enter', 취소 'Esc')",
+    "Text_En": "(\"Enter\" confirm, \"Esc\" cancel)",
+    "FontSiz_Ko": 24,
+    "FontSiz_En": 24
+  },
+  {
+    "Id": "TextInput_PopUp_UI_03",
+    "Place": "TextInputPopup",
+    "Text_Ko": "클릭하세요",
+    "Text_En": "Click",
+    "FontSiz_Ko": 30,
+    "FontSiz_En": 30
+  },
+  {
+    "Id": "TrainDeparture_PopUp_UI_01",
+    "Place": "TrainDepartureUI",
+    "Text_Ko": "동쪽 방향",
+    "Text_En": "East",
+    "FontSiz_Ko": 45,
+    "FontSiz_En": 45
+  },
+  {
+    "Id": "TrainDeparture_PopUp_UI_02",
+    "Place": "TrainDepartureUI",
+    "Text_Ko": "동쪽 방향",
+    "Text_En": "East",
+    "FontSiz_Ko": 45,
+    "FontSiz_En": 45
+  },
+  {
+    "Id": "TrainDeparture_PopUp_UI_03",
+    "Place": "TrainDepartureUI",
+    "Text_Ko": "서쪽 방향",
+    "Text_En": "West",
+    "FontSiz_Ko": 45,
+    "FontSiz_En": 45
+  },
+  {
+    "Id": "TrainDeparture_PopUp_UI_04",
+    "Place": "TrainDepartureUI",
+    "Text_Ko": "서쪽 방향",
+    "Text_En": "West",
+    "FontSiz_Ko": 45,
+    "FontSiz_En": 45
+  },
+  {
+    "Id": "TrainDeparture_PopUp_UI_05",
+    "Place": "TrainDepartureUI",
+    "Text_Ko": "남쪽 방향",
+    "Text_En": "South",
+    "FontSiz_Ko": 45,
+    "FontSiz_En": 45
+  },
+  {
+    "Id": "TrainDeparture_PopUp_UI_06",
+    "Place": "TrainDepartureUI",
+    "Text_Ko": "남쪽 방향",
+    "Text_En": "South",
+    "FontSiz_Ko": 45,
+    "FontSiz_En": 45
+  },
+  {
+    "Id": "TrainDeparture_PopUp_UI_07",
+    "Place": "TrainDepartureUI",
+    "Text_Ko": "북쪽 방향",
+    "Text_En": "North",
+    "FontSiz_Ko": 45,
+    "FontSiz_En": 45
+  },
+  {
+    "Id": "TrainDeparture_PopUp_UI_08",
+    "Place": "TrainDepartureUI",
+    "Text_Ko": "북쪽 방향",
+    "Text_En": "North",
+    "FontSiz_Ko": 45,
+    "FontSiz_En": 45
+  },
+  {
+    "Id": "TrainDeparture_PopUp_UI_09",
+    "Place": "TrainDepartureUI",
+    "Text_Ko": "열 차 출 발",
+    "Text_En": "Departure",
+    "FontSiz_Ko": 48,
+    "FontSiz_En": 48
+  },
+  {
+    "Id": "TrainDeparture_PopUp_UI_10",
+    "Place": "TrainDepartureUI",
+    "Text_Ko": "출 발 취 소",
+    "Text_En": "Exit",
+    "FontSiz_Ko": 48,
+    "FontSiz_En": 48
+  },
+  {
+    "Id": "TrainStrengthening_PopUp_UI_01",
+    "Place": "TrainStrengtheningUI",
+    "Text_Ko": "전 투",
+    "Text_En": "Battle",
+    "FontSiz_Ko": 26,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "TrainStrengthening_PopUp_UI_02",
+    "Place": "TrainStrengtheningUI",
+    "Text_Ko": "적 제",
+    "Text_En": "Cargo",
+    "FontSiz_Ko": 26,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "TrainStrengthening_PopUp_UI_03",
+    "Place": "TrainStrengtheningUI",
+    "Text_Ko": "드 론",
+    "Text_En": "Drone",
+    "FontSiz_Ko": 26,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "TrainStrengthening_PopUp_UI_04",
+    "Place": "TrainStrengtheningUI",
+    "Text_Ko": "구 매 하 기",
+    "Text_En": "Buy",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "WeaponGacha_PopUp_UI_01",
+    "Place": "WeaponGachaUI",
+    "Text_Ko": "<<< 상자를 여는중",
+    "Text_En": "<<< Opening box",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "WeaponGacha_PopUp_UI_02",
+    "Place": "WeaponGachaUI",
+    "Text_Ko": "무 기 상 자",
+    "Text_En": "Gun box",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "WeaponGacha_PopUp_UI_03",
+    "Place": "WeaponGachaUI",
+    "Text_Ko": "리롤 가능 횟 수 :  00",
+    "Text_En": "Possible Rerolls: 00",
+    "FontSiz_Ko": 26,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "WeaponGacha_PopUp_UI_04",
+    "Place": "WeaponGachaUI",
+    "Text_Ko": "전부 다시 굴림",
+    "Text_En": "All Rerolls",
+    "FontSiz_Ko": 20,
+    "FontSiz_En": 20
+  },
+  {
+    "Id": "Loading_UI_01",
+    "Place": "LoadingUI",
+    "Text_Ko": "기지를 향해 나아가는 중 {0}%",
+    "Text_En": "Heading toward the base {0}%",
+    "FontSiz_Ko": 45,
+    "FontSiz_En": 45
+  },
+  {
+    "Id": "StationArrival_UI_01",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "열 차 출 발",
+    "Text_En": "Departure",
+    "FontSiz_Ko": 65,
+    "FontSiz_En": 65
+  },
+  {
+    "Id": "Score_PopUp_UI_06",
+    "Place": "ScoreUI",
+    "Text_Ko": "운행 중간 점검",
+    "Text_En": "Midterm Result",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "Score_PopUp_UI_07",
+    "Place": "ScoreUI",
+    "Text_Ko": "운행 결과 : Game Clear",
+    "Text_En": "Result : Game Clear",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "Score_PopUp_UI_08",
+    "Place": "ScoreUI",
+    "Text_Ko": "운행 결과 : Game Over",
+    "Text_En": "Result : Game Over",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "Score_PopUp_UI_09",
+    "Place": "ScoreUI",
+    "Text_Ko": "운행 결과 : Simple Clear",
+    "Text_En": "Result : Simple Clear",
+    "FontSiz_Ko": 50,
+    "FontSiz_En": 50
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_02",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "돌이 부족합니다.",
+    "Text_En": "Not enough stone.",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_03",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "인 게임 내용은 저장되지 않습니다. 그래도 나가시겠습니까?",
+    "Text_En": "In-game progress will not be saved. Do you still want to exit?",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_04",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "재화가 부족합니다.",
+    "Text_En": "Not enough currency.",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_05",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "열차 체력이 이미 가득 찼습니다!",
+    "Text_En": "The train's durability is already full!",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_06",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "더 이상 가져갈 수 없습니다.\n(적재 한도 초과)",
+    "Text_En": "You can't take any more.\n(Cargo limit exceeded)",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_07",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "더 이상 탑승시킬 수 없습니다.\n(탑승 정원 초과)",
+    "Text_En": "No more passengers can board.\n(Boarding limit exceeded)",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_08",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "올바른 숫자를 입력해주세요.",
+    "Text_En": "Please enter a valid number.",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_09",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "인벤토리에 빈 칸이 없습니다.",
+    "Text_En": "There is no empty slot in the inventory.",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_10",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "무기가 인벤토리로 들어갔습니다.",
+    "Text_En": "The weapon has been added to your inventory.",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_11",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "캐쉬가 모자랍니다.",
+    "Text_En": "Not enough cash.",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_12",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "판매 할게 없습니다.",
+    "Text_En": "There is nothing to sell.",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_13",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "정말 모두 판매 하시겠습니까?",
+    "Text_En": "Are you sure you want to sell everything?",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_14",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "아직 열리지 않은 칸입니다.",
+    "Text_En": "This slot hasn't been unlocked yet.",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_15",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "이미 다른 무기가 장착된 칸입니다.",
+    "Text_En": "Another weapon is already equipped in this slot.",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "ExitConfirm_PopUp_UI_16",
+    "Place": "ExitConfirmPopup",
+    "Text_Ko": "이 증강을 판매하시겠습니까?",
+    "Text_En": "Do you want to sell this augment?",
+    "FontSiz_Ko": 42,
+    "FontSiz_En": 42
+  },
+  {
+    "Id": "StationArrival_TextInput_UI_01",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "가져갈 돌의 양을 입력하세요.\n(최대 {0})",
+    "Text_En": "Enter the amount of stone to take.\n(Max {0})",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "StationArrival_TextInput_UI_02",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "탑승시킬 인원을 입력하세요.\n(최대 {0})",
+    "Text_En": "Enter the number of passengers to board.\n(Max {0})",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "GameBook_PopUp_UI_08",
+    "Place": "GameBookUI",
+    "Text_Ko": "체력",
+    "Text_En": "HP",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "GameBook_PopUp_UI_09",
+    "Place": "GameBookUI",
+    "Text_Ko": "데미지",
+    "Text_En": "Damage",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "GameBook_PopUp_UI_10",
+    "Place": "GameBookUI",
+    "Text_Ko": "속도",
+    "Text_En": "Speed",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  },
+  {
+    "Id": "GameBook_PopUp_UI_11",
+    "Place": "GameBookUI",
+    "Text_Ko": "공격 타입",
+    "Text_En": "ATK Type",
+    "FontSiz_Ko": 26,
+    "FontSiz_En": 23
+  },
+  {
+    "Id": "GameBook_PopUp_UI_12",
+    "Place": "GameBookUI",
+    "Text_Ko": "획득 골드",
+    "Text_En": "Get Gold",
+    "FontSiz_Ko": 26,
+    "FontSiz_En": 26
+  },
+  {
+    "Id": "WeaponGacha_PopUp_UI_05",
+    "Place": "WeaponGachaUI",
+    "Text_Ko": "다시 굴림",
+    "Text_En": "Reroll",
+    "FontSiz_Ko": 20,
+    "FontSiz_En": 20
+  },
+  {
+    "Id": "WeaponGacha_PopUp_UI_06",
+    "Place": "WeaponGachaUI",
+    "Text_Ko": "무기 선택",
+    "Text_En": "Select",
+    "FontSiz_Ko": 20,
+    "FontSiz_En": 20
+  },
+  {
+    "Id": "StationArrival_UI_MR_05",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "무료",
+    "Text_En": "Free",
+    "FontSiz_Ko": 28,
+    "FontSiz_En": 28
+  }
+]

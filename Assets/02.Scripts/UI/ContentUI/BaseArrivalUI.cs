@@ -6,7 +6,6 @@ public class BaseArrivalUI : UIBase
 {
     private const int REPAIR_HEAL_PERCENT = 20; // 임시 값 추후
     private const int REPAIR_STONE_COST = 40; // 임시 값 추후
-    private const string InsufficientResourceMessage = "재화가 부족합니다.";
 
     [Header("자원 표시")]
     [SerializeField] private TextMeshProUGUI Text_Wood;
@@ -22,7 +21,7 @@ public class BaseArrivalUI : UIBase
     [SerializeField] private UIButton Button_TrainRepair;
     [SerializeField] private UIButton Button_TrainDeparture;
 
-    [Header("자제 창고 버튼")]
+    [Header("로비 나가기")]
     [SerializeField] private UIButton Button_Warehouse;
 
     [Header("버튼 설명 표시")]
@@ -80,7 +79,7 @@ public class BaseArrivalUI : UIBase
         if (Button_Inventory != null) Button_Inventory.BindOnClickButtonEvent(OnClick_Inventory);
         if (Button_TrainRepair != null) Button_TrainRepair.BindOnClickButtonEvent(OnClick_TrainRepair);
         if (Button_TrainDeparture != null) Button_TrainDeparture.BindOnClickButtonEvent(OnClick_TrainDeparture);
-        if (Button_Warehouse != null) Button_Warehouse.BindOnClickButtonEvent(OnClick_Warehouse);
+        if (Button_Warehouse != null) Button_Warehouse.BindOnClickButtonEvent(OnClick_ReturnToLobby);
 
         BindButtonDescriptionEvents();
     }
@@ -92,7 +91,7 @@ public class BaseArrivalUI : UIBase
         if (Button_Inventory != null) Button_Inventory.UnBindOnClickButtonEvent(OnClick_Inventory);
         if (Button_TrainRepair != null) Button_TrainRepair.UnBindOnClickButtonEvent(OnClick_TrainRepair);
         if (Button_TrainDeparture != null) Button_TrainDeparture.UnBindOnClickButtonEvent(OnClick_TrainDeparture);
-        if (Button_Warehouse != null) Button_Warehouse.UnBindOnClickButtonEvent(OnClick_Warehouse);
+        if (Button_Warehouse != null) Button_Warehouse.UnBindOnClickButtonEvent(OnClick_ReturnToLobby);
 
         UnbindButtonDescriptionEvents();
     }
@@ -148,10 +147,8 @@ public class BaseArrivalUI : UIBase
             curHpPercent = Mathf.RoundToInt(_currentTrainHp / _currentTrainMaxHp * 100f);
         }
 
-        bool isFreeAvailable = NetworkResourceService.Instance != null && NetworkResourceService.Instance.IsBaseRepairFreeAvailable;
-        string costText = isFreeAvailable ? "무료 (첫 1회)" : $"돌 {REPAIR_STONE_COST}개";
-
-        Text_BK.text = $"현재 열차의 체력은 {curHpPercent}% 입니다.\n열차 수리 한번당 가격 : 돌 {REPAIR_STONE_COST}개 이고 {REPAIR_HEAL_PERCENT}%의 체력을 회복합니다.";
+        string template = LocalizationManager.Instance.GetText("Base_UI_LM_Button_hover_05");
+        Text_BK.text = string.Format(template, curHpPercent, REPAIR_STONE_COST, REPAIR_HEAL_PERCENT);
     }
 
     private void OnWeaponGachaHoverEnter(string description)
@@ -168,7 +165,8 @@ public class BaseArrivalUI : UIBase
         }
 
         int gachaCost = NetworkGachaService.Instance.CurrentGachaCost;
-        Text_BK.text = $"무기 가챠 1회 현재 가격 : 돌 {gachaCost}. \n열차에 장착할 수 있는 무기를 랜덤으로 3개 뽑고, 하나를 정해서 인벤토리로 가져갈 수 있습니다.\n무기 가챠 비용은 구매시마다 5씩 증가합니다.";
+        string template = LocalizationManager.Instance.GetText("Base_UI_LM_Button_hover_01");
+        Text_BK.text = string.Format(template, gachaCost);
     }
 
     private void OnButtonHoverExit()
@@ -236,7 +234,7 @@ public class BaseArrivalUI : UIBase
         if (NetworkResourceService.Instance.HasEnoughStone(cost) == false)
         {
             SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Denied);
-            UIManager.Instance.OpenExitConfirmPopup(null, null, InsufficientResourceMessage);
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_04"));
             return false;
         }
 
@@ -276,7 +274,7 @@ public class BaseArrivalUI : UIBase
         if (GameManager.Train != null && GameManager.Train.IsTrainHpFull())
         {
             SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Denied);
-            UIManager.Instance.OpenExitConfirmPopup(null, null, "열차 체력이 이미 가득 찼습니다!");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_05"));
             return;
         }
 
@@ -299,8 +297,8 @@ public class BaseArrivalUI : UIBase
         UIManager.Instance.OpenTrainDepartureUI();
     }
 
-    private void OnClick_Warehouse()
+    private void OnClick_ReturnToLobby()
     {
-        UIManager.Instance.OpenWarehouseUI();
+        GameManager.Instance.GiveUpRun();
     }
 }

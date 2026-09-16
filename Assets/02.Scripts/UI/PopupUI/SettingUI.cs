@@ -2,6 +2,8 @@
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using TMPro;
+using Enums;
+using System.Collections.Generic;
 
 public class SettingUI : UIBase
 {
@@ -9,6 +11,7 @@ public class SettingUI : UIBase
     [SerializeField] private Slider _sliderBgmVolume;
     [SerializeField] private Slider _sliderSfxVolume;
     [SerializeField] private TMP_Dropdown _dropdownDisplayMode;
+    [SerializeField] private TMP_Dropdown _dropdownLanguage;
 
     [Header("버튼 연결")]
     [SerializeField] private UIButton _btnReset;
@@ -21,15 +24,19 @@ public class SettingUI : UIBase
 
     private void OnEnable()
     {
+        RefreshDisplayModeOptions();
         LoadSavedSettings();
 
         _sliderBgmVolume.onValueChanged.AddListener(OnBgmVolumeChanged);
         _sliderSfxVolume.onValueChanged.AddListener(OnSfxVolumeChanged);
         _dropdownDisplayMode.onValueChanged.AddListener(OnDisplayModeChanged);
+        _dropdownLanguage.onValueChanged.AddListener(OnLanguageChanged);
 
         _btnReset.BindOnClickButtonEvent(OnClick_Reset);
         _btnSave.BindOnClickButtonEvent(OnClick_Save);
         _btnBack.BindOnClickButtonEvent(OnClick_Back);
+
+        LocalizationEventHub.Instance.OnLanguageChanged += OnLanguageChanged_LocalizationEventHub;
     }
 
     private void OnDisable()
@@ -37,10 +44,39 @@ public class SettingUI : UIBase
         _sliderBgmVolume.onValueChanged.RemoveListener(OnBgmVolumeChanged);
         _sliderSfxVolume.onValueChanged.RemoveListener(OnSfxVolumeChanged);
         _dropdownDisplayMode.onValueChanged.RemoveListener(OnDisplayModeChanged);
+        _dropdownLanguage.onValueChanged.RemoveListener(OnLanguageChanged);
 
         _btnReset.UnBindOnClickButtonEvent(OnClick_Reset);
         _btnSave.UnBindOnClickButtonEvent(OnClick_Save);
         _btnBack.UnBindOnClickButtonEvent(OnClick_Back);
+
+        if (LocalizationEventHub.Instance != null)
+        {
+            LocalizationEventHub.Instance.OnLanguageChanged -= OnLanguageChanged_LocalizationEventHub;
+        }
+    }
+
+    private void OnLanguageChanged_LocalizationEventHub(LanguageType language)
+    {
+        RefreshDisplayModeOptions();
+    }
+
+    private void RefreshDisplayModeOptions()
+    {
+        int currentValue = _dropdownDisplayMode.value;
+
+        _dropdownDisplayMode.ClearOptions();
+
+        List<string> options = new List<string>
+        {
+            LocalizationManager.Instance.GetText("Setting_PopUp_UI_TR_03"),
+            LocalizationManager.Instance.GetText("Setting_PopUp_UI_TR_04"),
+            LocalizationManager.Instance.GetText("Setting_PopUp_UI_TR_05")
+        };
+
+        _dropdownDisplayMode.AddOptions(options);
+        _dropdownDisplayMode.SetValueWithoutNotify(currentValue);
+        _dropdownDisplayMode.RefreshShownValue();
     }
 
     private void Update()
@@ -62,13 +98,17 @@ public class SettingUI : UIBase
         _savedSfxVolume = SaveManager.Instance.SfxVolume;
         _savedDisplayMode = SaveManager.Instance.DisplayMode;
 
+        int savedLanguage = (int)SaveManager.Instance.Language;
+
         _sliderBgmVolume.value = _savedBgmVolume;
         _sliderSfxVolume.value = _savedSfxVolume;
         _dropdownDisplayMode.value = _savedDisplayMode;
+        _dropdownLanguage.value = savedLanguage;
 
         ApplyBgmVolume(_savedBgmVolume);
         ApplySfxVolume(_savedSfxVolume);
         ApplyDisplayMode(_savedDisplayMode);
+        ApplyLanguage(savedLanguage);
     }
 
     private void OnBgmVolumeChanged(float value)
@@ -135,6 +175,16 @@ public class SettingUI : UIBase
         }
     }
 
+    private void OnLanguageChanged(int index)
+    {
+        ApplyLanguage(index);
+    }
+
+    private void ApplyLanguage(int index)
+    {
+        LocalizationManager.Instance.PreviewLanguage((LanguageType)index);
+    }
+
     private void OnClick_Reset()
     {
         SettingsSaveData defaults = new SettingsSaveData();
@@ -142,10 +192,12 @@ public class SettingUI : UIBase
         _sliderBgmVolume.value = defaults.BgmVolume;
         _sliderSfxVolume.value = defaults.SfxVolume;
         _dropdownDisplayMode.value = defaults.DisplayMode;
+        _dropdownLanguage.value = defaults.Language;
 
         ApplyBgmVolume(defaults.BgmVolume);
         ApplySfxVolume(defaults.SfxVolume);
         ApplyDisplayMode(defaults.DisplayMode);
+        ApplyLanguage(defaults.Language);
     }
 
     private void OnClick_Save()
@@ -158,6 +210,8 @@ public class SettingUI : UIBase
         SaveManager.Instance.SfxVolume = _savedSfxVolume;
         SaveManager.Instance.DisplayMode = _savedDisplayMode;
 
+        LocalizationManager.Instance.CommitLanguage();
+
         Debug.Log("환경설정 저장 완료!");
     }
 
@@ -166,6 +220,7 @@ public class SettingUI : UIBase
         ApplyBgmVolume(_savedBgmVolume);
         ApplySfxVolume(_savedSfxVolume);
         ApplyDisplayMode(_savedDisplayMode);
+        LocalizationManager.Instance.RevertLanguage();
 
         UIManager.Instance.CloseSettingUI();
     }
