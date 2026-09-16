@@ -1,5 +1,7 @@
-﻿using UnityEngine;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using Enums;
+using TMPro;
+using UnityEngine;
 
 public class LobbyUI : UIBase
 {
@@ -8,6 +10,10 @@ public class LobbyUI : UIBase
     [SerializeField] private UIButton _btnDictionary;
     [SerializeField] private UIButton _btnSetting;
     [SerializeField] private UIButton _btnExit;
+    [SerializeField] private UIButton _btnTip;
+
+    [Header("스테이지 표시")]
+    [SerializeField] private TextMeshProUGUI _textStage;
 
     private bool _isStartingGame;
 
@@ -20,6 +26,11 @@ public class LobbyUI : UIBase
         _btnDictionary.BindOnClickButtonEvent(OnClick_Dictionary);
         _btnSetting.BindOnClickButtonEvent(OnClick_Setting);
         _btnExit.BindOnClickButtonEvent(OnClick_Exit);
+        _btnTip.BindOnClickButtonEvent(OnClick_Tip);
+
+        LocalizationEventHub.Instance.OnLanguageChanged += OnLanguageChanged_LocalizationEventHub;
+
+        RefreshStageText();
     }
 
     private void OnDisable()
@@ -29,6 +40,43 @@ public class LobbyUI : UIBase
         _btnDictionary.UnBindOnClickButtonEvent(OnClick_Dictionary);
         _btnSetting.UnBindOnClickButtonEvent(OnClick_Setting);
         _btnExit.UnBindOnClickButtonEvent(OnClick_Exit);
+        _btnTip.UnBindOnClickButtonEvent(OnClick_Tip);
+
+        if (LocalizationEventHub.Instance != null)
+        {
+            LocalizationEventHub.Instance.OnLanguageChanged -= OnLanguageChanged_LocalizationEventHub;
+        }
+    }
+
+    private void OnLanguageChanged_LocalizationEventHub(LanguageType language)
+    {
+        RefreshStageText();
+    }
+
+    private void RefreshStageText()
+    {
+        if (_textStage == null || GameManager.Instance == null)
+        {
+            return;
+        }
+
+        string stageTextId = GetStageLocalizationId(GameManager.Instance.CurrentGameStage);
+        _textStage.text = $"( {LocalizationManager.Instance.GetText(stageTextId)} )";
+    }
+
+    private string GetStageLocalizationId(GameStage stage)
+    {
+        switch (stage)
+        {
+            case GameStage.Stage1:
+                return "StageSelect_PopUp_UI_01";
+            case GameStage.Stage2:
+                return "StageSelect_PopUp_UI_02";
+            case GameStage.Stage3:
+                return "StageSelect_PopUp_UI_03";
+            default:
+                return "StageSelect_PopUp_UI_01";
+        }
     }
 
     private async void OnClick_GameStart()
@@ -73,5 +121,10 @@ public class LobbyUI : UIBase
     private void OnConfirmExit()
     {
         Application.Quit();
+    }
+
+    private void OnClick_Tip()
+    {
+        UIManager.Instance.OpenNoticePopup(null);
     }
 }

@@ -157,7 +157,7 @@ public class StationArrivalUI : UIBase
         }
 
         bool isFreeAvailable = NetworkResourceService.Instance != null && NetworkResourceService.Instance.IsStationRepairFreeAvailable;
-        Text_RepairCost.text = isFreeAvailable ? "무료" : REPAIR_STONE_COST.ToString();
+        Text_RepairCost.text = isFreeAvailable ? LocalizationManager.Instance.GetText("StationArrival_UI_MR_05") : REPAIR_STONE_COST.ToString();
     }
 
     private void RefreshTopIndicators()
@@ -200,15 +200,11 @@ public class StationArrivalUI : UIBase
         int maxAllowed = Mathf.Min(_stationAvailableStone, NetworkResourceService.Instance.RemainingCargoCapacity);
         if (maxAllowed <= 0)
         {
-            UIManager.Instance.OpenExitConfirmPopup(null, null, "더 이상 가져갈 수 없습니다.\n(적재 한도 초과)");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_06"));
             return;
         }
 
-        UIManager.Instance.OpenTextInputPopup(
-            $"가져갈 돌의 양을 입력하세요.\n(최대 {maxAllowed})",
-            OnStoneAmountConfirmed,
-            OnInvalidInputAlert,
-            maxAllowed);
+        UIManager.Instance.OpenTextInputPopup(string.Format(LocalizationManager.Instance.GetText("StationArrival_TextInput_UI_01"), maxAllowed),OnStoneAmountConfirmed,OnInvalidInputAlert,maxAllowed);
     }
 
     private void OnStoneAmountConfirmed(int amount)
@@ -222,15 +218,11 @@ public class StationArrivalUI : UIBase
         int maxAllowed = Mathf.Min(_stationAvailableCitizen, NetworkTrainCargoService.Instance.RemainingBoardingCapacity);
         if (maxAllowed <= 0)
         {
-            UIManager.Instance.OpenExitConfirmPopup(null, null, "더 이상 탑승시킬 수 없습니다.\n(탑승 정원 초과)");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_07"));
             return;
         }
 
-        UIManager.Instance.OpenTextInputPopup(
-            $"탑승시킬 인원을 입력하세요.\n(최대 {maxAllowed})",
-            OnCitizenAmountConfirmed,
-            OnInvalidInputAlert,
-            maxAllowed);
+        UIManager.Instance.OpenTextInputPopup(string.Format(LocalizationManager.Instance.GetText("StationArrival_TextInput_UI_02"), maxAllowed),OnCitizenAmountConfirmed,OnInvalidInputAlert,maxAllowed);
     }
 
     private void OnCitizenAmountConfirmed(int amount)
@@ -241,7 +233,7 @@ public class StationArrivalUI : UIBase
 
     private void OnInvalidInputAlert()
     {
-        UIManager.Instance.OpenExitConfirmPopup(null, null, "올바른 숫자를 입력해주세요.");
+        UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_08"));
     }
 
     private void OnClick_Repair()
@@ -249,7 +241,7 @@ public class StationArrivalUI : UIBase
         if (GameManager.Train != null && GameManager.Train.IsTrainHpFull())
         {
             SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Denied);
-            UIManager.Instance.OpenExitConfirmPopup(null, null, "열차 체력이 이미 가득 찼습니다!");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_05"));
             return;
         }
 
@@ -259,7 +251,7 @@ public class StationArrivalUI : UIBase
         if (isSpent == false)
         {
             SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Denied);
-            UIManager.Instance.OpenExitConfirmPopup(null, null, "돌이 부족합니다.");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_02"));
             return;
         }
 

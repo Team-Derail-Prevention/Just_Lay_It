@@ -315,6 +315,7 @@ public class GameManager : SingletonBase<GameManager>
 
         GameStage clearedStage = _currentGameStage;
         bool isFinalStage = clearedStage >= GameStage.Stage3;
+        bool isFirstFinalClear = isFinalStage && Save != null && Save.HasClearedAllStagesSpecial == false;
 
         if (!isFinalStage)
         {
@@ -330,17 +331,38 @@ public class GameManager : SingletonBase<GameManager>
         else
         {
             Debug.Log("[GameManager] Stage 3 최종 클리어!");
+
+            if (Save != null)
+            {
+                Save.HasClearedAllStagesSpecial = true;
+            }
         }
 
         OnGameCleared?.Invoke();
         FinalizeRunStatsAndGrantReward();
 
-        if (isFinalStage && Save != null)
+        if (isFirstFinalClear)
         {
-            Save.HasClearedAllStagesSpecial = true;
+            OpenGameClearResultUI(ReturnToLobby);
+        }
+        else
+        {
+            OpenScoreReport(ScoreResultType.GameClear, ReturnToLobby);
+        }
+    }
+
+    public void GiveUpRun()
+    {
+        if (CurrentGameState != GameState.EventPaused)
+        {
+            return;
         }
 
-        OpenGameClearResultUI(clearedStage, isFinalStage, ReturnToLobby);
+        ChangeGameState(GameState.GaveUp);
+        PauseGameplayTime();
+
+        FinalizeRunStatsAndGrantReward();
+        OpenScoreReport(ScoreResultType.SimpleClear, ReturnToLobby);
     }
 
 #if UNITY_EDITOR
@@ -377,13 +399,13 @@ public class GameManager : SingletonBase<GameManager>
         return snapshot;
     }
 
-    private void OpenGameClearResultUI(GameStage clearedStage, bool isFinalStage, Action onConfirm)
+    private void OpenGameClearResultUI(Action onConfirm)
     {
-        GameClearResultData resultData = BuildGameClearResultData(clearedStage, isFinalStage);
+        GameClearResultData resultData = BuildGameClearResultData();
         UI?.OpenGameClearResultUI(resultData, onConfirm);
     }
 
-    private GameClearResultData BuildGameClearResultData(GameStage clearedStage, bool isFinalStage)
+    private GameClearResultData BuildGameClearResultData()
     {
         GameClearResultData resultData = new GameClearResultData();
         resultData.TotalDistance = Save != null ? Save.LifetimeTotalDistance : 0f;
@@ -396,37 +418,9 @@ public class GameManager : SingletonBase<GameManager>
         resultData.RailInstalledCount = Save != null ? Save.LifetimeTotalRailInstalled : 0;
         resultData.EarnedCashCount = Save != null ? Save.LifetimeTotalEarnedCash : 0;
         resultData.TotalPlayCount = Save != null ? Save.TotalPlayCount : 0;
-        resultData.TitleMessage = BuildGameClearTitleMessage(clearedStage, isFinalStage);
-
-        resultData.NextStageNoticeMessage = isFinalStage
-            ? string.Empty
-            : "다음 난이도에 도전해 보세요.";
-
-        resultData.IsFinalStage = isFinalStage;
+        resultData.TitleMessage = LocalizationManager.Instance.GetText("GameClearResult_PopUp_UI_16");
 
         return resultData;
-    }
-
-    private string BuildGameClearTitleMessage(GameStage clearedStage, bool isFinalStage)
-    {
-        if (isFinalStage)
-        {
-            return "축하드립니다. 모든 난이도를 클리어하셨습니다.\n이로써 모든 난이도를 정복하셨습니다. 다시 한번 축하드립니다.";
-        }
-
-        GameStage nextStage = _currentGameStage;
-        return $"{GetStageDisplayName(clearedStage)} 난이도를 클리어하셨습니다.\n자동으로 게임 시작 시 {GetStageDisplayName(nextStage)} 난이도가 시작됩니다.";
-    }
-
-    private string GetStageDisplayName(GameStage stage)
-    {
-        return stage switch
-        {
-            GameStage.Stage1 => "보통",
-            GameStage.Stage2 => "어려움",
-            GameStage.Stage3 => "매우 어려움",
-            _ => stage.ToString()
-        };
     }
 
     private void OpenScoreReport(ScoreResultType resultType, Action onConfirm)

@@ -4,5 +4,6 @@ public enum ScoreResultType
 {
     BaseArrival = 0,  
     GameOver = 1,   
-    GameClear = 2,     
+    GameClear = 2,
+    SimpleClear = 3,
 }

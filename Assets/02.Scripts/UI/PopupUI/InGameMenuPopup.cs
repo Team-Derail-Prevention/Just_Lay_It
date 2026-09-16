@@ -60,7 +60,7 @@ public class InGameMenuPopup : UIBase
 
     private void OnClick_ExitLobby()
     {
-        UIManager.Instance.OpenExitConfirmPopup(ConfirmExitToLobby, null, "인 게임 내용은 저장되지 않습니다. 그래도 나가시겠습니까?");
+        UIManager.Instance.OpenExitConfirmPopup(ConfirmExitToLobby, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_03"));
     }
 
     private void ConfirmExitToLobby()
@@ -71,12 +71,11 @@ public class InGameMenuPopup : UIBase
 
     private void OnClick_QuitGame()
     {
-        UIManager.Instance.OpenExitConfirmPopup(ConfirmQuitGame, null, "인 게임 내용은 저장되지 않습니다. 그래도 나가시겠습니까?");
+        UIManager.Instance.OpenExitConfirmPopup(ConfirmQuitGame, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_03"));
     }
 
     private void ConfirmQuitGame()
     {
-        // 추후 게임매니저에서 게임 끄게 수정
         Application.Quit();
     }
 

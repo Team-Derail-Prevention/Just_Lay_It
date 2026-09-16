@@ -58,9 +58,14 @@ public class TextInputPopupUI : UIBase
 
         if (InputField_Amount != null)
         {
-            InputField_Amount.text = string.Empty;
+            bool hasValidMax = maxAllowedAmount > 0 && maxAllowedAmount < int.MaxValue;
+            string initialText = hasValidMax ? maxAllowedAmount.ToString() : string.Empty;
+
+            InputField_Amount.text = initialText;
             InputField_Amount.Select();
             InputField_Amount.ActivateInputField();
+            InputField_Amount.selectionAnchorPosition = 0;
+            InputField_Amount.selectionFocusPosition = initialText.Length;
         }
 
         _onConfirm = onConfirm;

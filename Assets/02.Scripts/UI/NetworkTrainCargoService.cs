@@ -45,12 +45,14 @@ public class NetworkTrainCargoService : SingletonBase<NetworkTrainCargoService>
         }
 
         _boardedCitizenCount += boardable;
+        NotifyBoardingChanged();
         return boardable;
     }
 
     public void UnloadAllCitizens()
     {
         _boardedCitizenCount = 0;
+        NotifyBoardingChanged();
     }
 
     private int GetInGameBoardingLimitBonus()
@@ -70,5 +72,14 @@ public class NetworkTrainCargoService : SingletonBase<NetworkTrainCargoService>
     public void ResetRun()
     {
         _boardedCitizenCount = 0;
+        NotifyBoardingChanged();
+    }
+
+    private void NotifyBoardingChanged()
+    {
+        if (ResourceStatusEventHub.Instance != null)
+        {
+            ResourceStatusEventHub.Instance.NotifyBoardingChanged(_boardedCitizenCount, BoardingLimit);
+        }
     }
 }

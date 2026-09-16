@@ -1,110 +1,158 @@
 [
   {
     "Id": "LOBBY_WEAPON_RELOAD",
-    "Name": "무기 재장전 속도 감소",
+    "Name_Ko": "무기 재장전 속도 감소",
+    "Name_En": "Weapon Reload Speed Reduced",
     "MaxLevel": 4,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "Description": "장착한 모든 무기의 재장전 속도가 감소 합니다. (- 0.2)",
-    "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_RELOAD_Icon]"
+    "Description_Ko": "장착한 모든 무기의 재장전 속도가 감소 합니다. (- 0.2)",
+    "Description_En": "The reload speed of all equipped weapons is reduced by (-0.2)",
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_RELOAD_Icon]",
+    "NameFontSize_Ko": 36,
+    "NameFontSize_En": 36
   },
   {
     "Id": "LOBBY_WEAPON_MAGAZINE",
-    "Name": "무기 탄창 수 증가",
+    "Name_Ko": "무기 탄창 수 증가",
+    "Name_En": "Weapon Magazines Up",
     "MaxLevel": 4,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "Description": "장착한 모든 무기의 탄창 수가 증가 합니다. (+ 5)",
-    "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_MAGAZINE_Icon]"
+    "Description_Ko": "장착한 모든 무기의 탄창 수가 증가 합니다. (+ 5)",
+    "Description_En": "The number of magazines in all equipped weapons increases. (+ 5)",
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_MAGAZINE_Icon]",
+    "NameFontSize_Ko": 36,
+    "NameFontSize_En": 36
   },
   {
     "Id": "LOBBY_WEAPON_ATK",
-    "Name": "무기 공격력 증가",
+    "Name_Ko": "무기 공격력 증가",
+    "Name_En": "Weapon Damages Up",
     "MaxLevel": 4,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "Description": "장착한 모든 무기의 공격력이 증가 합니다. (+ 2)",
-    "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_ATK_Icon]"
+    "Description_Ko": "장착한 모든 무기의 공격력이 증가 합니다. (+ 2)",
+    "Description_En": "The attack power of all equipped weapons increases. (+ 2)",
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_ATK_Icon]",
+    "NameFontSize_Ko": 36,
+    "NameFontSize_En": 36
   },
   {
     "Id": "LOBBY_WEAPON_RANGE",
-    "Name": "무기 사거리 증가",
+    "Name_Ko": "무기 사거리 증가",
+    "Name_En": "Weapon Range Up",
     "MaxLevel": 4,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "Description": "장착한 모든 무기의 공격 가능 범위가 증가 합니다. (+ 1)",
-    "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_RANGE_Icon]"
+    "Description_Ko": "장착한 모든 무기의 공격 가능 범위가 증가 합니다. (+ 1)",
+    "Description_En": "The attack range of all equipped weapons is increased. (+ 1)",
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_WEAPON_RANGE_Icon]",
+    "NameFontSize_Ko": 36,
+    "NameFontSize_En": 36
   },
   {
     "Id": "LOBBY_GACHA_REROLL",
-    "Name": "무기 가챠 리롤 횟수 증가",
+    "Name_Ko": "무기 가챠 리롤 횟수 증가",
+    "Name_En": "Weapon Gacha Rerolls Increase",
     "MaxLevel": 4,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "Description": "무기 가챠 진행시 뽑힌 무기를 다시 돌릴 수 있는 횟수가 증가 합니다. (+ 1)",
-    "IconPath": "LobbyUpgrade_Icon[LOBBY_GACHA_REROLL_Icon]"
+    "Description_Ko": "무기 가챠 진행시 뽑힌 무기를 다시 돌릴 수 있는 횟수가 증가 합니다. (+ 1)",
+    "Description_En": "The number of times you can reroll a weapon you pulled from the weapon gacha will increase. (+ 1)",
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_GACHA_REROLL_Icon]",
+    "NameFontSize_Ko": 36,
+    "NameFontSize_En": 36
   },
   {
     "Id": "LOBBY_RESCUE_REWARD",
-    "Name": "시민 구출 보상량 증가",
+    "Name_Ko": "시민 구출 보상량 증가",
+    "Name_En": "Citizen Rescue compensation Increase",
     "MaxLevel": 4,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "Description": "정거장에서 구출한 시민 숫자에 따른 캐쉬 보상량이 증가 합니다. (+ 5)",
-    "IconPath": "LobbyUpgrade_Icon[LOBBY_RESCUE_REWARD_Icon]"
+    "Description_Ko": "정거장에서 구출한 시민 숫자에 따른 캐쉬 보상량이 증가 합니다. (+ 5)",
+    "Description_En": "Compensation for citizens rescued at the station will increase (+ 5)",
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_RESCUE_REWARD_Icon]",
+    "NameFontSize_Ko": 36,
+    "NameFontSize_En": 32
   },
   {
     "Id": "LOBBY_RAIL_CRAFT_SPEED",
-    "Name": "선로 제작 속도 감소",
+    "Name_Ko": "선로 제작 속도 감소",
+    "Name_En": "Railway Construction Speed Reduction",
     "MaxLevel": 4,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "Description": "선로를 제작 하는 속도가 빨라집니다. (- 10%)",
-    "IconPath": "LobbyUpgrade_Icon[LOBBY_RAIL_CRAFT_SPEED_Icon]"
+    "Description_Ko": "선로를 제작 하는 속도가 빨라집니다. (- 10%)",
+    "Description_En": "Railway production speed increases. (-10%)",
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_RAIL_CRAFT_SPEED_Icon]",
+    "NameFontSize_Ko": 36,
+    "NameFontSize_En": 32
   },
   {
     "Id": "LOBBY_BASE_RAIL_COUNT",
-    "Name": "기본 선로 갯수 증가",
+    "Name_Ko": "기본 선로 갯수 증가",
+    "Name_En": "Base Railway Number UP",
     "MaxLevel": 4,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "Description": "게임 시작시 처음에 가지고 시작하는 선로의 개수가 증가합니다. (+ 2)",
-    "IconPath": "LOBBY_BASE_RAIL_COUNT_Icon"
+    "Description_Ko": "게임 시작시 처음에 가지고 시작하는 선로의 개수가 증가합니다. (+ 2)",
+    "Description_En": "When the game starts, the number of start railway increases. (+ 2)",
+    "IconPath": "LOBBY_BASE_RAIL_COUNT_Icon",
+    "NameFontSize_Ko": 36,
+    "NameFontSize_En": 36
   },
   {
     "Id": "LOBBY_BASE_CARGO_LIMIT",
-    "Name": "기본 적재 제한량 증가",
+    "Name_Ko": "기본 적재 제한량 증가",
+    "Name_En": "Base Resources Capacity limit UP",
     "MaxLevel": 4,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "Description": "게임 시작시 나무와 돌의 가지고 있을 수 있는 제한량이 증가 합니다. (+ 100)",
-    "IconPath": "LobbyUpgrade_Icon[LOBBY_BASE_CARGO_LIMIT_Icon]"
+    "Description_Ko": "게임 시작시 나무와 돌의 가지고 있을 수 있는 제한량이 증가 합니다. (+ 100)",
+    "Description_En": "When the game starts, the amount of basic resources capacity limit increases. (+ 100)",
+    "IconPath": "LobbyUpgrade_Icon[LOBBY_BASE_CARGO_LIMIT_Icon]",
+    "NameFontSize_Ko": 36,
+    "NameFontSize_En": 36
   },
   {
     "Id": "LOBBY_TRAIN_MAX_HP",
-    "Name": "열차 체력 증가",
+    "Name_Ko": "열차 체력 증가",
+    "Name_En": "Training HP Up",
     "MaxLevel": 4,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "Description": "기차의 기본 최대 체력을 영구적으로 증가시킵니다. (+ 50)",
-    "IconPath": "LobbyUpgrade01_Icon[LOBBY_TRAIN_MAX_HP_Icon]"
+    "Description_Ko": "기차의 기본 최대 체력을 영구적으로 증가시킵니다. (+ 50)",
+    "Description_En": "Training Max HP Permanent Up (+50)",
+    "IconPath": "LobbyUpgrade01_Icon[LOBBY_TRAIN_MAX_HP_Icon]",
+    "NameFontSize_Ko": 36,
+    "NameFontSize_En": 36
   },
   {
     "Id": "LOBBY_TRAIN_DEFENSE",
-    "Name": "열차 방어력 증가",
+    "Name_Ko": "열차 방어력 증가",
+    "Name_En": "Training Damage Up",
     "MaxLevel": 4,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "Description": "기차의 기본 방어력을 영구적으로 증가시킵니다. (+ 2)",
-    "IconPath": "LobbyUpgrade01_Icon[LOBBY_TRAIN_DEFENSE_Icon]"
+    "Description_Ko": "기차의 기본 방어력을 영구적으로 증가시킵니다. (+ 2)",
+    "Description_En": "Training Max Damage Permanent Up (+2)",
+    "IconPath": "LobbyUpgrade01_Icon[LOBBY_TRAIN_DEFENSE_Icon]",
+    "NameFontSize_Ko": 36,
+    "NameFontSize_En": 36
   },
   {
     "Id": "LOBBY_BASE_WEAPON_UPGrade",
-    "Name": "기본 지급 무기 강화",
+    "Name_Ko": "기본 지급 무기 강화",
+    "Name_En": "Base Weapon Up",
     "MaxLevel": 4,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "Description": "기본으로 지급되는 무기의 등급이 한 단계 상승합니다.",
-    "IconPath": "LobbyUpgrade01_Icon[LOBBY_BASE_WEAPON_UPGrade_Icon]"
+    "Description_Ko": "기본으로 지급되는 무기의 등급이 한 단계 상승합니다.",
+    "Description_En": "The weapon grade assigned by default increases by one level.",
+    "IconPath": "LobbyUpgrade01_Icon[LOBBY_BASE_WEAPON_UPGrade_Icon]",
+    "NameFontSize_Ko": 36,
+    "NameFontSize_En": 36
   }
 ]

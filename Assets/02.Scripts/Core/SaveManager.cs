@@ -104,6 +104,17 @@ public class SaveManager : SingletonBase<SaveManager>
         }
     }
 
+    public LanguageType Language
+    {
+        get => (LanguageType)GetSettingsSaveData().Language;
+        set
+        {
+            SettingsSaveData data = GetSettingsSaveData();
+            data.Language = (int)value;
+            SaveSettingsData(data);
+        }
+    }
+
     public int IncreaseTotalPlayCount()
     {
         int increasedCount = TotalPlayCount + 1;
@@ -439,5 +450,6 @@ public class SettingsSaveData
     public float BgmVolume = 0.5f;
     public float SfxVolume = 0.5f;
     public int DisplayMode = 1;
+    public int Language = (int)LanguageType.English;
 }
 

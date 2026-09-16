@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+﻿using Enums;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class GachaCardState : ViewModelBase
 {
@@ -116,7 +117,7 @@ public class GachaCardState : ViewModelBase
         GradeName = data.GradeName;
         IconPath = data.IconPath;
         Dps = data.Atk;
-        Description = data.Description;
+        Description = LocalizationManager.Instance.CurrentLanguage == LanguageType.Korean ? data.Description_Ko : data.Description_En;
 
         var statList = new List<string>();
         statList.Add($"{data.Atk}");

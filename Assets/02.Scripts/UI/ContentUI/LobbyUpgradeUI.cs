@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using TMPro;
 using UnityEngine.UI;
+using Enums;
 
 public class LobbyUpgradeUI : UIBase
 {
@@ -39,6 +40,8 @@ public class LobbyUpgradeUI : UIBase
         _vm = NetworkUpgradeService.Instance.GetLocalUpgradeViewModel();
         _vm.PropertyChanged += OnPropertyChanged_View;
 
+        LocalizationEventHub.Instance.OnLanguageChanged += OnLanguageChanged_LocalizationEventHub;
+
         RefreshCashText();
         CreateAllSlots();
     }
@@ -55,7 +58,20 @@ public class LobbyUpgradeUI : UIBase
             _vm.PropertyChanged -= OnPropertyChanged_View;
         }
 
+        if (LocalizationEventHub.Instance != null)
+        {
+            LocalizationEventHub.Instance.OnLanguageChanged -= OnLanguageChanged_LocalizationEventHub;
+        }
+
         OnDestroyAndClearSlotList();
+    }
+
+    private void OnLanguageChanged_LocalizationEventHub(LanguageType language)
+    {
+        if (string.IsNullOrEmpty(_curSelectedSlotId) == false)
+        {
+            RefreshDetailPanel();
+        }
     }
 
     private void OnPropertyChanged_View(object sender, PropertyChangedEventArgs e)
@@ -150,6 +166,7 @@ public class LobbyUpgradeUI : UIBase
         if (Text_DetailTitle != null)
         {
             Text_DetailTitle.text = slotVm.DisplayName;
+            Text_DetailTitle.fontSize = slotVm.NameFontSize;
         }
 
         if (Text_DetailDescription != null)
@@ -187,7 +204,7 @@ public class LobbyUpgradeUI : UIBase
 
         if (_vm.CurrentCash < slotVm.NextCost)
         {
-            UIManager.Instance.OpenExitConfirmPopup(null, null, "캐쉬가 모자랍니다.");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_11"));
             return;
         }
 
@@ -204,7 +221,7 @@ public class LobbyUpgradeUI : UIBase
         bool isRefunded = NetworkUpgradeService.Instance.RequestRefund(_curSelectedSlotId);
         if (isRefunded == false)
         {
-            UIManager.Instance.OpenExitConfirmPopup(null, null, "판매 할게 없습니다.");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_12"));
         }
     }
 
@@ -212,11 +229,11 @@ public class LobbyUpgradeUI : UIBase
     {
         if (NetworkUpgradeService.Instance.HasAnyRefundableSlot() == false)
         {
-            UIManager.Instance.OpenExitConfirmPopup(null, null, "판매 할게 없습니다.");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_12"));
             return;
         }
 
-        UIManager.Instance.OpenExitConfirmPopup(ConfirmRefundAll, null, "정말 모두 판매 하시겠습니까?");
+        UIManager.Instance.OpenExitConfirmPopup(ConfirmRefundAll, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_13"));
     }
 
     private void ConfirmRefundAll()

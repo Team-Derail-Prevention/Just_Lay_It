@@ -35,7 +35,7 @@ public class GachaUI : UIBase
         bool isOpened = NetworkGachaService.Instance.OpenGachaBox();
         if (isOpened == false)
         {
-            UIManager.Instance.OpenExitConfirmPopup(null, null, "재화가 부족합니다.");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_04"));
             UIManager.Instance.CloseWeaponGachaUI();
             return;
         }

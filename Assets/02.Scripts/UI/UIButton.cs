@@ -20,6 +20,7 @@ public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     [Header("호버 설명")]
     [SerializeField][TextArea] private string _description;
+    [SerializeField] private string _descriptionLocalizationId;
 
     private bool _isManualUnbindEvent;
 
@@ -178,7 +179,11 @@ public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
             SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Hover);
         }
 
-        OnPointerEnterButton?.Invoke(_description);
+        string descriptionText = string.IsNullOrWhiteSpace(_descriptionLocalizationId)
+            ? _description
+            : LocalizationManager.Instance.GetText(_descriptionLocalizationId);
+
+        OnPointerEnterButton?.Invoke(descriptionText);
     }
 
     public void OnPointerExit(PointerEventData eventData)
