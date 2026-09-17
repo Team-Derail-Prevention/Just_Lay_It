@@ -11,7 +11,7 @@ public class SandstormOverlayUI : UIBase
     [SerializeField] private CanvasGroup CanvasGroup_Root;
 
     [Header("모래 색상")]
-    [SerializeField] private Color _sandColor = new Color(0.76f, 0.64f, 0.42f, 1f);
+    [SerializeField] private Color _sandColor = new Color(0.76f, 0.64f, 0.42f, 0.5f);
 
     [Header("타원형 시야 확보 영역 (가로세로 비율)")]
     [SerializeField] private float _ovalAspectX = 1.4f;
@@ -27,14 +27,17 @@ public class SandstormOverlayUI : UIBase
     [SerializeField] private int _textureWidth = 256;
     [SerializeField] private int _textureHeight = 256;
 
-    [Header("모래 스크롤 속도")]
-    [SerializeField] private Vector2 _scrollSpeed = new Vector2(0.08f, 0.03f);
-
     [Header("페이드 시간")]
     [SerializeField] private float _fadeInDuration = 1.5f;
     [SerializeField] private float _fadeOutDuration = 1.5f;
 
-    private Vector2 _currentUvOffset = Vector2.zero;
+    [Header("게임 아웃(암전) 연출 — Show()와 동시에 자동 진행")]
+    [SerializeField] private Image Image_Blackout;
+    [SerializeField] private Color _blackoutColor = new Color(0.76f, 0.64f, 0.42f, 1f);
+    [SerializeField, Range(0f, 1f)] private float _blackoutMaxIntensity = 0.95f;
+    [SerializeField] private float _blackoutFullTime = 6f;
+    [SerializeField] private float _blackoutSpeedExponent = 1f;
+
     private CancellationTokenSource _showCts;
 
     private void Awake()
@@ -45,17 +48,8 @@ public class SandstormOverlayUI : UIBase
         {
             CanvasGroup_Root.alpha = 0f;
         }
-    }
 
-    private void Update()
-    {
-        if (RawImage_Sand == null)
-        {
-            return;
-        }
-
-        _currentUvOffset += _scrollSpeed * Time.deltaTime;
-        RawImage_Sand.uvRect = new Rect(_currentUvOffset, Vector2.one);
+        ResetBlackout();
     }
 
     private void OnDestroy()
@@ -66,9 +60,13 @@ public class SandstormOverlayUI : UIBase
     public void Show(float duration)
     {
         CancelShowTask();
+        ResetBlackout();
 
         _showCts = new CancellationTokenSource();
-        RunShowSequence(duration, _showCts.Token).Forget();
+        CancellationToken token = _showCts.Token;
+
+        RunBlackoutOverTime(token).Forget();
+        RunShowSequence(duration, token).Forget();
     }
 
     public void Hide()
@@ -89,6 +87,18 @@ public class SandstormOverlayUI : UIBase
         }
     }
 
+    private void ResetBlackout()
+    {
+        if (Image_Blackout == null)
+        {
+            return;
+        }
+
+        Color resetColor = _blackoutColor;
+        resetColor.a = 0f;
+        Image_Blackout.color = resetColor;
+    }
+
     private async UniTaskVoid RunShowSequence(float duration, CancellationToken token)
     {
         await FadeCanvasGroup(0f, 1f, _fadeInDuration, token);
@@ -97,6 +107,9 @@ public class SandstormOverlayUI : UIBase
         await UniTask.Delay(TimeSpan.FromSeconds(holdDuration), cancellationToken: token);
 
         await FadeCanvasGroup(1f, 0f, _fadeOutDuration, token);
+
+        CancelShowTask();
+        ResetBlackout();
 
         if (UIManager.Instance != null)
         {
@@ -113,6 +126,8 @@ public class SandstormOverlayUI : UIBase
         }
 
         await FadeCanvasGroup(currentAlpha, 0f, _fadeOutDuration, token);
+
+        ResetBlackout();
 
         if (UIManager.Instance != null)
         {
@@ -148,6 +163,35 @@ public class SandstormOverlayUI : UIBase
         CanvasGroup_Root.alpha = toAlpha;
     }
 
+    private async UniTask RunBlackoutOverTime(CancellationToken token)
+    {
+        if (Image_Blackout == null)
+        {
+            Debug.LogError("[SandstormOverlayUI] Image_Blackout이 연결되지 않았습니다.");
+            return;
+        }
+
+        float elapsedTime = 0f;
+        while (elapsedTime < _blackoutFullTime)
+        {
+            token.ThrowIfCancellationRequested();
+
+            elapsedTime += Time.deltaTime;
+            float progressRatio = Mathf.Clamp01(elapsedTime / _blackoutFullTime);
+            float easedRatio = Mathf.Pow(progressRatio, _blackoutSpeedExponent);
+
+            Color currentColor = _blackoutColor;
+            currentColor.a = easedRatio * _blackoutMaxIntensity;
+            Image_Blackout.color = currentColor;
+
+            await UniTask.Yield(PlayerLoopTiming.Update, token);
+        }
+
+        Color finalColor = _blackoutColor;
+        finalColor.a = _blackoutMaxIntensity;
+        Image_Blackout.color = finalColor;
+    }
+
     private void CreateSandTexture()
     {
         if (RawImage_Sand == null)
@@ -164,7 +208,6 @@ public class SandstormOverlayUI : UIBase
     private Texture2D GenerateSandTexture(int textureWidth, int textureHeight)
     {
         Texture2D texture = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false);
-        texture.wrapMode = TextureWrapMode.Repeat;
 
         Color[] pixels = new Color[textureWidth * textureHeight];
         Vector2 center = new Vector2(textureWidth * 0.5f, textureHeight * 0.5f);
