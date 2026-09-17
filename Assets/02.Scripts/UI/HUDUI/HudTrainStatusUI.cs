@@ -30,6 +30,10 @@ public class HudTrainStatusUI : UIBase
     [Header("난이도")]
     [SerializeField] private TextMeshProUGUI Text_Stage;
 
+    [Header("정지 경고")]
+    [SerializeField] private GameObject Cont;
+    [SerializeField] private TextMeshProUGUI Text_Cont;
+
     private void Awake()
     {
         InitHpTextOutline();
@@ -49,6 +53,11 @@ public class HudTrainStatusUI : UIBase
 
     private void OnEnable()
     {
+        if (Cont != null)
+        {
+            Cont.SetActive(false);
+        }
+
         if (TrainStatusEventHub.Instance == null)
         {
             Debug.LogError("[HudTrainStatusUI] TrainStatusEventHub.Instance가 null입니다. 씬에 배치했는지 확인하세요.");
@@ -59,6 +68,7 @@ public class HudTrainStatusUI : UIBase
         TrainStatusEventHub.Instance.OnSpeedChanged += SetSpeed;
         TrainStatusEventHub.Instance.OnDistanceChanged += SetDistance;
         TrainStatusEventHub.Instance.OnPlayTimeChanged += SetPlayTime;
+        TrainManager.OnTrainStopWarning += SetTrainStopWarning;
 
         LocalizationEventHub.Instance.OnLanguageChanged += OnLanguageChanged_LocalizationEventHub;
 
@@ -79,6 +89,7 @@ public class HudTrainStatusUI : UIBase
             TrainStatusEventHub.Instance.OnSpeedChanged -= SetSpeed;
             TrainStatusEventHub.Instance.OnDistanceChanged -= SetDistance;
             TrainStatusEventHub.Instance.OnPlayTimeChanged -= SetPlayTime;
+            TrainManager.OnTrainStopWarning -= SetTrainStopWarning;
         }
 
         if (LocalizationEventHub.Instance != null)
@@ -186,6 +197,27 @@ public class HudTrainStatusUI : UIBase
         if (Text_Distance != null)
         {
             Text_Distance.text = $"{Mathf.RoundToInt(distanceMeters)}M";
+        }
+    }
+
+    public void SetTrainStopWarning(int remainingSecond)
+    {
+        if (Cont == null)
+        {
+            return;
+        }
+
+        if (remainingSecond < 0)
+        {
+            Cont.SetActive(false);
+            return;
+        }
+
+        Cont.SetActive(true);
+
+        if (Text_Cont != null)
+        {
+            Text_Cont.text = remainingSecond.ToString();
         }
     }
 }

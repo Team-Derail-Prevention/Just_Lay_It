@@ -2,36 +2,28 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using UnityEngine;
 
 public class SaveManager : SingletonBase<SaveManager>
 {
-    private const string UpgradeSaveKey = "UpgradeSaveData";
-    private const string FirstPlayNoticeSeenKey = "HasSeenFirstPlayNotice";
-    private const string TotalPlayCountKey = "TotalPlayCount";
-    private const string LifetimeStatsKey = "LifetimeStatsData";
-    private const string AllStagesClearedKey = "HasClearedAllStagesSpecial";
-    private const string SettingsSaveKey = "SettingsSaveData";
-    private const string CurrentGameStageKey = "CurrentGameStage";
+    private const string SaveFileName = "save.dat";
 
     private readonly HashSet<UpgradeSlotViewModel> _subscribedSlotSet = new HashSet<UpgradeSlotViewModel>();
 
     private UpgradeViewModel _upgradeViewModel;
-    private UpgradeSaveData _loadedSaveData;
-    private LifetimeStatsData _lifetimeStatsData;
-    private SettingsSaveData _settingsSaveData;
+    private SaveFileData _saveFileData;
     private bool _isLoading;
+
+    private string SaveFilePath => Path.Combine(Application.persistentDataPath, SaveFileName);
 
     public bool HasSeenFirstPlayNotice
     {
-        get
-        {
-            return PlayerPrefs.GetInt(FirstPlayNoticeSeenKey, 0) == 1;
-        }
+        get => GetSaveFileData().HasSeenFirstPlayNotice;
         set
         {
-            PlayerPrefs.SetInt(FirstPlayNoticeSeenKey, value ? 1 : 0);
-            PlayerPrefs.Save();
+            GetSaveFileData().HasSeenFirstPlayNotice = value;
+            WriteSaveFile();
         }
     }
 
@@ -43,96 +35,86 @@ public class SaveManager : SingletonBase<SaveManager>
     }
 #endif
 
-    public int TotalPlayCount
-    {
-        get
-        {
-            return PlayerPrefs.GetInt(TotalPlayCountKey, 0);
-        }
-    }
+    public int TotalPlayCount => GetSaveFileData().TotalPlayCount;
 
     public bool HasClearedAllStagesSpecial
     {
-        get => PlayerPrefs.GetInt(AllStagesClearedKey, 0) == 1;
+        get => GetSaveFileData().HasClearedAllStagesSpecial;
         set
         {
-            PlayerPrefs.SetInt(AllStagesClearedKey, value ? 1 : 0);
-            PlayerPrefs.Save();
+            GetSaveFileData().HasClearedAllStagesSpecial = value;
+            WriteSaveFile();
         }
     }
 
     public GameStage CurrentGameStage
     {
-        get => (GameStage)PlayerPrefs.GetInt(CurrentGameStageKey, (int)GameStage.Stage1);
+        get => GetSaveFileData().CurrentGameStage;
         set
         {
-            PlayerPrefs.SetInt(CurrentGameStageKey, (int)value);
-            PlayerPrefs.Save();
+            GetSaveFileData().CurrentGameStage = value;
+            WriteSaveFile();
         }
     }
 
     public float BgmVolume
     {
-        get => GetSettingsSaveData().BgmVolume;
+        get => GetSaveFileData().Settings.BgmVolume;
         set
         {
-            SettingsSaveData data = GetSettingsSaveData();
-            data.BgmVolume = value;
-            SaveSettingsData(data);
+            GetSaveFileData().Settings.BgmVolume = value;
+            WriteSaveFile();
         }
     }
 
     public float SfxVolume
     {
-        get => GetSettingsSaveData().SfxVolume;
+        get => GetSaveFileData().Settings.SfxVolume;
         set
         {
-            SettingsSaveData data = GetSettingsSaveData();
-            data.SfxVolume = value;
-            SaveSettingsData(data);
+            GetSaveFileData().Settings.SfxVolume = value;
+            WriteSaveFile();
         }
     }
 
     public int DisplayMode
     {
-        get => GetSettingsSaveData().DisplayMode;
+        get => GetSaveFileData().Settings.DisplayMode;
         set
         {
-            SettingsSaveData data = GetSettingsSaveData();
-            data.DisplayMode = value;
-            SaveSettingsData(data);
+            GetSaveFileData().Settings.DisplayMode = value;
+            WriteSaveFile();
         }
     }
 
     public LanguageType Language
     {
-        get => (LanguageType)GetSettingsSaveData().Language;
+        get => (LanguageType)GetSaveFileData().Settings.Language;
         set
         {
-            SettingsSaveData data = GetSettingsSaveData();
-            data.Language = (int)value;
-            SaveSettingsData(data);
+            GetSaveFileData().Settings.Language = (int)value;
+            WriteSaveFile();
         }
     }
 
     public int IncreaseTotalPlayCount()
     {
-        int increasedCount = TotalPlayCount + 1;
-        PlayerPrefs.SetInt(TotalPlayCountKey, increasedCount);
-        PlayerPrefs.Save();
+        SaveFileData data = GetSaveFileData();
+        data.TotalPlayCount += 1;
+        WriteSaveFile();
 
-        return increasedCount;
+        return data.TotalPlayCount;
     }
 
-    public float LifetimeTotalDistance => GetLifetimeStatsData().TotalDistance;
-    public float LifetimeTotalPlayTimeSeconds => GetLifetimeStatsData().TotalPlayTimeSeconds;
-    public int LifetimeTotalRescuedHumanCount => GetLifetimeStatsData().TotalRescuedHumanCount;
-    public int LifetimeTotalCollectedWood => GetLifetimeStatsData().TotalCollectedWood;
-    public int LifetimeTotalCollectedStone => GetLifetimeStatsData().TotalCollectedStone;
-    public int LifetimeTotalKillCount => GetLifetimeStatsData().TotalKillCount;
-    public int LifetimeTotalRailCrafted => GetLifetimeStatsData().TotalRailCrafted;
-    public int LifetimeTotalRailInstalled => GetLifetimeStatsData().TotalRailInstalled;
-    public int LifetimeTotalEarnedCash => GetLifetimeStatsData().TotalEarnedCash;
+    public float LifetimeTotalDistance => GetSaveFileData().LifetimeStats.TotalDistance;
+    public float LifetimeTotalPlayTimeSeconds => GetSaveFileData().LifetimeStats.TotalPlayTimeSeconds;
+    public int LifetimeTotalRescuedHumanCount => GetSaveFileData().LifetimeStats.TotalRescuedHumanCount;
+    public int LifetimeTotalCollectedWood => GetSaveFileData().LifetimeStats.TotalCollectedWood;
+    public int LifetimeTotalCollectedStone => GetSaveFileData().LifetimeStats.TotalCollectedStone;
+    public int LifetimeTotalKillCount => GetSaveFileData().LifetimeStats.TotalKillCount;
+    public int LifetimeTotalRailCrafted => GetSaveFileData().LifetimeStats.TotalRailCrafted;
+    public int LifetimeTotalRailInstalled => GetSaveFileData().LifetimeStats.TotalRailInstalled;
+    public int LifetimeTotalEarnedCash => GetSaveFileData().LifetimeStats.TotalEarnedCash;
 
     public void AddRunStatsToLifetime(RunStatsSnapshot snapshot)
     {
@@ -141,7 +123,7 @@ public class SaveManager : SingletonBase<SaveManager>
             return;
         }
 
-        LifetimeStatsData data = GetLifetimeStatsData();
+        LifetimeStatsData data = GetSaveFileData().LifetimeStats;
         data.TotalDistance += snapshot.Distance;
         data.TotalPlayTimeSeconds += snapshot.PlayTimeSeconds;
         data.TotalRescuedHumanCount += snapshot.RescuedHumanCount;
@@ -152,71 +134,7 @@ public class SaveManager : SingletonBase<SaveManager>
         data.TotalRailInstalled += snapshot.RailInstalledCount;
         data.TotalEarnedCash += snapshot.EarnedCashCount;
 
-        SaveLifetimeStatsData(data);
-    }
-
-    private LifetimeStatsData GetLifetimeStatsData()
-    {
-        if (_lifetimeStatsData == null)
-        {
-            _lifetimeStatsData = LoadLifetimeStatsData();
-        }
-
-        return _lifetimeStatsData;
-    }
-
-    private LifetimeStatsData LoadLifetimeStatsData()
-    {
-        if (PlayerPrefs.HasKey(LifetimeStatsKey) == false)
-        {
-            return new LifetimeStatsData();
-        }
-
-        string json = PlayerPrefs.GetString(LifetimeStatsKey);
-        LifetimeStatsData data = JsonUtility.FromJson<LifetimeStatsData>(json);
-
-        return data ?? new LifetimeStatsData();
-    }
-
-    private void SaveLifetimeStatsData(LifetimeStatsData data)
-    {
-        string json = JsonUtility.ToJson(data);
-        PlayerPrefs.SetString(LifetimeStatsKey, json);
-        PlayerPrefs.Save();
-
-        _lifetimeStatsData = data;
-    }
-
-    private SettingsSaveData GetSettingsSaveData()
-    {
-        if (_settingsSaveData == null)
-        {
-            _settingsSaveData = LoadSettingsData();
-        }
-
-        return _settingsSaveData;
-    }
-
-    private SettingsSaveData LoadSettingsData()
-    {
-        if (PlayerPrefs.HasKey(SettingsSaveKey) == false)
-        {
-            return new SettingsSaveData();
-        }
-
-        string json = PlayerPrefs.GetString(SettingsSaveKey);
-        SettingsSaveData data = JsonUtility.FromJson<SettingsSaveData>(json);
-
-        return data ?? new SettingsSaveData();
-    }
-
-    private void SaveSettingsData(SettingsSaveData data)
-    {
-        string json = JsonUtility.ToJson(data);
-        PlayerPrefs.SetString(SettingsSaveKey, json);
-        PlayerPrefs.Save();
-
-        _settingsSaveData = data;
+        WriteSaveFile();
     }
 
     private void Start()
@@ -227,6 +145,8 @@ public class SaveManager : SingletonBase<SaveManager>
         }
 
         DontDestroyOnLoad(gameObject);
+
+        LoadSaveFile();
 
         if (GameManager.Instance != null)
         {
@@ -242,6 +162,55 @@ public class SaveManager : SingletonBase<SaveManager>
         SaveUpgradeData();
     }
 
+    private SaveFileData GetSaveFileData()
+    {
+        if (_saveFileData == null)
+        {
+            LoadSaveFile();
+        }
+
+        return _saveFileData;
+    }
+
+    private void LoadSaveFile()
+    {
+        string path = SaveFilePath;
+
+        if (File.Exists(path) == false)
+        {
+            _saveFileData = new SaveFileData();
+            return;
+        }
+
+        try
+        {
+            byte[] cipherBytes = File.ReadAllBytes(path);
+            string json = SaveCrypto.Decrypt(cipherBytes);
+            SaveFileData loadedData = JsonUtility.FromJson<SaveFileData>(json);
+
+            _saveFileData = loadedData ?? new SaveFileData();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[SaveManager] 세이브 파일 로드 실패, 손상된 것으로 판단하여 초기화합니다. 예외={ex}");
+            _saveFileData = new SaveFileData();
+        }
+    }
+
+    private void WriteSaveFile()
+    {
+        try
+        {
+            string json = JsonUtility.ToJson(_saveFileData);
+            byte[] cipherBytes = SaveCrypto.Encrypt(json);
+            File.WriteAllBytes(SaveFilePath, cipherBytes);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[SaveManager] 세이브 파일 저장 실패. 예외={ex}");
+        }
+    }
+
     private void InitializeUpgradeSaveData()
     {
         if (GameManager.NetworkUpgradeService == null)
@@ -255,8 +224,7 @@ public class SaveManager : SingletonBase<SaveManager>
         SubscribeSlotViewModels();
 
         _isLoading = true;
-        _loadedSaveData = LoadUpgradeData();
-        _upgradeViewModel.CurrentCash = _loadedSaveData.Cash;
+        _upgradeViewModel.CurrentCash = GetSaveFileData().UpgradeData.Cash;
         ApplySavedSlotLevels();
         _isLoading = false;
     }
@@ -300,12 +268,14 @@ public class SaveManager : SingletonBase<SaveManager>
 
     private void ApplySavedSlotLevels()
     {
-        if (_loadedSaveData == null || _loadedSaveData.SlotList == null)
+        UpgradeSaveData loadedSaveData = GetSaveFileData().UpgradeData;
+
+        if (loadedSaveData == null || loadedSaveData.SlotList == null)
         {
             return;
         }
 
-        foreach (UpgradeSlotSaveData slotSaveData in _loadedSaveData.SlotList)
+        foreach (UpgradeSlotSaveData slotSaveData in loadedSaveData.SlotList)
         {
             if (slotSaveData == null || string.IsNullOrWhiteSpace(slotSaveData.SlotDataId))
             {
@@ -332,25 +302,8 @@ public class SaveManager : SingletonBase<SaveManager>
             return;
         }
 
-        UpgradeSaveData saveData = CreateUpgradeSaveData();
-        string json = JsonUtility.ToJson(saveData);
-        PlayerPrefs.SetString(UpgradeSaveKey, json);
-        PlayerPrefs.Save();
-
-        _loadedSaveData = saveData;
-    }
-
-    private UpgradeSaveData LoadUpgradeData()
-    {
-        if (PlayerPrefs.HasKey(UpgradeSaveKey) == false)
-        {
-            return new UpgradeSaveData();
-        }
-
-        string json = PlayerPrefs.GetString(UpgradeSaveKey);
-        UpgradeSaveData saveData = JsonUtility.FromJson<UpgradeSaveData>(json);
-
-        return saveData ?? new UpgradeSaveData();
+        GetSaveFileData().UpgradeData = CreateUpgradeSaveData();
+        WriteSaveFile();
     }
 
     private UpgradeSaveData CreateUpgradeSaveData()
@@ -358,9 +311,10 @@ public class SaveManager : SingletonBase<SaveManager>
         UpgradeSaveData saveData = new UpgradeSaveData();
         Dictionary<string, int> savedLevelDic = new Dictionary<string, int>();
 
-        if (_loadedSaveData != null && _loadedSaveData.SlotList != null)
+        UpgradeSaveData loadedSaveData = GetSaveFileData().UpgradeData;
+        if (loadedSaveData != null && loadedSaveData.SlotList != null)
         {
-            foreach (UpgradeSlotSaveData loadedSlotData in _loadedSaveData.SlotList)
+            foreach (UpgradeSlotSaveData loadedSlotData in loadedSaveData.SlotList)
             {
                 if (loadedSlotData == null || string.IsNullOrWhiteSpace(loadedSlotData.SlotDataId))
                 {
@@ -392,14 +346,8 @@ public class SaveManager : SingletonBase<SaveManager>
 #if UNITY_EDITOR
     public void Debug_ResetAllProgressData()
     {
-        HasSeenFirstPlayNotice = false;
-        HasClearedAllStagesSpecial = false;
-        CurrentGameStage = GameStage.Stage1;
-
-        PlayerPrefs.SetInt(TotalPlayCountKey, 0);
-        PlayerPrefs.Save();
-
-        SaveLifetimeStatsData(new LifetimeStatsData());
+        _saveFileData = new SaveFileData();
+        WriteSaveFile();
 
         if (GameManager.NetworkUpgradeService != null)
         {
@@ -414,6 +362,18 @@ public class SaveManager : SingletonBase<SaveManager>
         Debug.Log("[SaveManager] 전체 진행 데이터를 초기화했습니다.");
     }
 #endif
+}
+
+[Serializable]
+public class SaveFileData
+{
+    public bool HasSeenFirstPlayNotice;
+    public int TotalPlayCount;
+    public bool HasClearedAllStagesSpecial;
+    public GameStage CurrentGameStage = GameStage.Stage1;
+    public UpgradeSaveData UpgradeData = new UpgradeSaveData();
+    public LifetimeStatsData LifetimeStats = new LifetimeStatsData();
+    public SettingsSaveData Settings = new SettingsSaveData();
 }
 
 [Serializable]

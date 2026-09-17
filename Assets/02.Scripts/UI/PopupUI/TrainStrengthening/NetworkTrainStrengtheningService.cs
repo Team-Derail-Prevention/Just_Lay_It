@@ -39,7 +39,7 @@ public class NetworkTrainStrengtheningService : SingletonBase<NetworkTrainStreng
                 continue;
             }
 
-            var slotVm = new TrainStatSlotViewModel(data.Id, category, data.Name_Ko, data.IconPath, data.MaxLevel, data.BaseCost, data.CostIncreasePerLevel);
+            var slotVm = new TrainStatSlotViewModel(data.Id, category, data.Name_Ko, data.Name_En, data.NameFontSize_Ko, data.NameFontSize_En, data.IconPath, data.MaxLevel, data.BaseCost, data.CostIncreasePerLevel);
             _localVm.AddSlot(slotVm);
         }
     }

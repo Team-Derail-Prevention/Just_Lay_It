@@ -410,16 +410,16 @@
   {
     "Id": "RailBuild_UI_03",
     "Place": "RailBuildUI",
-    "Text_Ko": "Key 'W' - 설치 / 채취 On or Off ",
-    "Text_En": "Key 'W' - Set / Take On or Off",
+    "Text_Ko": "설치 / 채취 On or Off ",
+    "Text_En": "Set / Take On or Off",
     "FontSiz_Ko": 15,
     "FontSiz_En": 15
   },
   {
     "Id": "RailBuild_UI_04",
     "Place": "RailBuildUI",
-    "Text_Ko": "Key 'V' - 드론 행동 취소",
-    "Text_En": "Key 'V\" - Drone abort action",
+    "Text_Ko": "드론 행동 취소",
+    "Text_En": "Drone abort action",
     "FontSiz_Ko": 15,
     "FontSiz_En": 15
   },
@@ -962,8 +962,8 @@
   {
     "Id": "WeaponGacha_PopUp_UI_03",
     "Place": "WeaponGachaUI",
-    "Text_Ko": "리롤 가능 횟 수 :  00",
-    "Text_En": "Possible Rerolls: 00",
+    "Text_Ko": "리롤 가능 횟수",
+    "Text_En": "Possible Rerolls",
     "FontSiz_Ko": 26,
     "FontSiz_En": 26
   },

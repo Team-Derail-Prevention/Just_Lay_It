@@ -412,7 +412,6 @@ GameObject:
   - component: {fileID: 8882707731695476214}
   - component: {fileID: 3593310431848298285}
   - component: {fileID: 7217686581451244138}
-  - component: {fileID: 8345313684093921738}
   m_Layer: 5
   m_Name: RerollText
   m_TagString: Untagged
@@ -539,20 +538,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &8345313684093921738
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6632755443482702195}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  _localizationId: WeaponGacha_PopUp_UI_03
-  _targetText: {fileID: 7217686581451244138}
 --- !u!1 &7031963491434117156
 GameObject:
   m_ObjectHideFlags: 0

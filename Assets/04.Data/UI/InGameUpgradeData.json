@@ -7,7 +7,9 @@
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[BATTLE_HP_Icon]"
+    "IconPath": "InGameUpgrade_Icon[BATTLE_HP_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 20
   },
   {
     "Id": "BATTLE_DAMAGE",
@@ -17,7 +19,9 @@
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[BATTLE_DAMAGE_Icon]"
+    "IconPath": "InGameUpgrade_Icon[BATTLE_DAMAGE_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 20
   },
   {
     "Id": "BATTLE_DEFENSE",
@@ -27,7 +31,9 @@
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[BATTLE_DEFENSE_Icon]"
+    "IconPath": "InGameUpgrade_Icon[BATTLE_DEFENSE_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 20
   },
   {
     "Id": "CARGO_RESOURCE_LIMIT",
@@ -37,7 +43,9 @@
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[CARGO_RESOURCE_LIMIT_Icon]"
+    "IconPath": "InGameUpgrade_Icon[CARGO_RESOURCE_LIMIT_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 18
   },
   {
     "Id": "CARGO_CREW_LIMIT",
@@ -47,7 +55,9 @@
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[CARGO_CREW_LIMIT_Icon]"
+    "IconPath": "InGameUpgrade_Icon[CARGO_CREW_LIMIT_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 20
   },
   {
     "Id": "CARGO_WEAPON_LIMIT",
@@ -57,7 +67,9 @@
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[CARGO_WEAPON_LIMIT_Icon]"
+    "IconPath": "InGameUpgrade_Icon[CARGO_WEAPON_LIMIT_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 20
   },
   {
     "Id": "DRONE_GATHER_SPEED",
@@ -67,7 +79,9 @@
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[DRONE_GATHER_SPEED_Icon]"
+    "IconPath": "InGameUpgrade_Icon[DRONE_GATHER_SPEED_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 18
   },
   {
     "Id": "DRONE_GATHER_EFFICIENCY",
@@ -77,7 +91,9 @@
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[DRONE_GATHER_EFFICIENCY_Icon]"
+    "IconPath": "InGameUpgrade_Icon[DRONE_GATHER_EFFICIENCY_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 19
   },
   {
     "Id": "DRONE_MOVE_SPEED",
@@ -87,6 +103,8 @@
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[DRONE_MOVE_SPEED_Icon]"
+    "IconPath": "InGameUpgrade_Icon[DRONE_MOVE_SPEED_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 18
   }
 ]

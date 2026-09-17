@@ -85,7 +85,6 @@ public static class UIManagerExtension
             GameManager.Instance.SetGameStage(selectedStage.Value);
         }
 
-        await uiManager.ShowFirstPlayNoticeIfNeededAsync();
         uiManager.CloseContentUI(UIType.LobbyUI);
 
         var loadingUI = uiManager.OpenLoadingUI();
@@ -102,21 +101,6 @@ public static class UIManagerExtension
         }
 
         return; 
-    }
-
-    public static async Cysharp.Threading.Tasks.UniTask ShowFirstPlayNoticeIfNeededAsync(this UIManager uiManager)
-    {
-        if (SaveManager.Instance == null || SaveManager.Instance.HasSeenFirstPlayNotice)
-        {
-            return;
-        }
-
-        bool isConfirmed = false;
-
-        uiManager.OpenNoticePopup(() => isConfirmed = true);
-        await Cysharp.Threading.Tasks.UniTask.WaitUntil(() => isConfirmed, cancellationToken: uiManager.GetCancellationTokenOnDestroy());
-
-        SaveManager.Instance.HasSeenFirstPlayNotice = true;
     }
 
     public static async Cysharp.Threading.Tasks.UniTask<GameStage?> RequestStageSelectionAsync(this UIManager uiManager)
@@ -549,6 +533,8 @@ public static class UIManagerExtension
             Debug.LogWarning("NoticePopup가 생성되지 않았습니다");
             return;
         }
+
+        UnityEngine.EventSystems.EventSystem.current?.SetSelectedGameObject(null);
 
         if (uiBase is NoticePopupUI noticePopup)
         {

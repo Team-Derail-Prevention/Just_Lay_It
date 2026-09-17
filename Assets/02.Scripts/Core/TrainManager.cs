@@ -36,7 +36,7 @@ public class TrainManager : SingletonBase<TrainManager>
 
     public static event Action<int> OnTrainStopWarning;
     // 게임오버 시간 초
-    private float _maxStopAllowedTime = 3.0f;
+    private float _maxStopAllowedTime = 4.0f;
     private float _stopTimer = 0f;
     private int _lastWarningSecond = 0; // 마지막으로 이벤트를 발생시킨 '초' 기록용
 
@@ -56,8 +56,7 @@ public class TrainManager : SingletonBase<TrainManager>
     {
         if (GameManager.Instance == null || GameManager.Instance.CurrentGameState != GameState.Playing || _headTrain == null || IsStation)
         {
-            _stopTimer = 0f;
-            _lastWarningSecond = 0;
+            ClearStopWarningIfActive();
             return;
         }
 
@@ -75,7 +74,9 @@ public class TrainManager : SingletonBase<TrainManager>
             if (currentSecond > _lastWarningSecond)
             {
                 _lastWarningSecond = currentSecond;
-                OnTrainStopWarning?.Invoke(currentSecond); // 구독한 객체들에게 1초마다 알림 발송
+
+                int remainingSecond = Mathf.Max(0, Mathf.CeilToInt(_maxStopAllowedTime) - currentSecond);
+                OnTrainStopWarning?.Invoke(remainingSecond); // 남은 초를 그대로 전달 (2 -> 1 -> 0)
             }
 
             if (_stopTimer >= _maxStopAllowedTime)
@@ -86,21 +87,31 @@ public class TrainManager : SingletonBase<TrainManager>
         else
         {
             // 정상 주행 중이면 타이머 리셋
-            _stopTimer = 0f;
-            _lastWarningSecond = 0;
+            ClearStopWarningIfActive();
         }
+    }
+
+    private void ClearStopWarningIfActive()
+    {
+        if (_lastWarningSecond > 0)
+        {
+            OnTrainStopWarning?.Invoke(-1); // -1: 정지 해제 신호(HUD에서 숨김 처리용)
+        }
+
+        _stopTimer = 0f;
+        _lastWarningSecond = 0;
     }
 
     private void TriggerStopGameOver()
     {
-        _stopTimer = 0f;
-        _lastWarningSecond = 0;
         Debug.LogError($"[TrainManager] 기차가 {_maxStopAllowedTime}초 이상 정지 상태여서 게임오버 처리됩니다.");
 
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.GameOver();
-        }
+        OnTrainStopWarning?.Invoke(-1);
+
+        _stopTimer = 0f;
+        _lastWarningSecond = 0;
+
+        GameManager.Instance.GameOver();
     }
 
     // 터미널 스폰 + 동,서,남,북 선택 시 이동

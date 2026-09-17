@@ -126,15 +126,22 @@ public class BaseArrivalUI : UIBase
         if (Button_TrainDeparture != null) Button_TrainDeparture.OnPointerExitButton -= OnButtonHoverExit;
     }
 
-    private void OnButtonHoverEnter(string description)
+    private void OnButtonHoverEnter(string description, int fontSize)
     {
-        if (Text_BK != null)
+        if (Text_BK == null)
         {
-            Text_BK.text = description;
+            return;
+        }
+
+        Text_BK.text = description;
+
+        if (fontSize > 0)
+        {
+            Text_BK.fontSize = fontSize;
         }
     }
 
-    private void OnTrainRepairHoverEnter(string description)
+    private void OnTrainRepairHoverEnter(string description, int fontSize)
     {
         if (Text_BK == null)
         {
@@ -149,9 +156,10 @@ public class BaseArrivalUI : UIBase
 
         string template = LocalizationManager.Instance.GetText("Base_UI_LM_Button_hover_05");
         Text_BK.text = string.Format(template, curHpPercent, REPAIR_STONE_COST, REPAIR_HEAL_PERCENT);
+        Text_BK.fontSize = LocalizationManager.Instance.GetFontSize("Base_UI_LM_Button_hover_05");
     }
 
-    private void OnWeaponGachaHoverEnter(string description)
+    private void OnWeaponGachaHoverEnter(string description, int fontSize)
     {
         if (Text_BK == null)
         {
@@ -167,6 +175,7 @@ public class BaseArrivalUI : UIBase
         int gachaCost = NetworkGachaService.Instance.CurrentGachaCost;
         string template = LocalizationManager.Instance.GetText("Base_UI_LM_Button_hover_01");
         Text_BK.text = string.Format(template, gachaCost);
+        Text_BK.fontSize = LocalizationManager.Instance.GetFontSize("Base_UI_LM_Button_hover_01");
     }
 
     private void OnButtonHoverExit()
