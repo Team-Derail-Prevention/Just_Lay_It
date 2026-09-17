@@ -39,7 +39,7 @@ public class NetworkTrainStrengtheningService : SingletonBase<NetworkTrainStreng
                 continue;
             }
 
-            var slotVm = new TrainStatSlotViewModel(data.Id, category, data.Name, data.IconPath, data.MaxLevel, data.BaseCost, data.CostIncreasePerLevel);
+            var slotVm = new TrainStatSlotViewModel(data.Id, category, data.Name_Ko, data.Name_En, data.NameFontSize_Ko, data.NameFontSize_En, data.IconPath, data.MaxLevel, data.BaseCost, data.CostIncreasePerLevel);
             _localVm.AddSlot(slotVm);
         }
     }
@@ -60,7 +60,7 @@ public class NetworkTrainStrengtheningService : SingletonBase<NetworkTrainStreng
     {
         if (isApproved == false)
         {
-            UIManager.Instance.OpenExitConfirmPopup(null, null, "돌이 부족합니다.");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_02"));
             return;
         }
 

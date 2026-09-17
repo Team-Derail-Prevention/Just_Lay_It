@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel;
 using TMPro;
 using UnityEngine.InputSystem;
+using Enums;
 
 public class ScoreUI : UIBase
 {
@@ -21,16 +22,14 @@ public class ScoreUI : UIBase
     [Header("처치한 몬스터 수")]
     [SerializeField] private TextMeshProUGUI Text_KillScore;
 
-    private const string TITLE_BASE_ARRIVAL = "운행 중간 점검";
-    private const string TITLE_GAME_CLEAR = "운행 결과 : Game Clear";
-    private const string TITLE_GAME_OVER = "운행 결과 : Game Over";
-
     private readonly ScoreViewModel _viewModel = new ScoreViewModel();
     private Action _onConfirm;
 
     private void OnEnable()
     {
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+        LocalizationEventHub.Instance.OnLanguageChanged += OnLanguageChanged_LocalizationEventHub;
+
         RefreshAllTexts();
     }
 
@@ -51,7 +50,18 @@ public class ScoreUI : UIBase
     private void OnDisable()
     {
         _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+
+        if (LocalizationEventHub.Instance != null)
+        {
+            LocalizationEventHub.Instance.OnLanguageChanged -= OnLanguageChanged_LocalizationEventHub;
+        }
+
         _onConfirm = null;
+    }
+
+    private void OnLanguageChanged_LocalizationEventHub(LanguageType language)
+    {
+        SetTitleText();
     }
 
     public void Init(float totalDistance, int rescuedHumanCount, int collectedResourceCount, int killCount, ScoreResultType resultType, Action onConfirm)
@@ -108,14 +118,17 @@ public class ScoreUI : UIBase
         switch (_viewModel.ResultType)
         {
             case ScoreResultType.GameClear:
-                Text_Title.text = TITLE_GAME_CLEAR;
+                Text_Title.text = LocalizationManager.Instance.GetText("Score_PopUp_UI_07");
                 break;
             case ScoreResultType.GameOver:
-                Text_Title.text = TITLE_GAME_OVER;
+                Text_Title.text = LocalizationManager.Instance.GetText("Score_PopUp_UI_08");
+                break;
+            case ScoreResultType.SimpleClear:
+                Text_Title.text = LocalizationManager.Instance.GetText("Score_PopUp_UI_09");
                 break;
             case ScoreResultType.BaseArrival:
             default:
-                Text_Title.text = TITLE_BASE_ARRIVAL;
+                Text_Title.text = LocalizationManager.Instance.GetText("Score_PopUp_UI_06");
                 break;
         }
     }

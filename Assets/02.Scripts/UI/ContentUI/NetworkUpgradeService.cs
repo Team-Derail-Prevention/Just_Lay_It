@@ -65,7 +65,7 @@ public class NetworkUpgradeService : SingletonBase<NetworkUpgradeService>
 
         foreach (var data in dataList)
         {
-            var slotVm = new UpgradeSlotViewModel(data.Id, data.Name, data.IconPath, data.Description, data.MaxLevel, data.BaseCost, data.CostIncreasePerLevel);
+            var slotVm = new UpgradeSlotViewModel(data.Id, data.Name_Ko, data.Name_En, data.IconPath, data.Description_Ko, data.Description_En, data.NameFontSize_Ko, data.NameFontSize_En, data.MaxLevel, data.BaseCost, data.CostIncreasePerLevel);
             _localUpgradeViewModel.AddSlot(slotVm);
         }
 

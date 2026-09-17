@@ -12,7 +12,6 @@ public class LoadingUI : UIBase
 
     [Header("로딩 설정")]
     [SerializeField] private float _loadingBarTimer = 2.0f;
-    [SerializeField] private string _loadingMessage = "기지를 향해 나아가는 중";
 
     private CancellationTokenSource _cts;
     private bool _isDataLoaded;
@@ -77,6 +76,8 @@ public class LoadingUI : UIBase
         UIManager.Instance.OpenHudMinimapUI();
         UIManager.Instance.OpenHudViewControlUI();
         UIManager.Instance.OpenInGameMenuButtonUI();
+        UIManager.Instance.OpenHpWarningOverlayUI();
+        UIManager.Instance.PreloadSandstormOverlayUI();
     }
 
     private void SetProgressUI(float progress01)
@@ -98,7 +99,7 @@ public class LoadingUI : UIBase
         }
 
         _lastDisplayedPercent = percent;
-        Text_LoadingLabel.text = $"{_loadingMessage} {percent}%";
+        Text_LoadingLabel.text = string.Format(LocalizationManager.Instance.GetText("Loading_UI_01"), percent);
     }
 
     // 실제 맵 로딩 관련 추후 수정

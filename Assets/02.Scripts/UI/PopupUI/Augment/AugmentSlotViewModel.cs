@@ -157,7 +157,7 @@ public class AugmentSlotViewModel : ViewModelBase
         DisplayName = data.WeaponName;
         GradeName = data.GradeName;
         IconPath = data.IconPath;
-        Description = data.Description;
+        Description = data.Description_Ko;
         Price = data.Price;
     }
 

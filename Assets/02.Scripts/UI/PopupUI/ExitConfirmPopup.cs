@@ -13,12 +13,9 @@ public class ExitConfirmPopup : UIBase
     [Header("폰트 크기")]
     [SerializeField] private float _customMessageFontSize = 42f;
 
-    private float _defaultFontSize;
-    private bool _isDefaultFontSizeCaptured;
-    private string _defaultMessage;
-    private bool _isDefaultMessageCaptured;
     private Action _onConfirmExit;
     private Action _onCancel;
+    private const string DEFAULT_MESSAGE_ID = "ExitConfirm_PopUp_UI_01";
 
     private void OnEnable()
     {
@@ -39,9 +36,6 @@ public class ExitConfirmPopup : UIBase
     {
         Debug.Log($"[ExitConfirmPopup] Init 호출됨, onConfirmExit target={onConfirmExit?.Target}, method={onConfirmExit?.Method}");
 
-        CaptureDefaultFontSizeIfNeeded();
-        CaptureDefaultMessageIfNeeded();
-
         if (_messageText != null)
         {
             if (string.IsNullOrEmpty(message) == false)
@@ -51,35 +45,13 @@ public class ExitConfirmPopup : UIBase
             }
             else
             {
-                _messageText.text = _defaultMessage;
-                _messageText.fontSize = _defaultFontSize;
+                _messageText.text = LocalizationManager.Instance.GetText(DEFAULT_MESSAGE_ID);
+                _messageText.fontSize = LocalizationManager.Instance.GetFontSize(DEFAULT_MESSAGE_ID);
             }
         }
 
         _onConfirmExit = onConfirmExit;
         _onCancel = onCancel;
-    }
-
-    private void CaptureDefaultFontSizeIfNeeded()
-    {
-        if (_isDefaultFontSizeCaptured == true || _messageText == null)
-        {
-            return;
-        }
-
-        _defaultFontSize = _messageText.fontSize;
-        _isDefaultFontSizeCaptured = true;
-    }
-
-    private void CaptureDefaultMessageIfNeeded()
-    {
-        if (_isDefaultMessageCaptured == true || _messageText == null)
-        {
-            return;
-        }
-
-        _defaultMessage = _messageText.text;
-        _isDefaultMessageCaptured = true;
     }
 
     private void OnClick_Yes()

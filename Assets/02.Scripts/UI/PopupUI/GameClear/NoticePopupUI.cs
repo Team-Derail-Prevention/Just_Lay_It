@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using TMPro;
+using Enums;
 
 public class NoticePopupUI : UIBase
 {
@@ -11,12 +12,16 @@ public class NoticePopupUI : UIBase
     [SerializeField] private TextMeshProUGUI _enterGuideText;
 
     [Header("안내 문구")]
-    [SerializeField] private string _nextPageGuideMessage = "다음 'Enter'";
-    [SerializeField] private string _confirmGuideMessage = "확인 'Enter'";
+    [SerializeField] private string _nextPageGuideMessage = "Next'Enter'";
+    [SerializeField] private string _confirmGuideMessage = "'Enter'";
 
-    [Header("TIP 이미지 목록")]
-    [SerializeField] private Sprite[] _tipSprites;
+    [Header("TIP 이미지 목록 (한국어)")]
+    [SerializeField] private Sprite[] _tipSpritesKo;
 
+    [Header("TIP 이미지 목록 (영어)")]
+    [SerializeField] private Sprite[] _tipSpritesEn;
+
+    private Sprite[] _tipSprites;
     private int _currentPageIndex;
     private Action _onConfirm;
 
@@ -45,6 +50,7 @@ public class NoticePopupUI : UIBase
     {
         _onConfirm = onConfirm;
         _currentPageIndex = 0;
+        _tipSprites = LocalizationManager.Instance.CurrentLanguage == LanguageType.Korean ? _tipSpritesKo : _tipSpritesEn;
 
         UpdatePage();
     }

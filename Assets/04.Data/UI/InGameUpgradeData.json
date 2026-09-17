@@ -2,82 +2,109 @@
   {
     "Id": "BATTLE_HP",
     "Category": "Battle",
-    "Name": "열차 체력 증가 (+ 50)",
+    "Name_Ko": "열차 체력 증가 (+ 50)",
+    "Name_En": "Training HP Up (+ 50)",
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[BATTLE_HP_Icon]"
+    "IconPath": "InGameUpgrade_Icon[BATTLE_HP_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 20
   },
   {
     "Id": "BATTLE_DAMAGE",
     "Category": "Battle",
-    "Name": "열차 피해량 증가 (+ 2)",
+    "Name_Ko": "열차 피해량 증가 (+ 2)",
+    "Name_En": "Training Damage Up (+ 2)",
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[BATTLE_DAMAGE_Icon]"
+    "IconPath": "InGameUpgrade_Icon[BATTLE_DAMAGE_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 20
   },
   {
     "Id": "BATTLE_DEFENSE",
     "Category": "Battle",
-    "Name": "열차 방어력 증가 (+ 2)",
+    "Name_Ko": "열차 방어력 증가 (+ 2)",
+    "Name_En": "Training Defense Up (+ 2)",
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[BATTLE_DEFENSE_Icon]"
+    "IconPath": "InGameUpgrade_Icon[BATTLE_DEFENSE_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 20
   },
   {
     "Id": "CARGO_RESOURCE_LIMIT",
     "Category": "Cargo",
-    "Name": "자원 적제 제한량 증가 (+ 100)",
+    "Name_Ko": "자원 적제 제한량 증가 (+ 100)",
+    "Name_En": "Resources Capacity limit UP (+ 100)",
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[CARGO_RESOURCE_LIMIT_Icon]"
+    "IconPath": "InGameUpgrade_Icon[CARGO_RESOURCE_LIMIT_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 18
   },
   {
     "Id": "CARGO_CREW_LIMIT",
     "Category": "Cargo",
-    "Name": "인원 탑승 제한량 증가 (+ 5)",
+    "Name_Ko": "인원 탑승 제한량 증가 (+ 5)",
+    "Name_En": "Passenger limit Up (+ 5)",
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[CARGO_CREW_LIMIT_Icon]"
+    "IconPath": "InGameUpgrade_Icon[CARGO_CREW_LIMIT_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 20
   },
   {
     "Id": "CARGO_WEAPON_LIMIT",
     "Category": "Cargo",
-    "Name": "무기 장착 칸 제한 해제",
+    "Name_Ko": "무기 장착 칸 제한 해제",
+    "Name_En": "Weapon Slot limit Up",
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[CARGO_WEAPON_LIMIT_Icon]"
+    "IconPath": "InGameUpgrade_Icon[CARGO_WEAPON_LIMIT_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 20
   },
   {
     "Id": "DRONE_GATHER_SPEED",
     "Category": "Drone",
-    "Name": "자원 채집 속도 증가 (- 0.15)",
+    "Name_Ko": "자원 채집 속도 증가 (- 0.15)",
+    "Name_En": "Resources Harvesting Speed Up (- 0.15)",
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[DRONE_GATHER_SPEED_Icon]"
+    "IconPath": "InGameUpgrade_Icon[DRONE_GATHER_SPEED_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 18
   },
   {
     "Id": "DRONE_GATHER_EFFICIENCY",
     "Category": "Drone",
-    "Name": "자원 채집 효율 증가 (+ 1)",
+    "Name_Ko": "자원 채집 효율 증가 (+ 1)",
+    "Name_En": "Resources Harvesting Up (+ 1)",
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[DRONE_GATHER_EFFICIENCY_Icon]"
+    "IconPath": "InGameUpgrade_Icon[DRONE_GATHER_EFFICIENCY_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 19
   },
   {
     "Id": "DRONE_MOVE_SPEED",
     "Category": "Drone",
-    "Name": "드론 행동 속도 증가 (+ 0.15))",
+    "Name_Ko": "드론 행동 속도 증가 (+ 0.15))",
+    "Name_En": "Drone Behavior Speed Up (+ 0.15))",
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
-    "IconPath": "InGameUpgrade_Icon[DRONE_MOVE_SPEED_Icon]"
+    "IconPath": "InGameUpgrade_Icon[DRONE_MOVE_SPEED_Icon]",
+    "NameFontSize_Ko": 20,
+    "NameFontSize_En": 18
   }
 ]

@@ -1,17 +1,27 @@
 ﻿using UnityEngine;
+using Enums;
 
 public class UpgradeSlotViewModel : ViewModelBase
 {
     public string SlotDataId { get; set; }
-    public string DisplayName { get; private set; }
     public string IconPath { get; private set; }
-    public string Description { get; private set; }
     public int MaxLevel { get; set; } = 4;
 
+    private readonly string _displayNameKo;
+    private readonly string _displayNameEn;
+    private readonly string _descriptionKo;
+    private readonly string _descriptionEn;
+    private readonly int _nameFontSizeKo;
+    private readonly int _nameFontSizeEn;
     private readonly int _baseCost;
     private readonly int _costIncreasePerLevel;
 
+    public string DisplayName => LocalizationManager.Instance.CurrentLanguage == LanguageType.Korean ? _displayNameKo : _displayNameEn;
+    public string Description => LocalizationManager.Instance.CurrentLanguage == LanguageType.Korean ? _descriptionKo : _descriptionEn;
+    public int NameFontSize => LocalizationManager.Instance.CurrentLanguage == LanguageType.Korean ? _nameFontSizeKo : _nameFontSizeEn;
+
     private int _currentLevel;
+
     public int CurrentLevel
     {
         get
@@ -68,12 +78,16 @@ public class UpgradeSlotViewModel : ViewModelBase
         }
     }
 
-    public UpgradeSlotViewModel(string slotDataId, string displayName, string iconPath, string description, int maxLevel, int baseCost, int costIncreasePerLevel)
+    public UpgradeSlotViewModel(string slotDataId, string displayNameKo, string displayNameEn, string iconPath, string descriptionKo, string descriptionEn, int nameFontSizeKo, int nameFontSizeEn, int maxLevel, int baseCost, int costIncreasePerLevel)
     {
         SlotDataId = slotDataId;
-        DisplayName = displayName;
+        _displayNameKo = displayNameKo;
+        _displayNameEn = displayNameEn;
         IconPath = iconPath;
-        Description = description;
+        _descriptionKo = descriptionKo;
+        _descriptionEn = descriptionEn;
+        _nameFontSizeKo = nameFontSizeKo;
+        _nameFontSizeEn = nameFontSizeEn;
         MaxLevel = maxLevel;
         _baseCost = baseCost;
         _costIncreasePerLevel = costIncreasePerLevel;

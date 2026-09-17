@@ -41,6 +41,11 @@ public class DebugTestPanel : MonoBehaviour
             GameManager.Instance.Debug_GameClear();
         }
 
+        if (Keyboard.current.f10Key.wasPressedThisFrame == true)
+        {
+            UIManager.Instance.OpenSandstormOverlayUI(8f);
+        }
+
         if (Keyboard.current.f11Key.wasPressedThisFrame == true)
         {
             SaveManager.Instance.Debug_ResetFirstPlayNotice();

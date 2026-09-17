@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
+using Enums;
 
 public enum EGameBookCategory
 {
@@ -52,6 +53,8 @@ public class GameBookUI : UIBase
     [SerializeField] private UIButton Button_CloseUI;
 
     private Dictionary<string, GameBookSlotUI> _slotList = new Dictionary<string, GameBookSlotUI>();
+    private string _curSelectedSlotId;
+    private EGameBookCategory _curSelectedCategory;
 
     private void OnEnable()
     {
@@ -69,6 +72,8 @@ public class GameBookUI : UIBase
         {
             Button_CategoryB.BindOnClickButtonEvent(OnClick_CategoryB);
         }
+
+        LocalizationEventHub.Instance.OnLanguageChanged += OnLanguageChanged_LocalizationEventHub;
 
         OnClick_CategoryA();
     }
@@ -90,7 +95,20 @@ public class GameBookUI : UIBase
             Button_CategoryB.UnBindOnClickButtonEvent(OnClick_CategoryB);
         }
 
+        if (LocalizationEventHub.Instance != null)
+        {
+            LocalizationEventHub.Instance.OnLanguageChanged -= OnLanguageChanged_LocalizationEventHub;
+        }
+
         OnDestroyAndClearSlotList();
+    }
+
+    private void OnLanguageChanged_LocalizationEventHub(LanguageType language)
+    {
+        if (string.IsNullOrEmpty(_curSelectedSlotId) == false)
+        {
+            OnClickChildSlotSelected(_curSelectedSlotId, _curSelectedCategory);
+        }
     }
 
     private void OnDestroyAndClearSlotList()
@@ -231,12 +249,17 @@ public class GameBookUI : UIBase
 
     private void OnClickChildSlotSelected(string slotDataId, EGameBookCategory selectedSlotCategory)
     {
+        _curSelectedSlotId = slotDataId;
+        _curSelectedCategory = selectedSlotCategory;
+
         foreach (var slotKv in _slotList)
         {
             var slot = slotKv.Value;
             var dataId = slot.GetSlotDataId();
             slot.SetSelectedUI(slotDataId == dataId);
         }
+
+        bool isKorean = LocalizationManager.Instance.CurrentLanguage == LanguageType.Korean;
 
         if (selectedSlotCategory == EGameBookCategory.CategoryA)
         {
@@ -248,12 +271,12 @@ public class GameBookUI : UIBase
 
             if (Text_WeaponName != null) Text_WeaponName.text = weaponData.WeaponName;
             if (Text_WeaponGrade != null) Text_WeaponGrade.text = weaponData.GradeName;
-            if (Text_WeaponDescription != null) Text_WeaponDescription.text = weaponData.Description;
+            if (Text_WeaponDescription != null) Text_WeaponDescription.text = isKorean ? weaponData.Description_Ko : weaponData.Description_En;
             if (Text_Damage != null) Text_Damage.text = weaponData.Atk.ToString();
             if (Text_FireRate != null) Text_FireRate.text = weaponData.FireRate.ToString();
             if (Text_Range != null) Text_Range.text = weaponData.Range.ToString();
             if (Text_MagazineSize != null) Text_MagazineSize.text = weaponData.MagazineSize.ToString();
-            if (Text_ReloadTime != null) Text_ReloadTime.text = $"{weaponData.ReloadTime} 초";
+            if (Text_ReloadTime != null) Text_ReloadTime.text = $"{weaponData.ReloadTime}";
 
             if (string.IsNullOrEmpty(weaponData.IconPath) == false)
             {
@@ -268,8 +291,18 @@ public class GameBookUI : UIBase
                 return;
             }
 
-            if (Text_MonsterName != null) Text_MonsterName.text = monsterData.MonsterName;
-            if (Text_MonsterDescription != null) Text_MonsterDescription.text = monsterData.Description;
+            if (Text_MonsterName != null)
+            {
+                Text_MonsterName.text = isKorean ? monsterData.MonsterName_Ko : monsterData.MonsterName_En;
+                Text_MonsterName.fontSize = isKorean ? monsterData.NameFontSize_Ko : monsterData.NameFontSize_En;
+            }
+
+            if (Text_MonsterDescription != null)
+            {
+                Text_MonsterDescription.text = isKorean ? monsterData.Description_Ko : monsterData.Description_En;
+                Text_MonsterDescription.fontSize = isKorean ? monsterData.DescriptionFontSize_Ko : monsterData.DescriptionFontSize_En;
+            }
+
             if (Text_Hp != null) Text_Hp.text = monsterData.Hp.ToString();
             if (Text_MonsterAtk != null) Text_MonsterAtk.text = monsterData.Atk.ToString();
             if (Text_Speed != null) Text_Speed.text = monsterData.Speed.ToString();

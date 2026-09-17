@@ -1,8 +1,10 @@
 [
   {
     "Id": "INGAME_TRAIN_MAX_HP",
-    "Name": "내구도 강화",
-    "Description": "열차의 내구도를 높여 최대 체력을 증가시킵니다. (+50)",
+    "Name_Ko": "내구도 강화",
+    "Name_En": "Durability Up",
+    "Description_Ko": "열차의 내구도를 높여 최대 체력을 증가시킵니다. (+50)",
+    "Description_En": "Increases the train's durability and boosts its maximum health. (+50)",
     "TargetStatType": "MaxHp",
     "Operation": "Add",
     "Value": 50,
@@ -13,8 +15,10 @@
   },
   {
     "Id": "INGAME_TRAIN_DEFENSE",
-    "Name": "장갑 강화",
-    "Description": "외장 장갑을 덧대어 적의 공격으로 입는 피해를 감소시킵니다. (+2)",
+    "Name_Ko": "장갑 강화",
+    "Name_En": "Plating Up",
+    "Description_Ko": "외장 장갑을 덧대어 적의 공격으로 입는 피해를 감소시킵니다. (+2)",
+    "Description_En": "Add outer armor to reduce damage taken from enemy attacks. (+2)",
     "TargetStatType": "Defense",
     "Operation": "Add",
     "Value": 2,

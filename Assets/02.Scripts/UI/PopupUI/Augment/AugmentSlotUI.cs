@@ -306,7 +306,7 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
         if (_slotState.IsLocked == true)
         {
             SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Denied);
-            UIManager.Instance.OpenExitConfirmPopup(null, null, "아직 열리지 않은 칸입니다.");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_14"));
             return;
         }
 
@@ -318,7 +318,7 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
         else if (_slotState.Augment != null)
         {
             SoundManager.Instance?.PlaySFX(SfxAddress.Ui.Denied);
-            UIManager.Instance.OpenExitConfirmPopup(null, null, "이미 다른 무기가 장착된 칸입니다.");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_15"));
         }
     }
 
@@ -334,7 +334,7 @@ public class AugmentSlotUI : MonoBehaviour,IBeginDragHandler, IDragHandler, IEnd
             return;
         }
 
-        UIManager.Instance.OpenExitConfirmPopup(ConfirmSell, null, "이 증강을 판매하시겠습니까?");
+        UIManager.Instance.OpenExitConfirmPopup(ConfirmSell, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_16"));
     }
 
     private void ConfirmSell()

@@ -35,7 +35,7 @@ public class GachaUI : UIBase
         bool isOpened = NetworkGachaService.Instance.OpenGachaBox();
         if (isOpened == false)
         {
-            UIManager.Instance.OpenExitConfirmPopup(null, null, "재화가 부족합니다.");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_04"));
             UIManager.Instance.CloseWeaponGachaUI();
             return;
         }
@@ -106,7 +106,8 @@ public class GachaUI : UIBase
     {
         if (Text_RerollCount != null)
         {
-            Text_RerollCount.text = $"x{_vm.RerollCountCurrent}/{_vm.RerollCountMax}";
+            Text_RerollCount.text = $"{LocalizationManager.Instance.GetText("WeaponGacha_PopUp_UI_03")} : {_vm.RerollCountCurrent}/{_vm.RerollCountMax}";
+            Text_RerollCount.fontSize = LocalizationManager.Instance.GetFontSize("WeaponGacha_PopUp_UI_03");
         }
 
         if (Button_RerollAll != null)

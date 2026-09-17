@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using Enums;
 
 public class HudTrainStatusUI : UIBase
 {
@@ -26,6 +27,13 @@ public class HudTrainStatusUI : UIBase
     [Header("이동 거리")]
     [SerializeField] private TextMeshProUGUI Text_Distance;
 
+    [Header("난이도")]
+    [SerializeField] private TextMeshProUGUI Text_Stage;
+
+    [Header("정지 경고")]
+    [SerializeField] private GameObject Cont;
+    [SerializeField] private TextMeshProUGUI Text_Cont;
+
     private void Awake()
     {
         InitHpTextOutline();
@@ -45,6 +53,11 @@ public class HudTrainStatusUI : UIBase
 
     private void OnEnable()
     {
+        if (Cont != null)
+        {
+            Cont.SetActive(false);
+        }
+
         if (TrainStatusEventHub.Instance == null)
         {
             Debug.LogError("[HudTrainStatusUI] TrainStatusEventHub.Instance가 null입니다. 씬에 배치했는지 확인하세요.");
@@ -55,25 +68,65 @@ public class HudTrainStatusUI : UIBase
         TrainStatusEventHub.Instance.OnSpeedChanged += SetSpeed;
         TrainStatusEventHub.Instance.OnDistanceChanged += SetDistance;
         TrainStatusEventHub.Instance.OnPlayTimeChanged += SetPlayTime;
+        TrainManager.OnTrainStopWarning += SetTrainStopWarning;
+
+        LocalizationEventHub.Instance.OnLanguageChanged += OnLanguageChanged_LocalizationEventHub;
 
         if (TrainManager.Instance != null && TrainManager.Instance.ActiveTrain != null)
         {
             Train activeTrain = TrainManager.Instance.ActiveTrain;
             SetHp(activeTrain.CurrentHp, activeTrain.MaxHp);
         }
+
+        RefreshStageText();
     }
 
     private void OnDisable()
     {
-        if (TrainStatusEventHub.Instance == null)
+        if (TrainStatusEventHub.Instance != null)
+        {
+            TrainStatusEventHub.Instance.OnHpChanged -= SetHp;
+            TrainStatusEventHub.Instance.OnSpeedChanged -= SetSpeed;
+            TrainStatusEventHub.Instance.OnDistanceChanged -= SetDistance;
+            TrainStatusEventHub.Instance.OnPlayTimeChanged -= SetPlayTime;
+            TrainManager.OnTrainStopWarning -= SetTrainStopWarning;
+        }
+
+        if (LocalizationEventHub.Instance != null)
+        {
+            LocalizationEventHub.Instance.OnLanguageChanged -= OnLanguageChanged_LocalizationEventHub;
+        }
+    }
+
+    private void OnLanguageChanged_LocalizationEventHub(LanguageType language)
+    {
+        RefreshStageText();
+    }
+
+    private void RefreshStageText()
+    {
+        if (Text_Stage == null || GameManager.Instance == null)
         {
             return;
         }
 
-        TrainStatusEventHub.Instance.OnHpChanged -= SetHp;
-        TrainStatusEventHub.Instance.OnSpeedChanged -= SetSpeed;
-        TrainStatusEventHub.Instance.OnDistanceChanged -= SetDistance;
-        TrainStatusEventHub.Instance.OnPlayTimeChanged -= SetPlayTime;
+        string stageId = GetStageLocalizationId(GameManager.Instance.CurrentGameStage);
+        Text_Stage.text = LocalizationManager.Instance.GetText(stageId);
+    }
+
+    private string GetStageLocalizationId(GameStage stage)
+    {
+        switch (stage)
+        {
+            case GameStage.Stage1:
+                return "StageSelect_PopUp_UI_01";
+            case GameStage.Stage2:
+                return "StageSelect_PopUp_UI_02";
+            case GameStage.Stage3:
+                return "StageSelect_PopUp_UI_03";
+            default:
+                return "StageSelect_PopUp_UI_01";
+        }
     }
 
     public void SetHp(float curHp, float maxHp)
@@ -144,6 +197,27 @@ public class HudTrainStatusUI : UIBase
         if (Text_Distance != null)
         {
             Text_Distance.text = $"{Mathf.RoundToInt(distanceMeters)}M";
+        }
+    }
+
+    public void SetTrainStopWarning(int remainingSecond)
+    {
+        if (Cont == null)
+        {
+            return;
+        }
+
+        if (remainingSecond < 0)
+        {
+            Cont.SetActive(false);
+            return;
+        }
+
+        Cont.SetActive(true);
+
+        if (Text_Cont != null)
+        {
+            Text_Cont.text = remainingSecond.ToString();
         }
     }
 }

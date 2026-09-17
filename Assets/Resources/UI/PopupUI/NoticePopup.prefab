@@ -65,10 +65,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uD655\uC778  'Enter'"
+  m_text: Next  'Enter'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
-  m_sharedMaterial: {fileID: 2665294240148262135, guid: 4b28519c8617db84a983a59c620e10de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+  m_sharedMaterial: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -265,12 +265,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NoticePopupUI
   _tipImage: {fileID: 6772651737357800445}
   _enterGuideText: {fileID: 3387989607014400251}
-  _nextPageGuideMessage: "\uB2E4\uC74C 'Enter'"
-  _confirmGuideMessage: "\uD655\uC778 'Enter'"
-  _tipSprites:
-  - {fileID: 21300000, guid: 23ab5bdeadc14db438905e8025ea9ff7, type: 3}
-  - {fileID: 21300000, guid: 6b50f3d1f6ee76647bf0160ae0ec1947, type: 3}
-  - {fileID: 21300000, guid: 15d6df8c32075a549b1d938d6651f805, type: 3}
+  _nextPageGuideMessage: ' Next ''Enter'''
+  _confirmGuideMessage: ' ''Enter'''
+  _tipSpritesKo:
+  - {fileID: 21300000, guid: 46a28158f4c1c1d4492bb6815b90e478, type: 3}
+  - {fileID: 21300000, guid: 51032a661cb132b4eb9150f3c15e7cc2, type: 3}
+  - {fileID: 21300000, guid: b9f63d4ca823f9d4e83a3e04491174d7, type: 3}
+  - {fileID: 21300000, guid: ac3dced8077d3384dacab1b15769535d, type: 3}
+  _tipSpritesEn:
+  - {fileID: 21300000, guid: 5ec1013d66359a342b8c2faff8eac4df, type: 3}
+  - {fileID: 21300000, guid: 7d94cd91fc19a3048b87d6879b6b72fc, type: 3}
+  - {fileID: 21300000, guid: 881e4402c7dbf8e4cb6258cf00fb9708, type: 3}
+  - {fileID: 21300000, guid: d928cc63ee91406499cb931bc88b48a7, type: 3}
 --- !u!1 &4764710488238852972
 GameObject:
   m_ObjectHideFlags: 0
@@ -336,7 +342,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 23ab5bdeadc14db438905e8025ea9ff7, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 46a28158f4c1c1d4492bb6815b90e478, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

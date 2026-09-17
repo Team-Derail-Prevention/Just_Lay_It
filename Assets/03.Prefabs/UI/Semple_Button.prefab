@@ -67,8 +67,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Game Start
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
+  m_sharedMaterial: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -276,6 +276,10 @@ MonoBehaviour:
   Text_Base: {fileID: 7350394956635442120}
   Image_Base: {fileID: 8350104151169847862}
   Image_Select: {fileID: 0}
+  Image_BKFrame: {fileID: 0}
+  _normalFrameColor: {r: 1, g: 1, b: 1, a: 1}
+  _hoverFrameColor: {r: 0, g: 1, b: 0, a: 1}
+  _description: 
 --- !u!114 &8503369621699697003
 MonoBehaviour:
   m_ObjectHideFlags: 0

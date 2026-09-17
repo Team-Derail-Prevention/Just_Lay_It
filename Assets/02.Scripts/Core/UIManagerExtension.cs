@@ -43,7 +43,10 @@ public enum UIType
     GameClearResultUI,
     StageSelectPopup,
     HudViewControlUI,
+    HpWarningOverlayUI,
+    SandstormOverlayUI,
 }
+
 public static class UIManagerExtension
 {
     public static string GetUIPath(this UIManager uiManager, UIRootType uiRootType, UIType uiType)
@@ -85,7 +88,6 @@ public static class UIManagerExtension
             GameManager.Instance.SetGameStage(selectedStage.Value);
         }
 
-        await uiManager.ShowFirstPlayNoticeIfNeededAsync();
         uiManager.CloseContentUI(UIType.LobbyUI);
 
         var loadingUI = uiManager.OpenLoadingUI();
@@ -102,21 +104,6 @@ public static class UIManagerExtension
         }
 
         return; 
-    }
-
-    public static async Cysharp.Threading.Tasks.UniTask ShowFirstPlayNoticeIfNeededAsync(this UIManager uiManager)
-    {
-        if (SaveManager.Instance == null || SaveManager.Instance.HasSeenFirstPlayNotice)
-        {
-            return;
-        }
-
-        bool isConfirmed = false;
-
-        uiManager.OpenNoticePopup(() => isConfirmed = true);
-        await Cysharp.Threading.Tasks.UniTask.WaitUntil(() => isConfirmed, cancellationToken: uiManager.GetCancellationTokenOnDestroy());
-
-        SaveManager.Instance.HasSeenFirstPlayNotice = true;
     }
 
     public static async Cysharp.Threading.Tasks.UniTask<GameStage?> RequestStageSelectionAsync(this UIManager uiManager)
@@ -550,6 +537,8 @@ public static class UIManagerExtension
             return;
         }
 
+        UnityEngine.EventSystems.EventSystem.current?.SetSelectedGameObject(null);
+
         if (uiBase is NoticePopupUI noticePopup)
         {
             noticePopup.Init(onConfirm);
@@ -581,5 +570,49 @@ public static class UIManagerExtension
     public static void CloseGameClearResultUI(this UIManager uiManager)
     {
         uiManager.ClosePopupUI(UIType.GameClearResultUI);
+    }
+
+    public static HpWarningOverlayUI OpenHpWarningOverlayUI(this UIManager uiManager)
+    {
+        var uiBase = uiManager.OpenMainUI(UIType.HpWarningOverlayUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("HpWarningOverlayUI가 생성되지 않았습니다");
+            return null;
+        }
+
+        return uiBase as HpWarningOverlayUI;
+    }
+
+    public static void CloseHpWarningOverlayUI(this UIManager uiManager)
+    {
+        uiManager.CloseMainUI(UIType.HpWarningOverlayUI);
+    }
+
+    public static SandstormOverlayUI OpenSandstormOverlayUI(this UIManager uiManager, float duration)
+    {
+        var uiBase = uiManager.OpenUI(UIRootType.BackgroundUI, UIType.SandstormOverlayUI);
+        if (uiBase == null)
+        {
+            Debug.LogWarning("SandstormOverlayUI가 생성되지 않았습니다");
+            return null;
+        }
+
+        if (uiBase is SandstormOverlayUI sandstormOverlayUI)
+        {
+            sandstormOverlayUI.Show(duration);
+        }
+
+        return uiBase as SandstormOverlayUI;
+    }
+
+    public static void CloseSandstormOverlayUI(this UIManager uiManager)
+    {
+        uiManager.CloseUI(UIRootType.BackgroundUI, UIType.SandstormOverlayUI);
+    }
+
+    public static void PreloadSandstormOverlayUI(this UIManager uiManager)
+    {
+        uiManager.OpenUI(UIRootType.BackgroundUI, UIType.SandstormOverlayUI, isInitialHide: true);
     }
 }

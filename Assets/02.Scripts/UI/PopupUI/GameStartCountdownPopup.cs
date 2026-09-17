@@ -37,7 +37,7 @@ public class GameStartCountdownPopup : UIBase
         {
             if (Text_Countdown != null)
             {
-                Text_Countdown.text = $"'{remainingSeconds}' 초 후 열차가 출발 합니다.";
+                Text_Countdown.text = string.Format(LocalizationManager.Instance.GetText("GameStartCountdown_PopUp_UI_01"), remainingSeconds);
             }
         }
         else

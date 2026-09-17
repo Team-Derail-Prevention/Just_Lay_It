@@ -63,6 +63,7 @@ public class TrainStrengtheningSlotUI : MonoBehaviour
         if (Text_Name != null)
         {
             Text_Name.text = _viewModel.DisplayName;
+            Text_Name.fontSize = _viewModel.NameFontSize;
         }
 
         if (Text_Level != null)

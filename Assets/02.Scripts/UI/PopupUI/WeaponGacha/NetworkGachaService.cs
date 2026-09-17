@@ -252,12 +252,12 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
         bool isAdded = NetworkAugmentService.Instance.AddAugment(cardState.WeaponDataId);
         if (isAdded == false)
         {
-            UIManager.Instance.OpenExitConfirmPopup(null, null, "인벤토리에 빈 칸이 없습니다.");
+            UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_09"));
             return;
         }
 
         UIManager.Instance.CloseWeaponGachaUI();
-        UIManager.Instance.OpenExitConfirmPopup(null, null, "무기가 인벤토리로 들어갔습니다.");
+        UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_10"));
     }
 
     public void PreloadGachaIcons()
