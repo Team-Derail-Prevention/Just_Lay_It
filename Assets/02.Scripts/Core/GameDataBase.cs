@@ -165,6 +165,8 @@ public class InGameUpgradeData : GameDataBase
     public int MaxLevel;
     public int BaseCost;
     public int CostIncreasePerLevel;
+    public int NameFontSize_Ko;
+    public int NameFontSize_En;
 }
 
 [Serializable]

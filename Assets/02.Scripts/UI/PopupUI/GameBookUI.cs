@@ -276,7 +276,7 @@ public class GameBookUI : UIBase
             if (Text_FireRate != null) Text_FireRate.text = weaponData.FireRate.ToString();
             if (Text_Range != null) Text_Range.text = weaponData.Range.ToString();
             if (Text_MagazineSize != null) Text_MagazineSize.text = weaponData.MagazineSize.ToString();
-            if (Text_ReloadTime != null) Text_ReloadTime.text = $"{weaponData.ReloadTime} 초";
+            if (Text_ReloadTime != null) Text_ReloadTime.text = $"{weaponData.ReloadTime}";
 
             if (string.IsNullOrEmpty(weaponData.IconPath) == false)
             {

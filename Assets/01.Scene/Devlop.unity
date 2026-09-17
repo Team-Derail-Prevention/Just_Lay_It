@@ -438,6 +438,10 @@ PrefabInstance:
       propertyPath: m_ReferenceResolution.y
       value: 1080
       objectReference: {fileID: 0}
+    - target: {fileID: 4668960120860792025, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
+      propertyPath: m_SortingOrder
+      value: 400
+      objectReference: {fileID: 0}
     - target: {fileID: 5135570578148450497, guid: d8856e72adf160c43b2d92ea608ee86b, type: 3}
       propertyPath: m_Name
       value: NeedGame

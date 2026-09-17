@@ -106,7 +106,8 @@ public class GachaUI : UIBase
     {
         if (Text_RerollCount != null)
         {
-            Text_RerollCount.text = $"x{_vm.RerollCountCurrent}/{_vm.RerollCountMax}";
+            Text_RerollCount.text = $"{LocalizationManager.Instance.GetText("WeaponGacha_PopUp_UI_03")} : {_vm.RerollCountCurrent}/{_vm.RerollCountMax}";
+            Text_RerollCount.fontSize = LocalizationManager.Instance.GetFontSize("WeaponGacha_PopUp_UI_03");
         }
 
         if (Button_RerollAll != null)

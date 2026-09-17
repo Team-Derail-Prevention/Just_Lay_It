@@ -268,15 +268,15 @@ MonoBehaviour:
   _nextPageGuideMessage: ' Next ''Enter'''
   _confirmGuideMessage: ' ''Enter'''
   _tipSpritesKo:
-  - {fileID: 21300000, guid: 23ab5bdeadc14db438905e8025ea9ff7, type: 3}
-  - {fileID: 21300000, guid: 6b50f3d1f6ee76647bf0160ae0ec1947, type: 3}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 21300000, guid: 46a28158f4c1c1d4492bb6815b90e478, type: 3}
+  - {fileID: 21300000, guid: 51032a661cb132b4eb9150f3c15e7cc2, type: 3}
+  - {fileID: 21300000, guid: b9f63d4ca823f9d4e83a3e04491174d7, type: 3}
+  - {fileID: 21300000, guid: ac3dced8077d3384dacab1b15769535d, type: 3}
   _tipSpritesEn:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 21300000, guid: 5ec1013d66359a342b8c2faff8eac4df, type: 3}
+  - {fileID: 21300000, guid: 7d94cd91fc19a3048b87d6879b6b72fc, type: 3}
+  - {fileID: 21300000, guid: 881e4402c7dbf8e4cb6258cf00fb9708, type: 3}
+  - {fileID: 21300000, guid: d928cc63ee91406499cb931bc88b48a7, type: 3}
 --- !u!1 &4764710488238852972
 GameObject:
   m_ObjectHideFlags: 0
@@ -342,7 +342,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 23ab5bdeadc14db438905e8025ea9ff7, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 46a28158f4c1c1d4492bb6815b90e478, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
