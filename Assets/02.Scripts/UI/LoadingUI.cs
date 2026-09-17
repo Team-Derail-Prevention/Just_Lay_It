@@ -76,6 +76,8 @@ public class LoadingUI : UIBase
         UIManager.Instance.OpenHudMinimapUI();
         UIManager.Instance.OpenHudViewControlUI();
         UIManager.Instance.OpenInGameMenuButtonUI();
+        UIManager.Instance.OpenHpWarningOverlayUI();
+        UIManager.Instance.PreloadSandstormOverlayUI();
     }
 
     private void SetProgressUI(float progress01)
