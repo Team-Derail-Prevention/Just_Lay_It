@@ -43,7 +43,7 @@ public class DebugTestPanel : MonoBehaviour
 
         if (Keyboard.current.f10Key.wasPressedThisFrame == true)
         {
-            UIManager.Instance.OpenSandstormOverlayUI(8f);
+            UIManager.Instance.OpenSandstormOverlayUI(20f);
         }
 
         if (Keyboard.current.f11Key.wasPressedThisFrame == true)
