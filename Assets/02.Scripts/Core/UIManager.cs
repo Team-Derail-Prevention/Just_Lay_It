@@ -31,7 +31,11 @@ public class UIManager : SingletonBase<UIManager>
         if (_openedUIDic.Contains(uiType) == false)
         {
             openedUI.gameObject.SetActive(isSetActiveOnOpen);
-            _openedUIDic.Add(uiType);
+
+            if (isSetActiveOnOpen == true)
+            {
+                _openedUIDic.Add(uiType);
+            }
         }
 
         openedUI.transform.SetAsLastSibling();
