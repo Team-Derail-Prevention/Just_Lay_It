@@ -224,5 +224,5 @@ MonoBehaviour:
   Image_Blackout: {fileID: 7560971737028620728}
   _blackoutColor: {r: 0.76, g: 0.64, b: 0.42, a: 1}
   _blackoutMaxIntensity: 0.95
-  _blackoutFullTime: 15
-  _blackoutSpeedExponent: 2
+  _blackoutFullTime: 30
+  _blackoutSpeedExponent: 1

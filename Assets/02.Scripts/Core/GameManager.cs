@@ -438,6 +438,7 @@ public class GameManager : SingletonBase<GameManager>
 
         _isSandstormActive = true;
         _sandstormDurationTimer = 0f;
+        OnCountSandStorm?.Invoke(_sandstormDurationSeconds);
         UI?.OpenSandstormOverlayUI(_sandstormDurationSeconds);
         Debug.Log("[GameManager] (디버그) 모래폭풍을 즉시 발동했습니다.");
     }
