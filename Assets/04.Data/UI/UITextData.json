@@ -1222,5 +1222,29 @@
     "Text_En": "Free",
     "FontSiz_Ko": 28,
     "FontSiz_En": 28
+  },
+  {
+    "Id": "RailBuild_UI_05",
+    "Place": "RailBuildUI",
+    "Text_Ko": "위 험 경 고",
+    "Text_En": "Warning",
+    "FontSiz_Ko": 14,
+    "FontSiz_En": 14
+  },
+  {
+    "Id": "RailBuild_UI_06",
+    "Place": "RailBuildUI",
+    "Text_Ko": "모래 폭풍이 오고 있습니다!",
+    "Text_En": "Sandstorm is coming!",
+    "FontSiz_Ko": 16,
+    "FontSiz_En": 16
+  },
+  {
+    "Id": "RailBuild_UI_07",
+    "Place": "RailBuildUI",
+    "Text_Ko": "기지 or 정거장으로 대피하세요!",
+    "Text_En": "Go to a base or station!",
+    "FontSiz_Ko": 16,
+    "FontSiz_En": 16
   }
 ]
