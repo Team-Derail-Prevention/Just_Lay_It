@@ -43,7 +43,27 @@ public class DebugTestPanel : MonoBehaviour
 
         if (Keyboard.current.f10Key.wasPressedThisFrame == true)
         {
-            UIManager.Instance.OpenSandstormOverlayUI(8f);
+            GameManager.Instance.Debug_TriggerSandstorm();
+        }
+
+        if (Keyboard.current.digit8Key.wasPressedThisFrame == true)
+        {
+            GameManager.Instance.Debug_SetGameSpeed(10f);
+        }
+
+        if (Keyboard.current.digit7Key.wasPressedThisFrame == true)
+        {
+            GameManager.Instance.Debug_SetGameSpeed(1f);
+        }
+
+        if (Keyboard.current.digit6Key.wasPressedThisFrame == true)
+        {
+            GameManager.Instance.Debug_ToggleMonsterSpawning();
+        }
+
+        if (Keyboard.current.digit5Key.wasPressedThisFrame == true)
+        {
+            GameManager.Instance.Debug_ToggleGameOverIgnore();
         }
 
         if (Keyboard.current.f11Key.wasPressedThisFrame == true)

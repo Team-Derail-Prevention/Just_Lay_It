@@ -20,6 +20,11 @@ public class GameManager : SingletonBase<GameManager>
     [Header("Game Stage")]
     [SerializeField] private GameStage _currentGameStage = GameStage.Stage1;
 
+    [Header("Sandstorm Settings")]
+    private float _sandstormMinIntervalSeconds = 120f;
+    private float _sandstormMaxIntervalSeconds = 240f;
+    private float _sandstormDurationSeconds = 30f;
+
     private readonly TimeManager _timeManager = new TimeManager();
 
     private Transform _managerRoot;
@@ -31,6 +36,15 @@ public class GameManager : SingletonBase<GameManager>
     private float _playTime;
     private int _lastNotifiedTime;
     private int _currentMapSize = 3;
+    private float _sandstormIntervalTimer;
+    private float _sandstormDurationTimer;
+    private float _nextSandstormTime;
+    private bool _isSandstormActive;
+
+#if UNITY_EDITOR
+    private bool _debugIgnoreGameOver;
+    private bool _debugDisableMonsterSpawning;
+#endif
 
     private readonly HashSet<StationObject> _completedStations = new();
     public int CompletedStationCount => _completedStations.Count;
@@ -42,7 +56,7 @@ public class GameManager : SingletonBase<GameManager>
     public event Action<int> OnCountdownChanged;
     public event Action OnGameCleared;
     public event Action<GameState> OnGameStateChanged;
-
+    public event Action<float> OnCountSandStorm;
     public bool IsStageSelectUnlocked => Save != null && Save.HasClearedAllStagesSpecial;
 
     public static DataManager Data => DataManager.Instance;
@@ -111,7 +125,15 @@ public class GameManager : SingletonBase<GameManager>
             return;
         }
 
+#if UNITY_EDITOR
+        if (_debugDisableMonsterSpawning)
+        {
+            Monster?.StopSpawning();
+        }
+#endif
+
         _playTime += UnityEngine.Time.deltaTime;
+        UpdateSandstormTimer();
         int currentSecond = (int)_playTime;
 
         if (currentSecond == _lastNotifiedTime)
@@ -291,12 +313,22 @@ public class GameManager : SingletonBase<GameManager>
 
     public void GameOver()
     {
+#if UNITY_EDITOR
+        if (_debugIgnoreGameOver)
+        {
+            Debug.Log("[GameManager] (디버그) 게임오버를 무시했습니다.");
+            ResetSandstormTimer();
+            return;
+        }
+#endif
+
         if (CurrentGameState == GameState.GameOver)
         {
             return;
         }
 
         Debug.Log("[GameManager] 게임 오버: 진행 중인 시스템을 정리합니다.");
+        ResetSandstormTimer();
         ChangeGameState(GameState.GameOver);
         PauseGameplayTime();
 
@@ -371,6 +403,44 @@ public class GameManager : SingletonBase<GameManager>
         _playTime = 0f;
         Debug.Log("[GameManager] (디버그) 클리어를 강제로 트리거합니다.");
         GameClear();
+    }
+
+    public void Debug_SetGameSpeed(float timeScale)
+    {
+        UnityEngine.Time.timeScale = timeScale;
+        Debug.Log($"[GameManager] (디버그) 게임 배속을 {timeScale}배로 설정했습니다.");
+    }
+
+    public void Debug_ToggleMonsterSpawning()
+    {
+        _debugDisableMonsterSpawning = !_debugDisableMonsterSpawning;
+
+        if (_debugDisableMonsterSpawning)
+        {
+            Monster?.StopSpawning();
+        }
+
+        Debug.Log($"[GameManager] (디버그) 몬스터 소환 차단: {_debugDisableMonsterSpawning}");
+    }
+
+    public void Debug_ToggleGameOverIgnore()
+    {
+        _debugIgnoreGameOver = !_debugIgnoreGameOver;
+        Debug.Log($"[GameManager] (디버그) 게임오버 무시: {_debugIgnoreGameOver}");
+    }
+
+    public void Debug_TriggerSandstorm()
+    {
+        if (_isSandstormActive || CurrentGameState != GameState.Playing)
+        {
+            return;
+        }
+
+        _isSandstormActive = true;
+        _sandstormDurationTimer = 0f;
+        OnCountSandStorm?.Invoke(_sandstormDurationSeconds);
+        UI?.OpenSandstormOverlayUI(_sandstormDurationSeconds);
+        Debug.Log("[GameManager] (디버그) 모래폭풍을 즉시 발동했습니다.");
     }
 #endif
 
@@ -449,7 +519,6 @@ public class GameManager : SingletonBase<GameManager>
         {
             transform.SetParent(_managerRoot);
         }
-        // TODO: Station UI를 열고 CompleteStation(stoneTaken, citizenBoarded)을 호출하도록 연결해야 한다.
     }
 
     private void OrganizeExistingManagers()
@@ -548,6 +617,7 @@ public class GameManager : SingletonBase<GameManager>
 
     private void HandleCentralTerminalEntered(CentralTerminal terminal)
     {
+        ResetSandstormTimer();
         HandleTerminalArrivalAsync(terminal).Forget();
     }
 
@@ -678,6 +748,8 @@ public class GameManager : SingletonBase<GameManager>
 
             ResumeMonsterSpawning();
             ResumeGameplayTime();
+            StartSandstormCycle();
+
         }
         finally
         {
@@ -687,6 +759,14 @@ public class GameManager : SingletonBase<GameManager>
 
     private void ResumeMonsterSpawning()
     {
+#if UNITY_EDITOR
+        if (_debugDisableMonsterSpawning)
+        {
+            Debug.Log("[GameManager] (디버그) 몬스터 소환이 차단되어 재개하지 않습니다.");
+            return;
+        }
+#endif
+
         if (Monster != null && CurrentGameState == GameState.Playing)
         {
             Monster.StartSpawning();
@@ -703,8 +783,6 @@ public class GameManager : SingletonBase<GameManager>
         Pool?.AllDespawnToPool();
 
         Debug.Log("[GameManager] 몬스터스폰 정지");
-        // TODO: Weapon 투사체 정리
-        // TODO: PoolManager 몬스터 정리(스킬정리도 필요한지 확인필요)
     }
 
     private void RemovePlayerPlacedRails()
@@ -743,6 +821,75 @@ public class GameManager : SingletonBase<GameManager>
         _sessionKillCount = 0;
         _sessionEarnedStone = 0;
         _completedStations.Clear();
+        ResetSandstormTimer();
+    }
+
+    private void StartSandstormCycle()
+    {
+        if (_currentGameStage < GameStage.Stage2)
+        {
+            ResetSandstormTimer();
+            return;
+        }
+
+        _sandstormIntervalTimer = 0f;
+        _sandstormDurationTimer = 0f;
+        _isSandstormActive = false;
+        _nextSandstormTime = UnityEngine.Random.Range(_sandstormMinIntervalSeconds, _sandstormMaxIntervalSeconds);
+
+        Debug.Log($"[GameManager] 샌드스톰 예약: 현재 플레이 시간 {_playTime:F1}초, {(_playTime + _nextSandstormTime):F1}에 샌드스톰 발동, {_nextSandstormTime:F1}초 후 발동합니다.");
+    }
+
+    private void ResetSandstormTimer()
+    {
+        _sandstormIntervalTimer = 0f;
+        _sandstormDurationTimer = 0f;
+        _nextSandstormTime = 0f;
+
+        if (_isSandstormActive)
+        {
+            UI?.CloseSandstormOverlayUI();
+        }
+
+        _isSandstormActive = false;
+    }
+
+    private void UpdateSandstormTimer()
+    {
+        if (_currentGameStage < GameStage.Stage2)
+        {
+            return;
+        }
+
+        if (_nextSandstormTime <= 0f)
+        {
+            StartSandstormCycle();
+        }
+
+        if (_isSandstormActive)
+        {
+            _sandstormDurationTimer += UnityEngine.Time.deltaTime;
+            if (_sandstormDurationTimer >= _sandstormDurationSeconds)
+            {
+                Debug.Log($"[GameManager] 샌드스톰이 {_sandstormDurationSeconds:F1}초 동안 지속되어 게임 오버됩니다.");
+                GameOver();
+            }
+
+            return;
+        }
+
+        _sandstormIntervalTimer += UnityEngine.Time.deltaTime;
+        if (_sandstormIntervalTimer < _nextSandstormTime)
+        {
+            return;
+        }
+
+        _isSandstormActive = true;
+        OnCountSandStorm?.Invoke(_sandstormDurationSeconds);
+        UI?.OpenSandstormOverlayUI(_sandstormDurationSeconds);
+        _sandstormDurationTimer = 0f;
+
+        Debug.Log($"[GameManager] 샌드스톰이 발동: 현재 플레이 시간 {_playTime:F1}초, {_sandstormDurationSeconds:F1}초 동안 지속됩니다.");
     }
 
     private void ClearCurrentSession()
