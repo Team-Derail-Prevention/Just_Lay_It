@@ -52,7 +52,7 @@ MonoBehaviour:
   _normalCutoff: 22000
   _resourceSfxCooldown: 0.08
   _sfxVoiceLimit: 8
-  _sfxMinDistance: 3
-  _sfxMaxDistance: 25
+  _sfxMinDistance: 20
+  _sfxMaxDistance: 60
   _sfxVolume: 0.5
   _bgmVolume: 0.5
