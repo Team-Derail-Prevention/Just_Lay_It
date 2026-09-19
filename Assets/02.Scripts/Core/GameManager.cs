@@ -567,11 +567,19 @@ public class GameManager : SingletonBase<GameManager>
             return;
         }
 
+        ApplySavedDisplayMode();
         RestoreSavedGameStage();
 
         await EnsureGameDataLoadedAsync();
         ChangeGameState(GameState.Ready);
         Debug.Log("[GameManager] 초기화 및 데이터 로드가 완료되었습니다.");
+    }
+
+    private void ApplySavedDisplayMode()
+    {
+#if !UNITY_EDITOR
+        DisplayModeController.Apply(Save.DisplayMode);
+#endif
     }
 
     private async UniTask<bool> EnsureGameDataLoadedAsync()

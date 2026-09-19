@@ -158,21 +158,7 @@ public class SettingUI : UIBase
 
     private void ApplyDisplayMode(int index)
     {
-        switch (index)
-        {
-            case 0:
-                Screen.fullScreenMode = FullScreenMode.Windowed;
-                Cursor.lockState = CursorLockMode.Confined;
-                break;
-            case 1:
-                Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
-                Cursor.lockState = CursorLockMode.None;
-                break;
-            case 2:
-                Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
-                Cursor.lockState = CursorLockMode.Confined;
-                break;
-        }
+        DisplayModeController.Apply(index);
     }
 
     private void OnLanguageChanged(int index)
