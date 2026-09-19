@@ -82,6 +82,7 @@ public class WeaponData : GameDataBase
     public float ReloadTime;
     public float Range;
     public int Price;
+    public string AuraColor;
 
     public string Description_Ko;
     public string Description_En;
