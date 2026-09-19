@@ -232,6 +232,17 @@ public class RailManager : SingletonBase<RailManager>
             return;
         }
 
+        if (GameManager.Instance.CurrentGameState == GameState.GamePaused)
+        {
+            Debug.LogWarning($"[RailManager] 게임 플레이 중에만 레일을 설치할 수 있습니다. ");
+            return;
+        }
+
+        if (GameManager.Instance.CurrentGameState == GameState.EventPaused)
+        {
+            Debug.LogWarning($"[RailManager] 게임 플레이 중에만 레일을 설치할 수 있습니다. ");
+            return;
+        }
         if (GameManager.Instance.CurrentGameState != GameState.Playing)
         {
             Debug.LogWarning("[RailManager] 게임 플레이 중에만 레일을 설치할 수 있습니다.");

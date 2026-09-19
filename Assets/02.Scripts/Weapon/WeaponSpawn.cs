@@ -59,6 +59,7 @@ public class WeaponSpawn : SingletonBase<WeaponSpawn>
 
     private void OnWeaponEquipped(TrainCarSection section, int slotIndex, string weaponDataId)
     {
+        Debug.Log($"[WeaponSpawn] OnWeaponEquipped 호출됨. weaponDataId={weaponDataId}");
         WeaponInstall(section, slotIndex, weaponDataId).Forget();
     }
 
