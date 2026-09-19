@@ -74,10 +74,10 @@
   {
     "Id": "Base_UI_LM_Button_hover_05",
     "Place": "BaseArrivalUI_Button_hover",
-    "Text_Ko": "현재 열차의 체력은 {0}% 입니다.\n열차 수리 한번당 가격 : 돌 {1}개 이고 {2}%의 체력을 회복합니다.",
-    "Text_En": "The train's current durability is {0}%.\nEach repair costs {1} Stone and restores {2}% of durability.",
-    "FontSiz_Ko": 38,
-    "FontSiz_En": 26
+    "Text_Ko": "현재 열차의 체력은 {0}% 입니다.\n열차 수리 한번당 가격 : 돌 {1}개\n{2}%의 체력을 회복합니다.",
+    "Text_En": "The train's current durability is {0}%.\nEach repair costs {1} Stone\nRestores {2}% of durability.",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 35
   },
   {
     "Id": "Base_UI_LT_01",
