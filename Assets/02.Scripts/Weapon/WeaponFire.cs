@@ -18,6 +18,7 @@ public class WeaponFire : MonoBehaviour
     [SerializeField] private string _projectileId;
     [SerializeField] private Transform _firePosition;
     [SerializeField] private WeaponTargeting _weaponTargeting;
+    [SerializeField] private Transform _auraRoot;
 
     private WeaponData _weaponData;
     private GameObject _projectilePrefab;
@@ -37,6 +38,7 @@ public class WeaponFire : MonoBehaviour
     private float _baseRange;
 
     private int _lobbyAtkBonus;
+    private bool _weaponIdAssigned;
 
     private Train _parentTrain;
 
@@ -57,15 +59,18 @@ public class WeaponFire : MonoBehaviour
 
     private async void Start()
     {
+        if (_weaponIdAssigned)
+        {
+            return;
+        }
+
         if (DataManager.Instance == null)
         {
             Debug.LogError("[WeaponFire] 데이터 매니저가 인스탄스 되어있지 않습니다");
             return;
         }
 
-        LoadWeaponData();
-        await RegisterProjectilePoolAsync();
-        InitWeponLevel();
+        await InitializeAsync();
     }
 
     private void Update()
@@ -119,9 +124,12 @@ public class WeaponFire : MonoBehaviour
         }
     }
 
-    public void SetWeaponId(string weaponId)
+    public async void SetWeaponId(string weaponId)
     {
+        _weaponIdAssigned = true;
         _weaponId = weaponId;
+
+        await InitializeAsync();
     }
 
     public WeaponCurrentStats GetCurrentStats()
@@ -135,6 +143,11 @@ public class WeaponFire : MonoBehaviour
         stats.CurrentAmmo = _currentAmmo;
 
         return stats;
+    }
+
+    public void ApplyAuraColor()
+    {
+        ApplyGradeAura();
     }
 
     private float GetModifiedFireRate()
@@ -234,11 +247,15 @@ public class WeaponFire : MonoBehaviour
             _reloadTime = _weaponData.ReloadTime;
             _baseRange = _weaponData.Range;
             _currentAmmo = _magazineSize;
+
+            ApplyGradeAura();
         }
         else
         {
             Debug.LogError($"{_weaponId} 무기 데이터를 찾을 수 없습니다");
         }
+
+        Debug.Log($"[WeaponFire] LoadWeaponData: id={_weaponId}, aura={_weaponData.AuraColor}, frame={Time.frameCount}", this);
     }
 
     private void ShootProjectile()
@@ -300,5 +317,32 @@ public class WeaponFire : MonoBehaviour
             _isReloading = false;
         }
     }
-    
+
+    private void ApplyGradeAura()
+    {
+        Debug.Log($"[WeaponFire] ApplyGradeAura 진입. _auraRoot={_auraRoot}, WeaponAura.Instance={WeaponAura.Instance}, AuraColor={_weaponData?.AuraColor}");
+
+        if (_auraRoot == null)
+        {
+            Debug.LogWarning("[WeaponFire] _auraRoot가 null입니다");
+            return;
+        }
+
+        if (WeaponAura.Instance == null)
+        {
+            Debug.LogWarning("[WeaponFire] WeaponAura.Instance가 null입니다");
+            return;
+        }
+
+        WeaponAura.Instance.ApplyGradeColor(_auraRoot.gameObject, _weaponData.AuraColor);
+    }
+
+
+
+    private async UniTask InitializeAsync()
+    {
+        LoadWeaponData();
+        await RegisterProjectilePoolAsync();
+        InitWeponLevel();
+    }
 }

@@ -143,6 +143,7 @@ MonoBehaviour:
   _projectileId: MiniGunProjectile
   _firePosition: {fileID: 4327927592965014162}
   _weaponTargeting: {fileID: 5059821468252789910}
+  _auraRoot: {fileID: 1032954792537359026}
 --- !u!114 &5059821468252789910
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -187,7 +188,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4113700522050563859}
   m_Layer: 0
-  m_Name: MiniGun
+  m_Name: Minigun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -207,5 +208,68 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4327927592965014162}
+  - {fileID: 1032954792537359026}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1115015092515903366
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 4113700522050563859}
+    m_Modifications:
+    - target: {fileID: 84617008718943540, guid: c85938f6d8ef41e418fd1eb081e48dae, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.002
+      objectReference: {fileID: 0}
+    - target: {fileID: 84617008718943540, guid: c85938f6d8ef41e418fd1eb081e48dae, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 84617008718943540, guid: c85938f6d8ef41e418fd1eb081e48dae, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.258
+      objectReference: {fileID: 0}
+    - target: {fileID: 84617008718943540, guid: c85938f6d8ef41e418fd1eb081e48dae, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 84617008718943540, guid: c85938f6d8ef41e418fd1eb081e48dae, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 84617008718943540, guid: c85938f6d8ef41e418fd1eb081e48dae, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 84617008718943540, guid: c85938f6d8ef41e418fd1eb081e48dae, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 84617008718943540, guid: c85938f6d8ef41e418fd1eb081e48dae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 84617008718943540, guid: c85938f6d8ef41e418fd1eb081e48dae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 84617008718943540, guid: c85938f6d8ef41e418fd1eb081e48dae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2291914944590719046, guid: c85938f6d8ef41e418fd1eb081e48dae, type: 3}
+      propertyPath: m_Name
+      value: Aura
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c85938f6d8ef41e418fd1eb081e48dae, type: 3}
+--- !u!4 &1032954792537359026 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 84617008718943540, guid: c85938f6d8ef41e418fd1eb081e48dae, type: 3}
+  m_PrefabInstance: {fileID: 1115015092515903366}
+  m_PrefabAsset: {fileID: 0}

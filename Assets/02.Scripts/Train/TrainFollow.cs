@@ -164,10 +164,14 @@ public class TrainFollow : MonoBehaviour
         weaponObj.transform.localPosition = Vector3.zero;
         weaponObj.transform.localRotation = Quaternion.identity;
 
-        WeaponFire weaponFire = weaponObj.GetComponent<WeaponFire>();
+        WeaponFire weaponFire = weaponObj.GetComponentInChildren<WeaponFire>(true);
         if (weaponFire != null)
         {
             weaponFire.SetWeaponId(weaponDataId);
+        }
+        else
+        {
+            Debug.LogError($"[TrainFollow] {weaponObj.name}에서 WeaponFire를 찾지 못했습니다.");
         }
 
         _equippedWeaponObjs[slotIndex] = weaponObj;
