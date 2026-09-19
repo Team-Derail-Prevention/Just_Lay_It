@@ -211,7 +211,13 @@ public class SoundManager : SingletonBase<SoundManager>
     {
         for (int i = 0; i < SfxAddress.All.Length; i++)
         {
-            await LoadClipAsync(SfxAddress.All[i]);
+            string address = SfxAddress.All[i];
+            int variantCount = SfxAddress.GetVariantCount(address);
+
+            for (int number = 1; number <= variantCount; number++)
+            {
+                await LoadClipAsync(SfxAddress.GetVariant(address, number));
+            }
         }
     }
 
@@ -325,7 +331,7 @@ public class SoundManager : SingletonBase<SoundManager>
 
     private static async UniTaskVoid LoadAndPlayOneShot(AudioSource audioSource, string assetPath)
     {
-        AudioClip clip = await LoadClipAsync(assetPath);
+        AudioClip clip = await LoadClipAsync(SfxAddress.PickRandom(assetPath));
 
         if (clip == null || audioSource == null)
         {
@@ -337,7 +343,7 @@ public class SoundManager : SingletonBase<SoundManager>
 
     private async UniTaskVoid LoadAndPlaySpatial(string assetPath, Vector3 position)
     {
-        AudioClip clip = await LoadClipAsync(assetPath);
+        AudioClip clip = await LoadClipAsync(SfxAddress.PickRandom(assetPath));
 
         if (clip == null)
         {

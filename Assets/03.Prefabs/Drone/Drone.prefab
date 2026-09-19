@@ -1028,8 +1028,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LoopSoundSource
   _address: 
   _playOnEnable: 0
-  _baseVolume: 0.5
-  _minDistance: 3
+  _baseVolume: 0.8
+  _minDistance: 20
   _maxDistance: 60
   _usePitchBySpeed: 0
   _speedForMaxPitch: 12
