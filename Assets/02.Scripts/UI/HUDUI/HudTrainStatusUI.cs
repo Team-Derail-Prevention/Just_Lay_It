@@ -39,7 +39,12 @@ public class HudTrainStatusUI : UIBase
     [SerializeField] private GameObject Denger;
     [SerializeField] private float _dengerShowSeconds = 3f;
 
+    [Header("HP 경고")]
+    [SerializeField] private GameObject Denger2;
+    [SerializeField] private float _hpWarningShowSeconds = 3f;
+
     private Coroutine _dengerCoroutine;
+    private Coroutine _hpWarningCoroutine;
 
     private void Awake()
     {
@@ -75,6 +80,8 @@ public class HudTrainStatusUI : UIBase
         TrainStatusEventHub.Instance.OnSpeedChanged += SetSpeed;
         TrainStatusEventHub.Instance.OnDistanceChanged += SetDistance;
         TrainStatusEventHub.Instance.OnPlayTimeChanged += SetPlayTime;
+        TrainStatusEventHub.Instance.OnLowHpWarning += OnLowHpWarning_TrainStatusEventHub;
+
         TrainManager.OnTrainStopWarning += SetTrainStopWarning;
 
         LocalizationEventHub.Instance.OnLanguageChanged += OnLanguageChanged_LocalizationEventHub;
@@ -88,6 +95,11 @@ public class HudTrainStatusUI : UIBase
         if (Denger != null)
         {
             Denger.SetActive(false);
+        }
+
+        if (Denger2 != null)
+        {
+            Denger2.SetActive(false);
         }
 
         if (GameManager.Instance != null)
@@ -106,6 +118,8 @@ public class HudTrainStatusUI : UIBase
             TrainStatusEventHub.Instance.OnSpeedChanged -= SetSpeed;
             TrainStatusEventHub.Instance.OnDistanceChanged -= SetDistance;
             TrainStatusEventHub.Instance.OnPlayTimeChanged -= SetPlayTime;
+            TrainStatusEventHub.Instance.OnLowHpWarning -= OnLowHpWarning_TrainStatusEventHub;
+
             TrainManager.OnTrainStopWarning -= SetTrainStopWarning;
         }
 
@@ -120,6 +134,12 @@ public class HudTrainStatusUI : UIBase
         }
 
         _dengerCoroutine = null;
+
+        if (_hpWarningCoroutine != null)
+        {
+            StopCoroutine(_hpWarningCoroutine);
+            _hpWarningCoroutine = null;
+        }
     }
 
     private void OnCountSandStorm_GameManager(float durationSeconds)
@@ -149,6 +169,35 @@ public class HudTrainStatusUI : UIBase
 
         Denger.SetActive(false);
         _dengerCoroutine = null;
+    }
+
+    private void OnLowHpWarning_TrainStatusEventHub()
+    {
+        ShowHpWarning();
+    }
+
+    private void ShowHpWarning()
+    {
+        if (Denger2 == null)
+        {
+            return;
+        }
+
+        if (_hpWarningCoroutine != null)
+        {
+            StopCoroutine(_hpWarningCoroutine);
+        }
+
+        Denger2.SetActive(true);
+        _hpWarningCoroutine = StartCoroutine(CoHideHpWarning());
+    }
+
+    private IEnumerator CoHideHpWarning()
+    {
+        yield return new WaitForSeconds(_hpWarningShowSeconds);
+
+        Denger2.SetActive(false);
+        _hpWarningCoroutine = null;
     }
 
     private void OnLanguageChanged_LocalizationEventHub(LanguageType language)
