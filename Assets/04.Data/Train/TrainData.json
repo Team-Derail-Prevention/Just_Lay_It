@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "Id": "TRAIN_HEAD_01",
     "TrainName": "머리칸",
@@ -7,7 +7,7 @@
     "MoveSpeed": 2,
     "RotateSpeed": 5,
     "MaxHp": 300,
-    "Defense": 3,
+    "Defense": 0,
     "PrefabPath": "Train/train-Front"
   },
   {
