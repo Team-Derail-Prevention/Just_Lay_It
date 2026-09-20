@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "Id": "Monster_01",
     "MonsterName_Ko": "롸봇",
@@ -33,7 +33,7 @@
     "AttackType": "None",
     "DebuffDuration": 0,
     "DebuffPower": 0,
-    "UseAttackSound": "Monster_01_Attack_Sound",
+    "UseAttackSound": "Monster_02_Attack_Sound",
     "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
     "UseDieSound": "Monster_01_Die_Sound",
     "UseIconName": "Monster_02_Icon",
@@ -56,7 +56,7 @@
     "AttackType": "None",
     "DebuffDuration": 0,
     "DebuffPower": 0,
-    "UseAttackSound": "Monster_01_Attack_Sound",
+    "UseAttackSound": "Monster_03_Attack_Sound",
     "UseTakeDamageSound": "Monster_01_TakeDamage_Sound",
     "UseDieSound": "Monster_01_Die_Sound",
     "UseIconName": "Monster_03_Icon",
