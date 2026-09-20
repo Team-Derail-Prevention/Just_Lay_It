@@ -33,6 +33,7 @@ public class BaseArrivalUI : UIBase
 
     private void OnEnable()
     {
+        OnButtonHoverExit();
         BindButtons();
         SubscribeResourceEvents();
 
@@ -103,12 +104,14 @@ public class BaseArrivalUI : UIBase
         if (Button_Inventory != null) Button_Inventory.OnPointerEnterButton += OnButtonHoverEnter;
         if (Button_TrainRepair != null) Button_TrainRepair.OnPointerEnterButton += OnTrainRepairHoverEnter;
         if (Button_TrainDeparture != null) Button_TrainDeparture.OnPointerEnterButton += OnButtonHoverEnter;
+        if (Button_Warehouse != null) Button_Warehouse.OnPointerEnterButton += OnButtonHoverEnter;
 
         if (Button_WeaponGacha != null) Button_WeaponGacha.OnPointerExitButton += OnButtonHoverExit;
         if (Button_TrainStrengthening != null) Button_TrainStrengthening.OnPointerExitButton += OnButtonHoverExit;
         if (Button_Inventory != null) Button_Inventory.OnPointerExitButton += OnButtonHoverExit;
         if (Button_TrainRepair != null) Button_TrainRepair.OnPointerExitButton += OnButtonHoverExit;
         if (Button_TrainDeparture != null) Button_TrainDeparture.OnPointerExitButton += OnButtonHoverExit;
+        if (Button_Warehouse != null) Button_Warehouse.OnPointerExitButton += OnButtonHoverExit;
     }
 
     private void UnbindButtonDescriptionEvents()
@@ -118,12 +121,14 @@ public class BaseArrivalUI : UIBase
         if (Button_Inventory != null) Button_Inventory.OnPointerEnterButton -= OnButtonHoverEnter;
         if (Button_TrainRepair != null) Button_TrainRepair.OnPointerEnterButton -= OnTrainRepairHoverEnter;
         if (Button_TrainDeparture != null) Button_TrainDeparture.OnPointerEnterButton -= OnButtonHoverEnter;
+        if (Button_Warehouse != null) Button_Warehouse.OnPointerEnterButton -= OnButtonHoverEnter;
 
         if (Button_WeaponGacha != null) Button_WeaponGacha.OnPointerExitButton -= OnButtonHoverExit;
         if (Button_TrainStrengthening != null) Button_TrainStrengthening.OnPointerExitButton -= OnButtonHoverExit;
         if (Button_Inventory != null) Button_Inventory.OnPointerExitButton -= OnButtonHoverExit;
         if (Button_TrainRepair != null) Button_TrainRepair.OnPointerExitButton -= OnButtonHoverExit;
         if (Button_TrainDeparture != null) Button_TrainDeparture.OnPointerExitButton -= OnButtonHoverExit;
+        if (Button_Warehouse != null) Button_Warehouse.OnPointerExitButton -= OnButtonHoverExit;
     }
 
     private void OnButtonHoverEnter(string description, int fontSize)

@@ -45,7 +45,6 @@ GameObject:
   - component: {fileID: 8217342979526214534}
   - component: {fileID: 879883079838812106}
   - component: {fileID: 7922217663722064182}
-  - component: {fileID: 2924014770875255448}
   m_Layer: 0
   m_Name: WeaponBase
   m_TagString: Untagged
@@ -120,18 +119,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &2924014770875255448
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1272910922131034850}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 60ffff5de066e0446964eddb98428003, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WeaponAura
 --- !u!1 &7830460294201998702
 GameObject:
   m_ObjectHideFlags: 0

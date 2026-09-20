@@ -1,33 +1,26 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class HpWarningOverlayUI : UIBase
 {
     [Header("비네트 이미지")]
     [SerializeField] private Image Image_Vignette;
 
-    [Header("체력 임계값")]
-    [SerializeField, Range(0f, 1f)] private float _hpRatioStart = 0.5f;
-
     [Header("경고 색상")]
     [SerializeField] private Color _warningColor = Color.red;
 
-    [Header("최대 강도")]
-    [SerializeField, Range(0f, 1f)] private float _maxAlpha = 0.6f;
-
     [Header("점멸 효과")]
-    [SerializeField] private bool _isPulseEnabled = true;
-    [SerializeField, Range(0f, 1f)] private float _pulseHpRatioThreshold = 0.15f;
-    [SerializeField] private float _pulseSpeed = 3f;
-    [SerializeField, Range(0f, 1f)] private float _pulseAmplitude = 0.25f;
+    [SerializeField, Range(1, 10)] private int _blinkCount = 3;
+    [SerializeField] private float _blinkDurationSeconds = 0.5f;
+    [SerializeField, Range(0f, 1f)] private float _blinkMaxAlpha = 0.6f;
 
     [Header("비네트 텍스처 생성 설정")]
     [SerializeField] private int _vignetteTextureSize = 256;
     [SerializeField, Range(0f, 1f)] private float _vignetteInnerRadius = 0.3f;
     [SerializeField, Range(0f, 1f)] private float _vignetteOuterRadius = 0.75f;
 
-    private float _baseAlpha = 0f;
-    private bool _isPulseActive = false;
+    private Coroutine _blinkCoroutine;
 
     private void Awake()
     {
@@ -36,19 +29,15 @@ public class HpWarningOverlayUI : UIBase
 
     private void OnEnable()
     {
+        ApplyColor(0f);
+
         if (TrainStatusEventHub.Instance == null)
         {
             Debug.LogError("[HpWarningOverlayUI] TrainStatusEventHub.Instance가 null입니다. 씬에 배치했는지 확인하세요.");
             return;
         }
 
-        TrainStatusEventHub.Instance.OnHpChanged += SetHp;
-
-        if (TrainManager.Instance != null && TrainManager.Instance.ActiveTrain != null)
-        {
-            Train activeTrain = TrainManager.Instance.ActiveTrain;
-            SetHp(activeTrain.CurrentHp, activeTrain.MaxHp);
-        }
+        TrainStatusEventHub.Instance.OnLowHpWarning += OnLowHpWarning_TrainStatusEventHub;
 
         transform.SetAsFirstSibling();
     }
@@ -57,59 +46,56 @@ public class HpWarningOverlayUI : UIBase
     {
         if (TrainStatusEventHub.Instance != null)
         {
-            TrainStatusEventHub.Instance.OnHpChanged -= SetHp;
-        }
-    }
-
-    private void Update()
-    {
-        if (_isPulseActive == false)
-        {
-            return;
+            TrainStatusEventHub.Instance.OnLowHpWarning -= OnLowHpWarning_TrainStatusEventHub;
         }
 
-        ApplyPulse();
+        StopBlink();
     }
 
-    public void SetHp(float curHp, float maxHp)
+    private void OnLowHpWarning_TrainStatusEventHub()
     {
+        PlayBlink();
+    }
+
+    private void PlayBlink()
+    {
+        StopBlink();
+
         transform.SetAsFirstSibling();
-
-        float hpRatio = 0f;
-        if (maxHp > 0f)
-        {
-            hpRatio = curHp / maxHp;
-        }
-
-        UpdateWarningIntensity(hpRatio);
+        _blinkCoroutine = StartCoroutine(CoPlayBlink());
     }
 
-    private void UpdateWarningIntensity(float hpRatio)
+    private void StopBlink()
     {
-        if (hpRatio >= _hpRatioStart)
+        if (_blinkCoroutine != null)
         {
-            _baseAlpha = 0f;
-            _isPulseActive = false;
-            ApplyColor(0f);
-            return;
+            StopCoroutine(_blinkCoroutine);
+            _blinkCoroutine = null;
         }
 
-        float intensityRatio = Mathf.InverseLerp(_hpRatioStart, 0f, hpRatio);
-        _baseAlpha = intensityRatio * _maxAlpha;
-
-        _isPulseActive = (_isPulseEnabled == true) && (hpRatio <= _pulseHpRatioThreshold);
-
-        if (_isPulseActive == false)
-        {
-            ApplyColor(_baseAlpha);
-        }
+        ApplyColor(0f);
     }
 
-    private void ApplyPulse()
+    private IEnumerator CoPlayBlink()
     {
-        float pulseOffset = Mathf.Sin(Time.time * _pulseSpeed) * _pulseAmplitude;
-        float pulsedAlpha = Mathf.Clamp01(_baseAlpha + pulseOffset);
-        ApplyColor(pulsedAlpha);
+        for (int blinkIndex = 0; blinkIndex < _blinkCount; blinkIndex++)
+        {
+            float elapsedSeconds = 0f;
+
+            while (elapsedSeconds < _blinkDurationSeconds)
+            {
+                elapsedSeconds += Time.unscaledDeltaTime;
+
+                float progress = Mathf.Clamp01(elapsedSeconds / _blinkDurationSeconds);
+                float alpha = Mathf.Sin(progress * Mathf.PI) * _blinkMaxAlpha;
+                ApplyColor(alpha);
+
+                yield return null;
+            }
+        }
+
+        ApplyColor(0f);
+        _blinkCoroutine = null;
     }
 
     private void ApplyColor(float alpha)
