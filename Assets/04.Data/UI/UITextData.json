@@ -298,8 +298,8 @@
   {
     "Id": "StationArrival_UI_ML_04",
     "Place": "StationArrivalUI",
-    "Text_Ko": "기 입 하 기",
-    "Text_En": "Fill in",
+    "Text_Ko": "적 제 하 기",
+    "Text_En": "L o a d",
     "FontSiz_Ko": 36,
     "FontSiz_En": 36
   },
@@ -330,10 +330,10 @@
   {
     "Id": "StationArrival_UI_MM_04",
     "Place": "StationArrivalUI",
-    "Text_Ko": "기 입 하 기",
-    "Text_En": "Fill in",
+    "Text_Ko": "승 차 허 락",
+    "Text_En": "Allow Entry",
     "FontSiz_Ko": 36,
-    "FontSiz_En": 36
+    "FontSiz_En": 28
   },
   {
     "Id": "StationArrival_UI_MR_01",
@@ -1246,5 +1246,21 @@
     "Text_En": "Go to a base or station!",
     "FontSiz_Ko": 16,
     "FontSiz_En": 16
+  },
+  {
+    "Id": "StationArrival_UI_ML_05",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "취 소 하 기",
+    "Text_En": "Cancel",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "StationArrival_UI_MM_05",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "취 소 하 기",
+    "Text_En": "Cancel",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
   }
 ]

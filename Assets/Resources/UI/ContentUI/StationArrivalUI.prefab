@@ -5608,11 +5608,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_text
-      value: "\uAE30 \uC785 \uD558 \uAE30"
+      value: Allow Entry
       objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontSize
-      value: 36
+      value: 28
       objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontAsset
@@ -5632,7 +5632,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontSizeBase
-      value: 36
+      value: 28
       objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_sharedMaterial
@@ -6274,7 +6274,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_text
-      value: "\uAE30 \uC785 \uD558 \uAE30"
+      value: "\uC801 \uC7AC"
       objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_fontSize
