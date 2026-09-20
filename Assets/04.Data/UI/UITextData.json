@@ -1262,5 +1262,13 @@
     "Text_En": "Cancel",
     "FontSiz_Ko": 36,
     "FontSiz_En": 36
+  },
+  {
+    "Id": "HudTrainStatus_UI_01",
+    "Place": "HudTrainStatusUI",
+    "Text_Ko": "모래 폭풍이 다가 옵니다.",
+    "Text_En": "Sandstorm is coming!",
+    "FontSiz_Ko": 70,
+    "FontSiz_En": 70
   }
 ]
