@@ -23,6 +23,10 @@ public class Train : MonoBehaviour
     private float _speedBoostMultiplier = 1.0f;
     private bool _isBoosted = false;
 
+    [Header("Effect Setting")]
+    [SerializeField] private GameObject _smokeEffect;
+    [SerializeField] private float _smokeThreshold = 0.5f;  // 연기가 켜지는 체력 비율 (0.5 = 50%)
+
     public bool IsFrozen => _isFrozen;
     public bool IsElectrified => _isElectrified;
 
@@ -205,6 +209,10 @@ public class Train : MonoBehaviour
 
         Debug.Log($"[Train] 기관차 피격! 받은 피해: {totalDamage} (기본 피해: {damage}, 방어력: {_defense}, 받는 데미지 배율: {_corrosionMultiplier}배), 남은 HP: {_currentHp}/{_maxHp}");
 
+        if (_smokeEffect != null && (float)_currentHp / _maxHp <= _smokeThreshold)
+        {
+            if (!_smokeEffect.activeSelf) _smokeEffect.SetActive(true);
+        }
         if (_currentHp <= 0)
         {
             _currentHp = 0;
@@ -235,6 +243,10 @@ public class Train : MonoBehaviour
 
         Debug.Log($"[Train] 열차 수리 완료! 회복량: {healAmount} ({healPercent}%), 현재 HP: {_currentHp}/{_maxHp}");
 
+        if (_smokeEffect != null && (float)_currentHp / _maxHp > _smokeThreshold)
+        {
+            if (_smokeEffect.activeSelf) _smokeEffect.SetActive(false);
+        }
 
         TrainStatusEventHub.Instance?.NotifyHpChanged(_currentHp, _maxHp);
     }
