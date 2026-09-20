@@ -220,6 +220,7 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
         string targetDebuffMonster3Id = "DebuffMonster_03";
         string targetDebuffMonster4Id = "DebuffMonster_04";
         string projectileId = "MonsterProjectile";
+        string deathEffectId = "MonsterDeathEffect";
 
         GameObject monsterPrefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetMonsterId);
         GameObject monster2Prefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetMonster2Id);
@@ -229,6 +230,7 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
         GameObject debuffMonster3Prefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetDebuffMonster3Id);
         GameObject debuffMonster4Prefab = await ResourceManager.Instance.LoadAsset<GameObject>(targetDebuffMonster4Id);
         GameObject projectilePrefab = await ResourceManager.Instance.LoadAsset<GameObject>(projectileId);
+        GameObject deathEffectPrefab = await ResourceManager.Instance.LoadAsset<GameObject>(deathEffectId);
 
         if (monsterPrefab == null)
         {
@@ -245,7 +247,8 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
             { targetDebuffMonster2Id, 5 },
             { targetDebuffMonster3Id, 5 },
             { targetDebuffMonster4Id, 5 },
-            { projectileId, 20 }
+            { projectileId, 20 },
+            { deathEffectId, 30 }
         };
 
         Dictionary<string, GameObject> prefabMap = new Dictionary<string, GameObject>
@@ -257,7 +260,8 @@ public class MonsterSpawn : SingletonBase<MonsterSpawn>
             { targetDebuffMonster2Id, debuffMonster2Prefab },
             { targetDebuffMonster3Id, debuffMonster3Prefab },
             { targetDebuffMonster4Id, debuffMonster4Prefab },
-            { projectileId, projectilePrefab }
+            { projectileId, projectilePrefab },
+            { deathEffectId, deathEffectPrefab }
         };
 
         PoolManager.Instance.Init(this.transform, initialPool, prefabMap);

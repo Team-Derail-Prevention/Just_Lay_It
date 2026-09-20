@@ -104,7 +104,7 @@ public class TrainManager : SingletonBase<TrainManager>
 
     private void TriggerStopGameOver()
     {
-        Debug.LogError($"[TrainManager] 기차가 {_maxStopAllowedTime}초 이상 정지 상태여서 게임오버 처리됩니다.");
+        Debug.Log($"[TrainManager] 기차가 {_maxStopAllowedTime}초 이상 정지 상태여서 게임오버 처리됩니다.");
 
         OnTrainStopWarning?.Invoke(-1);
 
