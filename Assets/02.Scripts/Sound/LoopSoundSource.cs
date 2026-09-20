@@ -128,7 +128,7 @@ public class LoopSoundSource : MonoBehaviour
 
         _isLoading = true;
 
-        AudioClip clip = await ResourceManager.Instance.LoadAsset<AudioClip>(_address);
+        AudioClip clip = await ResourceManager.Instance.LoadAsset<AudioClip>(SfxAddress.PickRandom(_address));
 
         _isLoading = false;
 

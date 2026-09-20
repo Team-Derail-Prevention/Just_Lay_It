@@ -74,10 +74,10 @@
   {
     "Id": "Base_UI_LM_Button_hover_05",
     "Place": "BaseArrivalUI_Button_hover",
-    "Text_Ko": "현재 열차의 체력은 {0}% 입니다.\n열차 수리 한번당 가격 : 돌 {1}개 이고 {2}%의 체력을 회복합니다.",
-    "Text_En": "The train's current durability is {0}%.\nEach repair costs {1} Stone and restores {2}% of durability.",
-    "FontSiz_Ko": 38,
-    "FontSiz_En": 26
+    "Text_Ko": "현재 열차의 체력은 {0}% 입니다.\n열차 수리 한번당 가격 : 돌 {1}개\n{2}%의 체력을 회복합니다.",
+    "Text_En": "The train's current durability is {0}%.\nEach repair costs {1} Stone\nRestores {2}% of durability.",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 35
   },
   {
     "Id": "Base_UI_LT_01",
@@ -298,8 +298,8 @@
   {
     "Id": "StationArrival_UI_ML_04",
     "Place": "StationArrivalUI",
-    "Text_Ko": "기 입 하 기",
-    "Text_En": "Fill in",
+    "Text_Ko": "적 제 하 기",
+    "Text_En": "L o a d",
     "FontSiz_Ko": 36,
     "FontSiz_En": 36
   },
@@ -330,10 +330,10 @@
   {
     "Id": "StationArrival_UI_MM_04",
     "Place": "StationArrivalUI",
-    "Text_Ko": "기 입 하 기",
-    "Text_En": "Fill in",
+    "Text_Ko": "승 차 허 락",
+    "Text_En": "Allow Entry",
     "FontSiz_Ko": 36,
-    "FontSiz_En": 36
+    "FontSiz_En": 28
   },
   {
     "Id": "StationArrival_UI_MR_01",
@@ -1246,5 +1246,29 @@
     "Text_En": "Go to a base or station!",
     "FontSiz_Ko": 16,
     "FontSiz_En": 16
+  },
+  {
+    "Id": "StationArrival_UI_ML_05",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "취 소 하 기",
+    "Text_En": "Cancel",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "StationArrival_UI_MM_05",
+    "Place": "StationArrivalUI",
+    "Text_Ko": "취 소 하 기",
+    "Text_En": "Cancel",
+    "FontSiz_Ko": 36,
+    "FontSiz_En": 36
+  },
+  {
+    "Id": "HudTrainStatus_UI_01",
+    "Place": "HudTrainStatusUI",
+    "Text_Ko": "모래 폭풍이 다가 옵니다.",
+    "Text_En": "Sandstorm is coming!",
+    "FontSiz_Ko": 70,
+    "FontSiz_En": 70
   }
 ]

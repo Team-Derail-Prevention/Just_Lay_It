@@ -3,8 +3,13 @@ using TMPro;
 
 public class StationArrivalUI : UIBase
 {
-    private const int REPAIR_HEAL_PERCENT = 20; 
-    private const int REPAIR_STONE_COST = 40;  
+    private const int REPAIR_HEAL_PERCENT = 20;
+    private const int REPAIR_STONE_COST = 40;
+
+    private const string TAKE_STONE_LABEL_ID = "StationArrival_UI_ML_04";
+    private const string CANCEL_STONE_LABEL_ID = "StationArrival_UI_ML_05";
+    private const string BOARD_CITIZEN_LABEL_ID = "StationArrival_UI_MM_04";
+    private const string CANCEL_CITIZEN_LABEL_ID = "StationArrival_UI_MM_05";
 
     [Header("좌상단 표시")]
     [SerializeField] private TextMeshProUGUI Text_MyStone;
@@ -34,18 +39,20 @@ public class StationArrivalUI : UIBase
     private int _stationAvailableCitizen;
     private int _takeStoneAmount;
     private int _boardCitizenAmount;
+    private bool _isStoneTakeSelected;
+    private bool _isCitizenBoardSelected;
     private float _currentHpPercent = 100f;
 
     private void OnEnable()
     {
         if (Button_InputStone != null)
         {
-            Button_InputStone.BindOnClickButtonEvent(OnClick_InputStone);
+            Button_InputStone.BindOnClickButtonEvent(OnClick_TakeStone);
         }
 
         if (Button_InputCitizen != null)
         {
-            Button_InputCitizen.BindOnClickButtonEvent(OnClick_InputCitizen);
+            Button_InputCitizen.BindOnClickButtonEvent(OnClick_BoardCitizen);
         }
 
         if (Button_Repair != null)
@@ -65,23 +72,26 @@ public class StationArrivalUI : UIBase
 
         _takeStoneAmount = 0;
         _boardCitizenAmount = 0;
+        _isStoneTakeSelected = false;
+        _isCitizenBoardSelected = false;
 
         RefreshRepairCostText();
         SyncHpFromActiveTrain();
         RefreshTopIndicators();
         RefreshTakeAmountTexts();
+        RefreshInputButtonTexts();
     }
 
     private void OnDisable()
     {
         if (Button_InputStone != null)
         {
-            Button_InputStone.UnBindOnClickButtonEvent(OnClick_InputStone);
+            Button_InputStone.UnBindOnClickButtonEvent(OnClick_TakeStone);
         }
 
         if (Button_InputCitizen != null)
         {
-            Button_InputCitizen.UnBindOnClickButtonEvent(OnClick_InputCitizen);
+            Button_InputCitizen.UnBindOnClickButtonEvent(OnClick_BoardCitizen);
         }
 
         if (Button_Repair != null)
@@ -195,45 +205,99 @@ public class StationArrivalUI : UIBase
         }
     }
 
-    private void OnClick_InputStone()
+    private void RefreshInputButtonTexts()
     {
-        int maxAllowed = Mathf.Min(_stationAvailableStone, NetworkResourceService.Instance.RemainingCargoCapacity);
-        if (maxAllowed <= 0)
+        if (Button_InputStone != null)
+        {
+            string stoneLabelId = _isStoneTakeSelected ? CANCEL_STONE_LABEL_ID : TAKE_STONE_LABEL_ID;
+            Button_InputStone.ChangeButtonText(LocalizationManager.Instance.GetText(stoneLabelId));
+        }
+
+        if (Button_InputCitizen != null)
+        {
+            string citizenLabelId = _isCitizenBoardSelected ? CANCEL_CITIZEN_LABEL_ID : BOARD_CITIZEN_LABEL_ID;
+            Button_InputCitizen.ChangeButtonText(LocalizationManager.Instance.GetText(citizenLabelId));
+        }
+    }
+
+    private int GetStoneTakeLimit()
+    {
+        return Mathf.Min(_stationAvailableStone, NetworkResourceService.Instance.RemainingCargoCapacity);
+    }
+
+    private int GetCitizenBoardLimit()
+    {
+        return Mathf.Min(_stationAvailableCitizen, NetworkTrainCargoService.Instance.RemainingBoardingCapacity);
+    }
+
+    private void OnClick_TakeStone()
+    {
+        if (_isStoneTakeSelected)
+        {
+            _isStoneTakeSelected = false;
+            _takeStoneAmount = 0;
+            RefreshTakeAmountTexts();
+            RefreshInputButtonTexts();
+            return;
+        }
+
+        int takeLimit = GetStoneTakeLimit();
+        if (takeLimit <= 0)
         {
             UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_06"));
             return;
         }
 
-        UIManager.Instance.OpenTextInputPopup(string.Format(LocalizationManager.Instance.GetText("StationArrival_TextInput_UI_01"), maxAllowed),OnStoneAmountConfirmed,OnInvalidInputAlert,maxAllowed);
-    }
-
-    private void OnStoneAmountConfirmed(int amount)
-    {
-        _takeStoneAmount = amount;
+        _isStoneTakeSelected = true;
+        _takeStoneAmount = takeLimit;
         RefreshTakeAmountTexts();
+        RefreshInputButtonTexts();
     }
 
-    private void OnClick_InputCitizen()
+    private void OnClick_BoardCitizen()
     {
-        int maxAllowed = Mathf.Min(_stationAvailableCitizen, NetworkTrainCargoService.Instance.RemainingBoardingCapacity);
-        if (maxAllowed <= 0)
+        if (_isCitizenBoardSelected)
+        {
+            _isCitizenBoardSelected = false;
+            _boardCitizenAmount = 0;
+            RefreshTakeAmountTexts();
+            RefreshInputButtonTexts();
+            return;
+        }
+
+        int boardLimit = GetCitizenBoardLimit();
+        if (boardLimit <= 0)
         {
             UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_07"));
             return;
         }
 
-        UIManager.Instance.OpenTextInputPopup(string.Format(LocalizationManager.Instance.GetText("StationArrival_TextInput_UI_02"), maxAllowed),OnCitizenAmountConfirmed,OnInvalidInputAlert,maxAllowed);
-    }
-
-    private void OnCitizenAmountConfirmed(int amount)
-    {
-        _boardCitizenAmount = amount;
+        _isCitizenBoardSelected = true;
+        _boardCitizenAmount = boardLimit;
         RefreshTakeAmountTexts();
+        RefreshInputButtonTexts();
     }
 
-    private void OnInvalidInputAlert()
+    private void RefreshSelectedStoneAmount()
     {
-        UIManager.Instance.OpenExitConfirmPopup(null, null, LocalizationManager.Instance.GetText("ExitConfirm_PopUp_UI_08"));
+        if (_isStoneTakeSelected == false)
+        {
+            return;
+        }
+
+        int takeLimit = GetStoneTakeLimit();
+        if (takeLimit <= 0)
+        {
+            _isStoneTakeSelected = false;
+            _takeStoneAmount = 0;
+            RefreshInputButtonTexts();
+        }
+        else
+        {
+            _takeStoneAmount = takeLimit;
+        }
+
+        RefreshTakeAmountTexts();
     }
 
     private void OnClick_Repair()
@@ -257,6 +321,7 @@ public class StationArrivalUI : UIBase
 
         RefreshTopIndicators();
         RefreshRepairCostText();
+        RefreshSelectedStoneAmount();
 
         GameManager.Train.HealActiveTrain(REPAIR_HEAL_PERCENT);
 

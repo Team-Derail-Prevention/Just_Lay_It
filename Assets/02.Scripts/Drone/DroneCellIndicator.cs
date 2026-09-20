@@ -34,7 +34,7 @@ public class DroneCellIndicator : MonoBehaviour
             return;
         }
 
-        if (_buildMode.IsBuildMode == false)
+        if (_buildMode.IsBuildModeInteractable == false)
         {
             SetVisible(false);
 
@@ -49,6 +49,13 @@ public class DroneCellIndicator : MonoBehaviour
         }
 
         if (_cursor.TryGetCell(out Vector3 cellCenter, out MaterialObject target) == false)
+        {
+            SetVisible(false);
+
+            return;
+        }
+
+        if (target != null && target.IsMining == true)
         {
             SetVisible(false);
 

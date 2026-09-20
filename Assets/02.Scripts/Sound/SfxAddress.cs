@@ -1,4 +1,6 @@
-﻿public static class SfxAddress
+﻿using System.Collections.Generic;
+
+public static class SfxAddress
 {
     public static class Ui
     {
@@ -58,6 +60,45 @@
     {
         public const string Clear = "Sfx/Game/Clear";
         public const string Over = "Sfx/Game/Over";
+    }
+
+    private static readonly Dictionary<string, int> VariantCounts = new Dictionary<string, int>
+    {
+        { Ui.Click, 2 },
+        { Ui.GachaSpin, 2 },
+        { Ui.WeaponPickLegendary, 5 },
+        { Train.Hit, 8 },
+        { Drone.MineRock, 8 },
+        { Drone.ChopTree, 8 },
+        { Resource.Collected, 2 },
+        { Game.Over, 5 },
+    };
+
+    public static int GetVariantCount(string address)
+    {
+        if (address == null || VariantCounts.TryGetValue(address, out int count) == false)
+        {
+            return 1;
+        }
+
+        return count;
+    }
+
+    public static string GetVariant(string address, int number)
+    {
+        if (GetVariantCount(address) <= 1)
+        {
+            return address;
+        }
+
+        return $"{address}_{number}";
+    }
+
+    public static string PickRandom(string address)
+    {
+        int number = UnityEngine.Random.Range(1, GetVariantCount(address) + 1);
+
+        return GetVariant(address, number);
     }
 
     public static string Resolve(string prefix, string dataSoundName, string fallbackAddress)
