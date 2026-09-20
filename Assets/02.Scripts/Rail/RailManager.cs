@@ -619,6 +619,77 @@ public class RailManager : SingletonBase<RailManager>
         return connected;
     }
 
+    // [추가] centerGrid를 기준으로, connectedDirs 방향에 있는 이웃들이
+    // centerGrid를 거치지 않고도 이미 서로 연결되어 있는지 그래프 탐색(BFS)으로 검사.
+    // true를 반환하면, centerGrid를 그 방향들로 연결/재형성하는 순간 폐곡선(루프, ㅁ자)이 생긴다는 뜻.
+    private bool WouldFormLoop(Vector2Int centerGrid, List<int> connectedDirs)
+    {
+        if (connectedDirs.Count < 2)
+        {
+            return false;
+        }
+
+        List<Vector2Int> neighborGrids = new List<Vector2Int>();
+        foreach (int dir in connectedDirs)
+        {
+            neighborGrids.Add(centerGrid + _cardinalOffsets[dir]);
+        }
+
+        Vector2Int start = neighborGrids[0];
+        HashSet<Vector2Int> visited = new HashSet<Vector2Int> { start };
+        Queue<Vector2Int> queue = new Queue<Vector2Int>();
+        queue.Enqueue(start);
+
+        while (queue.Count > 0)
+        {
+            Vector2Int current = queue.Dequeue();
+
+            if (!_placedRails.TryGetValue(current, out PlacedRailInfo info))
+            {
+                continue;
+            }
+
+            List<int> ports = GetRailPorts(info.Type, info.RotationStep);
+            foreach (int port in ports)
+            {
+                Vector2Int next = current + _cardinalOffsets[port];
+
+                if (next == centerGrid)
+                {
+                    continue; // centerGrid는 아직 이 형태로 확정되지 않았으므로 경유 취급하지 않음
+                }
+                if (visited.Contains(next))
+                {
+                    continue;
+                }
+                if (!_placedRails.TryGetValue(next, out PlacedRailInfo nextInfo))
+                {
+                    continue;
+                }
+
+                int dirFromNextToCurrent = OppositeDirection(port);
+                List<int> nextPorts = GetRailPorts(nextInfo.Type, nextInfo.RotationStep);
+                if (!nextPorts.Contains(dirFromNextToCurrent))
+                {
+                    continue; // 포트가 실제로 맞물려야 진짜 연결로 인정
+                }
+
+                visited.Add(next);
+                queue.Enqueue(next);
+            }
+        }
+
+        for (int i = 1; i < neighborGrids.Count; i++)
+        {
+            if (visited.Contains(neighborGrids[i]))
+            {
+                return true; // centerGrid 없이도 이미 서로 연결되어 있었음 -> 루프 발생
+            }
+        }
+
+        return false;
+    }
+
     private void ApplyAutoConnect(Vector2Int gridIndex)
     {
         List<int> connectedDirs = GetConnectedDirections(gridIndex);
@@ -722,6 +793,14 @@ public class RailManager : SingletonBase<RailManager>
         if (!cubeInfo.IsGroundLayer) return false;
         if (_installedCubes.Contains(gridIndex)) return false;
         if (cubeInfo.TileScript != null && cubeInfo.TileScript.HasRail) return false;
+
+        // [추가] 이 칸에 레일을 놓으면 폐곡선(루프, ㅁ자)이 생기는지 검사
+        List<int> connectedDirs = GetConnectedDirections(gridIndex);
+        if (WouldFormLoop(gridIndex, connectedDirs))
+        {
+            return false;
+        }
+
         return true;
     }
 
@@ -875,6 +954,13 @@ public class RailManager : SingletonBase<RailManager>
 
             if (GetActiveConnectionCount(neighbor) >= 2)
             {
+                continue;
+            }
+
+            // [추가] 이 이웃을 재형성(코너 등으로 변형)하면 폐곡선(루프, ㅁ자)이 생기는지 검사
+            if (WouldFormLoop(neighbor, connectedDirs))
+            {
+                Debug.Log($"[RailManager] {neighbor} 재형성 시 루프가 발생하여 변형을 건너뜁니다.");
                 continue;
             }
 
