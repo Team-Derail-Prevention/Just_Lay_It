@@ -127,6 +127,6 @@ MonoBehaviour:
   Image_Preset: {fileID: 8895755908344872944}
   _presetSprites:
   - {fileID: 21300000, guid: 32390330490f3f947bffb14931ebc696, type: 3}
-  - {fileID: 714341933, guid: 206a45353f96b5c4b827d7d3a1c3eab4, type: 3}
-  - {fileID: 2072438287, guid: 206a45353f96b5c4b827d7d3a1c3eab4, type: 3}
-  - {fileID: -551045897, guid: 206a45353f96b5c4b827d7d3a1c3eab4, type: 3}
+  - {fileID: 1827244838, guid: 206a45353f96b5c4b827d7d3a1c3eab4, type: 3}
+  - {fileID: 1147816907, guid: 206a45353f96b5c4b827d7d3a1c3eab4, type: 3}
+  - {fileID: 1598304360, guid: 206a45353f96b5c4b827d7d3a1c3eab4, type: 3}

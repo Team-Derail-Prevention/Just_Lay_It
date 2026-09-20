@@ -1270,5 +1270,21 @@
     "Text_En": "Sandstorm is coming!",
     "FontSiz_Ko": 70,
     "FontSiz_En": 70
+  },
+  {
+    "Id": "HudTrainStatus_UI_02",
+    "Place": "HudTrainStatusUI",
+    "Text_Ko": "HP가 20% 이하로 떨어졌습니다.",
+    "Text_En": "HP has dropped below 20%. ",
+    "FontSiz_Ko": 55,
+    "FontSiz_En": 55
+  },
+  {
+    "Id": "Base_UI_LT_02",
+    "Place": "BaseArrivalUI",
+    "Text_Ko": "게임을 포기하고, 로비로 돌아갑니다.\n현재까지 플레이한 시민 보상은 지급됩니다.",
+    "Text_En": "Give up the game and return to the lobby.\nCitizen rewards for play so far will be granted.",
+    "FontSiz_Ko": 32,
+    "FontSiz_En": 35
   }
 ]
