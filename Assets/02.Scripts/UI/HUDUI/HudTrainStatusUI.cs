@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine.UI;
 using Enums;
+using System.Collections;
 
 public class HudTrainStatusUI : UIBase
 {
@@ -33,6 +34,12 @@ public class HudTrainStatusUI : UIBase
     [Header("정지 경고")]
     [SerializeField] private GameObject Cont;
     [SerializeField] private TextMeshProUGUI Text_Cont;
+
+    [Header("모래폭풍 경고")]
+    [SerializeField] private GameObject Denger;
+    [SerializeField] private float _dengerShowSeconds = 3f;
+
+    private Coroutine _dengerCoroutine;
 
     private void Awake()
     {
@@ -78,6 +85,16 @@ public class HudTrainStatusUI : UIBase
             SetHp(activeTrain.CurrentHp, activeTrain.MaxHp);
         }
 
+        if (Denger != null)
+        {
+            Denger.SetActive(false);
+        }
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnCountSandStorm += OnCountSandStorm_GameManager;
+        }
+
         RefreshStageText();
     }
 
@@ -96,6 +113,42 @@ public class HudTrainStatusUI : UIBase
         {
             LocalizationEventHub.Instance.OnLanguageChanged -= OnLanguageChanged_LocalizationEventHub;
         }
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnCountSandStorm -= OnCountSandStorm_GameManager;
+        }
+
+        _dengerCoroutine = null;
+    }
+
+    private void OnCountSandStorm_GameManager(float durationSeconds)
+    {
+        ShowDenger();
+    }
+
+    private void ShowDenger()
+    {
+        if (Denger == null)
+        {
+            return;
+        }
+
+        if (_dengerCoroutine != null)
+        {
+            StopCoroutine(_dengerCoroutine);
+        }
+
+        Denger.SetActive(true);
+        _dengerCoroutine = StartCoroutine(CoHideDenger());
+    }
+
+    private IEnumerator CoHideDenger()
+    {
+        yield return new WaitForSeconds(_dengerShowSeconds);
+
+        Denger.SetActive(false);
+        _dengerCoroutine = null;
     }
 
     private void OnLanguageChanged_LocalizationEventHub(LanguageType language)
