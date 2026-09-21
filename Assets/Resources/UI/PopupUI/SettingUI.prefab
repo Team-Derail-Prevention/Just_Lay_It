@@ -1573,7 +1573,6 @@ GameObject:
   - component: {fileID: 2808607490594969264}
   - component: {fileID: 5913234813314992009}
   - component: {fileID: 6844803129188086487}
-  - component: {fileID: 588219022570838658}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -1700,20 +1699,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &588219022570838658
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2420594813420346508}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  _localizationId: Setting_PopUp_UI_TR_03
-  _targetText: {fileID: 6844803129188086487}
 --- !u!1 &2928405342944839013
 GameObject:
   m_ObjectHideFlags: 0
@@ -4111,7 +4096,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: English
+  m_text: Korea
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
   m_sharedMaterial: {fileID: 7855095231793655547, guid: 562f5d33967c6e648b2b431a6b2ca53f, type: 2}
