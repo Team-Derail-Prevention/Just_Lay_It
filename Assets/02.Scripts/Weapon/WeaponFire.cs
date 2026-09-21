@@ -271,16 +271,20 @@ public class WeaponFire : MonoBehaviour
             return;
         }
 
-        GameObject projObj = PoolManager.Instance.SpawnFromPool(_projectileId, _firePosition.position, Quaternion.identity);
+        Vector3 targetCenter = new Vector3(target.position.x, _firePosition.position.y, target.position.z);
+        Vector3 shootDir = (targetCenter - _firePosition.position).normalized;
+
+        Quaternion spawnRotation = shootDir.sqrMagnitude > 0.0001f
+            ? Quaternion.LookRotation(shootDir)
+            : Quaternion.identity;
+
+        GameObject projObj = PoolManager.Instance.SpawnFromPool(_projectileId, _firePosition.position, spawnRotation);
 
         PlayWeaponSfx(_weaponData?.UseFireSound, SfxAddress.Weapon.Fire);
 
         WeaponProjectile projectile = projObj.GetComponent<WeaponProjectile>();
         if (projectile != null)
         {
-            Vector3 targetCenter = new Vector3(target.position.x, _firePosition.position.y, target.position.z);
-            Vector3 shootDir = (targetCenter - _firePosition.position).normalized;
-
             int finalAtk = _weaponAtk;
             if (_parentTrain != null && _parentTrain.IsElectrified)
             {
