@@ -334,6 +334,8 @@ public static class UIManagerExtension
         if (GameManager.Instance != null && GameManager.Instance.CurrentGameState == GameState.Playing)
         {
             GameManager.Instance.PauseGameplayTime();
+
+            SoundManager.Instance?.SetGameSoundPaused(true);
         }
     }
 
@@ -344,6 +346,8 @@ public static class UIManagerExtension
         if (GameManager.Instance != null && GameManager.Instance.CurrentGameState == GameState.Playing)
         {
             GameManager.Instance.ResumeGameplayTime();
+
+            SoundManager.Instance?.SetGameSoundPaused(false);
         }
     }
 
