@@ -155,6 +155,11 @@ public class SoundManager : SingletonBase<SoundManager>
         PlayBGM(address);
     }
 
+    public void SetGameSoundPaused(bool isPaused)
+    {
+        AudioListener.pause = isPaused;
+    }
+
     private void PlayGameStateSfx(GameState gameState)
     {
         GameState previousState = _previousGameState;
@@ -668,6 +673,9 @@ public class SoundManager : SingletonBase<SoundManager>
         }
 
         _bgmSource.priority = 0;
+
+        _bgmSource.ignoreListenerPause = true;
+        _sfxSource.ignoreListenerPause = true;
 
         EnsureLowPassFilter();
 
