@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Enums;
 
@@ -18,6 +19,14 @@ public class SoundManager : SingletonBase<SoundManager>
 
     [Header("자원 획득음 연사 제한")]
     [SerializeField, Min(0f)] private float _resourceSfxCooldown = 0.08f;
+
+    [Header("열차 체력 경고")]
+    [SerializeField, Range(0f, 1f)] private float _hpWarningFirstThreshold = 0.5f;
+    [SerializeField, Range(0f, 1f)] private float _hpWarningSecondThreshold = 0.25f;
+
+    [Header("모래폭풍 배경음")]
+    [SerializeField, Range(0f, 1f)] private float _sandstormAmbienceVolume = 0.7f;
+    [SerializeField, Min(0f)] private float _sandstormCountdownStartSecond = 10f; // 남은 시간이 이 값 이하로 내려가면 초당 경고음
 
     [Header("3D 효과음")]
     [SerializeField, Min(1)] private int _sfxVoiceLimit = 8;
@@ -41,6 +50,14 @@ public class SoundManager : SingletonBase<SoundManager>
     private bool _hasPreviousGameState;
 
     private AudioLowPassFilter _bgmLowPassFilter;
+
+    private AudioSource _ambienceSource;
+    private string _currentAmbienceAddress;
+    private CancellationTokenSource _sandstormCts;
+
+    private bool _isTrainHpSubscribed;
+    private bool _isHpWarningFirstPlayed;
+    private bool _isHpWarningSecondPlayed;
 
     protected override void Init()
     {
@@ -70,6 +87,8 @@ public class SoundManager : SingletonBase<SoundManager>
         MaterialObject.OnMaterialObjectCollected -= HandleMaterialCollected;
         MaterialObject.OnMaterialObjectCollected += HandleMaterialCollected;
 
+        SubscribeTrainHpIfNeeded();
+
         if (GameManager.Instance == null)
         {
             HandleGameStateChanged(GameState.Ready);
@@ -78,6 +97,8 @@ public class SoundManager : SingletonBase<SoundManager>
         }
 
         GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
+        GameManager.Instance.OnCountSandStorm += HandleSandstormStarted;
+        GameManager.Instance.OnEndSandStorm += HandleSandstormEnded;
 
         HandleGameStateChanged(GameManager.Instance.CurrentGameState);
     }
@@ -86,12 +107,19 @@ public class SoundManager : SingletonBase<SoundManager>
     {
         MaterialObject.OnMaterialObjectCollected -= HandleMaterialCollected;
 
+        if (TrainStatusEventHub.Instance != null)
+        {
+            TrainStatusEventHub.Instance.OnHpChanged -= HandleTrainHpChanged;
+        }
+
         if (GameManager.Instance == null)
         {
             return;
         }
 
         GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+        GameManager.Instance.OnCountSandStorm -= HandleSandstormStarted;
+        GameManager.Instance.OnEndSandStorm -= HandleSandstormEnded;
     }
 
     private void HandleMaterialCollected(MaterialObjectData data)
@@ -107,6 +135,13 @@ public class SoundManager : SingletonBase<SoundManager>
     private void HandleGameStateChanged(GameState gameState)
     {
         SetMuffled(gameState == GameState.EventPaused);
+
+        SubscribeTrainHpIfNeeded();
+
+        if (gameState != GameState.Playing && gameState != GameState.EventPaused)
+        {
+            HandleSandstormEnded();
+        }
 
         PlayGameStateSfx(gameState);
 
@@ -250,6 +285,182 @@ public class SoundManager : SingletonBase<SoundManager>
         LoadAndPlaySpatial(assetPath, position).Forget();
     }
 
+    private void SubscribeTrainHpIfNeeded()
+    {
+        if (_isTrainHpSubscribed || TrainStatusEventHub.Instance == null)
+        {
+            return;
+        }
+
+        TrainStatusEventHub.Instance.OnHpChanged += HandleTrainHpChanged;
+        _isTrainHpSubscribed = true;
+    }
+
+    private void HandleTrainHpChanged(float currentHp, float maxHp)
+    {
+        if (maxHp <= 0f)
+        {
+            return;
+        }
+
+        float hpRatio = currentHp / maxHp;
+
+        if (hpRatio > _hpWarningFirstThreshold)
+        {
+            _isHpWarningFirstPlayed = false;
+            _isHpWarningSecondPlayed = false;
+
+            return;
+        }
+
+        if (hpRatio > _hpWarningSecondThreshold)
+        {
+            _isHpWarningSecondPlayed = false;
+
+            if (_isHpWarningFirstPlayed)
+            {
+                return;
+            }
+
+            _isHpWarningFirstPlayed = true;
+            PlaySFX(SfxAddress.Train.HpWarning50);
+
+            return;
+        }
+
+        if (currentHp <= 0f || _isHpWarningSecondPlayed)
+        {
+            return;
+        }
+
+        _isHpWarningFirstPlayed = true;
+        _isHpWarningSecondPlayed = true;
+        PlaySFX(SfxAddress.Train.HpWarning25);
+    }
+
+    private void HandleSandstormStarted(float durationSeconds)
+    {
+        PlayAmbienceLoop(SfxAddress.Sandstorm.Ambience);
+
+        CancelSandstormCountdown();
+
+        _sandstormCts = new CancellationTokenSource();
+        RunSandstormCountdown(durationSeconds, _sandstormCts.Token).Forget();
+    }
+
+    private void HandleSandstormEnded()
+    {
+        CancelSandstormCountdown();
+        StopAmbience();
+    }
+
+    private void CancelSandstormCountdown()
+    {
+        if (_sandstormCts == null)
+        {
+            return;
+        }
+
+        _sandstormCts.Cancel();
+        _sandstormCts.Dispose();
+        _sandstormCts = null;
+    }
+
+    private async UniTaskVoid RunSandstormCountdown(float durationSeconds, CancellationToken token)
+    {
+        float remainingSecond = durationSeconds;
+        int lastBeepSecond = Mathf.CeilToInt(durationSeconds) + 1;
+
+        while (remainingSecond > 0f)
+        {
+            await UniTask.Yield(PlayerLoopTiming.Update, token);
+
+            remainingSecond -= Time.deltaTime;
+
+            int currentSecond = Mathf.CeilToInt(remainingSecond);
+
+            if (currentSecond >= lastBeepSecond || currentSecond <= 0)
+            {
+                continue;
+            }
+
+            lastBeepSecond = currentSecond;
+
+            if (currentSecond > _sandstormCountdownStartSecond)
+            {
+                continue;
+            }
+
+            PlaySFX(SfxAddress.Sandstorm.Countdown);
+        }
+    }
+
+    public void PlayAmbienceLoop(string assetPath)
+    {
+        if (_currentAmbienceAddress == assetPath && _ambienceSource != null && _ambienceSource.isPlaying)
+        {
+            return;
+        }
+
+        ReleaseCurrentAmbience();
+
+        _currentAmbienceAddress = assetPath;
+
+        LoadAndPlayAmbience(assetPath).Forget();
+    }
+
+    public void StopAmbience()
+    {
+        ReleaseCurrentAmbience();
+    }
+
+    private async UniTaskVoid LoadAndPlayAmbience(string assetPath)
+    {
+        AudioClip clip = await LoadClipAsync(assetPath);
+
+        if (clip == null || _ambienceSource == null)
+        {
+            if (_currentAmbienceAddress == assetPath)
+            {
+                _currentAmbienceAddress = null;
+            }
+
+            return;
+        }
+
+        if (_currentAmbienceAddress != assetPath)
+        {
+            return;
+        }
+
+        _ambienceSource.Stop();
+        _ambienceSource.clip = clip;
+        _ambienceSource.loop = true;
+        _ambienceSource.volume = _sfxVolume * _sandstormAmbienceVolume;
+        _ambienceSource.Play();
+    }
+
+    private void ReleaseCurrentAmbience()
+    {
+        if (_ambienceSource != null)
+        {
+            _ambienceSource.Stop();
+            _ambienceSource.clip = null;
+        }
+
+        if (string.IsNullOrEmpty(_currentAmbienceAddress))
+        {
+            return;
+        }
+
+        if (ResourceManager.Instance != null)
+        {
+            ResourceManager.Instance.Release(_currentAmbienceAddress);
+        }
+
+        _currentAmbienceAddress = null;
+    }
+
     public void PlayBGM(string assetPath)
     {
         if (_currentBgmAddress == assetPath && IsBgmPlaying())
@@ -314,6 +525,11 @@ public class SoundManager : SingletonBase<SoundManager>
         for (int i = 0; i < _spatialSources.Count; i++)
         {
             _spatialSources[i].volume = _sfxVolume;
+        }
+
+        if (_ambienceSource != null)
+        {
+            _ambienceSource.volume = _sfxVolume * _sandstormAmbienceVolume;
         }
     }
 
@@ -444,6 +660,11 @@ public class SoundManager : SingletonBase<SoundManager>
         if (_bgmSource == null)
         {
             _bgmSource = CreateSource("BgmSource", isSpatial: false);
+        }
+
+        if (_ambienceSource == null)
+        {
+            _ambienceSource = CreateSource("AmbienceSource", isSpatial: false);
         }
 
         _bgmSource.priority = 0;
