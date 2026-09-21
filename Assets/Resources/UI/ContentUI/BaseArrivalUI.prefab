@@ -9636,8 +9636,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 35
-  m_fontSizeBase: 35
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -9844,6 +9844,19 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3933229204511864857, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      propertyPath: _description
+      value: "\uAC8C\uC784\uC744 \uD3EC\uAE30\uD558\uACE0, \uB85C\uBE44\uB85C \uB3CC\uC544\uAC11\uB2C8\uB2E4.\r\n\uD604\uC7AC
+        \uAE4C\uC9C0 \uD50C\uB808\uC774\uD55C \uC2DC\uBBFC \uBCF4\uC0C1\uC740 \uC9C0\uAE09\uB429\uB2C8\uB2E4."
+      objectReference: {fileID: 0}
+    - target: {fileID: 3933229204511864857, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      propertyPath: Image_BKFrame
+      value: 
+      objectReference: {fileID: 7859479955767095768}
+    - target: {fileID: 3933229204511864857, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+      propertyPath: _descriptionLocalizationId
+      value: Base_UI_LT_02
+      objectReference: {fileID: 0}
     - target: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
       propertyPath: m_text
       value: "\uC6B4\uD589 \uC885\uB8CC"
@@ -9955,6 +9968,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   _localizationId: Base_UI_LT_01
   _targetText: {fileID: 8715069289476302886}
+--- !u!114 &7859479955767095768 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8350104151169847862, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}
+  m_PrefabInstance: {fileID: 2230403441781548014}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!114 &8715069289476302886 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7350394956635442120, guid: 86a57efb235a3624c8282d38039dc4f6, type: 3}

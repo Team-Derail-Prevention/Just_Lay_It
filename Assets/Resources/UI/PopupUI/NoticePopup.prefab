@@ -272,11 +272,13 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 51032a661cb132b4eb9150f3c15e7cc2, type: 3}
   - {fileID: 21300000, guid: b9f63d4ca823f9d4e83a3e04491174d7, type: 3}
   - {fileID: 21300000, guid: ac3dced8077d3384dacab1b15769535d, type: 3}
+  - {fileID: 21300000, guid: 37cc516d766f78745918c22b550773b2, type: 3}
   _tipSpritesEn:
   - {fileID: 21300000, guid: 5ec1013d66359a342b8c2faff8eac4df, type: 3}
   - {fileID: 21300000, guid: 7d94cd91fc19a3048b87d6879b6b72fc, type: 3}
   - {fileID: 21300000, guid: 881e4402c7dbf8e4cb6258cf00fb9708, type: 3}
   - {fileID: 21300000, guid: d928cc63ee91406499cb931bc88b48a7, type: 3}
+  - {fileID: 21300000, guid: 1a10dfb7742fbbd4aa5c97be850915cc, type: 3}
 --- !u!1 &4764710488238852972
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 using System;
 using System.ComponentModel;
+using System.Collections;
 
 public class MonsterHealth : MonoBehaviour, IForceDespawnable
 {
+    [SerializeField] private string _deathEffectPoolId = "MonsterDeathEffect";
+
+
     public static event Action<int> OnMonsterDiedWithStone;
     public event Action<Transform>OnMonsterDied;
 
@@ -15,9 +19,10 @@ public class MonsterHealth : MonoBehaviour, IForceDespawnable
 
     private string _takeDamageSound;
     private string _dieSound;
+
     public void Initialize(MonsterData data,float hpMultiplier = 1.0f)
     {
-        if(data != null)
+        if (data != null)
         {
             _maxHp = Mathf.RoundToInt(data.Hp * hpMultiplier);
             _currentHp = _maxHp;
@@ -62,11 +67,16 @@ public class MonsterHealth : MonoBehaviour, IForceDespawnable
 
         PlayMonsterSfx(_dieSound, SfxAddress.Monster.Die);
 
+        if (!string.IsNullOrEmpty(_deathEffectPoolId) && PoolManager.Instance != null)
+        {
+            PoolManager.Instance.SpawnFromPool(_deathEffectPoolId, transform.position, Quaternion.identity);
+        }
+
         OnMonsterDiedWithStone?.Invoke(_dropStone);
         OnMonsterDied?.Invoke(transform);
 
         if (MonsterSpawn.Instance != null)
-        { 
+        {
             MonsterSpawn.Instance.DecreaseMonsterCount();
         }
 

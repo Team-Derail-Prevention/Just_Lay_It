@@ -108,6 +108,7 @@ MonoBehaviour:
   _attackRange: 5
   _projectilePrefab: {fileID: 6262142368634068685, guid: e7580cae417a1e540bc9d65fd6a9d1e8, type: 3}
   firePosition: {fileID: 8261399175528662270}
+  _isMeleeAttack: 0
 --- !u!54 &-381454180143105190
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -147,6 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5df38fa58f58b8d4187ae20b9c8e6379, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterHealth
+  _deathEffectPoolId: MonsterDeathEffect
   _dropStone: 0
 --- !u!135 &990825028463747129
 SphereCollider:

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 206a45353f96b5c4b827d7d3a1c3eab4
+guid: 1a10dfb7742fbbd4aa5c97be850915cc
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -121,100 +121,12 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites:
-    - serializedVersion: 2
-      name: ViewControl_Icon00_0
-      rect:
-        serializedVersion: 2
-        x: 21
-        y: 247
-        width: 291
-        height: 90
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f32726dd6dc222a4e9ca0a2c96f7818f
-      internalID: -1746108454
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ViewControl_Icon00_1
-      rect:
-        serializedVersion: 2
-        x: 344
-        y: 247
-        width: 289
-        height: 91
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a01dbbd94ba35894eb5a5aaa62f40b25
-      internalID: 1827244838
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ViewControl_Icon00_2
-      rect:
-        serializedVersion: 2
-        x: 21
-        y: 67
-        width: 290
-        height: 85
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3929fe827cd8e004299a63141be68b66
-      internalID: 1147816907
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ViewControl_Icon00_3
-      rect:
-        serializedVersion: 2
-        x: 342
-        y: 66
-        width: 291
-        height: 87
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: eea04299d97c34e4f89fb70b86aa050b
-      internalID: 1598304360
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
+    sprites: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 1261021f33f13a546bbdd79a04a7d870
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -223,11 +135,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      ViewControl_Icon00_0: -1746108454
-      ViewControl_Icon00_1: 1827244838
-      ViewControl_Icon00_2: 1147816907
-      ViewControl_Icon00_3: 1598304360
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
