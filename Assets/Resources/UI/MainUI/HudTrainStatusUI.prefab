@@ -1324,7 +1324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  _localizationId: HudTrainStatus_UI_01
+  _localizationId: HudTrainStatus_UI_02
   _targetText: {fileID: 3051279497949434546}
 --- !u!1 &4464955476744657643
 GameObject:
