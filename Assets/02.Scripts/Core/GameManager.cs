@@ -57,6 +57,7 @@ public class GameManager : SingletonBase<GameManager>
     public event Action OnGameCleared;
     public event Action<GameState> OnGameStateChanged;
     public event Action<float> OnCountSandStorm;
+    public event Action OnEndSandStorm;
     public bool IsStageSelectUnlocked => Save != null && Save.HasClearedAllStagesSpecial;
 
     public static DataManager Data => DataManager.Instance;
@@ -857,6 +858,7 @@ public class GameManager : SingletonBase<GameManager>
         if (_isSandstormActive)
         {
             UI?.CloseSandstormOverlayUI();
+            OnEndSandStorm?.Invoke();
         }
 
         _isSandstormActive = false;

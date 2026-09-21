@@ -77,6 +77,7 @@ public class TrainManager : SingletonBase<TrainManager>
 
                 int remainingSecond = Mathf.Max(0, Mathf.CeilToInt(_maxStopAllowedTime) - currentSecond);
                 OnTrainStopWarning?.Invoke(remainingSecond); // 남은 초를 그대로 전달 (2 -> 1 -> 0)
+                SoundManager.Instance?.PlaySFX(SfxAddress.Train.StopWarning);
             }
 
             if (_stopTimer >= _maxStopAllowedTime)
