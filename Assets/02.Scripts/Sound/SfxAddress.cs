@@ -26,6 +26,15 @@ public static class SfxAddress
         public const string Hit = "Sfx/Train/Hit";
         public const string Drive = "Sfx/Train/Drive";
         public const string Repair = "Sfx/Train/Repair";
+        public const string HpWarning50 = "Sfx/Train/HpWarning50";
+        public const string HpWarning25 = "Sfx/Train/HpWarning25";
+        public const string StopWarning = "Sfx/Train/StopWarning";
+    }
+
+    public static class Sandstorm
+    {
+        public const string Ambience = "Sfx/Sandstorm/Ambience";
+        public const string Countdown = "Sfx/Sandstorm/Countdown";
     }
 
     public static class Weapon
@@ -119,6 +128,10 @@ public static class SfxAddress
         Ui.Click,
         Train.Depart,
         Train.Arrive,
+        Train.HpWarning50,
+        Train.HpWarning25,
+        Train.StopWarning,
+        Sandstorm.Countdown,
     };
 }
 
