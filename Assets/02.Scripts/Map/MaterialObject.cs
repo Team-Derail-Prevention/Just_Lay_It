@@ -26,6 +26,8 @@ public class MaterialObject : BaseColliderTrigger
     [Tooltip("채굴 속도 (초 단위)")]
     [SerializeField] private float _defaultMiningDuration = 3.0f;
     [SerializeField] private float _shakeIntensity = 0.1f;
+    [SerializeField] private float _miningPulseSpeed = 20f;
+    [SerializeField] private float _miningPulseAmount = 0.1f;
 
     private bool _isMining = false;
     private bool _isBroken = false;
@@ -114,10 +116,18 @@ public class MaterialObject : BaseColliderTrigger
 
         while (elapsedTime < miningDuration && !cancellationToken.IsCancellationRequested)
         {
-            elapsedTime += Time.deltaTime;
+            float deltaTime = Time.deltaTime;
+            if (deltaTime <= 0f)
+            {
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+                continue;
+            }
+
+            elapsedTime += deltaTime;
             float t = elapsedTime / miningDuration;
 
-            transform.localScale = _initialLocalScale * (1f + Mathf.Sin(elapsedTime * 20f) * (0.1f * (1f - t * 0.5f)));
+            float pulseAmount = _miningPulseAmount * (1f - t * 0.5f);
+            transform.localScale = _initialLocalScale * (1f + Mathf.Sin(elapsedTime * _miningPulseSpeed) * pulseAmount);
             transform.position = startPos + UnityEngine.Random.insideUnitSphere * _shakeIntensity;
             transform.position = new Vector3(transform.position.x, startPos.y, transform.position.z);
 
