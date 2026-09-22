@@ -560,7 +560,7 @@
     "FontSiz_En": 40
   },
   {
-    "Id": "GameClearResult_PopUp_UI_8",
+    "Id": "GameClearResult_PopUp_UI_08",
     "Place": "GameClearResultUI",
     "Text_Ko": "총 플레이 선로 설치 수",
     "Text_En": "Total number of Install Rail",
@@ -568,7 +568,7 @@
     "FontSiz_En": 40
   },
   {
-    "Id": "GameClearResult_PopUp_UI_9",
+    "Id": "GameClearResult_PopUp_UI_09",
     "Place": "GameClearResultUI",
     "Text_Ko": "총 플레이 획득 캐쉬 수",
     "Text_En": "Total play acquisition cash count",
@@ -602,7 +602,7 @@
   {
     "Id": "GameStartCountdown_PopUp_UI_01",
     "Place": "GameStartCountdownPopup",
-    "Text_Ko": "{0}' 초 후 열차가 출발 합니다.",
+    "Text_Ko": "{0} 초 후 열차가 출발 합니다.",
     "Text_En": "The train will depart in {0} seconds.",
     "FontSiz_Ko": 50,
     "FontSiz_En": 50
@@ -1286,5 +1286,13 @@
     "Text_En": "Give up the game and return to the lobby.\nCitizen rewards for play so far will be granted.",
     "FontSiz_Ko": 32,
     "FontSiz_En": 35
+  },
+  {
+    "Id": "GameClearResult_PopUp_UI_15",
+    "Place": "GameClearResultUI",
+    "Text_Ko": "모든 난이도 클리어 달성!",
+    "Text_En": "All Difficulties Cleared!",
+    "FontSiz_Ko": 40,
+    "FontSiz_En": 40
   }
 ]

@@ -171,7 +171,15 @@ public class LobbyUpgradeUI : UIBase
 
         if (Text_DetailDescription != null)
         {
-            Text_DetailDescription.text = slotVm.Description; 
+            string description = slotVm.Description;
+
+            if (slotVm.SlotDataId == "LOBBY_BASE_RAIL_COUNT" && NetworkRailService.Instance != null)
+            {
+                int currentBaseCount = NetworkRailService.Instance.GetCurrentBaseRailCount();
+                description = description.Replace("{CUR}", $"[{currentBaseCount}]");
+            }
+
+            Text_DetailDescription.text = description;
         }
 
         if (Image_DetailIcon != null && string.IsNullOrEmpty(slotVm.IconPath) == false)

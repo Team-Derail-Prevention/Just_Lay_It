@@ -154,7 +154,8 @@ public class WeaponFire : MonoBehaviour
     {
         if (_parentTrain != null && _parentTrain.IsFrozen)
         {
-            return _fireRate * 2.0f;
+            float ratio = Mathf.Clamp01(_parentTrain.FreezeSlowRatio);
+            return _fireRate * (1f + ratio);
         }
         return _fireRate;
     }
@@ -288,7 +289,8 @@ public class WeaponFire : MonoBehaviour
             int finalAtk = _weaponAtk;
             if (_parentTrain != null && _parentTrain.IsElectrified)
             {
-                finalAtk = Mathf.RoundToInt(finalAtk * 0.5f);
+                float reduction = Mathf.Clamp01(_parentTrain.ElectricDamageReduction);
+                finalAtk = Mathf.RoundToInt(finalAtk * (1f - reduction));
             }
 
             projectile.ProjectileInitialize(shootDir, finalAtk);

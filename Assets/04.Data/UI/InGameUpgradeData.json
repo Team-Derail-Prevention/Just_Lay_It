@@ -2,8 +2,8 @@
   {
     "Id": "BATTLE_HP",
     "Category": "Battle",
-    "Name_Ko": "열차 체력 증가 (+ 50)",
-    "Name_En": "Training HP Up (+ 50)",
+    "Name_Ko": "열차 체력 증가 (+ 80)",
+    "Name_En": "Training HP Up (+ 80)",
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,
@@ -26,8 +26,8 @@
   {
     "Id": "BATTLE_DEFENSE",
     "Category": "Battle",
-    "Name_Ko": "열차 방어력 증가 (+ 2)",
-    "Name_En": "Training Defense Up (+ 2)",
+    "Name_Ko": "열차 방어력 증가 (+ 3)",
+    "Name_En": "Training Defense Up (+ 3)",
     "MaxLevel": 5,
     "BaseCost": 100,
     "CostIncreasePerLevel": 50,

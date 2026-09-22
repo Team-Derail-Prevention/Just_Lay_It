@@ -8,7 +8,7 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
     private const float CRAFT_SPEED_PERCENT_PER_LEVEL = 0.1f;
     private const int CRAFT_WOOD_COST = 2;
 
-    private const int BONUS_RAIL_COUNT_PER_LEVEL = 2;
+    private const int BONUS_RAIL_COUNT_PER_LEVEL = 3;
 
     private RailBuildViewModel _localRailBuildViewModel;
     private int _sessionCraftedCount;
@@ -167,5 +167,10 @@ public class NetworkRailService : SingletonBase<NetworkRailService>
         }
 
         RequestCraft(RailType.Straight);
+    }
+
+    public int GetCurrentBaseRailCount()
+    {
+        return RailBuildViewModel.INITIAL_STRAIGHT_RAIL_COUNT + GetBonusBaseRailCount();
     }
 }

@@ -11,11 +11,11 @@ public static class TrainStat
 {
 
     //로비
-    private const int LOBBY_HP_STEP = 50;
+    private const int LOBBY_HP_STEP = 100;
     private const int LOBBY_DEFENSE_STEP = 2;
     //인게임
-    private const int INGAME_HP_STEP = 50;
-    private const int INGAME_DEFENSE_STEP = 2;
+    private const int INGAME_HP_STEP = 80;
+    private const int INGAME_DEFENSE_STEP = 3;
 
 
     /// 기본 데이터 + 로비 영구 강화 + 인게임 세션 강화를 모두 합산해 최종 스탯 계산

@@ -13,6 +13,8 @@ public enum RailType
 
 public class RailManager : SingletonBase<RailManager>
 {
+    private const float RAIL_RETURN_RATIO = 0.2f;
+
     [Header("Refs")]
     [SerializeField] private LayerMask _groundLayer;
     [SerializeField] private LayerMask _blockedLayer; // 오브젝트가 올라간 바닥(Default) 레이어
@@ -1078,8 +1080,6 @@ public class RailManager : SingletonBase<RailManager>
         _placedRails.Remove(gridIndex);
         _installedCubes.Remove(gridIndex);
 
-        NetworkRailService.Instance?.ReturnRailToInventory(RailType.Straight);
-
         if (updateNeighbors)
         {
             UpdateNeighborShapes(gridIndex);
@@ -1096,12 +1096,25 @@ public class RailManager : SingletonBase<RailManager>
         if (_placedRails.Count == 0) return;
 
         List<Vector2Int> gridIndices = new List<Vector2Int>(_placedRails.Keys);
+
+        int actualRemovedCount = 0;
         foreach (Vector2Int gridIndex in gridIndices)
         {
+            if (_placedRails.TryGetValue(gridIndex, out PlacedRailInfo info) && !info.IsFixed)
+            {
+                actualRemovedCount++;
+            }
+
             RemoveRail(gridIndex, false);
         }
 
-        Debug.Log("[RailManager] 설치된 레일 전체 회수 완료");
+        int refundCount = Mathf.FloorToInt(actualRemovedCount * RAIL_RETURN_RATIO);
+        for (int i = 0; i < refundCount; i++)
+        {
+            NetworkRailService.Instance?.ReturnRailToInventory(RailType.Straight);
+        }
+
+        Debug.Log($"[RailManager] 설치된 레일 전체 회수 완료 ({actualRemovedCount}개 중 {refundCount}개 반환, {RAIL_RETURN_RATIO * 100}%)");
     }
 
     private void RecheckBlockedTiles()
