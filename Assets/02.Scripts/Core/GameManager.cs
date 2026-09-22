@@ -21,8 +21,7 @@ public class GameManager : SingletonBase<GameManager>
     [SerializeField] private GameStage _currentGameStage = GameStage.Stage1;
 
     [Header("Sandstorm Settings")]
-    private float _sandstormMinIntervalSeconds = 120f;
-    private float _sandstormMaxIntervalSeconds = 240f;
+    private float _sandstormIntervalSeconds = 180f;
     private float _sandstormDurationSeconds = 30f;
 
     private readonly TimeManager _timeManager = new TimeManager();
@@ -621,6 +620,11 @@ public class GameManager : SingletonBase<GameManager>
 
     private void HandleStationEntered(StationObject station, string stationId)
     {
+        if (_isSandstormActive)
+        {
+            ResetSandstormTimer();
+        }
+
         HandleStationArrival(station, stationId);
     }
 
@@ -759,7 +763,11 @@ public class GameManager : SingletonBase<GameManager>
 
             ResumeMonsterSpawning();
             ResumeGameplayTime();
-            StartSandstormCycle();
+            if (_isSandstormActive == true)
+            {
+                StartSandstormCycle();
+            }
+            
 
         }
         finally
@@ -846,7 +854,7 @@ public class GameManager : SingletonBase<GameManager>
         _sandstormIntervalTimer = 0f;
         _sandstormDurationTimer = 0f;
         _isSandstormActive = false;
-        _nextSandstormTime = UnityEngine.Random.Range(_sandstormMinIntervalSeconds, _sandstormMaxIntervalSeconds);
+        _nextSandstormTime = _sandstormIntervalSeconds;
 
         Debug.Log($"[GameManager] 샌드스톰 예약: 현재 플레이 시간 {_playTime:F1}초, {(_playTime + _nextSandstormTime):F1}에 샌드스톰 발동, {_nextSandstormTime:F1}초 후 발동합니다.");
     }
