@@ -794,7 +794,7 @@
   {
     "Id": "StageSelect_PopUp_UI_03",
     "Place": "StageSelectPopup",
-    "Text_Ko": "매 우 어 려 움",
+    "Text_Ko": "매우 어려움",
     "Text_En": "Very Hard",
     "FontSiz_Ko": 36,
     "FontSiz_En": 36
