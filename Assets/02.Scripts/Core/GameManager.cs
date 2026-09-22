@@ -489,7 +489,7 @@ public class GameManager : SingletonBase<GameManager>
         resultData.RailInstalledCount = Save != null ? Save.LifetimeTotalRailInstalled : 0;
         resultData.EarnedCashCount = Save != null ? Save.LifetimeTotalEarnedCash : 0;
         resultData.TotalPlayCount = Save != null ? Save.TotalPlayCount : 0;
-        resultData.TitleMessage = LocalizationManager.Instance.GetText("GameClearResult_PopUp_UI_16");
+        resultData.TitleMessage = LocalizationManager.Instance.GetText("GameClearResult_PopUp_UI_15");
 
         return resultData;
     }

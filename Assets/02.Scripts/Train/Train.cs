@@ -15,8 +15,10 @@ public class Train : MonoBehaviour
 
     [Header("Debuff State")]
     private bool _isFrozen = false;
-    private bool _isElectrified = false;
-    private float _corrosionMultiplier = 1.0f;
+private bool _isElectrified = false;
+private float _freezeSlowRatio = 0f;
+private float _electricDamageReduction = 0f;
+private float _corrosionDefenseReduction = 0f;
 
     [Header("Speed Boost Setting")]
     [SerializeField] private float _connectedSpeedMultiplier = 2.0f; // 레일 완공 시 속도 배율
@@ -51,6 +53,8 @@ public class Train : MonoBehaviour
 
     public float TotalDistance { get { return _totalDistance; } }
 
+    public float FreezeSlowRatio => _freezeSlowRatio;
+    public float ElectricDamageReduction => _electricDamageReduction;
 
     public bool IsMoving
     {
@@ -202,17 +206,13 @@ public class Train : MonoBehaviour
             return;
         }
 
-        int calculateDmg = Mathf.Max(1, damage - _defense);
-        int totalDamage = Mathf.Max(1, Mathf.RoundToInt(calculateDmg * _corrosionMultiplier));
+        int effectiveDefense = Mathf.RoundToInt(_defense * (1f - Mathf.Clamp01(_corrosionDefenseReduction)));
+        int totalDamage = Mathf.Max(1, damage - effectiveDefense);
 
         _currentHp = Mathf.Max(0, _currentHp - totalDamage);
 
-        Debug.Log($"[Train] 기관차 피격! 받은 피해: {totalDamage} (기본 피해: {damage}, 방어력: {_defense}, 받는 데미지 배율: {_corrosionMultiplier}배), 남은 HP: {_currentHp}/{_maxHp}");
+        Debug.Log($"[Train] 기관차 피격! 받은 피해: {totalDamage} (기본 피해: {damage}, 방어력: {_defense} → 부식 적용 후: {effectiveDefense}), 남은 HP: {_currentHp}/{_maxHp}");
 
-        if (_smokeEffect != null && (float)_currentHp / _maxHp <= _smokeThreshold)
-        {
-            if (!_smokeEffect.activeSelf) _smokeEffect.SetActive(true);
-        }
         if (_currentHp <= 0)
         {
             _currentHp = 0;
@@ -338,6 +338,8 @@ public class Train : MonoBehaviour
         switch (debuffType)
         {
             case "Freeze":
+                _freezeSlowRatio = power;
+
                 if (_isFrozen)
                 {
                     _freezeRemainTime = duration;
@@ -349,6 +351,8 @@ public class Train : MonoBehaviour
                 break;
 
             case "Electric":
+                _electricDamageReduction = power;
+
                 if (_isElectrified)
                 {
                     _electricRemainTime = duration;
@@ -359,10 +363,10 @@ public class Train : MonoBehaviour
                 break;
 
             case "Corrosion":
-                if (_corrosionMultiplier > 1.0f)
+                if (_corrosionDefenseReduction > 0f)
                 {
                     _corrosionRemainTime = duration;
-                    _corrosionMultiplier = power;
+                    _corrosionDefenseReduction = power;
                     return;
                 }
                 if (_corrosionCoroutine != null) StopCoroutine(_corrosionCoroutine);
@@ -405,9 +409,9 @@ public class Train : MonoBehaviour
         _electricCoroutine = null;
     }
 
-    private System.Collections.IEnumerator CorrosionRoutine(float duration, float damageMultiplier)
+    private System.Collections.IEnumerator CorrosionRoutine(float duration, float defenseReduction)
     {
-        _corrosionMultiplier = damageMultiplier;
+        _corrosionDefenseReduction = defenseReduction;
         _corrosionRemainTime = duration;
 
         while (_corrosionRemainTime > 0f)
@@ -416,7 +420,7 @@ public class Train : MonoBehaviour
             yield return null;
         }
 
-        _corrosionMultiplier = 1.0f;
+        _corrosionDefenseReduction = 0f;
         _corrosionCoroutine = null;
     }
 

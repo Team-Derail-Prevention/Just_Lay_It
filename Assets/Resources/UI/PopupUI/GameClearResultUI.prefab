@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  _localizationId: GameClearResult_PopUp_UI_05
+  _localizationId: GameClearResult_PopUp_UI_03
   _targetText: {fileID: 5830156789958579138}
 --- !u!1 &1208070609867960091
 GameObject:
@@ -377,7 +377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  _localizationId: GameClearResult_PopUp_UI_07
+  _localizationId: GameClearResult_PopUp_UI_05
   _targetText: {fileID: 8057863268829093113}
 --- !u!1 &1305406224226319853
 GameObject:
@@ -666,7 +666,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  _localizationId: GameClearResult_PopUp_UI_04
+  _localizationId: GameClearResult_PopUp_UI_02
   _targetText: {fileID: 3348345552459582539}
 --- !u!1 &2132755387411958217
 GameObject:
@@ -955,7 +955,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  _localizationId: GameClearResult_PopUp_UI_10
+  _localizationId: GameClearResult_PopUp_UI_8
   _targetText: {fileID: 8500218066501749472}
 --- !u!1 &2206674120486568648
 GameObject:
@@ -1653,7 +1653,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  _localizationId: GameClearResult_PopUp_UI_06
+  _localizationId: GameClearResult_PopUp_UI_04
   _targetText: {fileID: 8073991629008185751}
 --- !u!1 &3478676126035731049
 GameObject:
@@ -2064,7 +2064,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  _localizationId: GameClearResult_PopUp_UI_15
+  _localizationId: GameClearResult_PopUp_UI_12
   _targetText: {fileID: 3256253019655472724}
 --- !u!1 &4616964961723799535
 GameObject:
@@ -3002,7 +3002,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  _localizationId: GameClearResult_PopUp_UI_09
+  _localizationId: GameClearResult_PopUp_UI_07
   _targetText: {fileID: 960223882888149128}
 --- !u!1 &6819056949918219704
 GameObject:
@@ -3154,7 +3154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  _localizationId: GameClearResult_PopUp_UI_08
+  _localizationId: GameClearResult_PopUp_UI_06
   _targetText: {fileID: 1009070842729646500}
 --- !u!1 &7182828915941368951
 GameObject:
@@ -3167,6 +3167,7 @@ GameObject:
   - component: {fileID: 8759472434020636962}
   - component: {fileID: 8565738674704939521}
   - component: {fileID: 485155191011782319}
+  - component: {fileID: 1002814187285672734}
   m_Layer: 5
   m_Name: Text_subtitle
   m_TagString: Untagged
@@ -3221,7 +3222,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "00 \uB09C\uC774\uB3C4 \uD2B9\uC218 \uD074\uB9AC\uC5B4\uB97C \uC131\uACF5\uD558\uC168\uC2B5\uB2C8\uB2E4.\n"
+  m_text: "\uBAA8\uB4E0 \uB09C\uC774\uB3C4 \uD074\uB9AC\uC5B4 \uB2EC\uC131!"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 997aa9eb87106b748b6edd23318a87a4, type: 2}
   m_sharedMaterial: {fileID: -8422321618502442864, guid: 997aa9eb87106b748b6edd23318a87a4, type: 2}
@@ -3293,6 +3294,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &1002814187285672734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7182828915941368951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  _localizationId: GameClearResult_PopUp_UI_15
+  _targetText: {fileID: 485155191011782319}
 --- !u!1 &7648302732805220166
 GameObject:
   m_ObjectHideFlags: 0
@@ -3718,7 +3733,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  _localizationId: GameClearResult_PopUp_UI_12
+  _localizationId: GameClearResult_PopUp_UI_10
   _targetText: {fileID: 8004796296674996148}
 --- !u!1 &8009206633679549185
 GameObject:
@@ -3945,7 +3960,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  _localizationId: GameClearResult_PopUp_UI_03
+  _localizationId: GameClearResult_PopUp_UI_01
   _targetText: {fileID: 6429742120947806330}
 --- !u!1 &8400191822061929432
 GameObject:
@@ -4164,7 +4179,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c687a3b2dd578a49bda320ec0f7b50d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  _localizationId: GameClearResult_PopUp_UI_11
+  _localizationId: GameClearResult_PopUp_UI_9
   _targetText: {fileID: 3038515292204249822}
 --- !u!1 &9104489968318181789
 GameObject:

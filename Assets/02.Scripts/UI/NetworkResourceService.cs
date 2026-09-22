@@ -30,24 +30,6 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
     public int SessionTotalWoodCollected => _sessionTotalWoodCollected;
     public int SessionTotalStoneCollected => _sessionTotalStoneCollected;
 
-    private void OnEnable()
-    {
-        if (UpgradeEventHub.Instance != null)
-        {
-            UpgradeEventHub.Instance.OnLobbyUpgraded += OnLobbyUpgraded;
-            UpgradeEventHub.Instance.OnInGameUpgraded += OnInGameUpgraded;
-        }
-    }
-
-    private void OnDisable()
-    {
-        if (UpgradeEventHub.Instance != null)
-        {
-            UpgradeEventHub.Instance.OnLobbyUpgraded -= OnLobbyUpgraded;
-            UpgradeEventHub.Instance.OnInGameUpgraded -= OnInGameUpgraded;
-        }
-    }
-
     private void OnLobbyUpgraded(string slotDataId, int newLevel)
     {
         if (slotDataId == "LOBBY_BASE_CARGO_LIMIT" && ResourceStatusEventHub.Instance != null)
@@ -100,6 +82,12 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         {
             MoneyRequestEventHub.Instance.OnRequestSpendMoney += OnRequestSpendMoney;
         }
+
+        if (UpgradeEventHub.Instance != null)
+        {
+            UpgradeEventHub.Instance.OnLobbyUpgraded += OnLobbyUpgraded;
+            UpgradeEventHub.Instance.OnInGameUpgraded += OnInGameUpgraded;
+        }
     }
 
     private void OnDestroy()
@@ -109,6 +97,12 @@ public class NetworkResourceService : SingletonBase<NetworkResourceService>
         if (MoneyRequestEventHub.Instance != null)
         {
             MoneyRequestEventHub.Instance.OnRequestSpendMoney -= OnRequestSpendMoney;
+        }
+
+        if (UpgradeEventHub.Instance != null)
+        {
+            UpgradeEventHub.Instance.OnLobbyUpgraded -= OnLobbyUpgraded;
+            UpgradeEventHub.Instance.OnInGameUpgraded -= OnInGameUpgraded;
         }
     }
 
