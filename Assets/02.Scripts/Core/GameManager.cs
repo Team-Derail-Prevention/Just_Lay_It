@@ -666,6 +666,8 @@ public class GameManager : SingletonBase<GameManager>
         StopAndDespawnMonsters();
         RemovePlayerPlacedRails();
 
+        Rail?.ResetAllStationTracking();
+
         RemoveCompletedStations();
         NetworkTrainCargeService?.UnloadAllCitizens();
 
