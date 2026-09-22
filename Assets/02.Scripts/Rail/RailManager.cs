@@ -1282,6 +1282,7 @@ public class RailManager : SingletonBase<RailManager>
         _isStationRouteConnected = false;
         _installedRailPath.Clear();
 
+        TrainManager.Instance?.SetTrainSpeedBoost(false);
         if (dirRoot == null)
         {
             return;
