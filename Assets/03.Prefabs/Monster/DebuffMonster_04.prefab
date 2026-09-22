@@ -170,7 +170,7 @@ GameObject:
   - component: {fileID: 8969029064315857464}
   - component: {fileID: 2517396133912887936}
   - component: {fileID: 3287355816610902059}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DebuffMonster_04
   m_TagString: Monster
   m_Icon: {fileID: 0}
