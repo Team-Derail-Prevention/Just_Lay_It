@@ -33,6 +33,7 @@ public class TrainManager : SingletonBase<TrainManager>
     private Train _activeTrain;
     private Vector3 _lastEnterDirection = Vector3.forward;
 
+    private int _currentWaypointIndex = 0;
 
     public static event Action<int> OnTrainStopWarning;
     // 게임오버 시간 초
@@ -507,5 +508,8 @@ public class TrainManager : SingletonBase<TrainManager>
             _activeTrain.SetSpeedBoost(active);
         }
     }
-
+    public void ResetPathIndex()
+    {
+        _currentWaypointIndex = 0;
+    }
 }

@@ -30,6 +30,7 @@ public class RailManager : SingletonBase<RailManager>
     [Header("Installed Rail Order (Train Path)")]
     [SerializeField] private List<Transform> _installedRailPath = new List<Transform>();
 
+
     public float GhostAlpha { get { return _ghostAlpha; } }
 
     public bool IsPlaceModeActive { get { return _isPlaceModeActive; } }
@@ -61,6 +62,7 @@ public class RailManager : SingletonBase<RailManager>
     private Transform _currentDepartureGateRoot;
 
     private HashSet<Vector2Int> _installedCubes = new HashSet<Vector2Int>();
+    private HashSet<Transform> _visitedStationRoots = new HashSet<Transform>();
 
     private struct PlacedRailInfo
     {
@@ -130,7 +132,7 @@ public class RailManager : SingletonBase<RailManager>
 
     private void OnDisable()
     {
-        GameManager.Instance.OnGameStateChanged += StopPlaceMode;
+        GameManager.Instance.OnGameStateChanged -= StopPlaceMode;
     }
 
     private void OnDestroy()
@@ -1172,6 +1174,11 @@ public class RailManager : SingletonBase<RailManager>
             {
                 Transform touchedRail = hitTrans.name.Contains("AutoSpawned") ? hitTrans : hitTrans.parent;
                 Transform dirRoot = touchedRail.parent;
+                if ((dirRoot != null && _visitedStationRoots.Contains(dirRoot)) ||
+                    (touchedRail.parent != null && _visitedStationRoots.Contains(touchedRail.parent)))
+                {
+                    continue;
+                }
 
                 if (_currentDepartureGateRoot != null && (dirRoot == _currentDepartureGateRoot || touchedRail.IsChildOf(_currentDepartureGateRoot)))
                 {
@@ -1219,6 +1226,12 @@ public class RailManager : SingletonBase<RailManager>
                         }
                     }
                 }
+                if (dirRoot != null && !_visitedStationRoots.Contains(dirRoot))
+                {
+                    _visitedStationRoots.Add(dirRoot);
+                }
+
+                break;
             }
         }
 
@@ -1246,18 +1259,21 @@ public class RailManager : SingletonBase<RailManager>
             //레일 전체 연결 완료 -> 기차 속도 부스트 적용
             TrainManager.Instance?.SetTrainSpeedBoost(true);
         }
+
+
     }
 
     public void InitStartingRailPath(Transform dirRoot)
     {
         _currentDepartureGateRoot = dirRoot;
         _isStationRouteConnected = false;
+        _installedRailPath.Clear();
+
         if (dirRoot == null)
         {
-            _installedRailPath.Clear();
             return;
-
         }
+
 
         StationObject stationObj = dirRoot.GetComponentInParent<StationObject>();
         CentralTerminal terminalObj = dirRoot.GetComponentInParent<CentralTerminal>();
@@ -1275,7 +1291,26 @@ public class RailManager : SingletonBase<RailManager>
             _departureStationRoot = dirRoot.parent != null ? dirRoot.parent : dirRoot;
         }
 
-        RebuildInstalledRailPath();
+        if (!_visitedStationRoots.Contains(dirRoot))
+        {
+            _visitedStationRoots.Add(dirRoot);
+        }
+        if (_departureStationRoot != null && !_visitedStationRoots.Contains(_departureStationRoot))
+        {
+            _visitedStationRoots.Add(_departureStationRoot);
+        }
+
+        for (int i = 0; i < dirRoot.childCount; i++)
+        {
+            Transform rail = dirRoot.GetChild(i);
+            _installedRailPath.Add(rail);
+        }
+        if (TrainManager.Instance != null)
+        {
+            TrainManager.Instance.ResetPathIndex();
+            TrainManager.Instance.GetWaypoint(0);
+        }
+
         Debug.Log($"[RailManager] 시작 출구 레일 {_installedRailPath.Count}개 등록 완료");
     }
 
@@ -1481,4 +1516,11 @@ public class RailManager : SingletonBase<RailManager>
 
         Debug.Log($"[RailManager] 고스트 레일 데이터 동기화 완료 (제거된 찌꺼기: {keysToRemove.Count}개)");
     }
+
+    public void ResetAllStationTracking()
+    {
+        _visitedStationRoots?.Clear();
+        Debug.Log("[Rail] 모든 역 추적 및 오토스폰 방어 데이터가 초기화되었습니다.");
+    }
+
 }
