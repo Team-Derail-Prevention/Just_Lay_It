@@ -70,10 +70,26 @@ public class NetworkGachaService : SingletonBase<NetworkGachaService>
         if (_localVm == null)
         {
             _localVm = new GachaViewModel();
-            _localVm.SetRerollCount(REROLL_COUNT_DEFAULT, REROLL_COUNT_DEFAULT);
+
+            int initialMax = GetRerollCountMaxFromUpgrade();
+            _localVm.SetRerollCount(initialMax, initialMax);
         }
 
         return _localVm;
+    }
+
+    private int GetRerollCountMaxFromUpgrade()
+    {
+        if (NetworkUpgradeService.Instance == null)
+        {
+            return REROLL_COUNT_DEFAULT;
+        }
+
+        UpgradeViewModel upgradeVm = NetworkUpgradeService.Instance.GetLocalUpgradeViewModel();
+        UpgradeSlotViewModel slotVm = upgradeVm?.GetSlot("LOBBY_GACHA_REROLL");
+        int level = slotVm != null ? slotVm.CurrentLevel : 0;
+
+        return REROLL_COUNT_DEFAULT + level;
     }
 
     public void ResetRun()
