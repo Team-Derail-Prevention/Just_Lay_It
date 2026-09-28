@@ -105,6 +105,7 @@ public class HudTrainStatusUI : UIBase
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnCountSandStorm += OnCountSandStorm_GameManager;
+            GameManager.Instance.OnGameStateChanged += OnGameStateChanged_GameManager;
         }
 
         RefreshStageText();
@@ -131,15 +132,22 @@ public class HudTrainStatusUI : UIBase
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnCountSandStorm -= OnCountSandStorm_GameManager;
+            GameManager.Instance.OnGameStateChanged -= OnGameStateChanged_GameManager;
         }
 
-        _dengerCoroutine = null;
+        HideDenger();
+        HideHpWarning();
+    }
 
-        if (_hpWarningCoroutine != null)
+    private void OnGameStateChanged_GameManager(GameState newState)
+    {
+        if (newState == GameState.Playing)
         {
-            StopCoroutine(_hpWarningCoroutine);
-            _hpWarningCoroutine = null;
+            return;
         }
+
+        HideDenger();
+        HideHpWarning();
     }
 
     private void OnCountSandStorm_GameManager(float durationSeconds)
@@ -171,6 +179,20 @@ public class HudTrainStatusUI : UIBase
         _dengerCoroutine = null;
     }
 
+    private void HideDenger()
+    {
+        if (_dengerCoroutine != null)
+        {
+            StopCoroutine(_dengerCoroutine);
+            _dengerCoroutine = null;
+        }
+
+        if (Denger != null)
+        {
+            Denger.SetActive(false);
+        }
+    }
+
     private void OnLowHpWarning_TrainStatusEventHub()
     {
         ShowHpWarning();
@@ -198,6 +220,20 @@ public class HudTrainStatusUI : UIBase
 
         Denger2.SetActive(false);
         _hpWarningCoroutine = null;
+    }
+
+    private void HideHpWarning()
+    {
+        if (_hpWarningCoroutine != null)
+        {
+            StopCoroutine(_hpWarningCoroutine);
+            _hpWarningCoroutine = null;
+        }
+
+        if (Denger2 != null)
+        {
+            Denger2.SetActive(false);
+        }
     }
 
     private void OnLanguageChanged_LocalizationEventHub(LanguageType language)
