@@ -213,6 +213,11 @@ private float _corrosionDefenseReduction = 0f;
 
         Debug.Log($"[Train] 기관차 피격! 받은 피해: {totalDamage} (기본 피해: {damage}, 방어력: {_defense} → 부식 적용 후: {effectiveDefense}), 남은 HP: {_currentHp}/{_maxHp}");
 
+        if (_smokeEffect != null && (float)_currentHp / _maxHp <= _smokeThreshold)
+        {
+            if (!_smokeEffect.activeSelf) _smokeEffect.SetActive(true);
+        }
+
         if (_currentHp <= 0)
         {
             _currentHp = 0;
