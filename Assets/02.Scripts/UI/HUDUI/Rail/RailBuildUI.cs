@@ -45,6 +45,7 @@ public class RailBuildUI : UIBase
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnCountSandStorm += HandleSandstormStarted;
+            GameManager.Instance.OnEndSandStorm += HandleSandstormEnded;
         }
     }
 
@@ -53,6 +54,7 @@ public class RailBuildUI : UIBase
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnCountSandStorm -= HandleSandstormStarted;
+            GameManager.Instance.OnEndSandStorm -= HandleSandstormEnded;
         }
 
         _isSandstormCountingDown = false;
@@ -69,16 +71,27 @@ public class RailBuildUI : UIBase
 
         if (_sandstormRemainingTime <= 0f)
         {
-            _sandstormRemainingTime = 0f;
-            _isSandstormCountingDown = false;
-
-            if (Warning_Box != null)
-            {
-                Warning_Box.SetActive(false);
-            }
+            StopSandstormCountdown();
+            return;
         }
 
         UpdateCountdownText();
+    }
+
+    private void HandleSandstormEnded()
+    {
+        StopSandstormCountdown();
+    }
+
+    private void StopSandstormCountdown()
+    {
+        _sandstormRemainingTime = 0f;
+        _isSandstormCountingDown = false;
+
+        if (Warning_Box != null)
+        {
+            Warning_Box.SetActive(false);
+        }
     }
 
     private void HandleSandstormStarted(float durationSeconds)
